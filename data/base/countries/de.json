@@ -1,0 +1,40 @@
+{
+  "code": "DE",
+  "name": "Deutschland",
+  "currency": "EUR",
+  "validFrom": 2026,
+  "activation": "Playable",
+  "season": {
+    "startMonth": 7,
+    "firstMatchday": "08-15",
+    "winterBreakStart": "12-21",
+    "winterBreakEnd": "01-14",
+    "matchDay": "Saturday"
+  },
+  "squad": { "maxSquad": 30, "benchSize": 9, "substitutions": 5 },
+  "discipline": { "yellowCardsForSuspension": 5, "redCardBanMin": 1, "redCardBanMax": 3, "secondYellowBan": 1 },
+  "levels": [
+    {
+      "level": 1,
+      "divisions": [
+        {
+          "id": "DE1", "name": "1. Liga", "teams": 18, "rounds": 2,
+          "points": { "win": 3, "draw": 1, "loss": 0 },
+          "tieBreakers": [ "GoalDifference", "GoalsFor", "HeadToHead", "AwayGoals" ],
+          "promotion": 0, "relegation": 3
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "divisions": [
+        {
+          "id": "DE2", "name": "2. Liga", "teams": 18, "rounds": 2,
+          "points": { "win": 3, "draw": 1, "loss": 0 },
+          "tieBreakers": [ "GoalDifference", "GoalsFor", "HeadToHead", "AwayGoals" ],
+          "promotion": 3, "relegation": 0
+        }
+      ]
+    }
+  ]
+}

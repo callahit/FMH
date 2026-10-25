@@ -1,0 +1,105 @@
+using Fmh.Core.Data;
+
+namespace Fmh.Core.Model;
+
+/// <summary>Der komplette Spielstand.</summary>
+public sealed class World
+{
+    public const int CurrentSaveVersion = 1;
+
+    public int SaveVersion { get; set; } = CurrentSaveVersion;
+    public ulong Seed { get; set; }
+    public ulong[] RngState { get; set; } = Array.Empty<ulong>();
+    public DateOnly Date { get; set; }
+    public int SeasonYear { get; set; }
+    public WorldRules Rules { get; set; } = new();
+    /// <summary>Datenpakete, aus denen der Spielstand erzeugt wurde (Id und Version).</summary>
+    public List<string> Packages { get; set; } = new();
+    /// <summary>Kopie der Länderkonfigurationen, damit ein Spielstand unabhängig von Paket-Updates bleibt.</summary>
+    public List<CountryConfig> Countries { get; set; } = new();
+
+    public Dictionary<int, Player> Players { get; set; } = new();
+    public Dictionary<int, Club> Clubs { get; set; } = new();
+    public List<League> Leagues { get; set; } = new();
+    public List<Referee> Referees { get; set; } = new();
+    public List<Manager> Managers { get; set; } = new();
+    public List<Message> Messages { get; set; } = new();
+    public List<SeasonRecord> History { get; set; } = new();
+
+    /// <summary>Alle Ligen der laufenden Saison sind beendet und ausgewertet; der Wechsel folgt zum Saisonstart.</summary>
+    public bool SeasonFinished { get; set; }
+    public int AutosaveCounter { get; set; }
+
+    public int NextPlayerId { get; set; } = 1;
+    public int NextFixtureId { get; set; } = 1;
+    public int NextMessageId { get; set; } = 1;
+
+    public League LeagueOf(Club club) => Leagues.First(l => l.Id == club.LeagueId);
+
+    public League League(string id) => Leagues.First(l => l.Id == id);
+
+    public IEnumerable<Player> SquadOf(Club club) => club.PlayerIds.Select(id => Players[id]);
+
+    public CountryConfig Country(string code) => Countries.First(c => c.Code == code);
+}
+
+/// <summary>Weltregeln gelten für den ganzen Spielstand und alle Manager gleich (Kapitel 2).</summary>
+public sealed class WorldRules
+{
+    /// <summary>Multiplikator der Verletzungshäufigkeit (0,5 = selten, 1 = normal, 2 = oft).</summary>
+    public double InjuryFrequency { get; set; } = 1.0;
+    public bool Ironman { get; set; }
+    public int AutosaveSlots { get; set; } = 3;
+}
+
+public enum AttributeDisplay { Numbers, Bars, Stars, StrengthOnly }
+public enum MatchDisplayMode { Commentary, Ticker, Instant }
+public enum WageDisplay { Week, Month, Year }
+
+/// <summary>Persönliche Einstellungen eines menschlichen Managers (Kapitel 2).</summary>
+public sealed class ManagerProfile
+{
+    public WageDisplay WageDisplay { get; set; } = WageDisplay.Month;
+    public AttributeDisplay AttributeDisplay { get; set; } = AttributeDisplay.Numbers;
+    public MatchDisplayMode MatchDisplay { get; set; } = MatchDisplayMode.Commentary;
+    /// <summary>Spieltempo 1 ("Echtzeit-Feeling") bis 5 ("Blitz").</summary>
+    public int MatchSpeed { get; set; } = 3;
+    public bool PauseOnGoals { get; set; } = true;
+    public bool PauseOnRedCards { get; set; } = true;
+    public string Theme { get; set; } = "Klassik";
+    public string Language { get; set; } = "de";
+}
+
+public sealed class Manager
+{
+    public int Id { get; set; }
+    public string Name { get; set; } = "";
+    public bool Human { get; set; }
+    public int? ClubId { get; set; }
+    public int Reputation { get; set; } = 5;
+    public ManagerProfile Profile { get; set; } = new();
+}
+
+public enum MessageType { Info, Board, Medical, Discipline, Result, Season }
+
+public sealed class Message
+{
+    public int Id { get; set; }
+    public int ManagerId { get; set; }
+    public DateOnly Date { get; set; }
+    public MessageType Type { get; set; }
+    public string Sender { get; set; } = "";
+    public string Subject { get; set; } = "";
+    public string Body { get; set; } = "";
+    public bool Read { get; set; }
+}
+
+public sealed class SeasonRecord
+{
+    public int SeasonYear { get; set; }
+    public string LeagueId { get; set; } = "";
+    public string LeagueName { get; set; } = "";
+    public int ChampionId { get; set; }
+    public string ChampionName { get; set; } = "";
+    public List<int> FinalOrder { get; set; } = new();
+}

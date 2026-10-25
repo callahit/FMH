@@ -1,0 +1,122 @@
+{
+  "stepSeconds": 6,
+  "restartSeconds": 6,
+  "foulSeconds": 25,
+  "goalSeconds": 50,
+  "setPieceSeconds": 20,
+  "maxStepsPerPhase": 7,
+  "duelSlope": 0.14,
+  "homeAdvantage": 0.04,
+  "passBaseByRow": [
+    0.97,
+    0.96,
+    0.94,
+    0.89,
+    0.76,
+    0.5,
+    0.36
+  ],
+  "longPassPenalty": 0.12,
+  "dribbleBase": 0.52,
+  "crossBase": 0.42,
+  "aerialBase": 0.45,
+  "actionWeights": [
+    [
+      0.92,
+      0.08,
+      0,
+      0
+    ],
+    [
+      0.88,
+      0.12,
+      0,
+      0
+    ],
+    [
+      0.82,
+      0.18,
+      0,
+      0
+    ],
+    [
+      0.72,
+      0.22,
+      0.06,
+      0
+    ],
+    [
+      0.58,
+      0.22,
+      0.16,
+      0.025
+    ],
+    [
+      0.42,
+      0.22,
+      0.24,
+      0.065
+    ],
+    [
+      0.45,
+      0.15,
+      0,
+      0.3
+    ]
+  ],
+  "xgCentralByRow": [
+    0,
+    0,
+    0,
+    0.015,
+    0.03,
+    0.066,
+    0.16
+  ],
+  "xgWideByRow": [
+    0,
+    0,
+    0,
+    0.01,
+    0.02,
+    0.05,
+    0.12
+  ],
+  "headerXg": 0.1,
+  "oneOnOneXg": 0.38,
+  "oneOnOneChance": 0.22,
+  "penaltyXg": 0.76,
+  "freeKickXg": 0.06,
+  "directFreeKickShare": 0.45,
+  "blockChance": 0.22,
+  "wallBlockChance": 0.25,
+  "onTargetBase": 0.48,
+  "postChance": 0.03,
+  "finishingSlope": 0.05,
+  "keeperSlope": 0.045,
+  "pressureSlope": 0.03,
+  "cornerFromBlock": 0.45,
+  "cornerFromSave": 0.25,
+  "cornerFromCross": 0.32,
+  "cornerHeaderChance": 0.35,
+  "cornerHeaderXg": 0.09,
+  "foulPerDuel": 0.17,
+  "yellowPerFoul": 0.155,
+  "redPerFoul": 0.0025,
+  "boxFoulShare": 0.3,
+  "edgeFoulShare": 0.08,
+  "offsideBase": 0.032,
+  "injuryPerFoul": 0.012,
+  "injuryPerPhase": 0.0003,
+  "conditionPerSecond": 0.0055,
+  "conditionPerAction": 0.12,
+  "counterChance": 0.45,
+  "counterBonus": 1.2,
+  "gegenpressingRegain": 0.15,
+  "recycleChance": 0.5,
+  "aiSubCondition": 66,
+  "aiEarliestSubMinute": 56,
+  "gradeBase": 3.6,
+  "gradeScale": 1,
+  "gradeMinMinutes": 30
+}

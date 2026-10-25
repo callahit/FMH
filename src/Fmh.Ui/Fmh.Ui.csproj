@@ -1,0 +1,14 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>Fmh.Ui</RootNamespace>
+    <AssemblyName>fmh</AssemblyName>
+  </PropertyGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Fmh.Core\Fmh.Core.csproj" />
+    <ProjectReference Include="..\Fmh.MatchEngine\Fmh.MatchEngine.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="..\..\data\**\*" LinkBase="data" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>
