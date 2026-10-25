@@ -1,0 +1,1154 @@
+[
+ {
+  "id": "442",
+  "name": "4-4-2 flach",
+  "slots": [
+   {
+    "position": "GK",
+    "col": 2,
+    "row": 0,
+    "duty": "Defend"
+   },
+   {
+    "position": "DL",
+    "col": 0,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "DC",
+    "col": 1,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 3,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DR",
+    "col": 4,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "ML",
+    "col": 0,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "MC",
+    "col": 1,
+    "row": 3,
+    "duty": "Defend"
+   },
+   {
+    "position": "MC",
+    "col": 3,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "MR",
+    "col": 4,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "ST",
+    "col": 1,
+    "row": 5,
+    "duty": "Attack"
+   },
+   {
+    "position": "ST",
+    "col": 3,
+    "row": 5,
+    "duty": "Support"
+   }
+  ]
+ },
+ {
+  "id": "442D",
+  "name": "4-4-2 Raute",
+  "slots": [
+   {
+    "position": "GK",
+    "col": 2,
+    "row": 0,
+    "duty": "Defend"
+   },
+   {
+    "position": "DL",
+    "col": 0,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "DC",
+    "col": 1,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 3,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DR",
+    "col": 4,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "DM",
+    "col": 2,
+    "row": 2,
+    "duty": "Defend"
+   },
+   {
+    "position": "MC",
+    "col": 1,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "MC",
+    "col": 3,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "AMC",
+    "col": 2,
+    "row": 4,
+    "duty": "Attack"
+   },
+   {
+    "position": "ST",
+    "col": 1,
+    "row": 5,
+    "duty": "Attack"
+   },
+   {
+    "position": "ST",
+    "col": 3,
+    "row": 5,
+    "duty": "Attack"
+   }
+  ]
+ },
+ {
+  "id": "433",
+  "name": "4-3-3",
+  "slots": [
+   {
+    "position": "GK",
+    "col": 2,
+    "row": 0,
+    "duty": "Defend"
+   },
+   {
+    "position": "DL",
+    "col": 0,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "DC",
+    "col": 1,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 3,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DR",
+    "col": 4,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "DM",
+    "col": 2,
+    "row": 2,
+    "duty": "Defend"
+   },
+   {
+    "position": "MC",
+    "col": 1,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "MC",
+    "col": 3,
+    "row": 3,
+    "duty": "Attack"
+   },
+   {
+    "position": "AML",
+    "col": 0,
+    "row": 4,
+    "duty": "Attack"
+   },
+   {
+    "position": "AMR",
+    "col": 4,
+    "row": 4,
+    "duty": "Attack"
+   },
+   {
+    "position": "ST",
+    "col": 2,
+    "row": 5,
+    "duty": "Attack"
+   }
+  ]
+ },
+ {
+  "id": "433DM",
+  "name": "4-3-3 mit Doppelsechs",
+  "slots": [
+   {
+    "position": "GK",
+    "col": 2,
+    "row": 0,
+    "duty": "Defend"
+   },
+   {
+    "position": "DL",
+    "col": 0,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "DC",
+    "col": 1,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 3,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DR",
+    "col": 4,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "DM",
+    "col": 1,
+    "row": 2,
+    "duty": "Defend"
+   },
+   {
+    "position": "DM",
+    "col": 3,
+    "row": 2,
+    "duty": "Support"
+   },
+   {
+    "position": "MC",
+    "col": 2,
+    "row": 3,
+    "duty": "Attack"
+   },
+   {
+    "position": "AML",
+    "col": 0,
+    "row": 4,
+    "duty": "Attack"
+   },
+   {
+    "position": "AMR",
+    "col": 4,
+    "row": 4,
+    "duty": "Attack"
+   },
+   {
+    "position": "ST",
+    "col": 2,
+    "row": 5,
+    "duty": "Attack"
+   }
+  ]
+ },
+ {
+  "id": "4231",
+  "name": "4-2-3-1",
+  "slots": [
+   {
+    "position": "GK",
+    "col": 2,
+    "row": 0,
+    "duty": "Defend"
+   },
+   {
+    "position": "DL",
+    "col": 0,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "DC",
+    "col": 1,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 3,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DR",
+    "col": 4,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "DM",
+    "col": 1,
+    "row": 2,
+    "duty": "Defend"
+   },
+   {
+    "position": "DM",
+    "col": 3,
+    "row": 2,
+    "duty": "Support"
+   },
+   {
+    "position": "AML",
+    "col": 0,
+    "row": 4,
+    "duty": "Support"
+   },
+   {
+    "position": "AMC",
+    "col": 2,
+    "row": 4,
+    "duty": "Attack"
+   },
+   {
+    "position": "AMR",
+    "col": 4,
+    "row": 4,
+    "duty": "Support"
+   },
+   {
+    "position": "ST",
+    "col": 2,
+    "row": 5,
+    "duty": "Attack"
+   }
+  ]
+ },
+ {
+  "id": "4141",
+  "name": "4-1-4-1",
+  "slots": [
+   {
+    "position": "GK",
+    "col": 2,
+    "row": 0,
+    "duty": "Defend"
+   },
+   {
+    "position": "DL",
+    "col": 0,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "DC",
+    "col": 1,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 3,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DR",
+    "col": 4,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "DM",
+    "col": 2,
+    "row": 2,
+    "duty": "Defend"
+   },
+   {
+    "position": "ML",
+    "col": 0,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "MC",
+    "col": 1,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "MC",
+    "col": 3,
+    "row": 3,
+    "duty": "Attack"
+   },
+   {
+    "position": "MR",
+    "col": 4,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "ST",
+    "col": 2,
+    "row": 5,
+    "duty": "Attack"
+   }
+  ]
+ },
+ {
+  "id": "451",
+  "name": "4-5-1",
+  "slots": [
+   {
+    "position": "GK",
+    "col": 2,
+    "row": 0,
+    "duty": "Defend"
+   },
+   {
+    "position": "DL",
+    "col": 0,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "DC",
+    "col": 1,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 3,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DR",
+    "col": 4,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "ML",
+    "col": 0,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "MC",
+    "col": 1,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "MC",
+    "col": 2,
+    "row": 3,
+    "duty": "Defend"
+   },
+   {
+    "position": "MC",
+    "col": 3,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "MR",
+    "col": 4,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "ST",
+    "col": 2,
+    "row": 5,
+    "duty": "Attack"
+   }
+  ]
+ },
+ {
+  "id": "4321",
+  "name": "4-3-2-1 Tannenbaum",
+  "slots": [
+   {
+    "position": "GK",
+    "col": 2,
+    "row": 0,
+    "duty": "Defend"
+   },
+   {
+    "position": "DL",
+    "col": 0,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "DC",
+    "col": 1,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 3,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DR",
+    "col": 4,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "MC",
+    "col": 1,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "DM",
+    "col": 2,
+    "row": 2,
+    "duty": "Defend"
+   },
+   {
+    "position": "MC",
+    "col": 3,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "AMC",
+    "col": 1,
+    "row": 4,
+    "duty": "Attack"
+   },
+   {
+    "position": "AMC",
+    "col": 3,
+    "row": 4,
+    "duty": "Attack"
+   },
+   {
+    "position": "ST",
+    "col": 2,
+    "row": 5,
+    "duty": "Attack"
+   }
+  ]
+ },
+ {
+  "id": "4222",
+  "name": "4-2-2-2",
+  "slots": [
+   {
+    "position": "GK",
+    "col": 2,
+    "row": 0,
+    "duty": "Defend"
+   },
+   {
+    "position": "DL",
+    "col": 0,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "DC",
+    "col": 1,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 3,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DR",
+    "col": 4,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "DM",
+    "col": 1,
+    "row": 2,
+    "duty": "Defend"
+   },
+   {
+    "position": "DM",
+    "col": 3,
+    "row": 2,
+    "duty": "Support"
+   },
+   {
+    "position": "AMC",
+    "col": 1,
+    "row": 4,
+    "duty": "Attack"
+   },
+   {
+    "position": "AMC",
+    "col": 3,
+    "row": 4,
+    "duty": "Support"
+   },
+   {
+    "position": "ST",
+    "col": 1,
+    "row": 5,
+    "duty": "Attack"
+   },
+   {
+    "position": "ST",
+    "col": 3,
+    "row": 5,
+    "duty": "Attack"
+   }
+  ]
+ },
+ {
+  "id": "4312",
+  "name": "4-3-1-2",
+  "slots": [
+   {
+    "position": "GK",
+    "col": 2,
+    "row": 0,
+    "duty": "Defend"
+   },
+   {
+    "position": "DL",
+    "col": 0,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "DC",
+    "col": 1,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 3,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DR",
+    "col": 4,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "MC",
+    "col": 1,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "MC",
+    "col": 2,
+    "row": 3,
+    "duty": "Defend"
+   },
+   {
+    "position": "MC",
+    "col": 3,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "AMC",
+    "col": 2,
+    "row": 4,
+    "duty": "Attack"
+   },
+   {
+    "position": "ST",
+    "col": 1,
+    "row": 5,
+    "duty": "Attack"
+   },
+   {
+    "position": "ST",
+    "col": 3,
+    "row": 5,
+    "duty": "Support"
+   }
+  ]
+ },
+ {
+  "id": "4411",
+  "name": "4-4-1-1",
+  "slots": [
+   {
+    "position": "GK",
+    "col": 2,
+    "row": 0,
+    "duty": "Defend"
+   },
+   {
+    "position": "DL",
+    "col": 0,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "DC",
+    "col": 1,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 3,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DR",
+    "col": 4,
+    "row": 1,
+    "duty": "Support"
+   },
+   {
+    "position": "ML",
+    "col": 0,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "MC",
+    "col": 1,
+    "row": 3,
+    "duty": "Defend"
+   },
+   {
+    "position": "MC",
+    "col": 3,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "MR",
+    "col": 4,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "AMC",
+    "col": 2,
+    "row": 4,
+    "duty": "Attack"
+   },
+   {
+    "position": "ST",
+    "col": 2,
+    "row": 5,
+    "duty": "Attack"
+   }
+  ]
+ },
+ {
+  "id": "352",
+  "name": "3-5-2",
+  "slots": [
+   {
+    "position": "GK",
+    "col": 2,
+    "row": 0,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 1,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 2,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 3,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "ML",
+    "col": 0,
+    "row": 3,
+    "duty": "Attack"
+   },
+   {
+    "position": "MC",
+    "col": 1,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "DM",
+    "col": 2,
+    "row": 2,
+    "duty": "Defend"
+   },
+   {
+    "position": "MC",
+    "col": 3,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "MR",
+    "col": 4,
+    "row": 3,
+    "duty": "Attack"
+   },
+   {
+    "position": "ST",
+    "col": 1,
+    "row": 5,
+    "duty": "Attack"
+   },
+   {
+    "position": "ST",
+    "col": 3,
+    "row": 5,
+    "duty": "Support"
+   }
+  ]
+ },
+ {
+  "id": "343",
+  "name": "3-4-3",
+  "slots": [
+   {
+    "position": "GK",
+    "col": 2,
+    "row": 0,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 1,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 2,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 3,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "ML",
+    "col": 0,
+    "row": 3,
+    "duty": "Attack"
+   },
+   {
+    "position": "MC",
+    "col": 1,
+    "row": 3,
+    "duty": "Defend"
+   },
+   {
+    "position": "MC",
+    "col": 3,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "MR",
+    "col": 4,
+    "row": 3,
+    "duty": "Attack"
+   },
+   {
+    "position": "AML",
+    "col": 0,
+    "row": 4,
+    "duty": "Attack"
+   },
+   {
+    "position": "ST",
+    "col": 2,
+    "row": 5,
+    "duty": "Attack"
+   },
+   {
+    "position": "AMR",
+    "col": 4,
+    "row": 4,
+    "duty": "Attack"
+   }
+  ]
+ },
+ {
+  "id": "3412",
+  "name": "3-4-1-2",
+  "slots": [
+   {
+    "position": "GK",
+    "col": 2,
+    "row": 0,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 1,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 2,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 3,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "ML",
+    "col": 0,
+    "row": 3,
+    "duty": "Attack"
+   },
+   {
+    "position": "MC",
+    "col": 1,
+    "row": 3,
+    "duty": "Defend"
+   },
+   {
+    "position": "MC",
+    "col": 3,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "MR",
+    "col": 4,
+    "row": 3,
+    "duty": "Attack"
+   },
+   {
+    "position": "AMC",
+    "col": 2,
+    "row": 4,
+    "duty": "Attack"
+   },
+   {
+    "position": "ST",
+    "col": 1,
+    "row": 5,
+    "duty": "Attack"
+   },
+   {
+    "position": "ST",
+    "col": 3,
+    "row": 5,
+    "duty": "Attack"
+   }
+  ]
+ },
+ {
+  "id": "532",
+  "name": "5-3-2",
+  "slots": [
+   {
+    "position": "GK",
+    "col": 2,
+    "row": 0,
+    "duty": "Defend"
+   },
+   {
+    "position": "DL",
+    "col": 0,
+    "row": 1,
+    "duty": "Attack"
+   },
+   {
+    "position": "DC",
+    "col": 1,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 2,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 3,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DR",
+    "col": 4,
+    "row": 1,
+    "duty": "Attack"
+   },
+   {
+    "position": "MC",
+    "col": 1,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "MC",
+    "col": 2,
+    "row": 3,
+    "duty": "Defend"
+   },
+   {
+    "position": "MC",
+    "col": 3,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "ST",
+    "col": 1,
+    "row": 5,
+    "duty": "Attack"
+   },
+   {
+    "position": "ST",
+    "col": 3,
+    "row": 5,
+    "duty": "Support"
+   }
+  ]
+ },
+ {
+  "id": "541",
+  "name": "5-4-1",
+  "slots": [
+   {
+    "position": "GK",
+    "col": 2,
+    "row": 0,
+    "duty": "Defend"
+   },
+   {
+    "position": "DL",
+    "col": 0,
+    "row": 1,
+    "duty": "Attack"
+   },
+   {
+    "position": "DC",
+    "col": 1,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 2,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DC",
+    "col": 3,
+    "row": 1,
+    "duty": "Defend"
+   },
+   {
+    "position": "DR",
+    "col": 4,
+    "row": 1,
+    "duty": "Attack"
+   },
+   {
+    "position": "ML",
+    "col": 0,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "MC",
+    "col": 1,
+    "row": 3,
+    "duty": "Defend"
+   },
+   {
+    "position": "MC",
+    "col": 3,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "MR",
+    "col": 4,
+    "row": 3,
+    "duty": "Support"
+   },
+   {
+    "position": "ST",
+    "col": 2,
+    "row": 5,
+    "duty": "Attack"
+   }
+  ]
+ }
+]

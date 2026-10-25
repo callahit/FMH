@@ -1,0 +1,68 @@
+[
+ {
+  "key": "bruise",
+  "minDays": 2,
+  "maxDays": 7,
+  "weight": 4
+ },
+ {
+  "key": "strain",
+  "minDays": 5,
+  "maxDays": 14,
+  "weight": 5
+ },
+ {
+  "key": "groin",
+  "minDays": 7,
+  "maxDays": 21,
+  "weight": 1.5
+ },
+ {
+  "key": "sprainedAnkle",
+  "minDays": 7,
+  "maxDays": 21,
+  "weight": 3
+ },
+ {
+  "key": "concussion",
+  "minDays": 7,
+  "maxDays": 14,
+  "weight": 0.8
+ },
+ {
+  "key": "hamstring",
+  "minDays": 10,
+  "maxDays": 28,
+  "weight": 3
+ },
+ {
+  "key": "muscleTear",
+  "minDays": 21,
+  "maxDays": 42,
+  "weight": 2
+ },
+ {
+  "key": "ligamentTear",
+  "minDays": 35,
+  "maxDays": 70,
+  "weight": 1
+ },
+ {
+  "key": "meniscus",
+  "minDays": 42,
+  "maxDays": 90,
+  "weight": 0.6
+ },
+ {
+  "key": "brokenFoot",
+  "minDays": 56,
+  "maxDays": 100,
+  "weight": 0.4
+ },
+ {
+  "key": "acl",
+  "minDays": 180,
+  "maxDays": 270,
+  "weight": 0.2
+ }
+]
