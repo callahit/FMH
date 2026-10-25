@@ -1,0 +1,15 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Fmh.Desktop.ViewModels"
+             x:Class="Fmh.Desktop.Views.PlaceholderPageView"
+             x:DataType="vm:PlaceholderPageViewModel">
+  <StackPanel Spacing="12">
+    <TextBlock Classes="h1" Text="{Binding Title}" />
+    <Border Classes="card" MaxWidth="720" HorizontalAlignment="Left">
+      <StackPanel Spacing="8">
+        <TextBlock Text="{Binding Text}" TextWrapping="Wrap" />
+        <TextBlock Text="{Binding Roadmap}" Classes="muted small" />
+      </StackPanel>
+    </Border>
+  </StackPanel>
+</UserControl>

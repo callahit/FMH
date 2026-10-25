@@ -20,8 +20,9 @@
   "Schluss! Das Spiel endet {score}."
  ],
  "stoppage": [
-  "Es gibt {n} Minuten Nachspielzeit.",
-  "Der vierte Offizielle zeigt {n} Minuten Nachspielzeit an."
+  "Nachspielzeit: {n} Min.",
+  "Der vierte Offizielle zeigt {n} Minuten an.",
+  "Die Tafel geht hoch: +{n}."
  ],
  "attack": [
   "{p} treibt den Ball {side} nach vorn.",

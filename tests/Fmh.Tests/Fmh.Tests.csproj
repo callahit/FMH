@@ -4,9 +4,11 @@
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
   <ItemGroup>
-    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
-    <PackageReference Include="xunit" Version="2.5.3" />
-    <PackageReference Include="xunit.runner.visualstudio" Version="2.5.3" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
+    <PackageReference Include="xunit" Version="2.9.3" />
+    <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <PackageReference Include="Avalonia.Headless.XUnit" Version="11.3.22" />
+    <PackageReference Include="Avalonia.Skia" Version="11.3.22" />
   </ItemGroup>
   <ItemGroup>
     <Using Include="Xunit" />
@@ -14,7 +16,7 @@
   <ItemGroup>
     <ProjectReference Include="..\..\src\Fmh.Core\Fmh.Core.csproj" />
     <ProjectReference Include="..\..\src\Fmh.MatchEngine\Fmh.MatchEngine.csproj" />
-    <ProjectReference Include="..\..\src\Fmh.Ui\Fmh.Ui.csproj" />
+    <ProjectReference Include="..\..\src\Fmh.Desktop\Fmh.Desktop.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\data\**\*" LinkBase="data" CopyToOutputDirectory="PreserveNewest" />

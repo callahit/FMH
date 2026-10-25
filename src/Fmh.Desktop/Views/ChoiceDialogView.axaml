@@ -1,0 +1,23 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Fmh.Desktop.ViewModels"
+             xmlns:s="using:Fmh.Desktop.Services"
+             x:Class="Fmh.Desktop.Views.ChoiceDialogView"
+             x:DataType="vm:ChoiceDialogViewModel">
+  <Border Classes="card" MinWidth="460" MaxWidth="760" Padding="20">
+    <DockPanel>
+      <TextBlock DockPanel.Dock="Top" Classes="h2" Text="{Binding Title}" Margin="0,0,0,12" />
+      <Button DockPanel.Dock="Bottom" HorizontalAlignment="Right" Margin="0,12,0,0" Content="{s:L ui.cancel}" Command="{Binding CancelCommand}" />
+      <ListBox x:Name="List" ItemsSource="{Binding Options}" SelectedIndex="{Binding SelectedIndex}" MaxHeight="520">
+        <ListBox.ItemTemplate>
+          <DataTemplate x:DataType="vm:ChoiceOption">
+            <Grid ColumnDefinitions="*,Auto" Background="Transparent" Tapped="OnTapped">
+              <TextBlock Text="{Binding Label}" FontWeight="SemiBold" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="1" Text="{Binding Detail}" Classes="muted small" Margin="16,0,0,0" VerticalAlignment="Center" />
+            </Grid>
+          </DataTemplate>
+        </ListBox.ItemTemplate>
+      </ListBox>
+    </DockPanel>
+  </Border>
+</UserControl>
