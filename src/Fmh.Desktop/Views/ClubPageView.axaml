@@ -1,0 +1,51 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Fmh.Desktop.ViewModels"
+             xmlns:c="using:Fmh.Desktop.Controls"
+             xmlns:s="using:Fmh.Desktop.Services"
+             x:Class="Fmh.Desktop.Views.ClubPageView"
+             x:DataType="vm:ClubPageViewModel">
+  <Grid ColumnDefinitions="340,*" ColumnSpacing="16">
+    <Border Classes="card" VerticalAlignment="Top">
+      <StackPanel Spacing="12">
+        <c:Crest Width="180" Height="206" Primary="{Binding Primary}" Secondary="{Binding Secondary}" Initials="{Binding Initials}" HorizontalAlignment="Center" />
+        <TextBlock Classes="h1" Text="{Binding Name}" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
+        <TextBlock Classes="h3" Text="{s:L club.reputation}" />
+        <c:Meter Value="{Binding Reputation}" Maximum="20" Height="8" Fill="{DynamicResource GoldBrush}" Track="{DynamicResource LineBrush}" />
+      </StackPanel>
+    </Border>
+    <StackPanel Grid.Column="1" Spacing="14">
+      <Border Classes="card">
+        <ItemsControl ItemsSource="{Binding Facts}">
+          <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="2" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:InfoLine">
+              <StackPanel Margin="0,6,16,6">
+                <TextBlock Text="{Binding Label}" Classes="muted small" />
+                <TextBlock Text="{Binding Value}" FontSize="15" FontWeight="SemiBold" />
+              </StackPanel>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </Border>
+      <Border Classes="card">
+        <StackPanel Spacing="6">
+          <TextBlock Classes="h3" Text="{s:L club.history}" />
+          <TextBlock Classes="muted" Text="{s:L club.noHistory}" IsVisible="{Binding NoHistory}" />
+          <ItemsControl ItemsSource="{Binding History}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:HistoryLine">
+                <Grid ColumnDefinitions="80,90,*,140" Margin="0,3">
+                  <TextBlock Text="{Binding Season}" />
+                  <TextBlock Grid.Column="1" Text="{Binding League}" Classes="muted" />
+                  <TextBlock Grid.Column="2" Text="{Binding Champion}" Foreground="{Binding Brush}" FontWeight="SemiBold" />
+                  <TextBlock Grid.Column="3" Text="{Binding Own}" Classes="muted" />
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+    </StackPanel>
+  </Grid>
+</UserControl>

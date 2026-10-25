@@ -1,7 +1,4 @@
-using System.IO.Compression;
-using System.Text.Json;
-using System.Text.Json.Nodes;
-using Fmh.Core.Data;
+using System.Globalization;
 using Fmh.Core.Model;
 
 namespace Fmh.Core.Persistence;
@@ -11,18 +8,17 @@ public sealed class SaveInfo
     public required string Path { get; init; }
     public required string Name { get; init; }
     public DateTime Modified { get; init; }
+    public string ManagerName { get; init; } = "";
+    public string ClubName { get; init; } = "";
+    public string ClubKey { get; init; } = "";
+    public DateOnly? GameDate { get; init; }
+    public bool Valid { get; init; } = true;
 }
 
-/// <summary>
-/// Spielstände als komprimiertes JSON mit Versionsnummer. Ältere Versionen werden beim Laden
-/// schrittweise migriert (Kapitel 12, Stabilität).
-/// </summary>
+/// <summary>Spielstände als SQLite-Datenbanken mit Autosave in rotierenden Slots und Ironman-Modus.</summary>
 public static class SaveGame
 {
     public const string Extension = ".fmh";
-
-    /// <summary>Migrationsschritte: Schlüssel = Ausgangsversion, Wert hebt das JSON um eine Version an.</summary>
-    private static readonly Dictionary<int, Action<JsonObject>> Migrations = new();
 
     public static string DefaultDirectory()
     {
@@ -33,42 +29,9 @@ public static class SaveGame
         return System.IO.Path.Combine(root, "FMH", "saves");
     }
 
-    public static void Save(World world, string path)
-    {
-        var dir = System.IO.Path.GetDirectoryName(path);
-        if (!string.IsNullOrEmpty(dir)) Directory.CreateDirectory(dir);
-        var tmp = path + ".tmp";
-        using (var file = File.Create(tmp))
-        using (var gz = new GZipStream(file, CompressionLevel.Optimal))
-        {
-            JsonSerializer.Serialize(gz, world, Json.Compact);
-        }
-        File.Move(tmp, path, overwrite: true);
-    }
+    public static void Save(World world, string path) => SqliteStore.Save(world, path);
 
-    public static World Load(string path)
-    {
-        using var file = File.OpenRead(path);
-        using var gz = new GZipStream(file, CompressionMode.Decompress);
-        var node = JsonNode.Parse(gz) as JsonObject ?? throw new InvalidDataException("Spielstand ist beschädigt.");
-        Migrate(node);
-        return node.Deserialize<World>(Json.Compact) ?? throw new InvalidDataException("Spielstand ist leer.");
-    }
-
-    public static void Migrate(JsonObject root)
-    {
-        var version = root["saveVersion"]?.GetValue<int>() ?? 0;
-        if (version > World.CurrentSaveVersion)
-            throw new InvalidDataException($"Spielstand-Version {version} ist neuer als dieses Spiel ({World.CurrentSaveVersion}).");
-        while (version < World.CurrentSaveVersion)
-        {
-            if (!Migrations.TryGetValue(version, out var step))
-                throw new InvalidDataException($"Keine Migration von Spielstand-Version {version}.");
-            step(root);
-            version++;
-            root["saveVersion"] = version;
-        }
-    }
+    public static World Load(string path) => SqliteStore.Load(path);
 
     /// <summary>Autosave in rotierenden Slots (Standard 3).</summary>
     public static string Autosave(World world, string directory)
@@ -93,9 +56,28 @@ public static class SaveGame
     public static IReadOnlyList<SaveInfo> List(string directory)
     {
         if (!Directory.Exists(directory)) return Array.Empty<SaveInfo>();
-        return Directory.GetFiles(directory, "*" + Extension)
-            .Select(p => new SaveInfo { Path = p, Name = System.IO.Path.GetFileNameWithoutExtension(p), Modified = File.GetLastWriteTime(p) })
-            .OrderByDescending(s => s.Modified)
-            .ToList();
+        var result = new List<SaveInfo>();
+        foreach (var p in Directory.GetFiles(directory, "*" + Extension))
+        {
+            var name = System.IO.Path.GetFileNameWithoutExtension(p);
+            var modified = File.GetLastWriteTime(p);
+            try
+            {
+                var meta = SqliteStore.ReadMetaTable(p);
+                result.Add(new SaveInfo
+                {
+                    Path = p, Name = name, Modified = modified,
+                    ManagerName = meta.GetValueOrDefault("manager_name", ""),
+                    ClubName = meta.GetValueOrDefault("club_name", ""),
+                    ClubKey = meta.GetValueOrDefault("club_key", ""),
+                    GameDate = meta.TryGetValue("date", out var d) ? DateOnly.ParseExact(d, "yyyy-MM-dd", CultureInfo.InvariantCulture) : null,
+                });
+            }
+            catch (Exception ex) when (ex is Microsoft.Data.Sqlite.SqliteException or InvalidDataException or FormatException)
+            {
+                result.Add(new SaveInfo { Path = p, Name = name, Modified = modified, Valid = false });
+            }
+        }
+        return result.OrderByDescending(s => s.Modified).ToList();
     }
 }

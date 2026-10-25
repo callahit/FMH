@@ -1,0 +1,109 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Fmh.Desktop.ViewModels"
+             xmlns:c="using:Fmh.Desktop.Controls"
+             xmlns:s="using:Fmh.Desktop.Services"
+             x:Class="Fmh.Desktop.Views.LeaguePageView"
+             x:DataType="vm:LeaguePageViewModel">
+  <DockPanel>
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,0,0,12">
+      <TextBlock Classes="h1" Text="{Binding League.Name}" />
+      <TextBlock Grid.Column="1" Classes="muted" Text="{Binding Subtitle}" VerticalAlignment="Bottom" Margin="16,0" />
+      <ItemsControl Grid.Column="2" ItemsSource="{Binding Leagues}" Margin="0,0,12,0">
+        <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="6" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:LeagueChoice">
+            <Button Classes="chip" Content="{Binding Name}"
+                    Command="{Binding $parent[ItemsControl].((vm:LeaguePageViewModel)DataContext).SelectLeagueCommand}" CommandParameter="{Binding}" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <ToggleButton Grid.Column="3" IsChecked="{Binding ShowScorers}" Content="{s:L league.scorers}" />
+    </Grid>
+
+    <Border Classes="card" Padding="10">
+      <Panel>
+        <!-- Tabelle -->
+        <DockPanel IsVisible="{Binding !ShowScorers}">
+          <Grid DockPanel.Dock="Top" ColumnDefinitions="10,40,44,*,44,44,44,44,70,52,52,150" Margin="0,0,0,6">
+            <TextBlock Grid.Column="1" Text="#" Classes="muted small" HorizontalAlignment="Right" Margin="0,0,8,0" />
+            <TextBlock Grid.Column="3" Text="{s:L col.club}" Classes="muted small" />
+            <TextBlock Grid.Column="4" Text="{s:L col.played}" Classes="muted small" HorizontalAlignment="Center" />
+            <TextBlock Grid.Column="5" Text="{s:L col.won}" Classes="muted small" HorizontalAlignment="Center" />
+            <TextBlock Grid.Column="6" Text="{s:L col.drawn}" Classes="muted small" HorizontalAlignment="Center" />
+            <TextBlock Grid.Column="7" Text="{s:L col.lost}" Classes="muted small" HorizontalAlignment="Center" />
+            <TextBlock Grid.Column="8" Text="{s:L col.goals}" Classes="muted small" HorizontalAlignment="Center" />
+            <TextBlock Grid.Column="9" Text="{s:L col.diff}" Classes="muted small" HorizontalAlignment="Center" />
+            <TextBlock Grid.Column="10" Text="{s:L col.points}" Classes="muted small" HorizontalAlignment="Center" />
+            <TextBlock Grid.Column="11" Text="{s:L col.form}" Classes="muted small" Margin="8,0" />
+          </Grid>
+          <TextBlock DockPanel.Dock="Bottom" Classes="muted small" Text="{Binding Legend}" Margin="10,8,0,0" />
+          <ScrollViewer>
+            <ItemsControl ItemsSource="{Binding Table}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:TableRowVm">
+                  <Border Background="{Binding RowBrush}" CornerRadius="6" Padding="0,3">
+                    <Grid ColumnDefinitions="10,40,44,*,44,44,44,44,70,52,52,150">
+                      <Border Width="4" Height="24" CornerRadius="2" Background="{Binding ZoneBrush}" />
+                      <TextBlock Grid.Column="1" Text="{Binding Position}" FontWeight="SemiBold" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,8,0" />
+                      <c:Crest Grid.Column="2" Width="24" Height="28" Primary="{Binding Primary}" Secondary="{Binding Secondary}" Initials="{Binding Initials}" />
+                      <TextBlock Grid.Column="3" Text="{Binding Name}" VerticalAlignment="Center" Margin="6,0" />
+                      <TextBlock Grid.Column="4" Text="{Binding Played}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="5" Text="{Binding Won}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="6" Text="{Binding Drawn}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="7" Text="{Binding Lost}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="8" Text="{Binding Goals}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="9" Text="{Binding Diff}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="10" Text="{Binding Points}" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                      <ItemsControl Grid.Column="11" ItemsSource="{Binding Form}" Margin="8,0" VerticalAlignment="Center">
+                        <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="3" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="vm:FormChip">
+                            <Border Width="20" Height="20" CornerRadius="4" Background="{Binding Brush}">
+                              <TextBlock Text="{Binding Text}" Foreground="White" FontSize="11" FontWeight="Bold" HorizontalAlignment="Center" VerticalAlignment="Center" />
+                            </Border>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </DockPanel>
+
+        <!-- Torjäger -->
+        <DockPanel IsVisible="{Binding ShowScorers}">
+          <Grid DockPanel.Dock="Top" ColumnDefinitions="40,*,*,60,60,60,60" Margin="0,0,0,6">
+            <TextBlock Text="#" Classes="muted small" />
+            <TextBlock Grid.Column="1" Text="{s:L col.name}" Classes="muted small" />
+            <TextBlock Grid.Column="2" Text="{s:L col.club}" Classes="muted small" />
+            <TextBlock Grid.Column="3" Text="{s:L col.goals}" Classes="muted small" />
+            <TextBlock Grid.Column="4" Text="{s:L col.assists}" Classes="muted small" />
+            <TextBlock Grid.Column="5" Text="{s:L col.apps}" Classes="muted small" />
+            <TextBlock Grid.Column="6" Text="{s:L col.grade}" Classes="muted small" />
+          </Grid>
+          <TextBlock DockPanel.Dock="Bottom" Classes="muted" Text="{s:L league.noScorers}" IsVisible="{Binding NoScorers}" />
+          <ScrollViewer>
+            <ItemsControl ItemsSource="{Binding Scorers}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:ScorerVm">
+                  <Grid ColumnDefinitions="40,*,*,60,60,60,60" Margin="0,4">
+                    <TextBlock Text="{Binding Rank}" Classes="muted" />
+                    <TextBlock Grid.Column="1" Text="{Binding Name}" Foreground="{Binding Brush}" FontWeight="SemiBold" />
+                    <TextBlock Grid.Column="2" Text="{Binding Club}" Classes="muted" />
+                    <TextBlock Grid.Column="3" Text="{Binding Goals}" FontWeight="Bold" />
+                    <TextBlock Grid.Column="4" Text="{Binding Assists}" />
+                    <TextBlock Grid.Column="5" Text="{Binding Apps}" />
+                    <TextBlock Grid.Column="6" Text="{Binding Grade}" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </DockPanel>
+      </Panel>
+    </Border>
+  </DockPanel>
+</UserControl>

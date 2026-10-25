@@ -1,0 +1,20 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Fmh.Desktop.ViewModels"
+             xmlns:s="using:Fmh.Desktop.Services"
+             x:Class="Fmh.Desktop.Views.MessageDialogView"
+             x:DataType="vm:MessageDialogViewModel">
+  <Border Classes="card" MinWidth="420" MaxWidth="640" Padding="24">
+    <StackPanel Spacing="12">
+      <TextBlock Classes="h2" Text="{Binding Title}" />
+      <ItemsControl ItemsSource="{Binding Lines}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="x:String">
+            <TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="0,2" />
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <Button Classes="primary" HorizontalAlignment="Right" Content="{s:L ui.ok}" Command="{Binding CloseCommand}" />
+    </StackPanel>
+  </Border>
+</UserControl>

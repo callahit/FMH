@@ -1,0 +1,43 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Fmh.Desktop.ViewModels"
+             xmlns:s="using:Fmh.Desktop.Services"
+             x:Class="Fmh.Desktop.Views.InboxPageView"
+             x:DataType="vm:InboxPageViewModel">
+  <DockPanel>
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,14">
+      <TextBlock Classes="h1" Text="{Binding Title}" />
+      <TextBlock Grid.Column="1" Classes="muted" Text="{Binding CountText}" VerticalAlignment="Bottom" />
+    </Grid>
+    <Grid ColumnDefinitions="2*,3*" ColumnSpacing="16">
+      <Border Classes="card" Padding="6">
+        <ListBox ItemsSource="{Binding Messages}" SelectedItem="{Binding Selected}">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:MessageItem">
+              <Grid ColumnDefinitions="Auto,*,Auto" Margin="2">
+                <Ellipse Width="9" Height="9" Fill="{Binding TypeBrush}" VerticalAlignment="Center" />
+                <StackPanel Grid.Column="1" Margin="10,0">
+                  <TextBlock Text="{Binding Subject}" FontWeight="{Binding Weight}" TextTrimming="CharacterEllipsis" />
+                  <TextBlock Text="{Binding Sender}" Classes="muted small" />
+                </StackPanel>
+                <TextBlock Grid.Column="2" Text="{Binding Date}" Classes="muted small" VerticalAlignment="Top" />
+              </Grid>
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </Border>
+      <Border Grid.Column="1" Classes="card" Padding="24">
+        <StackPanel Spacing="8" IsVisible="{Binding Selected, Converter={x:Static ObjectConverters.IsNotNull}}">
+          <TextBlock Classes="h2" Text="{Binding Selected.Subject}" TextWrapping="Wrap" />
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <Ellipse Width="9" Height="9" Fill="{Binding Selected.TypeBrush}" />
+            <TextBlock Classes="muted small" Text="{Binding Selected.Sender}" />
+            <TextBlock Classes="muted small" Text="{Binding Selected.FullDate}" />
+          </StackPanel>
+          <Separator Margin="0,6" />
+          <TextBlock Text="{Binding Selected.Body}" TextWrapping="Wrap" LineHeight="22" />
+        </StackPanel>
+      </Border>
+    </Grid>
+  </DockPanel>
+</UserControl>

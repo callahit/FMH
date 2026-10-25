@@ -116,9 +116,60 @@ public class SessionTests
     }
 
     [Fact]
+    public void SaveIsAQueryableSqliteDatabase()
+    {
+        var dir = Path.Combine(Path.GetTempPath(), "fmh-test-" + Guid.NewGuid());
+        try
+        {
+            var s = TestData.NewSession();
+            var path = Path.Combine(dir, "db" + SaveGame.Extension);
+            SaveGame.Save(s.World, path);
+            using var con = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={path};Pooling=False");
+            con.Open();
+            using var cmd = con.CreateCommand();
+            cmd.CommandText = "SELECT COUNT(*) FROM players; ";
+            Assert.Equal((long)s.World.Players.Count, (long)cmd.ExecuteScalar()!);
+            cmd.CommandText = "SELECT MAX(a_Finishing) FROM players WHERE main_position = 'ST'";
+            Assert.InRange((long)cmd.ExecuteScalar()!, 10, 20);
+            cmd.CommandText = "SELECT value FROM meta WHERE key = 'club_name'";
+            Assert.Equal(s.HumanClub.Name, (string)cmd.ExecuteScalar()!);
+            con.Close();
+
+            var info = Assert.Single(SaveGame.List(dir));
+            Assert.Equal(s.HumanClub.Name, info.ClubName);
+            Assert.Equal(s.World.Date, info.GameDate);
+        }
+        finally
+        {
+            Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
+            if (Directory.Exists(dir)) Directory.Delete(dir, true);
+        }
+    }
+
+    [Fact]
     public void NewerSaveVersionIsRejected()
     {
-        var node = new System.Text.Json.Nodes.JsonObject { ["saveVersion"] = World.CurrentSaveVersion + 1 };
-        Assert.Throws<InvalidDataException>(() => SaveGame.Migrate(node));
+        var dir = Path.Combine(Path.GetTempPath(), "fmh-test-" + Guid.NewGuid());
+        try
+        {
+            var path = Path.Combine(dir, "x" + SaveGame.Extension);
+            SaveGame.Save(TestData.NewSession().World, path);
+            using (var con = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={path};Pooling=False"))
+            {
+                con.Open();
+                using var cmd = con.CreateCommand();
+                cmd.CommandText = "UPDATE meta SET value = '999' WHERE key = 'schema_version'";
+                cmd.ExecuteNonQuery();
+            }
+            Assert.Throws<InvalidDataException>(() => SaveGame.Load(path));
+            File.WriteAllText(path, "kein Spielstand");
+            Assert.ThrowsAny<Exception>(() => SaveGame.Load(path));
+            Assert.False(Assert.Single(SaveGame.List(dir)).Valid);
+        }
+        finally
+        {
+            Microsoft.Data.Sqlite.SqliteConnection.ClearAllPools();
+            if (Directory.Exists(dir)) Directory.Delete(dir, true);
+        }
     }
 }

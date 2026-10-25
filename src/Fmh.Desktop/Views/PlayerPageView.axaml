@@ -1,0 +1,160 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Fmh.Desktop.ViewModels"
+             xmlns:c="using:Fmh.Desktop.Controls"
+             xmlns:s="using:Fmh.Desktop.Services"
+             x:Class="Fmh.Desktop.Views.PlayerPageView"
+             x:DataType="vm:PlayerPageViewModel">
+  <ScrollViewer>
+    <StackPanel Spacing="14">
+      <!-- Kopf -->
+      <Border Classes="card">
+        <Grid ColumnDefinitions="Auto,Auto,*,Auto,Auto">
+          <Button Classes="ghost" Command="{Binding BackCommand}" VerticalAlignment="Center" ToolTip.Tip="{s:L tip.back}">
+            <Path Classes="icon" Data="{StaticResource IconBack}" />
+          </Button>
+          <c:Crest Grid.Column="1" Width="56" Height="64" Margin="8,0,16,0" Primary="{Binding ClubPrimary}" Secondary="{Binding ClubSecondary}" Initials="{Binding ClubInitials}" />
+          <StackPanel Grid.Column="2" VerticalAlignment="Center" Spacing="2">
+            <TextBlock Classes="h1" Text="{Binding Player.Name}" />
+            <TextBlock Classes="muted" Text="{Binding Subtitle}" />
+            <TextBlock Text="{Binding ClubName}" />
+          </StackPanel>
+          <StackPanel Grid.Column="3" Margin="16,0" VerticalAlignment="Center" HorizontalAlignment="Center">
+            <Border Classes="pill" Background="{Binding StrengthBrush}" Padding="14,6" CornerRadius="10">
+              <TextBlock Text="{Binding Strength}" FontSize="28" FontWeight="Black" Foreground="White" HorizontalAlignment="Center" />
+            </Border>
+            <TextBlock Text="{s:L player.strength}" Classes="muted small" HorizontalAlignment="Center" Margin="0,4,0,0" />
+          </StackPanel>
+          <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="4" VerticalAlignment="Center">
+            <Button Content="◄" Command="{Binding PreviousCommand}" ToolTip.Tip="{s:L tip.previous}" />
+            <TextBlock Text="{Binding NavText}" VerticalAlignment="Center" Classes="muted" Margin="6,0" />
+            <Button Content="►" Command="{Binding NextCommand}" ToolTip.Tip="{s:L tip.next}" />
+          </StackPanel>
+        </Grid>
+      </Border>
+
+      <Grid ColumnDefinitions="3*,2*" ColumnSpacing="14">
+        <!-- Attribute -->
+        <Border Classes="card">
+          <Panel>
+            <TextBlock Text="{s:L player.attributesHidden}" Classes="muted" IsVisible="{Binding AttributesHidden}" />
+            <ItemsControl ItemsSource="{Binding Groups}" IsVisible="{Binding !AttributesHidden}">
+              <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="3" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:AttrGroupVm">
+                  <StackPanel Margin="0,0,18,0" Spacing="3">
+                    <TextBlock Classes="h3" Text="{Binding Title}" Margin="0,0,0,6" />
+                    <ItemsControl ItemsSource="{Binding Items}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:AttrItem">
+                          <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,2">
+                            <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" FontSize="13" />
+                            <c:Meter Grid.Column="1" Width="46" Height="5" Margin="8,0" Maximum="20" Value="{Binding Value}" Fill="{Binding Brush}"
+                                     Track="{DynamicResource LineBrush}" IsVisible="{Binding ShowBar}" />
+                            <Border Grid.Column="2" Classes="pill" Background="{Binding Brush}" IsVisible="{Binding ShowNumber}" ToolTip.Tip="{Binding Symbol}">
+                              <TextBlock Text="{Binding Value}" Foreground="White" FontWeight="Bold" FontSize="12" HorizontalAlignment="Center" />
+                            </Border>
+                            <TextBlock Grid.Column="2" Text="{Binding Stars}" Foreground="{Binding Brush}" IsVisible="{Binding ShowStars}" />
+                          </Grid>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </StackPanel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </Panel>
+        </Border>
+
+        <!-- Radar, Zustand, Positionen -->
+        <StackPanel Grid.Column="1" Spacing="14">
+          <Border Classes="card" Height="290">
+            <c:RadarChart Values="{Binding RadarValues}" Labels="{Binding RadarLabels}" Fill="{DynamicResource AccentBrush}"
+                          LineBrush="{DynamicResource LineBrush}" TextBrush="{DynamicResource MutedBrush}" IsVisible="{Binding !AttributesHidden}" />
+          </Border>
+          <Border Classes="card">
+            <StackPanel Spacing="6">
+              <TextBlock Classes="h3" Text="{s:L player.state}" />
+              <ItemsControl ItemsSource="{Binding StateLines}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:InfoLine">
+                    <Grid ColumnDefinitions="140,*" Margin="0,2">
+                      <TextBlock Text="{Binding Label}" Classes="muted" />
+                      <TextBlock Grid.Column="1" Text="{Binding Value}" Foreground="{Binding Fore}" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <TextBlock Classes="h3" Text="{s:L player.formCurve}" Margin="0,8,0,0" />
+              <c:LineChart Height="70" SeriesA="{Binding FormPoints}" MaxX="4" MinY="1" MaxY="6" InvertY="True"
+                           BrushA="{DynamicResource GoldBrush}" GridBrush="{DynamicResource LineBrush}" />
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </Grid>
+
+      <Grid ColumnDefinitions="*,*,*" ColumnSpacing="14">
+        <Border Classes="card">
+          <StackPanel Spacing="6">
+            <TextBlock Classes="h3" Text="{s:L player.personal}" />
+            <ItemsControl ItemsSource="{Binding Personal}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:InfoLine">
+                  <Grid ColumnDefinitions="130,*" Margin="0,2">
+                    <TextBlock Text="{Binding Label}" Classes="muted" />
+                    <TextBlock Grid.Column="1" Text="{Binding Value}" TextWrapping="Wrap" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="1" Classes="card">
+          <StackPanel Spacing="6">
+            <TextBlock Classes="h3" Text="{s:L player.positions}" />
+            <ItemsControl ItemsSource="{Binding Positions}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:PositionChip">
+                  <Grid ColumnDefinitions="50,*,Auto" Margin="0,3">
+                    <TextBlock Text="{Binding Position}" FontWeight="SemiBold" />
+                    <TextBlock Grid.Column="1" Text="{Binding Suitability}" Classes="muted" />
+                    <Border Grid.Column="2" Classes="pill" Background="{Binding Brush}">
+                      <TextBlock Text="{Binding Strength}" Foreground="White" FontSize="12" FontWeight="Bold" HorizontalAlignment="Center" />
+                    </Border>
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+        <Border Grid.Column="2" Classes="card">
+          <StackPanel Spacing="6">
+            <TextBlock Classes="h3" Text="{s:L player.stats}" />
+            <Grid ColumnDefinitions="64,*,34,34,34,40" Margin="0,2">
+              <TextBlock Text="{s:L col.season}" Classes="muted small" />
+              <TextBlock Grid.Column="1" Text="{s:L col.club}" Classes="muted small" />
+              <TextBlock Grid.Column="2" Text="{s:L col.apps}" Classes="muted small" />
+              <TextBlock Grid.Column="3" Text="{s:L col.goals}" Classes="muted small" />
+              <TextBlock Grid.Column="4" Text="{s:L col.assists}" Classes="muted small" />
+              <TextBlock Grid.Column="5" Text="{s:L col.grade}" Classes="muted small" />
+            </Grid>
+            <ItemsControl ItemsSource="{Binding Seasons}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:SeasonLine">
+                  <Grid ColumnDefinitions="64,*,34,34,34,40" Margin="0,2">
+                    <TextBlock Text="{Binding Season}" />
+                    <TextBlock Grid.Column="1" Text="{Binding Club}" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Grid.Column="2" Text="{Binding Apps}" />
+                    <TextBlock Grid.Column="3" Text="{Binding Goals}" />
+                    <TextBlock Grid.Column="4" Text="{Binding Assists}" />
+                    <TextBlock Grid.Column="5" Text="{Binding Grade}" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+      </Grid>
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

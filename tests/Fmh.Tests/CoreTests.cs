@@ -221,3 +221,57 @@ public class LineupTests
         Assert.Contains(TacticAdvisor.Analyse(club, s.World, TestData.Data), a => a.Key == "advice.unsuitable");
     }
 }
+
+public class LineupEditorTests
+{
+    private static Tactic Make() => new()
+    {
+        Lineup = new List<int?> { 1, 2, 3 },
+        Bench = new List<int> { 10, 11 },
+    };
+
+    [Fact]
+    public void PlacingBenchPlayerInSlotSwapsWithStarter()
+    {
+        var t = Make();
+        LineupEditor.Place(t, 3, 5, 1, 11);
+        Assert.Equal(new int?[] { 1, 11, 3 }, t.Lineup);
+        Assert.Equal(new[] { 10, 2 }, t.Bench);
+    }
+
+    [Fact]
+    public void PlacingReservePlayerPushesStarterOut()
+    {
+        var t = Make();
+        LineupEditor.Place(t, 3, 5, 0, 99);
+        Assert.Equal(new int?[] { 99, 2, 3 }, t.Lineup);
+        Assert.Equal(new[] { 10, 11 }, t.Bench);
+    }
+
+    [Fact]
+    public void SwappingTwoStarters()
+    {
+        var t = Make();
+        LineupEditor.Place(t, 3, 5, 2, 1);
+        Assert.Equal(new int?[] { 3, 2, 1 }, t.Lineup);
+    }
+
+    [Fact]
+    public void StarterToEmptyBenchPlaceLeavesGap()
+    {
+        var t = Make();
+        LineupEditor.Place(t, 3, 5, 5, 2);
+        Assert.Equal(new int?[] { 1, null, 3 }, t.Lineup);
+        Assert.Equal(new[] { 10, 11, 2 }, t.Bench);
+    }
+
+    [Fact]
+    public void BenchLimitIsRespected()
+    {
+        var t = Make();
+        Assert.False(LineupEditor.ToBench(t, 2, 50));
+        LineupEditor.Remove(t, 10);
+        Assert.True(LineupEditor.ToBench(t, 2, 50));
+        Assert.Equal(new[] { 11, 50 }, t.Bench);
+    }
+}

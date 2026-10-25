@@ -75,7 +75,7 @@ public class DataTests
         var texts = TestData.Data.Texts;
         var missing = new List<string>();
         var src = Path.Combine(TestData.RepoRoot(), "src");
-        var keyPattern = new Regex("\"((?:app|menu|ui|unit|help|gameMenu|load|newGame|background|expectation|status|inbox|squad|col|player|foot|suit|suitShort|group|attr|pos|morale|injury|tactics|tactic|mentality|advice|lineup|sub|fixtures|league|club|placeholder|options|match|stat|pause|comm|msg|tone|shout|speed|weather)\\.[A-Za-z0-9.]+)\"");
+        var keyPattern = new Regex("\"((?:app|menu|ui|unit|help|tip|filter|radar|toneHint|shoutHint|gameMenu|load|newGame|background|expectation|status|inbox|squad|col|player|foot|suit|suitShort|group|attr|pos|morale|injury|tactics|tactic|mentality|advice|lineup|sub|fixtures|league|club|placeholder|options|match|stat|pause|comm|msg|tone|shout|speed|weather)\\.[A-Za-z0-9.]+)\"");
         foreach (var file in Directory.EnumerateFiles(src, "*.cs", SearchOption.AllDirectories))
         {
             foreach (Match m in keyPattern.Matches(File.ReadAllText(file)))
@@ -85,6 +85,11 @@ public class DataTests
                 if (!texts.Has(key)) missing.Add($"{key} ({Path.GetFileName(file)})");
             }
         }
+
+        var xamlKey = new Regex(@"\{s:L ([A-Za-z0-9.]+)\}");
+        foreach (var file in Directory.EnumerateFiles(src, "*.axaml", SearchOption.AllDirectories))
+            foreach (Match m in xamlKey.Matches(File.ReadAllText(file)))
+                if (!texts.Has(m.Groups[1].Value)) missing.Add($"{m.Groups[1].Value} ({Path.GetFileName(file)})");
 
         void Enum<T>(string prefix) where T : struct, System.Enum
         {

@@ -1,245 +1,287 @@
-using Fmh.Core.Game;
+using Avalonia;
+using Avalonia.Controls;
+using Avalonia.Headless;
+using Avalonia.Headless.XUnit;
+using Avalonia.Input;
+using Avalonia.Threading;
+using Avalonia.VisualTree;
 using Fmh.Core.Model;
-using Fmh.MatchEngine;
-using Fmh.Ui;
-using Fmh.Ui.Rendering;
-using Fmh.Ui.Views;
+using Fmh.Desktop;
+using Fmh.Desktop.Services;
+using Fmh.Desktop.ViewModels;
+using Fmh.Desktop.Views;
+
+[assembly: AvaloniaTestApplication(typeof(Fmh.Tests.TestAppBuilder))]
 
 namespace Fmh.Tests;
 
-/// <summary>Bedient die Oberfläche ohne echte Konsole: Tasten rein, Bild als Text raus.</summary>
+public static class TestAppBuilder
+{
+    public static AppBuilder BuildAvaloniaApp()
+    {
+        AppState.Initialise(TestData.Data, Path.Combine(Path.GetTempPath(), "fmh-ui-" + Guid.NewGuid()));
+        MatchViewModel.UseTimer = false;
+        return AppBuilder.Configure<App>()
+            .UseSkia()
+            .UseHeadless(new AvaloniaHeadlessPlatformOptions { UseHeadlessDrawing = false })
+            .WithInterFont();
+    }
+}
+
+/// <summary>
+/// Oberflächentests ohne Bildschirm (Avalonia Headless). Mit FMH_SHOTS=&lt;ordner&gt; werden Bildschirmfotos gespeichert.
+/// </summary>
 public class UiTests
 {
-    private static ConsoleKeyInfo Key(ConsoleKey k, char ch = '\0', bool shift = false, bool ctrl = false) => new(ch, k, shift, false, ctrl);
-
-    private static (App app, string saves) NewApp()
+    private static (Window window, MainWindowViewModel vm) Open()
     {
-        var saves = Path.Combine(Path.GetTempPath(), "fmh-ui-" + Guid.NewGuid());
-        var app = new App(TestData.Data, new TextMatchEngine(), saves);
-        app.Push(new MainMenuView(app));
-        return (app, saves);
+        var vm = new MainWindowViewModel();
+        var window = new MainWindow { DataContext = vm, Width = 1440, Height = 900 };
+        window.Show();
+        Pump();
+        return (window, vm);
     }
 
-    private static string Screen(App app, int w = 120, int h = 36)
+    private static void Pump()
     {
-        var c = new Canvas(w, h);
-        app.Render(c);
-        var text = c.ToPlainText();
-        Assert.DoesNotMatch(@"\[[a-z]+\.[A-Za-z.0-9]+\]", text); // fehlender Sprachschlüssel
-        return text;
+        Dispatcher.UIThread.RunJobs();
+        AvaloniaHeadlessPlatform.ForceRenderTimerTick();
+        Dispatcher.UIThread.RunJobs();
     }
 
-    private static void StartNewGame(App app)
+    private static void Shot(Window w, string name)
     {
-        app.Handle(Key(ConsoleKey.Enter)); // Neues Spiel
-        Assert.IsType<NewGameView>(app.Top);
-        for (var i = 0; i < 6; i++) app.Handle(Key(ConsoleKey.DownArrow));
-        app.Handle(Key(ConsoleKey.Enter)); // Spiel starten
-        Assert.IsType<GameView>(app.Top);
+        Pump();
+        var dir = Environment.GetEnvironmentVariable("FMH_SHOTS");
+        var frame = w.CaptureRenderedFrame();
+        Assert.NotNull(frame);
+        if (string.IsNullOrEmpty(dir)) return;
+        Directory.CreateDirectory(dir);
+        frame!.Save(Path.Combine(dir, name + ".png"));
     }
 
-    [Fact]
-    public void MainMenuAndNewGameRender()
+    private static IEnumerable<string> VisibleTexts(Window w) =>
+        w.GetVisualDescendants().OfType<TextBlock>().Where(t => t.IsEffectivelyVisible).Select(t => t.Text ?? "");
+
+    private static void AssertNoMissingTexts(Window w)
     {
-        var (app, _) = NewApp();
-        Assert.Contains("Neues Spiel", Screen(app));
-        app.Handle(Key(ConsoleKey.Enter));
-        var screen = Screen(app);
-        Assert.Contains("SV Nordheide", screen);
-        Assert.Contains("Werdegang", screen);
+        var missing = VisibleTexts(w).Where(t => System.Text.RegularExpressions.Regex.IsMatch(t, @"^\[[a-z]+\.[A-Za-z.0-9]+\]$")).ToList();
+        Assert.True(missing.Count == 0, "Fehlende Texte: " + string.Join(", ", missing));
+        Assert.DoesNotContain(VisibleTexts(w), t => t.StartsWith("View fehlt"));
     }
 
-    [Theory]
-    [InlineData(100, 30)]
-    [InlineData(160, 45)]
-    public void AllGamePagesRenderAtMinimumAndLargeSize(int w, int h)
+    private static ShellViewModel StartGame(MainWindowViewModel vm)
     {
-        var (app, _) = NewApp();
-        StartNewGame(app);
-        var titles = new[] { "Posteingang", "Kader", "Taktik", "Training", "Spielplan", "Transfers", "Finanzen", "Stadion", "Verein", "Liga" };
-        for (var i = 0; i < 10; i++)
+        var start = Assert.IsType<StartViewModel>(vm.Screen);
+        start.NewGameCommand.Execute(null);
+        var ng = Assert.IsType<NewGameViewModel>(vm.Screen);
+        ng.Seed = "4711";
+        ng.ManagerName = "Test";
+        ng.StartCommand.Execute(null);
+        return Assert.IsType<ShellViewModel>(vm.Screen);
+    }
+
+    [AvaloniaFact]
+    public void StartAndNewGameScreensRender()
+    {
+        var (w, vm) = Open();
+        Assert.Contains(VisibleTexts(w), t => t == "Neues Spiel");
+        AssertNoMissingTexts(w);
+        Shot(w, "01_start");
+        ((StartViewModel)vm.Screen).NewGameCommand.Execute(null);
+        Pump();
+        Assert.Contains(VisibleTexts(w), t => t == "SV Nordheide");
+        AssertNoMissingTexts(w);
+        Shot(w, "02_newgame");
+    }
+
+    [AvaloniaFact]
+    public void AllPagesRender()
+    {
+        var (w, vm) = Open();
+        var shell = StartGame(vm);
+        var names = new[] { "inbox", "squad", "tactics", "training", "fixtures", "transfers", "finances", "stadium", "club", "league" };
+        for (var i = 0; i < shell.Nav.Count; i++)
         {
-            app.Handle(Key(ConsoleKey.F1 + i));
-            var screen = Screen(app, w, h);
-            Assert.Contains(titles[i], screen);
-            Assert.Contains("SV NORDHEIDE", screen);
+            shell.Open(shell.Nav[i]);
+            Pump();
+            AssertNoMissingTexts(w);
+            Shot(w, $"1{i}_{names[i]}");
         }
-        app.Handle(Key(ConsoleKey.F2));
-        app.Handle(Key(ConsoleKey.S));
-        app.Handle(Key(ConsoleKey.Enter));
-        Assert.IsType<PlayerView>(app.Top);
-        Assert.Contains("Gesamtstärke", Screen(app, w, h));
-        app.Handle(Key(ConsoleKey.RightArrow));
-        Screen(app, w, h);
-        app.Handle(Key(ConsoleKey.Escape));
-        Assert.IsType<GameView>(app.Top);
+        shell.Open(shell.Nav[1]);
+        var squad = Assert.IsType<SquadPageViewModel>(shell.Page);
+        squad.OpenPlayer(squad.Rows[0]);
+        Pump();
+        Assert.IsType<PlayerPageViewModel>(shell.Page);
+        AssertNoMissingTexts(w);
+        Shot(w, "20_player");
+        shell.Back();
+        Assert.IsType<SquadPageViewModel>(shell.Page);
     }
 
-    [Fact]
-    public void AttributeDisplayModesRender()
+    [AvaloniaFact]
+    public void KeyboardShortcutsSwitchPages()
     {
-        var (app, _) = NewApp();
-        StartNewGame(app);
-        foreach (var mode in Enum.GetValues<AttributeDisplay>())
-        {
-            app.Session!.HumanManager.Profile.AttributeDisplay = mode;
-            app.Handle(Key(ConsoleKey.F2));
-            app.Handle(Key(ConsoleKey.Enter));
-            Screen(app);
-            app.Handle(Key(ConsoleKey.Escape));
-        }
+        var (w, vm) = Open();
+        var shell = StartGame(vm);
+        w.KeyPress(Key.F3, RawInputModifiers.None, PhysicalKey.F3, null);
+        Pump();
+        Assert.IsType<TacticsPageViewModel>(shell.Page);
+        w.KeyPress(Key.F10, RawInputModifiers.None, PhysicalKey.F10, null);
+        Pump();
+        Assert.IsType<LeaguePageViewModel>(shell.Page);
     }
 
-    [Fact]
-    public void TacticsPageChangesFormationAndInstructions()
+    [AvaloniaFact]
+    public void TacticsClickToSwapAndSettings()
     {
-        var (app, _) = NewApp();
-        StartNewGame(app);
-        var club = app.Session!.HumanClub;
-        app.Handle(Key(ConsoleKey.F3));
-        app.Handle(Key(ConsoleKey.E)); // Einstellungen
-        var before = club.Tactic.FormationId;
-        app.Handle(Key(ConsoleKey.RightArrow));
-        Assert.NotEqual(before, club.Tactic.FormationId);
+        var (w, vm) = Open();
+        var shell = StartGame(vm);
+        shell.Open(shell.Nav[2]);
+        var page = Assert.IsType<TacticsPageViewModel>(shell.Page);
+        var club = AppState.Current.Session!.HumanClub;
+        var before = club.Tactic.Lineup.ToList();
+
+        // Zwei Plätze nacheinander anklicken tauscht die Spieler.
+        page.SelectSlot(page.Slots[1]);
+        page.SelectSlot(page.Slots[2]);
+        Assert.Equal(before[1], club.Tactic.Lineup[2]);
+        Assert.Equal(before[2], club.Tactic.Lineup[1]);
+
+        // Platz wählen, dann Reservespieler anklicken: Spieler kommt in die Startelf.
+        var reserve = page.Reserves[0].Player;
+        page.SelectSlot(page.Slots[5]);
+        page.ClickPlayer(page.Reserves.First(r => r.Player == reserve));
+        Assert.Equal(reserve.Id, club.Tactic.Lineup[5]);
+
+        // Drag & Drop Ziel: Spieler auf Platz ziehen.
+        var benchPlayer = page.Bench[0].Player;
+        page.DropOnSlot(0, benchPlayer.Id);
+        Assert.Equal(benchPlayer.Id, club.Tactic.Lineup[0]);
+
+        var formation = page.Settings[0];
+        formation.SelectedIndex = (formation.SelectedIndex + 1) % formation.Options.Count;
         Assert.Equal(11, club.Tactic.Lineup.Count(id => id.HasValue));
-        app.Handle(Key(ConsoleKey.DownArrow));
-        app.Handle(Key(ConsoleKey.RightArrow));
-        Assert.Equal(Mentality.Positive, club.Tactic.Mentality);
-        Screen(app);
-
-        // Aufstellung: ersten Platz neu besetzen über den Auswahldialog.
-        app.Handle(Key(ConsoleKey.E));
-        app.Handle(Key(ConsoleKey.Enter));
-        Assert.IsType<ListDialog>(app.Top);
-        Screen(app);
-        app.Handle(Key(ConsoleKey.Enter));
-        Assert.IsType<GameView>(app.Top);
-        Assert.Equal(club.Tactic.Lineup.Count(id => id.HasValue), club.Tactic.Lineup.Where(id => id.HasValue).Distinct().Count());
+        Pump();
+        Shot(w, "21_tactics_changed");
     }
 
-    [Fact]
-    public void PlayMatchdayThroughUi()
+    [AvaloniaFact]
+    public void PlayMatchdayLive()
     {
-        var (app, saves) = NewApp();
-        try
-        {
-            StartNewGame(app);
-            var session = app.Session!;
-            app.Handle(Key(ConsoleKey.Spacebar)); // bis zum Spieltag
-            var fixture = session.PendingHumanFixture;
-            Assert.NotNull(fixture);
-            app.Handle(Key(ConsoleKey.Spacebar)); // Vorbericht öffnen (mit Autosave)
-            Assert.IsType<MatchView>(app.Top);
-            Assert.Contains("Vorbericht", Screen(app));
-            Assert.Single(Directory.GetFiles(saves, "autosave*"));
+        var (w, vm) = Open();
+        var shell = StartGame(vm);
+        var session = AppState.Current.Session!;
+        shell.Continue();
+        var fixture = session.PendingHumanFixture;
+        Assert.NotNull(fixture);
+        shell.Continue();
+        var match = Assert.IsType<MatchViewModel>(vm.Screen);
+        Pump();
+        AssertNoMissingTexts(w);
+        Shot(w, "30_prematch");
 
-            app.Handle(Key(ConsoleKey.Enter)); // Anpfiff -> Kabinenansprache
-            Screen(app);
-            app.Handle(Key(ConsoleKey.D6, '6')); // motivierend
-            for (var i = 0; i < 30; i++) app.Tick(TimeSpan.FromSeconds(1));
-            var live = Screen(app);
-            Assert.Contains("1'", live); // Kommentarzeilen mit Minute
-            Assert.Contains("Ballbesitz", live);
+        match.EditTacticsCommand.Execute(null);
+        Pump();
+        Shot(w, "31_prematch_tactics");
+        match.EditTacticsCommand.Execute(null);
 
-            // Bis zur Halbzeit laufen lassen (Pausen bei Toren/Verletzungen jeweils auflösen).
-            for (var i = 0; i < 2000 && fixture!.Result is null; i++)
-            {
-                app.Tick(TimeSpan.FromSeconds(5));
-                var s = Screen(app);
-                if (s.Contains("PAUSE")) app.Handle(Key(ConsoleKey.Spacebar));
-                if (s.Contains("Halbzeit – Kabinenansprache"))
-                {
-                    app.Handle(Key(ConsoleKey.D1, '1'));
-                    app.Handle(Key(ConsoleKey.Spacebar));
-                }
-                if (i == 50)
-                {
-                    app.Handle(Key(ConsoleKey.W)); // Wechsel
-                    Assert.IsType<ListDialog>(app.Top);
-                    app.Handle(Key(ConsoleKey.DownArrow));
-                    app.Handle(Key(ConsoleKey.Enter));
-                    app.Handle(Key(ConsoleKey.Enter));
-                    Assert.IsType<MatchView>(app.Top);
-                    app.Handle(Key(ConsoleKey.Spacebar));
-                }
-            }
-            Assert.NotNull(fixture!.Result);
-            var post = Screen(app);
-            Assert.Contains("Spieler des Spiels", post);
-            app.Handle(Key(ConsoleKey.RightArrow));
-            Assert.Contains("Heatmap", Screen(app));
-            app.Handle(Key(ConsoleKey.Enter));
-            Assert.IsType<GameView>(app.Top);
-            Assert.True(session.World.LeagueOf(session.HumanClub).Fixtures.Where(f => f.Matchday == fixture.Matchday).All(f => f.Result is not null));
-            Assert.Equal(11, session.HumanClub.Tactic.Lineup.Count);
-        }
-        finally
+        match.Kickoff();
+        Pump();
+        Shot(w, "32_teamtalk");
+        match.Talk(match.Tones[5]);
+        Assert.Equal(MatchStage.Live, match.Stage);
+        for (var i = 0; i < 40; i++) match.Tick(TimeSpan.FromSeconds(1));
+        if (match.Paused) match.TogglePause();
+        Pump();
+        AssertNoMissingTexts(w);
+        Shot(w, "33_live");
+
+        for (var i = 0; i < 400 && match.Stage == MatchStage.Live; i++)
         {
-            if (Directory.Exists(saves)) Directory.Delete(saves, true);
+            match.Tick(TimeSpan.FromSeconds(1));
+            if (match.Paused) match.TogglePause();
         }
+        Assert.Equal(MatchStage.HalfTime, match.Stage);
+        Pump();
+        Shot(w, "34_halftime");
+        match.Talk(match.Tones[0]);
+        match.SecondHalf();
+        match.Substitute();
+        var outDialog = Assert.IsType<ChoiceDialogViewModel>(vm.Dialog);
+        Pump();
+        Shot(w, "35_substitution");
+        outDialog.ChooseCommand.Execute(outDialog.Options[3]);
+        var inDialog = Assert.IsType<ChoiceDialogViewModel>(vm.Dialog);
+        inDialog.ChooseCommand.Execute(inDialog.Options[0]);
+        Assert.Null(vm.Dialog);
+
+        for (var i = 0; i < 1000 && match.Stage != MatchStage.PostMatch; i++)
+        {
+            match.Tick(TimeSpan.FromSeconds(1));
+            if (match.Paused) match.TogglePause();
+        }
+        Assert.Equal(MatchStage.PostMatch, match.Stage);
+        Assert.NotNull(fixture!.Result);
+        Pump();
+        AssertNoMissingTexts(w);
+        Shot(w, "36_postmatch");
+        match.Close();
+        Assert.IsType<ShellViewModel>(vm.Screen);
+        Pump();
+        Shot(w, "37_after_match");
     }
 
-    [Fact]
-    public void InstantModeAndSaveLoadThroughMenu()
+    [AvaloniaFact]
+    public void InstantMatchSaveAndLoad()
     {
-        var (app, saves) = NewApp();
-        try
-        {
-            StartNewGame(app);
-            var session = app.Session!;
-            session.HumanManager.Profile.MatchDisplay = MatchDisplayMode.Instant;
-            app.Handle(Key(ConsoleKey.Spacebar));
-            app.Handle(Key(ConsoleKey.Spacebar));
-            app.Handle(Key(ConsoleKey.Enter)); // Sofortergebnis
-            Assert.Contains("Spieler des Spiels", Screen(app));
-            app.Handle(Key(ConsoleKey.Enter));
+        var (w, vm) = Open();
+        var shell = StartGame(vm);
+        var session = AppState.Current.Session!;
+        session.HumanManager.Profile.MatchDisplay = MatchDisplayMode.Instant;
+        shell.Continue();
+        shell.Continue();
+        var match = Assert.IsType<MatchViewModel>(vm.Screen);
+        match.Kickoff();
+        Assert.Equal(MatchStage.PostMatch, match.Stage);
+        match.Close();
 
-            app.Handle(Key(ConsoleKey.S, 's', ctrl: true));
-            Assert.Contains("Gespeichert", Screen(app));
-            var date = session.World.Date;
-
-            // Hauptmenü -> Laden
-            app.Handle(Key(ConsoleKey.Escape));
-            app.Handle(Key(ConsoleKey.DownArrow));
-            app.Handle(Key(ConsoleKey.DownArrow));
-            app.Handle(Key(ConsoleKey.DownArrow));
-            app.Handle(Key(ConsoleKey.Enter));
-            Assert.IsType<MainMenuView>(app.Top);
-            app.Handle(Key(ConsoleKey.DownArrow));
-            app.Handle(Key(ConsoleKey.Enter));
-            Assert.IsType<ListDialog>(app.Top);
-            Screen(app);
-            // Neuester Spielstand steht oben (manuell gespeichert nach dem Autosave).
-            app.Handle(Key(ConsoleKey.Enter));
-            Assert.IsType<GameView>(app.Top);
-            Assert.Equal(date, app.Session!.World.Date);
-        }
-        finally
-        {
-            if (Directory.Exists(saves)) Directory.Delete(saves, true);
-        }
+        shell.Save();
+        Assert.Contains("Gespeichert", shell.StatusMessage);
+        var date = session.World.Date;
+        vm.Navigate(new StartViewModel(vm));
+        var start = (StartViewModel)vm.Screen;
+        Pump();
+        Shot(w, "03_start_with_saves");
+        var save = start.Saves.First(s => s.Info.Name.StartsWith("nordheide"));
+        start.LoadCommand.Execute(save);
+        Assert.IsType<ShellViewModel>(vm.Screen);
+        Assert.Equal(date, AppState.Current.Session!.World.Date);
     }
 
-    [Fact]
-    public void OptionsChangeProfileAndTheme()
+    [AvaloniaFact]
+    public void ThemesAndOptions()
     {
-        var (app, _) = NewApp();
-        StartNewGame(app);
-        app.Handle(Key(ConsoleKey.Escape));
-        app.Handle(Key(ConsoleKey.DownArrow));
-        app.Handle(Key(ConsoleKey.DownArrow));
-        app.Handle(Key(ConsoleKey.Enter));
-        Assert.IsType<OptionsView>(app.Top);
-        var profile = app.Session!.HumanManager.Profile;
-        app.Handle(Key(ConsoleKey.RightArrow));
-        Assert.Equal(WageDisplay.Year, profile.WageDisplay);
-        for (var i = 0; i < 6; i++) app.Handle(Key(ConsoleKey.DownArrow));
-        app.Handle(Key(ConsoleKey.RightArrow));
-        Assert.Equal("Hell", profile.Theme);
-        Assert.Equal(Theme.Light, app.Theme);
-        Screen(app);
-        app.Handle(Key(ConsoleKey.Escape));
-        app.Handle(Key(ConsoleKey.F2));
-        Assert.Contains("/Jahr", Screen(app, 160, 40));
+        var (w, vm) = Open();
+        var shell = StartGame(vm);
+        shell.OptionsCommand.Execute(null);
+        var options = Assert.IsType<OptionsViewModel>(vm.Dialog);
+        Pump();
+        Shot(w, "40_options");
+        var theme = options.Settings.Last();
+        theme.SelectedIndex = 1;
+        Assert.Equal("Hell", AppState.Current.Session!.HumanManager.Profile.Theme);
+        options.Settings[0].SelectedIndex = 2;
+        Assert.Equal(WageDisplay.Year, AppState.Current.Session!.HumanManager.Profile.WageDisplay);
+        options.CloseCommand.Execute(null);
+        shell.Open(shell.Nav[1]);
+        Pump();
+        Shot(w, "41_light_squad");
+        Assert.Contains(VisibleTexts(w), t => t.EndsWith("/Jahr"));
+        Palette.Apply("Terminal");
+        shell.Open(shell.Nav[9]);
+        Pump();
+        Shot(w, "42_terminal_league");
+        Palette.Apply("Klassik");
     }
 }
