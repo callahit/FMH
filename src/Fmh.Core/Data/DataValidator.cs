@@ -47,8 +47,39 @@ public static class DataValidator
             if (levels.Count > 0 && levels[0].Divisions.Any(d => d.Promotion > 0))
                 errors.Add($"Land '{country.Code}': die oberste Ebene kann keine Aufsteiger haben.");
         }
-        foreach (var club in data.Clubs.Where(c => !data.Countries.SelectMany(x => x.Divisions).Any(d => d.Id == c.Division)))
+        bool KnownDivision(string id) =>
+            data.Countries.SelectMany(x => x.Divisions).Any(d => d.Id == id) || data.Countries.SelectMany(x => x.Pools).Any(p => p.Id == id);
+        foreach (var club in data.Clubs.Where(c => !KnownDivision(c.Division)))
             errors.Add($"Verein '{club.Name}' gehört zu unbekannter Liga '{club.Division}'.");
+
+        foreach (var country in data.Countries)
+        {
+            foreach (var pool in country.Pools)
+            {
+                var count = data.Clubs.Count(c => c.Division == pool.Id);
+                if (count != pool.Teams) errors.Add($"Pool '{pool.Name}' braucht {pool.Teams} Vereine, Daten enthalten {count}.");
+            }
+            foreach (var cup in country.Cups)
+            {
+                foreach (var id in cup.Participants.Where(id => !KnownDivision(id)))
+                    errors.Add($"Pokal '{cup.Name}': unbekannte Teilnehmerliga '{id}'.");
+                var teams = data.Clubs.Count(c => cup.Participants.Contains(c.Division));
+                if (teams > cup.Teams) errors.Add($"Pokal '{cup.Name}': {teams} Teilnehmer, aber nur {cup.Teams} Plätze.");
+                var rounds = (int)Math.Ceiling(Math.Log2(Math.Max(2, cup.Teams)));
+                if (cup.Dates.Count < rounds) errors.Add($"Pokal '{cup.Name}': {rounds} Runden, aber nur {cup.Dates.Count} Termine.");
+            }
+            foreach (var po in country.Playoffs)
+            {
+                var upper = country.Divisions.FirstOrDefault(d => d.Id == po.UpperDivision);
+                var lower = country.Divisions.FirstOrDefault(d => d.Id == po.LowerDivision);
+                if (upper is null || lower is null) { errors.Add($"Relegation '{po.Name}': unbekannte Liga."); continue; }
+                if (po.UpperPosition < 1 || po.UpperPosition > upper.Teams || po.LowerPosition < 1 || po.LowerPosition > lower.Teams)
+                    errors.Add($"Relegation '{po.Name}': ungültige Tabellenplätze.");
+                if (po.UpperPosition > upper.Teams - upper.Relegation || po.LowerPosition <= lower.Promotion)
+                    errors.Add($"Relegation '{po.Name}': Plätze überschneiden sich mit direktem Auf- oder Abstieg.");
+                if (po.Dates.Count < po.Legs) errors.Add($"Relegation '{po.Name}': zu wenige Termine.");
+            }
+        }
 
         foreach (var pos in PositionInfo.All.Where(p => !data.PositionProfiles.Weights.ContainsKey(p)))
             errors.Add($"Positionsprofil für '{pos}' fehlt.");

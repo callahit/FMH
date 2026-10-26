@@ -11,17 +11,39 @@
     "winterBreakEnd": "01-14",
     "matchDay": "Saturday"
   },
-  "squad": { "maxSquad": 30, "benchSize": 9, "substitutions": 5 },
-  "discipline": { "yellowCardsForSuspension": 5, "redCardBanMin": 1, "redCardBanMax": 3, "secondYellowBan": 1 },
+  "squad": {
+    "maxSquad": 30,
+    "benchSize": 9,
+    "substitutions": 5
+  },
+  "discipline": {
+    "yellowCardsForSuspension": 5,
+    "redCardBanMin": 1,
+    "redCardBanMax": 3,
+    "secondYellowBan": 1
+  },
   "levels": [
     {
       "level": 1,
       "divisions": [
         {
-          "id": "DE1", "name": "1. Liga", "teams": 18, "rounds": 2,
-          "points": { "win": 3, "draw": 1, "loss": 0 },
-          "tieBreakers": [ "GoalDifference", "GoalsFor", "HeadToHead", "AwayGoals" ],
-          "promotion": 0, "relegation": 3
+          "id": "DE1",
+          "name": "1. Liga",
+          "teams": 18,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "GoalDifference",
+            "GoalsFor",
+            "HeadToHead",
+            "AwayGoals"
+          ],
+          "promotion": 0,
+          "relegation": 2
         }
       ]
     },
@@ -29,12 +51,86 @@
       "level": 2,
       "divisions": [
         {
-          "id": "DE2", "name": "2. Liga", "teams": 18, "rounds": 2,
-          "points": { "win": 3, "draw": 1, "loss": 0 },
-          "tieBreakers": [ "GoalDifference", "GoalsFor", "HeadToHead", "AwayGoals" ],
-          "promotion": 3, "relegation": 0
+          "id": "DE2",
+          "name": "2. Liga",
+          "teams": 18,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "GoalDifference",
+            "GoalsFor",
+            "HeadToHead",
+            "AwayGoals"
+          ],
+          "promotion": 2,
+          "relegation": 0
         }
       ]
     }
-  ]
+  ],
+  "pools": [
+    {
+      "id": "DE-AMA",
+      "name": "Amateure",
+      "teams": 28
+    }
+  ],
+  "cups": [
+    {
+      "id": "DE-CUP",
+      "name": "Pokal",
+      "participants": [
+        "DE1",
+        "DE2",
+        "DE-AMA"
+      ],
+      "teams": 64,
+      "lowerTierHome": true,
+      "legs": 1,
+      "awayGoals": false,
+      "dates": [
+        "08-05",
+        "09-30",
+        "11-04",
+        "02-03",
+        "03-24",
+        "05-08"
+      ],
+      "neutralFinal": true
+    }
+  ],
+  "playoffs": [
+    {
+      "id": "DE-REL",
+      "name": "Relegation",
+      "upperDivision": "DE1",
+      "upperPosition": 16,
+      "lowerDivision": "DE2",
+      "lowerPosition": 3,
+      "legs": 2,
+      "awayGoals": false,
+      "dates": [
+        "05-13",
+        "05-17"
+      ]
+    }
+  ],
+  "transferWindows": {
+    "summerStart": "07-01",
+    "summerEnd": "08-31",
+    "winterStart": "01-01",
+    "winterEnd": "01-31",
+    "preContractFrom": "01-01"
+  },
+  "youth": {
+    "intakeMonth": 3,
+    "minPlayers": 8,
+    "maxPlayers": 16,
+    "proContractAge": 17,
+    "promoteAge": 16
+  }
 }

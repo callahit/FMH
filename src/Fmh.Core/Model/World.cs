@@ -25,6 +25,18 @@ public sealed class World
     public List<Manager> Managers { get; set; } = new();
     public List<Message> Messages { get; set; } = new();
     public List<SeasonRecord> History { get; set; } = new();
+    public List<Cup> Cups { get; set; } = new();
+    public List<Negotiation> Negotiations { get; set; } = new();
+    public List<TransferRecord> Transfers { get; set; } = new();
+    public List<Transaction> Transactions { get; set; } = new();
+    public List<Installment> Installments { get; set; } = new();
+    public List<Scout> Scouts { get; set; } = new();
+    public List<ScoutAssignment> ScoutAssignments { get; set; } = new();
+    public List<ScoutReport> ScoutReports { get; set; } = new();
+    /// <summary>Kenntnisstand des menschlichen Managers je Spieler-Id (0–100).</summary>
+    public Dictionary<int, int> Knowledge { get; set; } = new();
+    /// <summary>Gesperrte Verhandlungen "Spieler:Verein" bis Datum (nach 3 gescheiterten Runden 14 Tage).</summary>
+    public Dictionary<string, DateOnly> NegotiationLocks { get; set; } = new();
 
     /// <summary>Alle Ligen der laufenden Saison sind beendet und ausgewertet; der Wechsel folgt zum Saisonstart.</summary>
     public bool SeasonFinished { get; set; }
@@ -33,8 +45,21 @@ public sealed class World
     public int NextPlayerId { get; set; } = 1;
     public int NextFixtureId { get; set; } = 1;
     public int NextMessageId { get; set; } = 1;
+    public int NextTieId { get; set; } = 1;
+    public int NextNegotiationId { get; set; } = 1;
+    public int NextScoutId { get; set; } = 1;
+    public int NextAssignmentId { get; set; } = 1;
 
     public League LeagueOf(Club club) => Leagues.First(l => l.Id == club.LeagueId);
+
+    public League? FindLeague(string id) => Leagues.FirstOrDefault(l => l.Id == id);
+
+    public Cup? FindCup(string id) => Cups.FirstOrDefault(c => c.Id == id);
+
+    /// <summary>Name eines Wettbewerbs (Liga, Pokal, Relegation).</summary>
+    public string CompetitionName(string id) => FindLeague(id)?.Name ?? FindCup(id)?.Name ?? id;
+
+    public IEnumerable<Fixture> AllFixtures => Leagues.SelectMany(l => l.Fixtures).Concat(Cups.SelectMany(c => c.Fixtures));
 
     public League League(string id) => Leagues.First(l => l.Id == id);
 
@@ -80,7 +105,10 @@ public sealed class Manager
     public ManagerProfile Profile { get; set; } = new();
 }
 
-public enum MessageType { Info, Board, Medical, Discipline, Result, Season }
+public enum MessageType { Info, Board, Medical, Discipline, Result, Season, Transfer, Contract, Scouting, Youth, Training, Cup }
+
+/// <summary>Aktion, die eine Nachricht auslöst (z. B. Transferangebot annehmen oder ablehnen).</summary>
+public enum MessageAction { None, IncomingOffer, ContractExpiring, ScoutReport, Negotiation, YouthIntake }
 
 public sealed class Message
 {
@@ -92,6 +120,11 @@ public sealed class Message
     public string Subject { get; set; } = "";
     public string Body { get; set; } = "";
     public bool Read { get; set; }
+    public MessageAction Action { get; set; }
+    public int? ActionRefId { get; set; }
+    /// <summary>Pflicht-Entscheidung: blockiert das Weiterspielen, bis sie erledigt ist (Kapitel 3).</summary>
+    public bool Required { get; set; }
+    public bool Resolved { get; set; }
 }
 
 public sealed class SeasonRecord

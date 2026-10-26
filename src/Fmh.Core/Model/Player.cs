@@ -32,6 +32,14 @@ public sealed class Player
     public PlayerState State { get; set; } = new();
     public PlayerSeasonStats SeasonStats { get; set; } = new();
     public List<PlayerSeasonStats> History { get; set; } = new();
+    public TransferStatus Transfer { get; set; } = new();
+    public Loan? Loan { get; set; }
+    public PlayerTraining Training { get; set; } = new();
+    /// <summary>Jugendspieler (U19/U17) des Vereins, noch nicht im Profikader.</summary>
+    public bool IsYouth { get; set; }
+    public bool Retired { get; set; }
+    /// <summary>Vorvertrag: Wechsel ablösefrei zum 1. Juli (Kapitel 7).</summary>
+    public PreContract? PreContract { get; set; }
 
     public string Name => $"{FirstName} {LastName}";
     public string ShortName => LastName;
@@ -52,11 +60,29 @@ public sealed class Player
     public bool IsAvailable => State.Injury is null && State.SuspendedMatches == 0;
 }
 
+public sealed class PreContract
+{
+    public int ClubId { get; set; }
+    public Contract Contract { get; set; } = new();
+}
+
 public sealed class Contract
 {
     /// <summary>Grundgehalt intern pro Woche gespeichert (Kapitel 7); Anzeige je Managerprofil.</summary>
     public int WeeklyWage { get; set; }
     public DateOnly Until { get; set; }
+    public DateOnly Start { get; set; }
+    public long SigningFee { get; set; }
+    public int AppearanceBonus { get; set; }
+    public int GoalBonus { get; set; }
+    public long? ReleaseClause { get; set; }
+    public int YearlyRaisePercent { get; set; }
+    /// <summary>Abstiegsklausel: Gehalt −30 % nach Abstieg.</summary>
+    public bool RelegationClause { get; set; }
+    public int ExtensionOptionYears { get; set; }
+    public SquadStatus Status { get; set; } = SquadStatus.Rotation;
+    /// <summary>Jugendvertrag (vor dem ersten Profivertrag).</summary>
+    public bool Youth { get; set; }
 }
 
 public sealed class PlayerState

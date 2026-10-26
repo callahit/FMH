@@ -1,3 +1,4 @@
+using Fmh.Desktop.Services;
 using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -16,7 +17,7 @@ public sealed class FixtureVm
     public required bool Own { get; init; }
     public string Matchday { get; init; } = "";
     public string Date => $"{Fmt.Weekday(Fixture.Date)} {Fmt.ShortDate(Fixture.Date)}";
-    public string Result => Fixture.Result is { } r ? $"{r.HomeGoals} : {r.AwayGoals}" : "– : –";
+    public string Result => Fixture.Result is { } r ? UiText.Score(r) : "– : –";
     public IBrush ResultBrush { get; init; } = Brushes.Gray;
     public string Detail { get; init; } = "";
     public string HomeName => Home.Name;

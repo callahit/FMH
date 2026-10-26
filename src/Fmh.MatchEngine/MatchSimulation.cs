@@ -20,7 +20,9 @@ internal enum ActionType { Pass, Dribble, Cross, Shot }
 
 internal sealed class MatchSimulation : IMatchSimulation
 {
-    private const double HalfSeconds = 45 * 60;
+    /// <summary>Spielabschnitte: 1 und 2 = Halbzeiten, 3 und 4 = Verlängerung.</summary>
+    private static double PeriodSeconds(int period) => period <= 2 ? 45 * 60 : 15 * 60;
+    private static int PeriodStartMinute(int period) => period switch { 1 => 0, 2 => 45, 3 => 90, _ => 105 };
 
     private readonly EngineConfig C;
     private readonly Rng _rng;
@@ -29,6 +31,7 @@ internal sealed class MatchSimulation : IMatchSimulation
     private readonly List<MatchEvent> _events = new();
 
     private int _half = 1;
+    private int? _penHome, _penAway;
     private double _clock;
     private int _stoppageMinutes = -1;
     private double _stoppageWeight;
@@ -65,10 +68,14 @@ internal sealed class MatchSimulation : IMatchSimulation
     public bool IsFinished => _finished;
     public int? PlayerOfTheMatchId { get; private set; }
 
-    public int Minute => Math.Min(45, (int)(_clock / 60) + 1) + (_half == 2 ? 45 : 0);
+    public int Minute => Math.Min((int)(PeriodSeconds(_half) / 60), (int)(_clock / 60) + 1) + PeriodStartMinute(_half);
 
     public int StoppageMinute =>
-        _clock < HalfSeconds ? 0 : Math.Min(Math.Max(_stoppageMinutes, 1), (int)((_clock - HalfSeconds) / 60) + 1);
+        _clock < PeriodSeconds(_half) ? 0 : Math.Min(Math.Max(_stoppageMinutes, 1), (int)((_clock - PeriodSeconds(_half)) / 60) + 1);
+
+    public bool IsExtraTime => _half >= 3 || (_halfTime && _half == 2);
+    public int? PenaltiesHome => _penHome;
+    public int? PenaltiesAway => _penAway;
 
     // ------------------------------------------------------------------ Aufbau
 
@@ -81,6 +88,8 @@ internal sealed class MatchSimulation : IMatchSimulation
             Tactic = ts.Tactic,
             Formation = ts.Formation,
             HumanControlled = ts.HumanControlled,
+            Orders = ts.Orders,
+            Familiarity = ts.Familiarity,
         };
         for (var i = 0; i < ts.Starting.Count && i < ts.Formation.Slots.Count; i++)
         {
@@ -131,14 +140,8 @@ internal sealed class MatchSimulation : IMatchSimulation
         else if (_halfTime)
         {
             _halfTime = false;
-            _half = 2;
-            _clock = 0;
-            _stoppageMinutes = -1;
-            _stoppageWeight = 0;
-            _ball = Side.Away;
-            _restart = Restart.KickOff;
-            _counter = false;
-            Emit(MatchEventType.SecondHalfKickOff, Side.Away, key: true);
+            StartPeriod(_half + 1);
+            Emit(_half == 2 ? MatchEventType.SecondHalfKickOff : MatchEventType.ExtraTimeStart, _ball, key: true);
         }
         else
         {
@@ -157,24 +160,118 @@ internal sealed class MatchSimulation : IMatchSimulation
         while (!_finished) Step();
     }
 
+    private void StartPeriod(int period)
+    {
+        _half = period;
+        _clock = 0;
+        _stoppageMinutes = -1;
+        _stoppageWeight = 0;
+        _ball = period % 2 == 0 ? Side.Away : Side.Home;
+        _restart = Restart.KickOff;
+        _counter = false;
+    }
+
     private void CheckClock()
     {
-        if (_clock >= HalfSeconds && _stoppageMinutes < 0)
+        var length = PeriodSeconds(_half);
+        if (_clock >= length && _stoppageMinutes < 0)
         {
-            var max = _half == 1 ? 4 : 6;
-            _stoppageMinutes = (int)Math.Clamp(Math.Round(0.6 + _stoppageWeight + _rng.Range(0, 1.4)), 1, max);
-            Emit(MatchEventType.Stoppage, _ball, value: _stoppageMinutes, key: true);
+            var max = _half switch { 1 => 4, 2 => 6, 3 => 2, _ => 3 };
+            var min = _half >= 3 ? 0 : 1;
+            _stoppageMinutes = (int)Math.Clamp(Math.Round(0.6 + _stoppageWeight + _rng.Range(0, 1.4)) - (_half >= 3 ? 1 : 0), min, max);
+            if (_stoppageMinutes > 0) Emit(MatchEventType.Stoppage, _ball, value: _stoppageMinutes, key: true);
         }
-        if (_stoppageMinutes < 0 || _clock < HalfSeconds + _stoppageMinutes * 60) return;
+        if (_stoppageMinutes < 0 || _clock < length + _stoppageMinutes * 60) return;
 
-        if (_half == 1)
+        switch (_half)
         {
-            _halfTime = true;
-            Emit(MatchEventType.HalfTime, _ball, key: true);
+            case 1:
+                _halfTime = true;
+                Emit(MatchEventType.HalfTime, _ball, key: true);
+                break;
+            case 2 when Setup.Knockout is not null && TieLevel():
+                // Pause vor der Verlängerung; ein zusätzlicher Wechsel ist erlaubt.
+                _halfTime = true;
+                Emit(MatchEventType.EndOfRegularTime, _ball, key: true);
+                break;
+            case 3:
+                StartPeriod(4);
+                Emit(MatchEventType.ExtraTimeSecondHalf, _ball);
+                break;
+            case 4 when TieLevel():
+                Shootout();
+                Finish();
+                break;
+            default:
+                Finish();
+                break;
         }
-        else
+    }
+
+    /// <summary>Ist das Duell nach Toren (und ggf. Auswärtstoren) ausgeglichen?</summary>
+    private bool TieLevel()
+    {
+        var k = Setup.Knockout!;
+        var homeAgg = Home.Goals + k.FirstLegHome;
+        var awayAgg = Away.Goals + k.FirstLegAway;
+        if (homeAgg != awayAgg) return false;
+        if (k.AwayGoals && k.TwoLegged && k.FirstLegHome != Away.Goals) return false;
+        return true;
+    }
+
+    public int MaxSubstitutions => Setup.Substitutions + (_half >= 3 || (_halfTime && _half == 2) ? 1 : 0);
+
+    /// <summary>Elfmeterschießen: fünf Schützen je Team, danach Sudden Death.</summary>
+    private void Shootout()
+    {
+        _penHome = 0;
+        _penAway = 0;
+        Emit(MatchEventType.ShootoutStart, Side.Home, key: true);
+        List<MatchPlayer> Order(MatchTeamState t) => t.OnPitch
+            .OrderBy(p => p.Position == Position.GK ? 1 : 0)
+            .ThenByDescending(p => p.Player.Attributes[Attr.Penalties] * 2 + p.Player.Attributes[Attr.Composure])
+            .ToList();
+        var takers = new[] { Order(Home), Order(Away) };
+        for (var round = 0; round < 30; round++)
         {
-            Finish();
+            foreach (var side in new[] { Side.Home, Side.Away })
+            {
+                var team = Team(side);
+                var list = takers[(int)side];
+                if (list.Count == 0) continue;
+                var shooter = list[round % list.Count];
+                var gk = Goalkeeper(Team(side.Other()));
+                var s = 0.6 * Eff(shooter, Attr.Penalties) + 0.4 * Eff(shooter, Attr.Composure);
+                var g = gk is null ? 1.0 : 0.6 * Eff(gk, Attr.Reflexes) + 0.4 * Eff(gk, Attr.OneOnOnes);
+                var p = Math.Clamp(C.PenaltyXg * Math.Exp((s - 11) * C.FinishingSlope) * Math.Exp(-(g - 11) * C.KeeperSlope) * (round >= 5 ? 0.97 : 1), 0.4, 0.95);
+                var scored = _rng.Chance(p);
+                ShotOutcome outcome;
+                if (scored)
+                {
+                    outcome = ShotOutcome.Goal;
+                    if (side == Side.Home) _penHome++; else _penAway++;
+                    shooter.RatingScore += 0.05;
+                }
+                else
+                {
+                    outcome = _rng.Chance(0.6) && gk is not null ? ShotOutcome.Saved : _rng.Chance(0.2) ? ShotOutcome.Post : ShotOutcome.Wide;
+                    shooter.RatingScore -= 0.25;
+                    if (outcome == ShotOutcome.Saved) gk!.RatingScore += 0.3;
+                }
+                Emit(MatchEventType.ShootoutKick, side, shooter, gk, outcome: outcome, kind: ShotKind.Penalty,
+                     value: _penHome!.Value * 100 + _penAway!.Value, key: true);
+                if (round < 5 && Decided(round, side)) goto done;
+            }
+            if (round >= 4 && _penHome != _penAway) break;
+        }
+        done:
+        Emit(MatchEventType.ShootoutEnd, _penHome > _penAway ? Side.Home : Side.Away, value: _penHome!.Value * 100 + _penAway!.Value, key: true);
+
+        bool Decided(int round, Side justKicked)
+        {
+            var homeLeft = 5 - (round + 1);
+            var awayLeft = 5 - (justKicked == Side.Away ? round + 1 : round);
+            return _penHome + homeLeft < _penAway || _penAway + awayLeft < _penHome;
         }
     }
 
@@ -190,7 +287,7 @@ internal sealed class MatchSimulation : IMatchSimulation
             {
                 if (own > 0) mp.RatingScore += 0.25;
                 if (own < 0) mp.RatingScore -= 0.25;
-                var minutes = mp.MinutesPlayed(90);
+                var minutes = mp.MinutesPlayed(Minute);
                 if (conceded == 0 && minutes >= 60 && (mp.Position == Position.GK || PositionInfo.IsDefender(mp.Position)))
                     mp.RatingScore += 0.3;
 
@@ -215,7 +312,7 @@ internal sealed class MatchSimulation : IMatchSimulation
 
     private void UpdateGrades()
     {
-        var minute = _finished ? 90 : Minute;
+        var minute = Minute;
         foreach (var mp in _teams.SelectMany(t => t.Participants))
         {
             var raw = C.GradeBase - mp.RatingScore * C.GradeScale;
@@ -360,6 +457,18 @@ internal sealed class MatchSimulation : IMatchSimulation
         if (row == 4) w[3] *= 0.4 + carrier.Player.Attributes[Attr.LongShots] / 20.0 * 1.2;
         if (row >= 5) w[3] *= wide ? 0.45 : 1.2;
         if (_counter) w[1] *= 1.2;
+        if (OrderOf(carrier) is { } order)
+        {
+            if (order.Role is { } role)
+            {
+                w[0] *= role.Pass;
+                w[1] *= role.Dribble;
+                w[2] *= role.Cross;
+                w[3] *= role.Shot;
+            }
+            if (order.MoreShots) w[3] *= 1.5;
+            if (order.CrossEarly && row is 3 or 4) w[2] *= 1.6;
+        }
         if (att.Shout == Shout.MoreForward) w[3] *= 1.15;
         if (att.Shout == Shout.WasteTime) { w[3] *= 0.6; w[1] *= 0.7; }
         return (ActionType)_rng.WeightedIndex(w);
@@ -377,6 +486,7 @@ internal sealed class MatchSimulation : IMatchSimulation
             _ => r < 0.2 ? 0 : r < 0.8 ? 1 : 2,
         };
         if (_counter) adv++;
+        if (OrderOf(carrier)?.Role is { LongPass: > 1 } longRole && _rng.Chance((longRole.LongPass - 1) * 0.6)) adv++;
         if (att.Shout == Shout.WasteTime) adv = Math.Min(adv, 1);
         var targetRow = Math.Clamp(_row + adv, carrier.Position == Position.GK ? 1 : 0, Grid.Rows - 1);
         var targetCol = DriftCol(_col, ins);
@@ -401,10 +511,10 @@ internal sealed class MatchSimulation : IMatchSimulation
 
         var a = 0.42 * Eff(carrier, Attr.Passing) + 0.18 * Eff(carrier, Attr.Decisions) + 0.12 * Eff(carrier, Attr.Technique)
                 + 0.08 * Eff(carrier, Attr.Flair) + 0.1 * Eff(receiver, Attr.FirstTouch) + 0.1 * Eff(receiver, Attr.OffTheBall)
-                + AttackBonus(att, targetRow);
+                + AttackBonus(att, targetRow) + 0.5 * (OrderOf(carrier)?.Role?.Playmaking ?? 0);
         var d = 0.35 * Eff(defender, Attr.Anticipation) + 0.3 * Eff(defender, Attr.Positioning)
                 + 0.2 * Eff(defender, Attr.Marking) + 0.15 * Eff(defender, Attr.Concentration)
-                + DefenceBonus(def, targetRow);
+                + DefenceBonus(def, targetRow) + 0.5 * MarkingBonus(defender);
         var baseP = C.PassBaseByRow[targetRow] - (adv >= 2 ? C.LongPassPenalty * (adv - 1) : 0) - WeatherPenalty();
         var p = Prob(att.Side, a, d, baseP);
 
@@ -438,7 +548,7 @@ internal sealed class MatchSimulation : IMatchSimulation
                 + AttackBonus(att, _row);
         var d = 0.4 * Eff(defender, Attr.Tackling) + 0.2 * Eff(defender, Attr.Positioning) + 0.1 * Eff(defender, Attr.Acceleration)
                 + 0.1 * Eff(defender, Attr.Pace) + 0.1 * Eff(defender, Attr.Strength) + 0.1 * Eff(defender, Attr.Anticipation)
-                + DefenceBonus(def, _row) + TacklingBonus(def);
+                + DefenceBonus(def, _row) + TacklingBonus(def) + MarkingBonus(defender);
         var won = _rng.Chance(Prob(att.Side, a, d, C.DribbleBase));
 
         if (won)
@@ -660,12 +770,31 @@ internal sealed class MatchSimulation : IMatchSimulation
         var target = ChooseAttacker(att, 6, 2, taker, ActionType.Cross);
         var marker = ChooseDefender(def, 6, 2, aerial: true);
         var quality = Eff(taker, Attr.Corners);
-        if (_rng.Chance(C.CornerHeaderChance * (0.7 + quality / 20.0 * 0.6)) && AerialDuel(att, def, target, marker))
+        var routine = att.Tactic.Corners;
+        var headerChance = C.CornerHeaderChance * (0.7 + quality / 20.0 * 0.6) * routine switch
+        {
+            CornerRoutine.Short => 0.5,
+            CornerRoutine.TallPlayersForward => 1.2,
+            _ => 1.0,
+        };
+        var xg = C.CornerHeaderXg * (routine == CornerRoutine.FarPost ? 1.15 : 1.0);
+        if (_rng.Chance(headerChance) && AerialDuel(att, def, target, marker))
         {
             Emit(MatchEventType.AerialWon, att.Side, target, marker, row: 6, col: 2);
-            ResolveShot(att, def, target, taker, 6, 2, ShotKind.Header, C.CornerHeaderXg);
+            ResolveShot(att, def, target, taker, 6, 2, ShotKind.Header, xg);
         }
-        else Turnover(att, def, 6, 2);
+        else if (routine == CornerRoutine.Short && _rng.Chance(0.55))
+        {
+            // Kurz ausgeführt: Ballbesitz bleibt, Angriff wird von der Seite neu aufgebaut.
+            _row = 5;
+            _col = _rng.Chance(0.5) ? 0 : 4;
+            _carrier = taker;
+        }
+        else
+        {
+            Turnover(att, def, 6, 2);
+            if (routine == CornerRoutine.TallPlayersForward && !_counter && _rng.Chance(0.2)) _counter = true;
+        }
     }
 
     private bool ResolveFreeKick(MatchTeamState att, MatchTeamState def)
@@ -674,8 +803,14 @@ internal sealed class MatchSimulation : IMatchSimulation
         var col = _restartCol;
         var taker = SetPieceTaker(att, att.Tactic.FreeKickTakerId, Attr.FreeKicks);
         var central = col is >= 1 and <= 3;
+        var share = att.Tactic.FreeKicks switch
+        {
+            FreeKickRoutine.Direct => C.DirectFreeKickShare + 0.25,
+            FreeKickRoutine.Cross => 0,
+            _ => C.DirectFreeKickShare,
+        };
         var direct = (row >= 5 || (row == 4 && central))
-                     && _rng.Chance(C.DirectFreeKickShare + (taker.Player.Attributes[Attr.FreeKicks] - 10) * 0.02);
+                     && _rng.Chance(share + (taker.Player.Attributes[Attr.FreeKicks] - 10) * 0.02);
         var meters = row >= 5 ? _rng.Next(17, 23) : _rng.Next(24, 32);
         Emit(MatchEventType.FreeKick, att.Side, taker, row: row, col: col, value: direct ? meters : 0);
 
@@ -809,7 +944,7 @@ internal sealed class MatchSimulation : IMatchSimulation
         if (team.OnPitch.Any(p => p.Position == Position.GK) || team.OnPitch.Count == 0) return;
         var gkSlot = team.Formation.Slots.FindIndex(s => s.Position == Position.GK);
         var benchGk = team.Bench.FirstOrDefault(p => p.Player.MainPosition == Position.GK);
-        if (benchGk is not null && team.SubstitutionsUsed < Setup.Substitutions)
+        if (benchGk is not null && team.SubstitutionsUsed < MaxSubstitutions)
         {
             var outfield = team.OnPitch.MinBy(p => p.RatingScore)!;
             DoSubstitute(team, outfield, benchGk);
@@ -870,6 +1005,11 @@ internal sealed class MatchSimulation : IMatchSimulation
         if (mp.Position == Position.GK || mp.SlotIndex < 0) return (2, 0);
         var slot = team.Formation.Slots[mp.SlotIndex];
         var push = slot.Duty switch { Duty.Defend => 0.2, Duty.Attack => 1.4, _ => 0.8 };
+        if (OrderOf(mp) is { } order)
+        {
+            push += order.Role?.Push ?? 0;
+            if (order.HoldPosition) push -= 0.4;
+        }
         return (slot.Col, slot.Row + push + 0.15 * EffMentality(team));
     }
 
@@ -896,7 +1036,8 @@ internal sealed class MatchSimulation : IMatchSimulation
             var dr = pr - row;
             var w = Math.Exp(-(dc * dc * 0.45 + dr * dr * 0.7));
             if (action == ActionType.Cross)
-                w *= (mp.Player.Attributes[Attr.Heading] + mp.Player.Attributes[Attr.JumpingReach]) / 20.0;
+                w *= (mp.Player.Attributes[Attr.Heading] + mp.Player.Attributes[Attr.JumpingReach]) / 20.0 * (OrderOf(mp)?.Role?.Aerial ?? 1);
+            w *= OrderOf(mp)?.Role?.Target ?? 1;
             if (mp.Injured) w *= 0.5;
             weights[i] = w + 1e-6;
         }
@@ -977,7 +1118,7 @@ internal sealed class MatchSimulation : IMatchSimulation
 
     private double AttackBonus(MatchTeamState att, int row)
     {
-        var bonus = 0.12 * EffMentality(att);
+        var bonus = 0.12 * EffMentality(att) + FamiliarityBonus(att);
         if (_counter) bonus += C.CounterBonus;
         bonus += att.Tactic.Instructions.Tempo switch { Tempo.High => -0.3, Tempo.Low => 0.15, _ => 0 };
         return bonus;
@@ -986,7 +1127,7 @@ internal sealed class MatchSimulation : IMatchSimulation
     private double DefenceBonus(MatchTeamState def, int attRow)
     {
         var ins = def.Tactic.Instructions;
-        var bonus = -0.1 * EffMentality(def);
+        var bonus = -0.1 * EffMentality(def) + FamiliarityBonus(def);
         if (ins.Pressing == PressingHeight.High && attRow <= 2) bonus += 1.0;
         if (ins.Pressing == PressingHeight.Low) bonus += attRow >= 5 ? 0.5 : attRow <= 2 ? -0.5 : 0;
         if (ins.Line == DefensiveLine.High && attRow >= 5) bonus -= 0.6;
@@ -994,6 +1135,18 @@ internal sealed class MatchSimulation : IMatchSimulation
         if (def.Shout == Shout.Concentrate) bonus += 0.3;
         return bonus;
     }
+
+    /// <summary>Taktikvertrautheit: unter 70 % kostet sie bis zu 0,8 Attributpunkte, darüber bringt sie bis zu 0,4.</summary>
+    private static double FamiliarityBonus(MatchTeamState team) => (Math.Clamp(team.Familiarity, 0, 100) - 70) * 0.012;
+
+    private ResolvedOrder? OrderOf(MatchPlayer mp)
+    {
+        var team = _teamOf[mp];
+        return mp.SlotIndex >= 0 && mp.SlotIndex < team.Orders.Count ? team.Orders[mp.SlotIndex] : null;
+    }
+
+    private double MarkingBonus(MatchPlayer defender) =>
+        (OrderOf(defender) is { } o ? (o.Role?.Tackle ?? 0) + (o.TightMarking ? 0.5 : 0) : 0);
 
     private static double TacklingBonus(MatchTeamState def) =>
         def.Tactic.Instructions.Tackling switch { TacklingStyle.Hard => 0.5, TacklingStyle.Fair => -0.4, _ => 0 };
@@ -1041,7 +1194,7 @@ internal sealed class MatchSimulation : IMatchSimulation
         foreach (var injured in team.OnPitch.Where(p => p.Injured).ToList())
             AutoReplace(team, injured);
 
-        if (minute >= C.AiEarliestSubMinute && team.SubstitutionsUsed < Setup.Substitutions
+        if (minute >= C.AiEarliestSubMinute && team.SubstitutionsUsed < MaxSubstitutions
             && minute - _lastAiSubMinute[(int)side] >= 4 && team.Bench.Count > 0)
         {
             var outfield = team.OnPitch.Where(p => p.Position != Position.GK).ToList();
@@ -1067,7 +1220,7 @@ internal sealed class MatchSimulation : IMatchSimulation
 
     private bool AutoReplace(MatchTeamState team, MatchPlayer outMp)
     {
-        if (team.SubstitutionsUsed >= Setup.Substitutions || !team.OnPitch.Contains(outMp)) return false;
+        if (team.SubstitutionsUsed >= MaxSubstitutions || !team.OnPitch.Contains(outMp)) return false;
         var pos = outMp.Position;
         var best = team.Bench
             .Where(p => pos == Position.GK ? p.Player.MainPosition == Position.GK : p.Player.MainPosition != Position.GK)
@@ -1098,7 +1251,7 @@ internal sealed class MatchSimulation : IMatchSimulation
         var team = Team(side);
         errorKey = null;
         if (_finished) errorKey = "sub.finished";
-        else if (team.SubstitutionsUsed >= Setup.Substitutions) errorKey = "sub.noneLeft";
+        else if (team.SubstitutionsUsed >= MaxSubstitutions) errorKey = "sub.noneLeft";
         var outMp = team.OnPitch.FirstOrDefault(p => p.Player.Id == outPlayerId);
         var inMp = team.Bench.FirstOrDefault(p => p.Player.Id == inPlayerId);
         if (errorKey is null && outMp is null) errorKey = "sub.notOnPitch";

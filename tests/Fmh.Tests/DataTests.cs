@@ -12,7 +12,7 @@ public class DataTests
     {
         Assert.Empty(DataValidator.Validate(TestData.Data));
         Assert.Contains(TestData.Data.Packages, p => p.Id == "base");
-        Assert.Equal(36, TestData.Data.Clubs.Count);
+        Assert.Equal(64, TestData.Data.Clubs.Count);
         Assert.True(TestData.Data.Formations.Count >= 15);
     }
 
@@ -75,13 +75,15 @@ public class DataTests
         var texts = TestData.Data.Texts;
         var missing = new List<string>();
         var src = Path.Combine(TestData.RepoRoot(), "src");
-        var keyPattern = new Regex("\"((?:app|menu|ui|unit|help|tip|filter|radar|toneHint|shoutHint|gameMenu|load|newGame|background|expectation|status|inbox|squad|col|player|foot|suit|suitShort|group|attr|pos|morale|injury|tactics|tactic|mentality|advice|lineup|sub|fixtures|league|club|placeholder|options|match|stat|pause|comm|msg|tone|shout|speed|weather)\\.[A-Za-z0-9.]+)\"");
+        var keyPattern = new Regex("\"((?:app|menu|ui|unit|help|tip|filter|radar|toneHint|shoutHint|gameMenu|load|newGame|background|expectation|status|inbox|squad|col|player|foot|suit|suitShort|group|attr|pos|morale|injury|tactics|tactic|mentality|advice|lineup|sub|fixtures|league|club|placeholder|options|match|stat|pause|comm|msg|tone|neg|refuse|tx|cup|scout|camp|youth|score|transfer|shout|speed|weather)\\.[A-Za-z0-9.]+)\"");
         foreach (var file in Directory.EnumerateFiles(src, "*.cs", SearchOption.AllDirectories))
         {
             foreach (Match m in keyPattern.Matches(File.ReadAllText(file)))
             {
                 var key = m.Groups[1].Value;
                 if (key.EndsWith('.')) continue;
+                // Präfix für zusammengesetzte Schlüssel (key + ".subject").
+                if (texts.Has(key + ".subject") && texts.Has(key + ".body")) continue;
                 if (!texts.Has(key)) missing.Add($"{key} ({Path.GetFileName(file)})");
             }
         }

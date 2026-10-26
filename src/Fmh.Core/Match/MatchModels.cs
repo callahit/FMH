@@ -26,6 +26,24 @@ public sealed class TeamSetup
     public List<Player> Bench { get; init; } = new();
     /// <summary>Wird die Mannschaft von einem Menschen gesteuert? Sonst trifft die KI Wechsel und Taktikänderungen.</summary>
     public bool HumanControlled { get; init; }
+    /// <summary>Rollen und Spieleranweisungen je Slot (Index = Formations-Slot).</summary>
+    public IReadOnlyList<ResolvedOrder> Orders { get; init; } = Array.Empty<ResolvedOrder>();
+    /// <summary>Taktikvertrautheit 0–100 mit der gespielten Formation.</summary>
+    public double Familiarity { get; init; } = 70;
+}
+
+/// <summary>Rolle und Anweisungen eines Slots, fertig aufgelöst für die Engine.</summary>
+public sealed record ResolvedOrder(RoleDef? Role, bool MoreShots, bool TightMarking, bool CrossEarly, bool HoldPosition);
+
+/// <summary>K.-o.-Spiel: Verlängerung und Elfmeterschießen bei Gleichstand (Kapitel 3).</summary>
+public sealed class KnockoutContext
+{
+    /// <summary>Tore aus dem Hinspiel aus Sicht des heutigen Heim- bzw. Gastteams.</summary>
+    public int FirstLegHome { get; init; }
+    public int FirstLegAway { get; init; }
+    public bool AwayGoals { get; init; }
+    public bool TwoLegged => HasFirstLeg;
+    public bool HasFirstLeg { get; init; }
 }
 
 public sealed class MatchSetup
@@ -34,6 +52,8 @@ public sealed class MatchSetup
     public required TeamSetup Away { get; init; }
     public required EngineConfig Config { get; init; }
     public required PositionProfiles Profiles { get; init; }
+    /// <summary>Rollen für Standardrollen nach einem Formationswechsel im Spiel.</summary>
+    public IReadOnlyList<RoleDef> Roles { get; init; } = Array.Empty<RoleDef>();
     public IReadOnlyList<InjuryType> InjuryTypes { get; init; } = Array.Empty<InjuryType>();
     public ulong Seed { get; init; }
     public int RefereeStrictness { get; init; } = 10;
@@ -41,6 +61,7 @@ public sealed class MatchSetup
     public double InjuryFrequency { get; init; } = 1.0;
     public int Substitutions { get; init; } = 5;
     public bool NeutralGround { get; init; }
+    public KnockoutContext? Knockout { get; init; }
 
     public TeamSetup Team(Side s) => s == Side.Home ? Home : Away;
 }
@@ -48,6 +69,7 @@ public sealed class MatchSetup
 public enum MatchEventType
 {
     KickOff, SecondHalfKickOff, HalfTime, FullTime, Stoppage,
+    EndOfRegularTime, ExtraTimeStart, ExtraTimeSecondHalf, ShootoutStart, ShootoutKick, ShootoutEnd,
     Attack, Counter, Dribble, Cross, AerialWon,
     Shot, Goal,
     Foul, YellowCard, SecondYellow, RedCard,
@@ -155,6 +177,8 @@ public sealed class MatchTeamState
     public required Tactic Tactic { get; init; }
     public required Formation Formation { get; set; }
     public bool HumanControlled { get; set; }
+    public IReadOnlyList<ResolvedOrder> Orders { get; set; } = Array.Empty<ResolvedOrder>();
+    public double Familiarity { get; set; } = 70;
     public List<MatchPlayer> OnPitch { get; } = new();
     public List<MatchPlayer> Bench { get; } = new();
     /// <summary>Ausgewechselte oder vom Platz gestellte Spieler.</summary>
@@ -187,8 +211,14 @@ public interface IMatchSimulation
     IReadOnlyList<MatchEvent> Events { get; }
     int Minute { get; }
     int StoppageMinute { get; }
+    /// <summary>Pause zur Halbzeit oder vor der Verlängerung; der nächste Schritt pfeift wieder an.</summary>
     bool IsHalfTime { get; }
     bool IsFinished { get; }
+    bool IsExtraTime { get; }
+    int? PenaltiesHome { get; }
+    int? PenaltiesAway { get; }
+    /// <summary>Erlaubte Wechsel (in der Verlängerung einer mehr).</summary>
+    int MaxSubstitutions { get; }
 
     /// <summary>Simuliert die nächste Spielphase und gibt die neu entstandenen Ereignisse zurück.</summary>
     IReadOnlyList<MatchEvent> Step();

@@ -12,8 +12,10 @@ public class SessionTests
     public void AdvanceStopsOnFirstOwnMatchday()
     {
         var s = TestData.NewSession();
-        var first = s.World.LeagueOf(s.HumanClub).Fixtures.Where(f => f.Involves(s.HumanClub.Id)).Min(f => f.Date);
+        // Erster Pflichttermin ist die 1. Pokalrunde.
+        var first = s.AllFixtures.Where(f => f.Involves(s.HumanClub.Id)).Min(f => f.Date);
         var r = s.Advance();
+        while (r.Reason == StopReason.Decision) { s.DelegateDecisions(); r = s.Advance(); }
         // Die Willkommensnachricht stammt vom Spielstart, daher hält "Weiter" erst am Spieltag.
         Assert.Equal(StopReason.HumanMatch, r.Reason);
         Assert.Equal(first, s.World.Date);
@@ -34,11 +36,20 @@ public class SessionTests
         TestData.PlayUntil(s, r => r.Reason == StopReason.SeasonEnd);
         Assert.True(s.World.Leagues.All(l => l.IsComplete));
         Assert.All(s.World.Leagues, l => Assert.Equal(l.ClubIds.Count * (l.ClubIds.Count - 1), l.Fixtures.Count));
-        Assert.Equal(2, s.World.History.Count);
+        Assert.Equal(2, s.World.History.Count(h => s.World.FindLeague(h.LeagueId) is not null));
+        Assert.Contains(s.World.Cups, c => c.Kind == CompetitionKind.Cup && c.IsFinished);
+        var playoff = Assert.Single(s.World.Cups, c => c.Kind == CompetitionKind.Playoff);
+        Assert.True(playoff.IsFinished);
         Assert.Contains(s.Inbox, m => m.Type == MessageType.Season);
 
-        var relegated = LeagueTable.Compute(l1).TakeLast(3).Select(r => r.ClubId).ToList();
-        var promoted = LeagueTable.Compute(l2).Take(3).Select(r => r.ClubId).ToList();
+        // Zwei direkte Auf- und Absteiger, dazu der Verlierer bzw. Sieger der Relegation (16. gegen 3.).
+        var relegated = LeagueTable.Compute(l1).TakeLast(2).Select(r => r.ClubId).ToList();
+        var promoted = LeagueTable.Compute(l2).Take(2).Select(r => r.ClubId).ToList();
+        var upper16 = LeagueTable.Compute(l1).First(r => r.Position == 16).ClubId;
+        var lower3 = LeagueTable.Compute(l2).First(r => r.Position == 3).ClubId;
+        Assert.Contains(upper16, playoff.ParticipantIds);
+        Assert.Contains(lower3, playoff.ParticipantIds);
+        if (playoff.WinnerId == lower3) { promoted.Add(lower3); relegated.Add(upper16); }
         var year = s.World.SeasonYear;
 
         TestData.PlayUntil(s, r => r.Reason == StopReason.NewSeason || s.World.SeasonYear > year);
@@ -48,7 +59,9 @@ public class SessionTests
         Assert.All(s.World.Leagues, l => Assert.Equal(18, l.ClubIds.Count));
         Assert.All(s.World.Leagues, l => Assert.All(l.Fixtures, f => Assert.Null(f.Result)));
         Assert.All(s.World.Clubs.Values, c => Assert.Empty(LineupSelector.Validate(c, s.World, TestData.Data)));
-        Assert.All(s.World.Clubs.Values, c => Assert.Equal(25, c.PlayerIds.Count));
+        // Der menschliche Verein verlängert in diesem Test nie Verträge; das Sicherheitsnetz hält ihn bei 16.
+        Assert.All(s.World.Clubs.Values, c => Assert.InRange(c.PlayerIds.Count, c == s.HumanClub ? 16 : 20, s.World.Country(c.CountryCode).Squad.MaxSquad));
+        Assert.Contains(s.World.Cups, c => c.Kind == CompetitionKind.Cup && c.SeasonYear == year + 1 && c.Rounds[0].Drawn);
     }
 
     [Fact]
@@ -62,7 +75,10 @@ public class SessionTests
         Assert.Contains(players, p => p.State.RecentGrades.Count > 0);
         Assert.Contains(players, p => p.State.Injury is not null || p.History.Count > 0 || s.Inbox.Any(m => m.Type == MessageType.Medical));
         var totalGoals = s.AllFixtures.Where(f => f.Result is not null).Sum(f => f.Result!.HomeGoals + f.Result!.AwayGoals);
-        Assert.Equal(totalGoals, s.World.Players.Values.Sum(p => p.SeasonStats.Goals));
+        // Nach einem Vereinswechsel liegt die Statistik des alten Vereins in der Historie derselben Saison.
+        var season = s.World.SeasonYear;
+        Assert.Equal(totalGoals, s.World.Players.Values.Sum(p =>
+            (p.SeasonStats.SeasonYear == season ? p.SeasonStats.Goals : 0) + p.History.Where(h => h.SeasonYear == season).Sum(h => h.Goals)));
     }
 
     [Fact]

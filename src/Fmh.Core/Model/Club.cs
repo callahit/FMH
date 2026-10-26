@@ -18,5 +18,21 @@ public sealed class Club
     public string LeagueId { get; set; } = "";
     public List<int> PlayerIds { get; set; } = new();
     public Tactic Tactic { get; set; } = new();
+    /// <summary>Bis zu drei gespeicherte Taktikvarianten, im Spiel umschaltbar.</summary>
+    public List<Tactic> SavedTactics { get; set; } = new();
+    /// <summary>Taktikvertrautheit 0–100 je Formation; steigt durch Taktiktraining und Spiele.</summary>
+    public Dictionary<string, double> Familiarity { get; set; } = new();
+    public TrainingPlan Training { get; set; } = new();
+    public TrainingCamp? Camp { get; set; }
     public int? ManagerId { get; set; }
+    public ClubBudget Budget { get; set; } = new();
+    /// <summary>Qualität des Trainerstabs 1–20 (bis zum Personalmodul in Phase 3 aus der Reputation).</summary>
+    public int CoachQuality { get; set; } = 10;
+    /// <summary>Jugendzentrum 1–20: Qualität des Jugendjahrgangs.</summary>
+    public int YouthFacilities { get; set; } = 10;
+    /// <summary>Rekrutierungsnetz 1–20: Zahl und Herkunft der Talente.</summary>
+    public int YouthRecruitment { get; set; } = 10;
+    public List<int> YouthIds { get; set; } = new();
+    /// <summary>Beobachtungsliste des Managers.</summary>
+    public List<int> Shortlist { get; set; } = new();
 }

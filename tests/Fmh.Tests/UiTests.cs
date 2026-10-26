@@ -5,6 +5,7 @@ using Avalonia.Headless.XUnit;
 using Avalonia.Input;
 using Avalonia.Threading;
 using Avalonia.VisualTree;
+using Fmh.Core.Game;
 using Fmh.Core.Model;
 using Fmh.Desktop;
 using Fmh.Desktop.Services;
@@ -166,13 +167,23 @@ public class UiTests
         Shot(w, "21_tactics_changed");
     }
 
+    /// <summary>"Weiter" bis zum Spieltag; Pflicht-Entscheidungen (z. B. Angebote) übernimmt der Assistent.</summary>
+    private static void ContinueToMatchday(ShellViewModel shell, GameSession session)
+    {
+        for (var i = 0; i < 20 && session.PendingHumanFixture is null; i++)
+        {
+            if (session.PendingDecisions.Count > 0) session.DelegateDecisions();
+            shell.Continue();
+        }
+    }
+
     [AvaloniaFact]
     public void PlayMatchdayLive()
     {
         var (w, vm) = Open();
         var shell = StartGame(vm);
         var session = AppState.Current.Session!;
-        shell.Continue();
+        ContinueToMatchday(shell, session);
         var fixture = session.PendingHumanFixture;
         Assert.NotNull(fixture);
         shell.Continue();
@@ -239,7 +250,7 @@ public class UiTests
         var shell = StartGame(vm);
         var session = AppState.Current.Session!;
         session.HumanManager.Profile.MatchDisplay = MatchDisplayMode.Instant;
-        shell.Continue();
+        ContinueToMatchday(shell, AppState.Current.Session!);
         shell.Continue();
         var match = Assert.IsType<MatchViewModel>(vm.Screen);
         match.Kickoff();

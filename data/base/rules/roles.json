@@ -1,0 +1,323 @@
+[
+ {
+  "id": "goalkeeper",
+  "positions": [
+   "GK"
+  ],
+  "duties": [
+   "Defend"
+  ],
+  "defaultDuty": "Defend"
+ },
+ {
+  "id": "sweeperKeeper",
+  "positions": [
+   "GK"
+  ],
+  "duties": [
+   "Support"
+  ],
+  "defaultDuty": "Support",
+  "playmaking": 0.5,
+  "longPass": 0.8
+ },
+ {
+  "id": "centreBack",
+  "positions": [
+   "DC"
+  ],
+  "duties": [
+   "Defend",
+   "Support"
+  ],
+  "defaultDuty": "Defend",
+  "tackle": 0.3
+ },
+ {
+  "id": "ballPlayingDefender",
+  "positions": [
+   "DC"
+  ],
+  "duties": [
+   "Defend",
+   "Support"
+  ],
+  "defaultDuty": "Defend",
+  "longPass": 1.4,
+  "playmaking": 0.6
+ },
+ {
+  "id": "noNonsenseCentreBack",
+  "positions": [
+   "DC"
+  ],
+  "duties": [
+   "Defend"
+  ],
+  "defaultDuty": "Defend",
+  "tackle": 0.6,
+  "pass": 0.8
+ },
+ {
+  "id": "fullBack",
+  "positions": [
+   "DL",
+   "DR"
+  ],
+  "duties": [
+   "Defend",
+   "Support",
+   "Attack"
+  ],
+  "defaultDuty": "Support",
+  "cross": 1.0
+ },
+ {
+  "id": "wingBack",
+  "positions": [
+   "DL",
+   "DR"
+  ],
+  "duties": [
+   "Support",
+   "Attack"
+  ],
+  "defaultDuty": "Attack",
+  "push": 0.6,
+  "cross": 1.4
+ },
+ {
+  "id": "anchor",
+  "positions": [
+   "DM"
+  ],
+  "duties": [
+   "Defend"
+  ],
+  "defaultDuty": "Defend",
+  "tackle": 0.6,
+  "push": -0.3
+ },
+ {
+  "id": "ballWinner",
+  "positions": [
+   "DM",
+   "MC"
+  ],
+  "duties": [
+   "Defend",
+   "Support"
+  ],
+  "defaultDuty": "Defend",
+  "tackle": 0.8,
+  "pass": 0.9
+ },
+ {
+  "id": "deepPlaymaker",
+  "positions": [
+   "DM",
+   "MC"
+  ],
+  "duties": [
+   "Defend",
+   "Support"
+  ],
+  "defaultDuty": "Support",
+  "playmaking": 1.0,
+  "longPass": 1.3,
+  "target": 1.3
+ },
+ {
+  "id": "centralMidfielder",
+  "positions": [
+   "MC"
+  ],
+  "duties": [
+   "Defend",
+   "Support",
+   "Attack"
+  ],
+  "defaultDuty": "Support"
+ },
+ {
+  "id": "boxToBox",
+  "positions": [
+   "MC"
+  ],
+  "duties": [
+   "Support"
+  ],
+  "defaultDuty": "Support",
+  "push": 0.5,
+  "shot": 1.2,
+  "tackle": 0.3
+ },
+ {
+  "id": "advancedPlaymaker",
+  "positions": [
+   "MC",
+   "AMC",
+   "AML",
+   "AMR"
+  ],
+  "duties": [
+   "Support",
+   "Attack"
+  ],
+  "defaultDuty": "Support",
+  "playmaking": 1.0,
+  "target": 1.3,
+  "pass": 1.1
+ },
+ {
+  "id": "wideMidfielder",
+  "positions": [
+   "ML",
+   "MR"
+  ],
+  "duties": [
+   "Defend",
+   "Support",
+   "Attack"
+  ],
+  "defaultDuty": "Support"
+ },
+ {
+  "id": "winger",
+  "positions": [
+   "ML",
+   "MR",
+   "AML",
+   "AMR"
+  ],
+  "duties": [
+   "Support",
+   "Attack"
+  ],
+  "defaultDuty": "Attack",
+  "cross": 1.5,
+  "dribble": 1.2
+ },
+ {
+  "id": "invertedWinger",
+  "positions": [
+   "ML",
+   "MR",
+   "AML",
+   "AMR"
+  ],
+  "duties": [
+   "Support",
+   "Attack"
+  ],
+  "defaultDuty": "Support",
+  "shot": 1.4,
+  "dribble": 1.3,
+  "cross": 0.6
+ },
+ {
+  "id": "attackingMidfielder",
+  "positions": [
+   "AMC"
+  ],
+  "duties": [
+   "Support",
+   "Attack"
+  ],
+  "defaultDuty": "Attack",
+  "shot": 1.2
+ },
+ {
+  "id": "shadowStriker",
+  "positions": [
+   "AMC"
+  ],
+  "duties": [
+   "Attack"
+  ],
+  "defaultDuty": "Attack",
+  "push": 0.6,
+  "shot": 1.4
+ },
+ {
+  "id": "insideForward",
+  "positions": [
+   "AML",
+   "AMR"
+  ],
+  "duties": [
+   "Support",
+   "Attack"
+  ],
+  "defaultDuty": "Attack",
+  "shot": 1.5,
+  "dribble": 1.2,
+  "cross": 0.7
+ },
+ {
+  "id": "advancedForward",
+  "positions": [
+   "ST"
+  ],
+  "duties": [
+   "Attack"
+  ],
+  "defaultDuty": "Attack",
+  "push": 0.4,
+  "dribble": 1.2
+ },
+ {
+  "id": "targetMan",
+  "positions": [
+   "ST"
+  ],
+  "duties": [
+   "Support",
+   "Attack"
+  ],
+  "defaultDuty": "Attack",
+  "aerial": 1.6,
+  "target": 1.3,
+  "dribble": 0.7
+ },
+ {
+  "id": "poacher",
+  "positions": [
+   "ST"
+  ],
+  "duties": [
+   "Attack"
+  ],
+  "defaultDuty": "Attack",
+  "shot": 1.4,
+  "push": 0.3,
+  "pass": 0.8
+ },
+ {
+  "id": "deepLyingForward",
+  "positions": [
+   "ST"
+  ],
+  "duties": [
+   "Support",
+   "Attack"
+  ],
+  "defaultDuty": "Support",
+  "playmaking": 0.5,
+  "push": -0.3,
+  "pass": 1.3
+ },
+ {
+  "id": "pressingForward",
+  "positions": [
+   "ST"
+  ],
+  "duties": [
+   "Defend",
+   "Support",
+   "Attack"
+  ],
+  "defaultDuty": "Support",
+  "tackle": 0.5
+ }
+]

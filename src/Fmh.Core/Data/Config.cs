@@ -20,8 +20,97 @@ public sealed class CountryConfig
     public SquadRules Squad { get; set; } = new();
     public DisciplineConfig Discipline { get; set; } = new();
     public List<LevelConfig> Levels { get; set; } = new();
+    /// <summary>Vereine ohne Ligabetrieb im Spiel (z. B. Amateure), die nur im Pokal antreten.</summary>
+    public List<PoolConfig> Pools { get; set; } = new();
+    public List<CupConfig> Cups { get; set; } = new();
+    public List<PlayoffConfig> Playoffs { get; set; } = new();
+    public TransferWindowConfig TransferWindows { get; set; } = new();
+    public YouthConfig Youth { get; set; } = new();
 
     public IEnumerable<DivisionConfig> Divisions => Levels.SelectMany(l => l.Divisions);
+}
+
+public sealed class PoolConfig
+{
+    public string Id { get; set; } = "";
+    public string Name { get; set; } = "";
+    public int Teams { get; set; }
+}
+
+/// <summary>Pokalformat (Kapitel 3): Teilnehmer, Runden, Heimrecht, Termine.</summary>
+public sealed class CupConfig
+{
+    public string Id { get; set; } = "";
+    public string Name { get; set; } = "";
+    /// <summary>Ligen und Pools, deren Vereine teilnehmen.</summary>
+    public List<string> Participants { get; set; } = new();
+    /// <summary>Teilnehmerzahl (Zweierpotenz). Fehlende Plätze werden mit Freilosen aufgefüllt.</summary>
+    public int Teams { get; set; } = 64;
+    /// <summary>Unterklassige Vereine haben Heimrecht (wie im DFB-Pokal).</summary>
+    public bool LowerTierHome { get; set; } = true;
+    public int Legs { get; set; } = 1;
+    public bool AwayGoals { get; set; }
+    /// <summary>Termine je Runde im Format MM-TT (bei zwei Spielen zwei Termine je Runde, durch Komma getrennt).</summary>
+    public List<string> Dates { get; set; } = new();
+    public bool NeutralFinal { get; set; } = true;
+}
+
+/// <summary>Relegation zwischen zwei Ebenen (Hin- und Rückspiel).</summary>
+public sealed class PlayoffConfig
+{
+    public string Id { get; set; } = "";
+    public string Name { get; set; } = "";
+    public string UpperDivision { get; set; } = "";
+    public int UpperPosition { get; set; }
+    public string LowerDivision { get; set; } = "";
+    public int LowerPosition { get; set; }
+    public int Legs { get; set; } = 2;
+    public bool AwayGoals { get; set; }
+    public List<string> Dates { get; set; } = new();
+}
+
+public sealed class TransferWindowConfig
+{
+    public string SummerStart { get; set; } = "07-01";
+    public string SummerEnd { get; set; } = "08-31";
+    public string WinterStart { get; set; } = "01-01";
+    public string WinterEnd { get; set; } = "01-31";
+    /// <summary>Vorverträge mit auslaufenden Spielern ab diesem Datum (MM-TT).</summary>
+    public string PreContractFrom { get; set; } = "01-01";
+}
+
+public sealed class YouthConfig
+{
+    /// <summary>Monat des Jugendjahrgangs (Kapitel 7: März).</summary>
+    public int IntakeMonth { get; set; } = 3;
+    public int MinPlayers { get; set; } = 8;
+    public int MaxPlayers { get; set; } = 16;
+    public int ProContractAge { get; set; } = 17;
+    public int PromoteAge { get; set; } = 16;
+}
+
+/// <summary>Spielerrolle (Kapitel 5, FM22): erlaubte Positionen, Aufgaben und Wirkung in der Matchengine.</summary>
+public sealed class RoleDef
+{
+    public string Id { get; set; } = "";
+    public List<Position> Positions { get; set; } = new();
+    public List<Duty> Duties { get; set; } = new();
+    public Duty DefaultDuty { get; set; } = Duty.Support;
+    /// <summary>Faktoren auf die Aktionswahl (1 = neutral).</summary>
+    public double Pass { get; set; } = 1;
+    public double LongPass { get; set; } = 1;
+    public double Dribble { get; set; } = 1;
+    public double Cross { get; set; } = 1;
+    public double Shot { get; set; } = 1;
+    /// <summary>Zusätzlicher Vorstoß in Reihen beim Angriff.</summary>
+    public double Push { get; set; }
+    /// <summary>Wie oft der Spieler angespielt wird bzw. Ziel von Flanken ist.</summary>
+    public double Target { get; set; } = 1;
+    public double Aerial { get; set; } = 1;
+    /// <summary>Bonus im Zweikampf als Verteidiger (Attributpunkte).</summary>
+    public double Tackle { get; set; }
+    /// <summary>Bonus beim Passspiel (Attributpunkte).</summary>
+    public double Playmaking { get; set; }
 }
 
 public sealed class SeasonConfig
