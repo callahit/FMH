@@ -57,6 +57,8 @@
                       <TextBlock Text="{Binding StrengthText}" Foreground="{Binding StrengthBrush}" FontSize="12" FontWeight="Bold" />
                     </StackPanel>
                   </Border>
+                  <TextBlock Text="{Binding RoleText}" Foreground="White" FontSize="10" HorizontalAlignment="Center" Opacity="0.85"
+                             TextTrimming="CharacterEllipsis" MaxWidth="96" />
                 </StackPanel>
               </DataTemplate>
             </ItemsControl.ItemTemplate>
@@ -119,6 +121,53 @@
       <!-- Anweisungen, Standards, Co-Trainer -->
       <ScrollViewer Grid.Column="2">
         <StackPanel Spacing="12">
+          <!-- Gewählter Platz: Rolle, Aufgabe, Anweisungen, freie Positionierung -->
+          <Border Classes="card" IsVisible="{Binding HasSlot}" BorderBrush="{DynamicResource GoldBrush}">
+            <StackPanel Spacing="6">
+              <TextBlock Classes="h2" Text="{Binding SlotTitle}" />
+              <Grid ColumnDefinitions="150,*" Margin="0,3">
+                <TextBlock Text="{Binding RoleSetting.Label}" VerticalAlignment="Center" Classes="muted" />
+                <ComboBox Grid.Column="1" ItemsSource="{Binding RoleSetting.Options}" SelectedIndex="{Binding RoleSetting.SelectedIndex}" HorizontalAlignment="Stretch" />
+              </Grid>
+              <Grid ColumnDefinitions="150,*" Margin="0,3">
+                <TextBlock Text="{Binding DutySetting.Label}" VerticalAlignment="Center" Classes="muted" />
+                <ComboBox Grid.Column="1" ItemsSource="{Binding DutySetting.Options}" SelectedIndex="{Binding DutySetting.SelectedIndex}" HorizontalAlignment="Stretch" />
+              </Grid>
+              <TextBlock Text="{Binding RoleDescription}" Classes="muted small" TextWrapping="Wrap" />
+              <WrapPanel>
+                <CheckBox Content="{s:L order.moreShots}" IsChecked="{Binding MoreShots}" Margin="0,0,14,0" />
+                <CheckBox Content="{s:L order.tightMarking}" IsChecked="{Binding TightMarking}" Margin="0,0,14,0" />
+                <CheckBox Content="{s:L order.crossEarly}" IsChecked="{Binding CrossEarly}" Margin="0,0,14,0" />
+                <CheckBox Content="{s:L order.holdPosition}" IsChecked="{Binding HoldPosition}" />
+              </WrapPanel>
+              <StackPanel Orientation="Horizontal" Spacing="6" Margin="0,4,0,0">
+                <TextBlock Text="{s:L tactics.move}" Classes="muted" VerticalAlignment="Center" Margin="0,0,6,0" />
+                <Button Content="◄" Command="{Binding MoveSlotCommand}" CommandParameter="left" />
+                <Button Content="▲" Command="{Binding MoveSlotCommand}" CommandParameter="up" />
+                <Button Content="▼" Command="{Binding MoveSlotCommand}" CommandParameter="down" />
+                <Button Content="►" Command="{Binding MoveSlotCommand}" CommandParameter="right" />
+                <Button Content="{s:L tactics.resetSlot}" Command="{Binding ResetSlotCommand}" Margin="8,0,0,0" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+          <Border Classes="card">
+            <StackPanel Spacing="6">
+              <TextBlock Classes="h3" Text="{s:L tactics.saved}" />
+              <ItemsControl ItemsSource="{Binding SavedTactics}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:SavedTacticVm">
+                    <Grid ColumnDefinitions="*,Auto,Auto" Margin="0,3" ColumnSpacing="6">
+                      <TextBlock Text="{Binding Label}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                      <Button Grid.Column="1" Content="{s:L tactics.saveHere}"
+                              Command="{Binding $parent[ItemsControl].((vm:TacticsPageViewModel)DataContext).SaveTacticCommand}" CommandParameter="{Binding}" />
+                      <Button Grid.Column="2" Content="{s:L tactics.load}" IsEnabled="{Binding Used}"
+                              Command="{Binding $parent[ItemsControl].((vm:TacticsPageViewModel)DataContext).LoadTacticCommand}" CommandParameter="{Binding}" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
           <Border Classes="card">
             <StackPanel Spacing="4">
               <TextBlock Classes="h3" Text="{s:L tactics.instructions}" Margin="0,0,0,6" />

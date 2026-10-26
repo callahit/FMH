@@ -39,7 +39,10 @@ public sealed partial class GameSession
         WorldGenerator.InitCareer(World, Data, _rng);
         if (!World.Scouts.Any(s => s.ClubId == HumanClub.Id)) CreateScouts(World, HumanClub, Data, _rng, 2);
         if (!World.SeasonFinished && World.Cups.Count == 0 && World.Leagues.All(l => l.Fixtures.All(f => f.Result is null)))
+        {
             CreateCups();
+            InitialYouth();
+        }
         SyncRng();
     }
 
