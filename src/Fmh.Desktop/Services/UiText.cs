@@ -10,6 +10,14 @@ public static class UiText
 {
     private static Texts T => AppState.Current.T;
 
+    /// <summary>Ergebnis mit Zusatz für Verlängerung und Elfmeterschießen, z. B. "2 : 2 i. E. 4 : 3".</summary>
+    public static string Score(MatchResult r)
+    {
+        var s = $"{r.HomeGoals} : {r.AwayGoals}";
+        if (r.PenaltiesHome is { } ph && r.PenaltiesAway is { } pa) return s + " " + T.Format("score.penalties", ph, pa);
+        return r.ExtraTime ? s + " " + T["score.extraTime"] : s;
+    }
+
     public static string Wage(int weekly, ManagerProfile profile, string currency) => profile.WageDisplay switch
     {
         WageDisplay.Week => $"{Fmt.Money(weekly, currency)}{T["unit.perWeek"]}",

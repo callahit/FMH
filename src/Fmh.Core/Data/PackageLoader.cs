@@ -79,6 +79,7 @@ public static class PackageLoader
             Formations = Path1("formations.json") is { } f ? Json.Load<List<Formation>>(f) : new(),
             PositionProfiles = Path1("rules/positions.json") is { } p ? Json.Load<PositionProfiles>(p) : new(),
             Injuries = Path1("rules/injuries.json") is { } i ? Json.Load<List<InjuryType>>(i) : new(),
+            Roles = Path1("rules/roles.json") is { } ro ? Json.Load<List<RoleDef>>(ro) : new(),
             Engine = Path1("rules/engine.json") is { } e ? Json.Load<EngineConfig>(e) : new(),
             Texts = new Texts(texts, language),
             Commentary = commentary,

@@ -73,7 +73,7 @@ public static class Program
             var home = league.ClubIds[rng.Next(league.ClubIds.Count)];
             int away;
             do away = league.ClubIds[rng.Next(league.ClubIds.Count)]; while (away == home);
-            var fixture = new Fixture { Id = 1_000_000 + i, LeagueId = league.Id, HomeId = home, AwayId = away, Date = world.Date, RefereeId = world.Referees[rng.Next(world.Referees.Count)].Id };
+            var fixture = new Fixture { Id = 1_000_000 + i, CompetitionId = league.Id, HomeId = home, AwayId = away, Date = world.Date, RefereeId = world.Referees[rng.Next(world.Referees.Count)].Id };
             var sim = session.StartMatch(fixture, humanControlled: false);
             sim.RunToEnd();
             m.Add(sim);

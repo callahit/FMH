@@ -23,10 +23,19 @@ public sealed class League
 
 public enum Weather { Sunny, Cloudy, Rain, Snow, Wind }
 
+/// <summary>Art des Wettbewerbs eines Spiels.</summary>
+public enum CompetitionKind { League, Cup, Playoff }
+
 public sealed class Fixture
 {
     public int Id { get; set; }
-    public string LeagueId { get; set; } = "";
+    /// <summary>Liga-, Pokal- oder Relegations-Id.</summary>
+    public string CompetitionId { get; set; } = "";
+    public CompetitionKind Kind { get; set; } = CompetitionKind.League;
+    /// <summary>Bei K.-o.-Spielen: Id des Duells und Hin- (1) oder Rückspiel (2).</summary>
+    public int? TieId { get; set; }
+    public int Leg { get; set; } = 1;
+    /// <summary>Spieltag (Liga) bzw. Runde (Pokal).</summary>
     public int Matchday { get; set; }
     public DateOnly Date { get; set; }
     public int HomeId { get; set; }
@@ -41,6 +50,10 @@ public sealed class MatchResult
 {
     public int HomeGoals { get; set; }
     public int AwayGoals { get; set; }
+    /// <summary>Spiel ging in die Verlängerung (Tore inklusive Verlängerung).</summary>
+    public bool ExtraTime { get; set; }
+    public int? PenaltiesHome { get; set; }
+    public int? PenaltiesAway { get; set; }
     public int HalfTimeHome { get; set; }
     public int HalfTimeAway { get; set; }
     public int Attendance { get; set; }

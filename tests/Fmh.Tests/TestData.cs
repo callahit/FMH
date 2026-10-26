@@ -24,6 +24,7 @@ internal static class TestData
         {
             var r = s.Advance();
             if (r.Reason == StopReason.HumanMatch && r.Fixture is { } f) s.PlayInstant(f);
+            if (r.Reason == StopReason.Decision) s.DelegateDecisions();
             if (stop(r)) return;
         }
         throw new InvalidOperationException("Abbruchbedingung nicht erreicht.");

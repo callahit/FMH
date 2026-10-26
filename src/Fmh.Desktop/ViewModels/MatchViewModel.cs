@@ -122,19 +122,30 @@ public sealed partial class MatchViewModel : ViewModelBase
 
     // ================================================================== Vorbericht
 
+    /// <summary>"Liga, 5. Spieltag" bzw. "Pokal, Achtelfinale" / "Relegation, Hinspiel".</summary>
+    private string CompetitionLabel()
+    {
+        var world = Session.World;
+        if (_fixture.Kind == CompetitionKind.League)
+            return T.Format("match.matchdayLabel", world.CompetitionName(_fixture.CompetitionId), _fixture.Matchday);
+        var cup = world.FindCup(_fixture.CompetitionId);
+        var round = cup?.Rounds.FirstOrDefault(r => r.Number == _fixture.Matchday)?.Name ?? "";
+        var leg = _fixture.Leg switch { 1 => " · " + T["cup.firstLeg"], 2 => " · " + T["cup.secondLeg"], _ => "" };
+        return $"{cup?.Name}, {round}{leg}";
+    }
+
     private void BuildPreview()
     {
         var world = Session.World;
-        var league = world.League(_fixture.LeagueId);
-        var table = LeagueTable.Compute(league);
         var own = Session.HumanClub;
         var opp = _side == Side.Home ? Away : Home;
-        var ownRow = table.First(r => r.ClubId == own.Id);
-        var oppRow = table.First(r => r.ClubId == opp.Id);
+        var ownRow = LeagueTable.Compute(world.LeagueOf(own)).First(r => r.ClubId == own.Id);
+        var oppLeague = world.FindLeague(opp.LeagueId);
+        var oppRow = oppLeague is null ? null : LeagueTable.Compute(oppLeague).First(r => r.ClubId == opp.Id);
         var referee = world.Referees.FirstOrDefault(r => r.Id == _fixture.RefereeId);
         var weather = Session.WeatherFor(_fixture);
         var profiles = Data.PositionProfiles;
-        Subline = $"{T.Format("match.matchdayLabel", league.Name, _fixture.Matchday)} · {Home.StadiumName} · {T["weather." + weather]}";
+        Subline = $"{CompetitionLabel()} · {Home.StadiumName} · {T["weather." + weather]}";
         Clock = Fmt.Date(_fixture.Date);
 
         var keyPlayers = world.SquadOf(opp).Where(p => p.IsAvailable)
@@ -143,8 +154,12 @@ public sealed partial class MatchViewModel : ViewModelBase
         Preview = new List<InfoLine>
         {
             new(T["match.opponent"], $"{opp.Name} ({(_side == Side.Home ? T["match.atHome"] : T["match.away"])})"),
-            new(T["match.tablePosition"], T.Format("match.positions", ownRow.Position, ownRow.Points, oppRow.Position, oppRow.Points)),
-            new(T["match.oppForm"], oppRow.Form.Count == 0 ? "–" : string.Join(" ", oppRow.Form.Select(f => T["form." + f]))),
+            new(T["match.tablePosition"], oppRow is null
+                ? T.Format("match.positionsOther", ownRow.Position, ownRow.Points, world.CompetitionName(opp.LeagueId))
+                : oppLeague == world.LeagueOf(own)
+                    ? T.Format("match.positions", ownRow.Position, ownRow.Points, oppRow.Position, oppRow.Points)
+                    : T.Format("match.positionsLeague", ownRow.Position, ownRow.Points, oppRow.Position, oppLeague!.Name)),
+            new(T["match.oppForm"], oppRow is null || oppRow.Form.Count == 0 ? "–" : string.Join(" ", oppRow.Form.Select(f => T["form." + f]))),
             new(T["match.oppFormation"], Data.Formation(opp.Tactic.FormationId).Name),
             new(T["match.keyPlayers"], string.Join(", ", keyPlayers)),
             new(T["match.strength"], T.Format("match.strengthValue",
@@ -505,9 +520,9 @@ public sealed partial class MatchViewModel : ViewModelBase
                    + " · " + T.Format("match.halfTimeScore", result.HalfTimeHome, result.HalfTimeAway);
         Heat = sim.Team(_side).Stats.Heat.ToList();
 
-        var league = Session.World.League(_fixture.LeagueId);
-        OtherResults = league.Fixtures.Where(f => f.Matchday == _fixture.Matchday).Select(f => new ResultLine(
-            Session.World.Clubs[f.HomeId].Name, f.Result is { } r ? $"{r.HomeGoals} : {r.AwayGoals}" : "– : –",
+        var league = Session.World.LeagueOf(Session.HumanClub);
+        OtherResults = Session.World.AllFixtures.Where(f => f.CompetitionId == _fixture.CompetitionId && f.Date == _fixture.Date).Select(f => new ResultLine(
+            Session.World.Clubs[f.HomeId].Name, f.Result is { } r ? UiText.Score(r) : "– : –",
             Session.World.Clubs[f.AwayId].Name, f.Involves(Session.HumanClub.Id) ? FontWeight.Bold : FontWeight.Normal)).ToList();
         var row = LeagueTable.Compute(league).First(r => r.ClubId == Session.HumanClub.Id);
         TableInfo = T.Format("match.ownTable", row.Position, row.Points, row.GoalsFor, row.GoalsAgainst);

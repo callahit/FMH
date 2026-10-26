@@ -90,7 +90,8 @@ public static class ScheduleGenerator
                 league.Fixtures.Add(new Fixture
                 {
                     Id = world.NextFixtureId++,
-                    LeagueId = league.Id,
+                    CompetitionId = league.Id,
+                    Kind = CompetitionKind.League,
                     Matchday = i + 1,
                     Date = dates[i],
                     HomeId = home,

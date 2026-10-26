@@ -79,7 +79,7 @@ public class EngineTests
             var h = league.ClubIds[rng.Next(league.ClubIds.Count)];
             int a;
             do a = league.ClubIds[rng.Next(league.ClubIds.Count)]; while (a == h);
-            var sim = s.StartMatch(new Fixture { Id = 500_000 + i, LeagueId = league.Id, HomeId = h, AwayId = a, Date = world.Date, RefereeId = world.Referees[rng.Next(world.Referees.Count)].Id }, false);
+            var sim = s.StartMatch(new Fixture { Id = 500_000 + i, CompetitionId = league.Id, HomeId = h, AwayId = a, Date = world.Date, RefereeId = world.Referees[rng.Next(world.Referees.Count)].Id }, false);
             sim.RunToEnd();
             goals += sim.Home.Goals + sim.Away.Goals;
             if (sim.Home.Goals == sim.Away.Goals) draws++;

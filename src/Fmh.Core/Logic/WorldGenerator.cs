@@ -67,6 +67,7 @@ public static class WorldGenerator
                     world.Leagues.Add(league);
                 }
             }
+            AddPoolClubs(world, data, rng, country);
         }
 
         foreach (var club in world.Clubs.Values)
@@ -74,6 +75,7 @@ public static class WorldGenerator
             club.Tactic.FormationId = AiTactics.BestFormation(club, world, data).Id;
             LineupSelector.PickBest(club, world, data, world.Country(club.CountryCode).Squad.BenchSize);
         }
+        InitCareer(world, data, rng);
 
         foreach (var league in world.Leagues)
             ScheduleGenerator.CreateFixtures(world, league, world.Country(league.CountryCode), rng);
@@ -90,6 +92,8 @@ public static class WorldGenerator
         };
         humanClub.ManagerId = manager.Id;
         world.Managers.Add(manager);
+        if (!world.Scouts.Any(s => s.ClubId == humanClub.Id))
+            Game.GameSession.CreateScouts(world, humanClub, data, rng, 2);
 
         Messages.Add(world, manager, MessageType.Board, data.Texts["msg.sender.board"],
             data.Texts.Format("msg.welcome.subject", humanClub.Name),
@@ -97,6 +101,51 @@ public static class WorldGenerator
 
         world.RngState = rng.GetState();
         return world;
+    }
+
+    /// <summary>Vereine unterhalb der Ligen (Amateurbereich): nehmen am Pokal teil und dienen als Transferumfeld.</summary>
+    private static void AddPoolClubs(World world, GameData data, Rng rng, CountryConfig country)
+    {
+        foreach (var pool in country.Pools)
+        {
+            foreach (var def in data.Clubs.Where(c => c.Division == pool.Id))
+            {
+                if (world.Clubs.Values.Any(c => c.Key == def.Key)) continue;
+                var club = CreateClub(world, def, country.Code, pool.Id);
+                CreateSquad(world, data, rng, club, country.Code);
+                club.Tactic.FormationId = AiTactics.BestFormation(club, world, data).Id;
+                LineupSelector.PickBest(club, world, data, country.Squad.BenchSize);
+            }
+        }
+    }
+
+    /// <summary>
+    /// Karrieredaten (Phase 2): Budgets, Trainer- und Jugendqualität, Taktikvertrautheit.
+    /// Idempotent, damit auch ältere Spielstände nachgerüstet werden können.
+    /// </summary>
+    public static void InitCareer(World world, GameData data, Rng rng)
+    {
+        foreach (var country in world.Countries) AddPoolClubs(world, data, rng, country);
+        foreach (var club in world.Clubs.Values)
+        {
+            if (club.Budget.Balance == 0 && club.Budget.TransferBudget == 0)
+            {
+                club.Budget.Balance = Budgets.StartingBalance(club);
+                Budgets.SetSeasonBudget(club, world);
+                int Quality(double sd) => (int)Math.Clamp(Math.Round(3 + club.Reputation * 0.75 + rng.Normal(0, sd)), 1, 20);
+                club.CoachQuality = Quality(2);
+                club.YouthFacilities = Quality(2.5);
+                club.YouthRecruitment = Quality(3);
+            }
+            if (club.Familiarity.Count == 0) club.Familiarity[club.Tactic.FormationId] = 75;
+            var ranked = world.SquadOf(club).Where(p => p.Contract is { Start.Year: 1 }).OrderByDescending(p => Ratings.Strength(p, data.PositionProfiles)).ToList();
+            for (var i = 0; i < ranked.Count; i++)
+            {
+                var c = ranked[i].Contract!;
+                c.Start = new DateOnly(world.SeasonYear - rng.Next(0, 3), 7, 1);
+                c.Status = i switch { < 3 => SquadStatus.Star, < 11 => SquadStatus.Regular, < 16 => SquadStatus.Rotation, _ => ranked[i].Age(world.Date) <= 20 ? SquadStatus.Prospect : SquadStatus.Backup };
+            }
+        }
     }
 
     private static Club CreateClub(World world, ClubDefinition def, string country, string leagueId)

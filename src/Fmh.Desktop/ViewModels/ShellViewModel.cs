@@ -190,6 +190,10 @@ public sealed partial class ShellViewModel : ViewModelBase
                 OpenPage<LeaguePageViewModel>();
                 _main.ShowDialog(new MessageDialogViewModel(T["ui.seasonEnd"], result.NewMessages.Select(m => m.Subject)));
                 break;
+            case StopReason.Decision:
+                StatusMessage = T["ui.decisionPending"];
+                OpenPage<InboxPageViewModel>();
+                break;
             case StopReason.NewSeason:
             case StopReason.Messages:
                 OpenPage<InboxPageViewModel>();

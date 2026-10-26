@@ -43,6 +43,12 @@ public sealed class Tactic
     public int? PenaltyTakerId { get; set; }
     public int? FreeKickTakerId { get; set; }
     public int? CornerTakerId { get; set; }
+    /// <summary>Rollen, Aufgaben, Spieleranweisungen und freie Positionierung je Slot.</summary>
+    public List<SlotOrder> Orders { get; set; } = new();
+    public CornerRoutine Corners { get; set; } = CornerRoutine.Mixed;
+    public FreeKickRoutine FreeKicks { get; set; } = FreeKickRoutine.Auto;
+    /// <summary>Name, wenn die Taktik als eine von drei Varianten gespeichert ist.</summary>
+    public string Name { get; set; } = "";
 
     public Tactic Clone() => new()
     {
@@ -55,6 +61,10 @@ public sealed class Tactic
         PenaltyTakerId = PenaltyTakerId,
         FreeKickTakerId = FreeKickTakerId,
         CornerTakerId = CornerTakerId,
+        Orders = Orders.Select(o => o.Clone()).ToList(),
+        Corners = Corners,
+        FreeKicks = FreeKicks,
+        Name = Name,
     };
 }
 
