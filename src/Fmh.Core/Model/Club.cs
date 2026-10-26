@@ -35,4 +35,15 @@ public sealed class Club
     public List<int> YouthIds { get; set; } = new();
     /// <summary>Beobachtungsliste des Managers.</summary>
     public List<int> Shortlist { get; set; } = new();
+
+    // Phase 3: Wirtschaft und Umfeld
+    public FinanceState Finance { get; set; } = new();
+    public Stadium Stadium { get; set; } = new();
+    public Grounds Grounds { get; set; } = new();
+    public List<SponsorDeal> Sponsors { get; set; } = new();
+    public List<SponsorDeal> SponsorOffers { get; set; } = new();
+    public BoardState Board { get; set; } = new();
+    public FanState Fans { get; set; } = new();
+    /// <summary>Lokalrivalen (Club-Ids) für Derbys.</summary>
+    public List<int> Rivals { get; set; } = new();
 }

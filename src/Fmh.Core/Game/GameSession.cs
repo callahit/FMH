@@ -38,6 +38,7 @@ public sealed partial class GameSession
         if (!World.Managers.Any(m => m.Human)) return;
         WorldGenerator.InitCareer(World, Data, _rng);
         if (!World.Scouts.Any(s => s.ClubId == HumanClub.Id)) CreateScouts(World, HumanClub, Data, _rng, 2);
+        InitEconomy();
         if (!World.SeasonFinished && World.Cups.Count == 0 && World.Leagues.All(l => l.Fixtures.All(f => f.Result is null)))
         {
             CreateCups();
@@ -131,6 +132,9 @@ public sealed partial class GameSession
         MarketDaily();
         ScoutingDaily();
         YouthDaily();
+        ConstructionDaily();
+        FinanceDaily();
+        EnvironmentDaily();
 
         if (!World.SeasonFinished && CompetitionsDaily())
         {
@@ -293,12 +297,10 @@ public sealed partial class GameSession
                 result.Cards.Add(new CardRecord { Minute = e.Minute + e.Stoppage, Home = e.Side == Side.Home, PlayerId = carded, Red = e.Type != MatchEventType.YellowCard });
         }
 
-        var rng = new Rng(Rng.Mix(sim.Setup.Seed, 0xA77E_17DAUL));
-        var bigGame = f.Kind != CompetitionKind.League ? 0.12 : 0;
-        var demand = 0.5 + home.Reputation * 0.02 + away.Reputation * 0.012 + rng.Range(-0.05, 0.05) + bigGame
-                     - (result.Weather is Weather.Rain or Weather.Snow ? 0.06 : 0);
-        result.Attendance = (int)(home.StadiumCapacity * Math.Clamp(demand, 0.3, 1.0));
+        var (standing, seating, boxes) = Attendance(home, away, f, result.Weather);
+        result.Attendance = standing + seating;
         f.Result = result;
+        MatchdayFinances(f, result, standing, seating, boxes);
 
         ServeSuspensions(home);
         ServeSuspensions(away);
@@ -310,6 +312,15 @@ public sealed partial class GameSession
 
         if (f.Kind != CompetitionKind.League && World.FindCup(f.CompetitionId) is { } cup)
             CupMatchPlayed(cup, f);
+        if (f.Involves(HumanClub.Id) && !AwaitingNewJob)
+        {
+            AfterHumanMatch(f);
+            if (!AwaitingNewJob)
+            {
+                MatchHeadline(f);
+                SchedulePress(f, after: true);
+            }
+        }
     }
 
     private void ServeSuspensions(Club club)
@@ -390,6 +401,12 @@ public sealed partial class GameSession
     private void InjurePlayer(Player p, string type, int days, bool notify)
     {
         if (p.State.Injury is { } existing && existing.DaysRemaining >= days) return;
+        // Medizinische Abteilung und Physiotherapie verkürzen Ausfallzeiten.
+        if (p.ClubId is { } cid && World.Clubs.TryGetValue(cid, out var club))
+        {
+            var medical = Math.Min(0.45, Effect(club, "medical.recovery") + StaffAbility(club, StaffRole.Physio) * 0.006 + StaffAbility(club, StaffRole.Doctor) * 0.006);
+            days = Math.Max(1, (int)Math.Round(days * (1 - medical)));
+        }
         p.State.Injury = new Injury { Type = type, DaysRemaining = days, TotalDays = days };
         if (notify)
             Notify(MessageType.Medical, "msg.sender.doctor",
@@ -435,7 +452,8 @@ public sealed partial class GameSession
             }
             else
             {
-                st.Condition = Math.Min(100, st.Condition + 3 + p.Attributes[Attr.NaturalFitness] * 0.25);
+                var extra = p.ClubId is { } cid && World.Clubs.TryGetValue(cid, out var club) ? Effect(club, "medical.condition") : 0;
+                st.Condition = Math.Min(100, st.Condition + 3 + p.Attributes[Attr.NaturalFitness] * 0.25 + extra);
             }
 
             if (weekly && st.Morale != Morale.Okay && _rng.Chance(0.25))

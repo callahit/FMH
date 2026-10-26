@@ -1,0 +1,286 @@
+[
+ {
+  "id": "tvShowInvite",
+  "category": "media",
+  "options": [
+   {
+    "id": "go",
+    "effects": {
+     "media": 5,
+     "board": -1
+    }
+   },
+   {
+    "id": "no",
+    "effects": {
+     "media": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "journalistBan",
+  "category": "media",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "options": [
+   {
+    "id": "ban",
+    "effects": {
+     "media": -4,
+     "morale": 0.2
+    }
+   },
+   {
+    "id": "talk",
+    "effects": {
+     "media": 2
+    }
+   }
+  ]
+ },
+ {
+  "id": "leakedTactics",
+  "category": "media",
+  "options": [
+   {
+    "id": "hunt",
+    "effects": {
+     "morale": -0.2,
+     "media": 1
+    }
+   },
+   {
+    "id": "change",
+    "effects": {
+     "morale": 0.1
+    }
+   }
+  ]
+ },
+ {
+  "id": "podcast",
+  "category": "media",
+  "options": [
+   {
+    "id": "join",
+    "effects": {
+     "media": 3,
+     "fans": 2
+    }
+   },
+   {
+    "id": "no",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "fakeNews",
+  "category": "media",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "options": [
+   {
+    "id": "deny",
+    "effects": {
+     "media": 1
+    }
+   },
+   {
+    "id": "laugh",
+    "effects": {
+     "media": 2,
+     "board": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "awardNomination",
+  "category": "media",
+  "when": {
+   "afterWin": true
+  },
+  "options": [
+   {
+    "id": "attend",
+    "effects": {
+     "media": 4,
+     "reputation": 0.1
+    }
+   }
+  ]
+ },
+ {
+  "id": "photoScandal",
+  "category": "media",
+  "options": [
+   {
+    "id": "explain",
+    "effects": {
+     "media": -1
+    }
+   },
+   {
+    "id": "ignore",
+    "effects": {
+     "media": -3,
+     "fans": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "columnOffer",
+  "category": "media",
+  "options": [
+   {
+    "id": "write",
+    "effects": {
+     "money": 10000,
+     "media": 2,
+     "morale": -0.1
+    }
+   },
+   {
+    "id": "no",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "interviewGaffe",
+  "category": "media",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "options": [
+   {
+    "id": "apologise",
+    "effects": {
+     "media": 1,
+     "board": 1
+    }
+   },
+   {
+    "id": "double",
+    "effects": {
+     "media": -3,
+     "fans": 2
+    }
+   }
+  ]
+ },
+ {
+  "id": "documentaryRival",
+  "category": "media",
+  "styles": [
+   "Satirical"
+  ],
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "morale": 0.2
+    }
+   }
+  ]
+ },
+ {
+  "id": "videoGame",
+  "category": "media",
+  "when": {
+   "minReputation": 8
+  },
+  "options": [
+   {
+    "id": "license",
+    "effects": {
+     "money": 40000,
+     "fans": 2
+    }
+   }
+  ]
+ },
+ {
+  "id": "refereeCriticism",
+  "category": "media",
+  "when": {
+   "afterLoss": true
+  },
+  "options": [
+   {
+    "id": "criticize",
+    "effects": {
+     "money": -10000,
+     "fans": 3,
+     "media": 1
+    }
+   },
+   {
+    "id": "calm",
+    "effects": {
+     "board": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "statsNerd",
+  "category": "media",
+  "styles": [
+   "Balanced",
+   "Serious"
+  ],
+  "options": [
+   {
+    "id": "hire",
+    "effects": {
+     "money": -20000,
+     "morale": 0.1
+    }
+   },
+   {
+    "id": "no",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "expertPundit",
+  "category": "media",
+  "options": [
+   {
+    "id": "respond",
+    "effects": {
+     "media": 2,
+     "board": -1
+    }
+   },
+   {
+    "id": "ignore",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "fairPlayAward",
+  "category": "media",
+  "options": [
+   {
+    "id": "accept",
+    "effects": {
+     "media": 3,
+     "fans": 1,
+     "money": 10000
+    }
+   }
+  ]
+ }
+]

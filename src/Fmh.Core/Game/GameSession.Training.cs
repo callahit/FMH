@@ -62,7 +62,10 @@ public sealed partial class GameSession
     private void RunSession(Club club, TrainingBlock block, TrainingIntensity intensity, List<Player> squad)
     {
         var cost = ConditionCost(block, intensity);
-        if (block == TrainingBlock.Tactics) AddFamiliarity(club, club.Tactic.FormationId, 0.8 * CoachFactor(club));
+        // Winter: ohne Kunstrasen, Halle oder Heizung fallen Einheiten aus.
+        if (World.Date.Month is 12 or 1 or 2 && block is not (TrainingBlock.Recovery or TrainingBlock.Rest)
+            && _rng.Chance(Math.Max(0, 0.25 - Effect(club, "training.winter") * 0.25 - (club.Stadium.UndersoilHeating ? 0.05 : 0)))) return;
+        if (block == TrainingBlock.Tactics) AddFamiliarity(club, club.Tactic.FormationId, 0.8 * CoachFactor(club) * (1 + Effect(club, "training.familiarity")));
         if (block == TrainingBlock.PracticeMatch) AddFamiliarity(club, club.Tactic.FormationId, 0.4);
 
         foreach (var p in squad)
@@ -77,12 +80,12 @@ public sealed partial class GameSession
             var gain = SessionGain(club, p, intensity);
             switch (effective)
             {
-                case TrainingBlock.Fitness: p.Training.Physical += gain * 1.2; break;
-                case TrainingBlock.Technique: p.Training.Technical += gain; break;
+                case TrainingBlock.Fitness: p.Training.Physical += gain * 1.2 * (1 + Effect(club, "training.physical") + StaffAbility(club, StaffRole.FitnessCoach) * 0.01); break;
+                case TrainingBlock.Technique: p.Training.Technical += gain * (1 + Effect(club, "training.technical")); break;
                 case TrainingBlock.Tactics: p.Training.Mental += gain; break;
                 case TrainingBlock.Finishing: p.Training.Technical += gain * 0.6; Raise(p, gain, Attr.Finishing, Attr.LongShots, Attr.Composure); break;
-                case TrainingBlock.SetPieces: p.Training.Technical += gain * 0.4; Raise(p, gain, Attr.FreeKicks, Attr.Corners, Attr.Penalties); break;
-                case TrainingBlock.Goalkeeping: if (gk) p.Training.Goalkeeping += gain * 1.2; break;
+                case TrainingBlock.SetPieces: p.Training.Technical += gain * 0.4; Raise(p, gain * (1 + Effect(club, "training.setPieces")), Attr.FreeKicks, Attr.Corners, Attr.Penalties); break;
+                case TrainingBlock.Goalkeeping: if (gk) p.Training.Goalkeeping += gain * 1.2 * (1 + Effect(club, "training.goalkeeping") + StaffAbility(club, StaffRole.GoalkeepingCoach) * 0.015); break;
                 case TrainingBlock.PracticeMatch: p.Training.Mental += gain * 0.5; p.Training.Technical += gain * 0.5; break;
             }
             if (p.Training.Focus is not null && effective is not (TrainingBlock.Recovery or TrainingBlock.Rest))
@@ -177,6 +180,7 @@ public sealed partial class GameSession
         if (block is TrainingBlock.Recovery or TrainingBlock.Rest or TrainingBlock.Tactics or TrainingBlock.SetPieces) return;
         var risk = 0.00035 * IntensityFactor(intensity) * IntensityFactor(intensity) * (0.5 + p.Hidden.InjuryProneness / 20.0) * World.Rules.InjuryFrequency;
         if (p.State.Condition < 70) risk *= 2;
+        risk *= Math.Max(0.3, 1 - Effect(club, "training.injury") - StaffAbility(club, StaffRole.FitnessCoach) * 0.01);
         if (!_rng.Chance(risk)) return;
         var light = Data.Injuries.OrderBy(i => i.MaxDays).Take(Math.Max(1, Data.Injuries.Count / 2)).ToList();
         var type = light[_rng.WeightedIndex(light.Select(i => i.Weight).ToList())];

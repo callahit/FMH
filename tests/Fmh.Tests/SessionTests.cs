@@ -15,8 +15,8 @@ public class SessionTests
         // Erster Pflichttermin ist die 1. Pokalrunde.
         var first = s.AllFixtures.Where(f => f.Involves(s.HumanClub.Id)).Min(f => f.Date);
         var r = s.Advance();
-        while (r.Reason == StopReason.Decision) { s.DelegateDecisions(); r = s.Advance(); }
-        // Die Willkommensnachricht stammt vom Spielstart, daher hält "Weiter" erst am Spieltag.
+        // Vor dem ersten Spiel kommen Saisonziel, Sponsorenangebote und Pressetermine.
+        while (r.Reason is StopReason.Decision or StopReason.Messages) { s.DelegateDecisions(); r = s.Advance(); }
         Assert.Equal(StopReason.HumanMatch, r.Reason);
         Assert.Equal(first, s.World.Date);
         Assert.NotNull(r.Fixture);

@@ -1,0 +1,290 @@
+[
+ {
+  "key": "b.general1",
+  "when": "before",
+  "context": "any",
+  "category": "general"
+ },
+ {
+  "key": "b.general2",
+  "when": "before",
+  "context": "any",
+  "category": "team"
+ },
+ {
+  "key": "b.general3",
+  "when": "before",
+  "context": "any",
+  "category": "opponent"
+ },
+ {
+  "key": "b.general4",
+  "when": "before",
+  "context": "any",
+  "category": "player"
+ },
+ {
+  "key": "b.general5",
+  "when": "before",
+  "context": "any",
+  "category": "team"
+ },
+ {
+  "key": "b.general6",
+  "when": "before",
+  "context": "any",
+  "category": "general",
+  "styles": [
+   "Satirical"
+  ]
+ },
+ {
+  "key": "b.general7",
+  "when": "before",
+  "context": "any",
+  "category": "general",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ]
+ },
+ {
+  "key": "b.general8",
+  "when": "before",
+  "context": "any",
+  "category": "general",
+  "styles": [
+   "Serious"
+  ]
+ },
+ {
+  "key": "b.derby1",
+  "when": "before",
+  "context": "derby",
+  "category": "opponent"
+ },
+ {
+  "key": "b.derby2",
+  "when": "before",
+  "context": "derby",
+  "category": "opponent"
+ },
+ {
+  "key": "b.derby3",
+  "when": "before",
+  "context": "derby",
+  "category": "team",
+  "styles": [
+   "Satirical"
+  ]
+ },
+ {
+  "key": "b.big1",
+  "when": "before",
+  "context": "bigGame",
+  "category": "opponent"
+ },
+ {
+  "key": "b.big2",
+  "when": "before",
+  "context": "bigGame",
+  "category": "team"
+ },
+ {
+  "key": "b.streakWin1",
+  "when": "before",
+  "context": "streakWin",
+  "category": "team"
+ },
+ {
+  "key": "b.streakWin2",
+  "when": "before",
+  "context": "streakWin",
+  "category": "general"
+ },
+ {
+  "key": "b.streakLoss1",
+  "when": "before",
+  "context": "streakLoss",
+  "category": "team"
+ },
+ {
+  "key": "b.streakLoss2",
+  "when": "before",
+  "context": "streakLoss",
+  "category": "general"
+ },
+ {
+  "key": "b.injury1",
+  "when": "before",
+  "context": "injury",
+  "category": "player"
+ },
+ {
+  "key": "b.injury2",
+  "when": "before",
+  "context": "injury",
+  "category": "team"
+ },
+ {
+  "key": "b.signing1",
+  "when": "before",
+  "context": "newSigning",
+  "category": "player"
+ },
+ {
+  "key": "b.signing2",
+  "when": "before",
+  "context": "newSigning",
+  "category": "general"
+ },
+ {
+  "key": "b.pressure1",
+  "when": "before",
+  "context": "pressure",
+  "category": "general"
+ },
+ {
+  "key": "b.pressure2",
+  "when": "before",
+  "context": "pressure",
+  "category": "general",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ]
+ },
+ {
+  "key": "a.general1",
+  "when": "after",
+  "context": "any",
+  "category": "team"
+ },
+ {
+  "key": "a.general2",
+  "when": "after",
+  "context": "any",
+  "category": "player"
+ },
+ {
+  "key": "a.general3",
+  "when": "after",
+  "context": "any",
+  "category": "referee"
+ },
+ {
+  "key": "a.general4",
+  "when": "after",
+  "context": "any",
+  "category": "opponent"
+ },
+ {
+  "key": "a.general5",
+  "when": "after",
+  "context": "any",
+  "category": "general",
+  "styles": [
+   "Satirical"
+  ]
+ },
+ {
+  "key": "a.win1",
+  "when": "after",
+  "context": "win",
+  "category": "team"
+ },
+ {
+  "key": "a.win2",
+  "when": "after",
+  "context": "win",
+  "category": "player"
+ },
+ {
+  "key": "a.win3",
+  "when": "after",
+  "context": "win",
+  "category": "general"
+ },
+ {
+  "key": "a.loss1",
+  "when": "after",
+  "context": "loss",
+  "category": "team"
+ },
+ {
+  "key": "a.loss2",
+  "when": "after",
+  "context": "loss",
+  "category": "referee"
+ },
+ {
+  "key": "a.loss3",
+  "when": "after",
+  "context": "loss",
+  "category": "player"
+ },
+ {
+  "key": "a.draw1",
+  "when": "after",
+  "context": "draw",
+  "category": "team"
+ },
+ {
+  "key": "a.draw2",
+  "when": "after",
+  "context": "draw",
+  "category": "opponent"
+ },
+ {
+  "key": "a.bigWin1",
+  "when": "after",
+  "context": "bigWin",
+  "category": "team"
+ },
+ {
+  "key": "a.bigWin2",
+  "when": "after",
+  "context": "bigWin",
+  "category": "opponent",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ]
+ },
+ {
+  "key": "a.bigLoss1",
+  "when": "after",
+  "context": "bigLoss",
+  "category": "team"
+ },
+ {
+  "key": "a.bigLoss2",
+  "when": "after",
+  "context": "bigLoss",
+  "category": "general"
+ },
+ {
+  "key": "a.red1",
+  "when": "after",
+  "context": "redCard",
+  "category": "referee"
+ },
+ {
+  "key": "a.red2",
+  "when": "after",
+  "context": "redCard",
+  "category": "player"
+ },
+ {
+  "key": "a.derby1",
+  "when": "after",
+  "context": "derby",
+  "category": "opponent"
+ },
+ {
+  "key": "a.pressure1",
+  "when": "after",
+  "context": "pressure",
+  "category": "general"
+ }
+]

@@ -151,8 +151,11 @@ public class CareerTests
         var s = TestData.NewSession(12);
         var year = s.World.SeasonYear;
         AdvanceResult? r = null;
-        for (var i = 0; i < 400 && r?.Reason != StopReason.Decision; i++)
+        bool HasOffer() => s.PendingDecisions.Any(m => m.Action == MessageAction.IncomingOffer);
+        for (var i = 0; i < 400 && !(r?.Reason == StopReason.Decision && HasOffer()); i++)
         {
+            // Andere Pflichtentscheidungen (Saisonziel, Presse, Ereignisse) delegieren.
+            if (s.PendingDecisions.Count > 0 && !HasOffer()) s.DelegateDecisions();
             r = s.Advance();
             if (r.Reason == StopReason.HumanMatch && r.Fixture is { } f) s.PlayInstant(f);
             Assert.Equal(year, s.World.SeasonYear);
@@ -162,17 +165,18 @@ public class CareerTests
         Assert.Equal(StopReason.Decision, s.Advance().Reason);
         Assert.Equal(date, s.World.Date);
 
-        var msg = s.PendingDecisions[0];
+        var msg = s.PendingDecisions.First(m => m.Action == MessageAction.IncomingOffer);
         var n = s.World.Negotiations.First(x => x.Id == msg.ActionRefId);
         var player = s.World.Players[n.PlayerId];
         var balance = s.HumanClub.Budget.Balance;
         s.RespondIncoming(n, ResponseKind.Accept);
-        Assert.Empty(s.PendingDecisions);
+        Assert.DoesNotContain(s.PendingDecisions, m => m.Action == MessageAction.IncomingOffer);
         if (n.Stage == NegotiationStage.Completed)
         {
             Assert.Equal(n.BuyerId, player.ClubId);
             Assert.True(s.HumanClub.Budget.Balance > balance);
         }
+        s.DelegateDecisions();
         Assert.NotEqual(StopReason.Decision, s.Advance().Reason);
     }
 

@@ -26,6 +26,7 @@ public sealed class CountryConfig
     public List<PlayoffConfig> Playoffs { get; set; } = new();
     public TransferWindowConfig TransferWindows { get; set; } = new();
     public YouthConfig Youth { get; set; } = new();
+    public FinanceConfig Finance { get; set; } = new();
 
     public IEnumerable<DivisionConfig> Divisions => Levels.SelectMany(l => l.Divisions);
 }

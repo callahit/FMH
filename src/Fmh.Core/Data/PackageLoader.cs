@@ -70,6 +70,11 @@ public static class PackageLoader
             PositionProfiles = Path1("rules/positions.json") is { } p ? Json.Load<PositionProfiles>(p) : new(),
             Injuries = Path1("rules/injuries.json") is { } i ? Json.Load<List<InjuryType>>(i) : new(),
             Roles = Path1("rules/roles.json") is { } ro ? Json.Load<List<RoleDef>>(ro) : new(),
+            Buildings = Path1("rules/buildings.json") is { } bu ? Json.Load<List<BuildingDef>>(bu) : new(),
+            // Ereignisse dürfen auf mehrere Dateien verteilt sein (Community-Pakete ergänzen eigene).
+            Events = PathsUnder("events").SelectMany(Json.Load<List<EventDef>>).ToList(),
+            PressQuestions = Path1("rules/press.json") is { } pr ? Json.Load<List<PressQuestionDef>>(pr) : new(),
+            Sponsors = PathsUnder("sponsors").Select(Json.Load<SponsorList>).ToDictionary(s => s.Country),
             Engine = Path1("rules/engine.json") is { } e ? Json.Load<EngineConfig>(e) : new(),
             Languages = languages,
             DefaultLanguage = defaultLanguage,

@@ -132,5 +132,55 @@
     "maxPlayers": 9,
     "proContractAge": 17,
     "promoteAge": 16
+  },
+  "finance": {
+    "divisions": {
+      "DE1": {
+        "tvPool": 110000000,
+        "tvEqualShare": 0.5,
+        "standing": 9,
+        "seating": 20,
+        "box": 2500,
+        "floodlightRequired": 3,
+        "youthCenterRequired": 2,
+        "minEquity": -4000000,
+        "travelPerAwayMatch": 35000
+      },
+      "DE2": {
+        "tvPool": 24000000,
+        "tvEqualShare": 0.6,
+        "standing": 7,
+        "seating": 14,
+        "box": 1200,
+        "floodlightRequired": 2,
+        "youthCenterRequired": 1,
+        "minEquity": -1500000,
+        "travelPerAwayMatch": 20000
+      },
+      "DE-AMA": {
+        "tvPool": 0,
+        "standing": 5,
+        "seating": 9,
+        "box": 400,
+        "floodlightRequired": 0,
+        "youthCenterRequired": 0,
+        "minEquity": -300000,
+        "travelPerAwayMatch": 4000
+      }
+    },
+    "cupPrizes": [
+      100000,
+      200000,
+      400000,
+      800000,
+      1500000,
+      2500000
+    ],
+    "cupWinnerPrize": 4000000,
+    "playoffPrize": 500000,
+    "creditLimitPercent": 15,
+    "boardApprovalAbove": 2000000,
+    "permitAbove": 1000000,
+    "seasonTicketDeadline": "07-31"
   }
 }

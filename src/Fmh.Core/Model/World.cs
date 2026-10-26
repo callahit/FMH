@@ -37,6 +37,11 @@ public sealed class World
     public Dictionary<int, int> Knowledge { get; set; } = new();
     /// <summary>Gesperrte Verhandlungen "Spieler:Verein" bis Datum (nach 3 gescheiterten Runden 14 Tage).</summary>
     public Dictionary<string, DateOnly> NegotiationLocks { get; set; } = new();
+    public List<StaffMember> Staff { get; set; } = new();
+    public List<PendingEvent> Events { get; set; } = new();
+    /// <summary>Zuletzt ausgelöste Ereignisse je Ereignis-Id (gegen Wiederholungen).</summary>
+    public Dictionary<string, DateOnly> EventHistory { get; set; } = new();
+    public PressConference? PendingPress { get; set; }
 
     /// <summary>Alle Ligen der laufenden Saison sind beendet und ausgewertet; der Wechsel folgt zum Saisonstart.</summary>
     public bool SeasonFinished { get; set; }
@@ -49,6 +54,12 @@ public sealed class World
     public int NextNegotiationId { get; set; } = 1;
     public int NextScoutId { get; set; } = 1;
     public int NextAssignmentId { get; set; } = 1;
+    public int NextStaffId { get; set; } = 1;
+    public int NextBuildingId { get; set; } = 1;
+    public int NextProjectId { get; set; } = 1;
+    public int NextSponsorId { get; set; } = 1;
+    public int NextLoanId { get; set; } = 1;
+    public int NextEventId { get; set; } = 1;
 
     public League LeagueOf(Club club) => Leagues.First(l => l.Id == club.LeagueId);
 
@@ -93,6 +104,11 @@ public sealed class ManagerProfile
     public bool PauseOnRedCards { get; set; } = true;
     public string Theme { get; set; } = "Klassik";
     public string Language { get; set; } = "de";
+    public Difficulty Difficulty { get; set; } = Difficulty.Normal;
+    public EventFrequency Events { get; set; } = EventFrequency.Normal;
+    public MediaStyle Style { get; set; } = MediaStyle.Balanced;
+    /// <summary>Pressekonferenzen an den Pressesprecher abgeben.</summary>
+    public bool DelegatePress { get; set; }
 }
 
 public sealed class Manager
@@ -103,12 +119,13 @@ public sealed class Manager
     public int? ClubId { get; set; }
     public int Reputation { get; set; } = 5;
     public ManagerProfile Profile { get; set; } = new();
+    public ManagerCareer Career { get; set; } = new();
 }
 
-public enum MessageType { Info, Board, Medical, Discipline, Result, Season, Transfer, Contract, Scouting, Youth, Training, Cup }
+public enum MessageType { Info, Board, Medical, Discipline, Result, Season, Transfer, Contract, Scouting, Youth, Training, Cup, Finance, Stadium, Fans, Press, Event, Career }
 
 /// <summary>Aktion, die eine Nachricht auslöst (z. B. Transferangebot annehmen oder ablehnen).</summary>
-public enum MessageAction { None, IncomingOffer, ContractExpiring, ScoutReport, Negotiation, YouthIntake }
+public enum MessageAction { None, IncomingOffer, ContractExpiring, ScoutReport, Negotiation, YouthIntake, Event, SponsorOffer, PressConference, SeasonGoal, JobOffer, Construction }
 
 public sealed class Message
 {

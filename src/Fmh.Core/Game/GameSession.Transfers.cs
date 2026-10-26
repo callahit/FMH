@@ -196,8 +196,24 @@ public sealed partial class GameSession
     {
         foreach (var m in PendingDecisions)
         {
-            if (m.Action == MessageAction.IncomingOffer && World.Negotiations.FirstOrDefault(n => n.Id == m.ActionRefId) is { } n)
-                RespondIncoming(n, ResponseKind.Reject);
+            switch (m.Action)
+            {
+                case MessageAction.IncomingOffer when World.Negotiations.FirstOrDefault(n => n.Id == m.ActionRefId) is { } n:
+                    RespondIncoming(n, ResponseKind.Reject);
+                    break;
+                case MessageAction.SeasonGoal:
+                    ChooseSeasonGoal(ExpectedGoal(HumanClub));
+                    break;
+                case MessageAction.Event when EventOf(m) is { } e:
+                    ResolveEvent(e, Data.Events.FirstOrDefault(d => d.Id == e.EventId)?.Options.LastOrDefault()?.Id ?? "");
+                    break;
+                case MessageAction.PressConference when World.PendingPress is { } conf:
+                    AnswerPress(conf.Questions.Select(_ => PressAnswer.Modest).ToList());
+                    break;
+                case MessageAction.JobOffer when HumanManager.Career.Offers.FirstOrDefault(o => o.ClubId == m.ActionRefId) is { } offer && AwaitingNewJob:
+                    AcceptJob(offer);
+                    break;
+            }
             m.Resolved = true;
         }
     }
@@ -299,11 +315,6 @@ public sealed partial class GameSession
         };
     }
 
-    private void Book(Club club, TransactionType type, long amount, TextRef text)
-    {
-        club.Budget.Balance += amount;
-        World.Transactions.Add(new Transaction { Date = World.Date, ClubId = club.Id, Type = type, Amount = amount, TextRef = text });
-    }
 
     private void ExecuteTransfer(Player p, Club buyer, Club? seller, ClubOffer offer, ContractOffer contract)
     {
@@ -349,6 +360,14 @@ public sealed partial class GameSession
         p.State.Morale = (Morale)Math.Min(6, (int)p.State.Morale + 1);
         World.Transfers.Add(new TransferRecord { Date = World.Date, PlayerId = p.Id, FromClubId = from, ToClubId = buyer.Id, Fee = fee, SeasonYear = World.SeasonYear });
         if (buyer.Id == HumanClub.Id) World.Knowledge[p.Id] = 100;
+        if (buyer.Id == HumanClub.Id && fee >= 5_000_000) Achieve("recordSigning");
+        // Verkauf eines Publikumslieblings verärgert die Fans.
+        if (seller is not null && seller.Fans.Favourites.Remove(p.Id))
+        {
+            seller.Fans.Mood = Math.Max(0, seller.Fans.Mood - 10);
+            if (seller.Id == HumanClub.Id)
+                Notify(MessageType.Fans, "msg.sender.fans", TR("msg.favouriteSold.subject", p.Name), TR("msg.favouriteSold.body", p.Name));
+        }
 
         if (buyer.Id == HumanClub.Id || seller?.Id == HumanClub.Id)
         {

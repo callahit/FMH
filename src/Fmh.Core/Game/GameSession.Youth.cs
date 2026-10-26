@@ -47,7 +47,7 @@ public sealed partial class GameSession
     /// <summary>Neuer Jahrgang: Anzahl nach Rekrutierung, Qualität nach Einrichtungen und Reputation; 2 % "goldene Generation".</summary>
     private void YouthIntake(Club club, int min, int max, bool initial = false)
     {
-        var count = Math.Clamp(min + (int)Math.Round((max - min) * club.YouthRecruitment / 20.0) + _rng.Next(-2, 2), min, max);
+        var count = Math.Clamp(min + (int)Math.Round((max - min) * club.YouthRecruitment / 20.0) + _rng.Next(-2, 2), min, max + (int)Effect(club, "youth.count"));
         count = Math.Min(count, MaxYouthSquad - club.YouthIds.Count);
         if (count <= 0) return;
         var golden = _rng.Chance(0.02);
@@ -60,6 +60,7 @@ public sealed partial class GameSession
             var p = PlayerGenerator.Create(World, Data, _rng, pos, Math.Clamp(level + _rng.Normal(0, 1.2), 2, 14), age, club.CountryCode);
             var bonus = (golden ? 25 : 0) + (int)(club.YouthRecruitment / 20.0 * 8) + _rng.Next(-5, 10);
             p.Hidden.PotentialAbility = Math.Clamp(p.Hidden.CurrentAbility + _rng.Next(15, 45) + bonus, p.Hidden.CurrentAbility, 200);
+            p.Hidden.Professionalism = Math.Clamp(p.Hidden.Professionalism + (int)Effect(club, "youth.professionalism"), 1, 20);
             p.IsYouth = true;
             p.Reputation = 1;
             p.ClubId = club.Id;

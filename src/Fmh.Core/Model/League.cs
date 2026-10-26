@@ -11,6 +11,8 @@ public sealed class League
     public DivisionConfig Format { get; set; } = new();
     public List<int> ClubIds { get; set; } = new();
     public List<Fixture> Fixtures { get; set; } = new();
+    /// <summary>Punktabzüge (Lizenzierung, Insolvenz) je Club-Id.</summary>
+    public Dictionary<int, int> Deductions { get; set; } = new();
 
     public int MatchdayCount => Fixtures.Count == 0 ? 0 : Fixtures.Max(f => f.Matchday);
 
