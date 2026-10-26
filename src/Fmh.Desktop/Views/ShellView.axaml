@@ -35,11 +35,12 @@
 
     <!-- Statuszeile -->
     <Border DockPanel.Dock="Bottom" Background="{DynamicResource SurfaceBrush}" BorderBrush="{DynamicResource LineBrush}" BorderThickness="0,1,0,0" Padding="18,7">
-      <Grid ColumnDefinitions="Auto,Auto,*,Auto">
-        <TextBlock Text="{Binding MoraleText}" Classes="small" />
-        <TextBlock Grid.Column="1" Text="{Binding NextText}" Classes="small" Margin="24,0" />
-        <TextBlock Grid.Column="2" Text="{Binding StatusMessage}" Classes="small" Foreground="{DynamicResource GoldBrush}" />
-        <TextBlock Grid.Column="3" Text="{s:L help.shell}" Classes="muted small" />
+      <Grid ColumnDefinitions="Auto,Auto,Auto,*,Auto">
+        <TextBlock Text="{Binding EconomyText}" Classes="small" Foreground="{Binding BalanceBrush}" Margin="0,0,12,0" />
+        <TextBlock Grid.Column="1" Text="{Binding MoraleText}" Classes="small" />
+        <TextBlock Grid.Column="2" Text="{Binding NextText}" Classes="small" Margin="24,0" />
+        <TextBlock Grid.Column="3" Text="{Binding StatusMessage}" Classes="small" Foreground="{DynamicResource GoldBrush}" />
+        <TextBlock Grid.Column="4" Text="{s:L help.shell}" Classes="muted small" />
       </Grid>
     </Border>
 

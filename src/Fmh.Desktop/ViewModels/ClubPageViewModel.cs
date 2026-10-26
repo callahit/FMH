@@ -1,4 +1,7 @@
 using Avalonia.Media;
+using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
+using Fmh.Core.Model;
 using Fmh.Core;
 using Fmh.Core.Game;
 using Fmh.Core.Logic;
@@ -9,11 +12,18 @@ namespace Fmh.Desktop.ViewModels;
 
 public sealed record HistoryLine(string Season, string League, string Champion, string Own, IBrush Brush);
 
-/// <summary>Verein: Stammdaten, Stadion, Kaderwerte und Historie.</summary>
-public sealed class ClubPageViewModel : PageViewModel
+public sealed record StaffLine(string Name, string Role, string Ability, string Detail, string Wage, IRelayCommand Action, string ActionText);
+
+public sealed record AchievementLine(string Name, string Info, bool Done, double Opacity);
+
+public sealed record StationLine(string Club, string Period, string Record, string Exit);
+
+/// <summary>Verein: Stammdaten, Historie, Vorstand, Personal, Fans und Managerkarriere.</summary>
+public sealed partial class ClubPageViewModel : PageViewModel, IRefreshable
 {
     public ClubPageViewModel(ShellViewModel shell) : base(shell)
     {
+        Roles = new[] { T["staff.allRoles"] }.Concat(Enum.GetValues<StaffRole>().Select(r => T["staff." + r])).ToList();
         var club = Session.HumanClub;
         var world = Session.World;
         var manager = Session.HumanManager;
@@ -52,7 +62,128 @@ public sealed class ClubPageViewModel : PageViewModel
                 pos >= 0 && isLeague ? T.Format("club.ownPlace", pos + 1) : "",
                 new SolidColorBrush(h.ChampionId == club.Id ? P.Gold : P.Text));
         }).ToList();
+        Refresh();
     }
+
+    public IReadOnlyList<string> Roles { get; }
+    [ObservableProperty] private int _roleIndex;
+    [ObservableProperty] private string? _result;
+    [ObservableProperty] private double _trust;
+    [ObservableProperty] private string _trustText = "";
+    [ObservableProperty] private IReadOnlyList<InfoLine> _boardFacts = Array.Empty<InfoLine>();
+    [ObservableProperty] private IReadOnlyList<InfoLine> _boardMembers = Array.Empty<InfoLine>();
+    [ObservableProperty] private IReadOnlyList<DecisionOption> _requests = Array.Empty<DecisionOption>();
+    [ObservableProperty] private IReadOnlyList<StaffLine> _ownStaff = Array.Empty<StaffLine>();
+    [ObservableProperty] private IReadOnlyList<StaffLine> _market = Array.Empty<StaffLine>();
+    [ObservableProperty] private double _fanMood;
+    [ObservableProperty] private string _fanText = "";
+    [ObservableProperty] private IReadOnlyList<InfoLine> _fanFacts = Array.Empty<InfoLine>();
+    [ObservableProperty] private IReadOnlyList<InfoLine> _careerFacts = Array.Empty<InfoLine>();
+    [ObservableProperty] private IReadOnlyList<StationLine> _stations = Array.Empty<StationLine>();
+    [ObservableProperty] private IReadOnlyList<AchievementLine> _achievements = Array.Empty<AchievementLine>();
+    [ObservableProperty] private double _media;
+    [ObservableProperty] private string _courseText = "";
+
+    partial void OnRoleIndexChanged(int value) => Refresh();
+
+    public void Refresh()
+    {
+        var s = Session;
+        var club = s.HumanClub;
+        var m = s.HumanManager;
+        var b = club.Board;
+        var currency = UiText.Currency(club);
+        Trust = b.Trust;
+        TrustText = T.Format("board.trust", (int)Math.Round(b.Trust)) + " – " + T[b.Trust switch { >= 75 => "board.mood.great", >= 50 => "board.mood.ok", >= 30 => "board.mood.tense", _ => "board.mood.critical" }];
+        var facts = new List<InfoLine>
+        {
+            new(T["board.goal"], T["goal." + b.Goal] + " " + T.Format("board.goalPosition", s.GoalPosition(club, b.Goal))),
+            new(T["board.contract"], b.ManagerContractUntil > 0 ? GameSession.SeasonLabel(b.ManagerContractUntil) : "–"),
+            new(T["board.wage"], Fmt.Money(b.ManagerWeeklyWage, currency) + T["unit.perWeek"]),
+        };
+        if (b.Ultimatum is { } u)
+            facts.Add(new InfoLine(T["board.ultimatum"], T.Format("board.ultimatumState", u.Points, u.PointsNeeded, u.MatchesPlayed, u.Matches), new SolidColorBrush(P.Bad)));
+        BoardFacts = facts;
+        BoardMembers = b.Members.Select(x => new InfoLine(T["boardRole." + x.Role], $"{x.Name} ({T["boardTrait." + x.Trait]})")).ToList();
+        Requests = new[] { "budget", "contract", "youth" }.Select(kind => new DecisionOption(T["board.request." + kind], "",
+            new RelayCommand(() =>
+            {
+                Result = T.Render(Session.BoardRequest(kind));
+                Refresh();
+                Shell.RefreshHeader();
+            }))).ToList();
+
+        OwnStaff = s.StaffOf(club).Select(x => StaffItem(x, true)).ToList();
+        var role = RoleIndex <= 0 ? (StaffRole?)null : (StaffRole)(RoleIndex - 1);
+        Market = s.StaffMarket.Where(x => role is null || x.Role == role).Take(40).Select(x => StaffItem(x, false)).ToList();
+
+        FanMood = club.Fans.Mood;
+        FanText = T.Format("fans.mood", (int)Math.Round(club.Fans.Mood)) + " – " + T[club.Fans.Mood switch { >= 75 => "fans.mood.euphoric", >= 55 => "fans.mood.happy", >= 35 => "fans.mood.grumbling", _ => "fans.mood.angry" }];
+        FanFacts = new List<InfoLine>
+        {
+            new(T["fans.members"], Fmt.Int(club.Fans.Members)),
+            new(T["fans.clubs"], Fmt.Int(club.Fans.FanClubs)),
+            new(T["fin.seasonTickets"], Fmt.Int(club.Finance.SeasonTickets)),
+            new(T["fans.priceMood"], Fmt.Num(club.Finance.PriceSatisfaction * 100, "0") + " %"),
+            new(T["fans.favourites"], string.Join(", ", club.Fans.Favourites.Where(s.World.Players.ContainsKey).Select(id => s.World.Players[id].ShortName)) is { Length: > 0 } fav ? fav : T["ui.none"]),
+            new(T["fans.rivals"], string.Join(", ", club.Rivals.Select(id => s.World.Clubs[id].Name)) is { Length: > 0 } r ? r : T["ui.none"]),
+        };
+
+        var c = m.Career;
+        Media = c.Media;
+        CareerFacts = new List<InfoLine>
+        {
+            new(T["career.license"], T["license." + c.License] + (c.License < s.RequiredLicense(club) ? " " + T.Format("career.licenseMissing", T["license." + s.RequiredLicense(club)]) : "")),
+            new(T["career.reputation"], $"{m.Reputation}/20"),
+            new(T["career.media"], Fmt.Num(c.Media, "0") + "/100"),
+            new(T["career.feuds"], c.Feuds.Count == 0 ? T["ui.none"] : string.Join(", ", c.Feuds.Select(id => s.World.Clubs[id].ShortName))),
+        };
+        CourseText = c.CourseUntil is { } until ? T.Format("career.courseRunning", Fmt.Date(until))
+            : c.License == CoachingLicense.Pro ? T["career.error.maxLicense"]
+            : T.Format("career.courseInfo", T["license." + (c.License + 1)], GameSession.CourseReputation(c.License + 1));
+        Stations = c.Stations.AsEnumerable().Reverse().Select(st => new StationLine(st.ClubName,
+            $"{Fmt.Date(st.From)} – {(st.To is { } to ? Fmt.Date(to) : T["career.today"])}",
+            T.Format("career.record", st.Matches, st.Wins, st.Draws, st.Losses) + (st.Titles.Count > 0 ? " · " + T.Format("career.titles", st.Titles.Count) : ""),
+            st.Exit.Length == 0 ? "" : T["career.exitKind." + st.Exit])).ToList();
+        Achievements = GameSession.AchievementIds.Select(id =>
+        {
+            var done = c.Achievements.Contains(id);
+            return new AchievementLine(T["achievement." + id], T["achievement." + id + ".info"], done, done ? 1 : 0.45);
+        }).OrderByDescending(a => a.Done).ToList();
+    }
+
+    private StaffLine StaffItem(StaffMember x, bool own)
+    {
+        var currency = UiText.Currency(Session.HumanClub);
+        var detail = T.Format("staff.detail", x.Age, x.Motivation) + (own ? " · " + T.Format("staff.until", Fmt.Date(x.ContractUntil)) : "");
+        return new StaffLine(x.Name, T["staff." + x.Role], $"{x.Ability}/20", detail, Fmt.Money(x.WeeklyWage, currency) + T["unit.perWeek"],
+            new RelayCommand(() =>
+            {
+                var error = own ? Session.FireStaff(x) : Session.HireStaff(x);
+                Result = error is null ? T.Format(own ? "staff.fired" : "staff.hired", x.Name) : T[error];
+                Refresh();
+                Shell.RefreshHeader();
+            }), own ? T["staff.fire"] : T["staff.hire"]);
+    }
+
+    [RelayCommand]
+    private void StartCourse()
+    {
+        var error = Session.StartCourse();
+        Result = error is null ? T["career.courseStarted"] : T[error];
+        Refresh();
+        Shell.RefreshHeader();
+    }
+
+    [RelayCommand]
+    private void Resign() =>
+        Shell.ShowDialog(new ConfirmDialogViewModel(T["career.resign"], T["career.confirmResign"], () =>
+        {
+            Session.Resign();
+            Result = T["career.resigned"];
+            Refresh();
+            Shell.RefreshHeader();
+        }));
 
     public override string Title => Name;
     public string Name { get; }

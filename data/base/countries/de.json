@@ -136,10 +136,10 @@
   "finance": {
     "divisions": {
       "DE1": {
-        "tvPool": 110000000,
+        "tvPool": 85000000,
         "tvEqualShare": 0.5,
-        "standing": 9,
-        "seating": 20,
+        "standing": 8,
+        "seating": 17,
         "box": 2500,
         "floodlightRequired": 3,
         "youthCenterRequired": 2,
@@ -147,7 +147,7 @@
         "travelPerAwayMatch": 35000
       },
       "DE2": {
-        "tvPool": 24000000,
+        "tvPool": 50000000,
         "tvEqualShare": 0.6,
         "standing": 7,
         "seating": 14,

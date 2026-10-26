@@ -34,6 +34,9 @@ public sealed partial class OptionsViewModel : ViewModelBase
                 // Erst nach dem Auswahlereignis neu aufbauen, die Auswahlbox gehört zur alten Ansicht.
                 Avalonia.Threading.Dispatcher.UIThread.Post(() => MainWindowViewModel.Instance?.Reload());
             }),
+            new(T["options.style"], Names<MediaStyle>("style."), Idx(p.Style), i => p.Style = At<MediaStyle>(i)),
+            new(T["options.events"], Names<EventFrequency>("events."), Idx(p.Events), i => p.Events = At<EventFrequency>(i)),
+            new(T["options.delegatePress"], yesNo, p.DelegatePress ? 1 : 0, i => p.DelegatePress = i == 1),
             new(T["options.theme"], themes.Select(t => T.TryGet("theme." + t) ?? t).ToList(), Math.Max(0, themes.IndexOf(p.Theme)), i =>
             {
                 p.Theme = themes[i];
@@ -43,6 +46,7 @@ public sealed partial class OptionsViewModel : ViewModelBase
         var rules = Session.World.Rules;
         World = new List<InfoLine>
         {
+            new(T["options.difficulty"], T["difficulty." + p.Difficulty]),
             new(T["newGame.injuryRule"], $"{rules.InjuryFrequency:0.0}x"),
             new(T["newGame.ironman"], rules.Ironman ? T["ui.yes"] : T["ui.no"]),
             new(T["options.autosave"], rules.AutosaveSlots.ToString()),

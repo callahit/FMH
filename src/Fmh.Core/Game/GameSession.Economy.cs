@@ -93,6 +93,9 @@ public sealed partial class GameSession
             SponsorsWeekly();
             PressWeekly();
             MoraleWeekly();
+            // Das Medienansehen fällt ohne neue Schlagzeilen langsam auf den Mittelwert zurück.
+            var career = HumanManager.Career;
+            career.Media += (50 - career.Media) * 0.02;
             if (World.Date.Month == 11 && World.Date.Day <= 7) AnnualMeeting();
         }
         EventsDaily();

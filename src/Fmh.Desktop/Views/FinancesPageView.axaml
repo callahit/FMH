@@ -1,0 +1,178 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Fmh.Desktop.ViewModels"
+             xmlns:c="using:Fmh.Desktop.Controls"
+             xmlns:s="using:Fmh.Desktop.Services"
+             x:Class="Fmh.Desktop.Views.FinancesPageView"
+             x:DataType="vm:FinancesPageViewModel">
+  <DockPanel>
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*" Margin="0,0,0,12">
+      <TextBlock Classes="h1" Text="{Binding Title}" />
+      <TextBlock Grid.Column="1" Text="{Binding Result}" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold"
+                 VerticalAlignment="Bottom" Margin="18,0" TextWrapping="Wrap" />
+    </Grid>
+    <TabControl>
+      <TabItem Header="{s:L fin.tab.overview}">
+        <ScrollViewer>
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
+            <StackPanel Spacing="14">
+              <Border Classes="card">
+                <ItemsControl ItemsSource="{Binding Overview}">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="2" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:InfoLine">
+                      <StackPanel Margin="0,6,16,6">
+                        <TextBlock Text="{Binding Label}" Classes="muted small" />
+                        <TextBlock Text="{Binding Value}" FontSize="15" FontWeight="SemiBold" Foreground="{Binding Fore}" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </Border>
+              <Border Classes="card">
+                <StackPanel Spacing="6">
+                  <TextBlock Classes="h3" Text="{s:L fin.chart}" />
+                  <c:LineChart Height="180" SeriesA="{Binding BalanceSeries}" SeriesB="{Binding IncomeSeries}" MaxX="{Binding ChartX}"
+                               MaxY="{Binding ChartMax}" MinY="{Binding ChartMin}" BrushA="{DynamicResource AccentBrush}"
+                               BrushB="{DynamicResource GoldBrush}" GridBrush="{DynamicResource LineBrush}" />
+                  <StackPanel Orientation="Horizontal" Spacing="16">
+                    <TextBlock Text="{s:L fin.chartBalance}" Foreground="{DynamicResource AccentBrush}" Classes="small" />
+                    <TextBlock Text="{s:L fin.chartMonth}" Foreground="{DynamicResource GoldBrush}" Classes="small" />
+                    <TextBlock Text="{Binding ChartText}" Classes="muted small" />
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+            <Border Grid.Column="1" Classes="card" VerticalAlignment="Top">
+              <StackPanel Spacing="4">
+                <Grid ColumnDefinitions="*,130,130">
+                  <TextBlock Classes="h3" Text="{s:L fin.seasonBalance}" />
+                  <TextBlock Grid.Column="1" Classes="muted small" Text="{s:L fin.thisSeason}" HorizontalAlignment="Right" VerticalAlignment="Bottom" />
+                  <TextBlock Grid.Column="2" Classes="muted small" Text="{s:L fin.lastSeason}" HorizontalAlignment="Right" VerticalAlignment="Bottom" />
+                </Grid>
+                <ItemsControl ItemsSource="{Binding Rows}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:FinanceRow">
+                      <Grid ColumnDefinitions="*,130,130" Margin="0,2">
+                        <TextBlock Text="{Binding Label}" FontWeight="{Binding Weight}" />
+                        <TextBlock Grid.Column="1" Text="{Binding Current}" Foreground="{Binding Brush}" FontWeight="{Binding Weight}" HorizontalAlignment="Right" />
+                        <TextBlock Grid.Column="2" Text="{Binding Last}" Classes="muted" FontWeight="{Binding Weight}" HorizontalAlignment="Right" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+          </Grid>
+        </ScrollViewer>
+      </TabItem>
+
+      <TabItem Header="{s:L fin.tab.bank}">
+        <ScrollViewer>
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
+            <StackPanel Spacing="14">
+              <Border Classes="card">
+                <StackPanel Spacing="8">
+                  <TextBlock Classes="h3" Text="{s:L fin.loans}" />
+                  <TextBlock Classes="muted" Text="{s:L fin.noLoans}" IsVisible="{Binding NoLoans}" />
+                  <ItemsControl ItemsSource="{Binding Loans}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:LoanLine">
+                        <Grid ColumnDefinitions="*,Auto" Margin="0,4">
+                          <StackPanel>
+                            <TextBlock Text="{Binding Text}" FontWeight="SemiBold" />
+                            <TextBlock Text="{Binding Detail}" Classes="muted small" />
+                          </StackPanel>
+                          <Button Grid.Column="1" Content="{s:L fin.repay}" Command="{Binding Repay}" VerticalAlignment="Center" />
+                        </Grid>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                  <Separator />
+                  <TextBlock Text="{Binding LoanText}" Classes="muted" TextWrapping="Wrap" />
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <NumericUpDown Value="{Binding LoanAmount}" Minimum="100000" Increment="250000" FormatString="N0" Width="200" />
+                    <ComboBox ItemsSource="{Binding LoanYears}" SelectedIndex="{Binding LoanYearIndex}" MinWidth="110" />
+                    <Button Classes="primary" Content="{s:L fin.takeLoan}" Command="{Binding TakeLoanCommand}" />
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+            <StackPanel Grid.Column="1" Spacing="14">
+              <Border Classes="card">
+                <StackPanel Spacing="8">
+                  <TextBlock Classes="h3" Text="{s:L fin.deposit}" />
+                  <TextBlock Text="{Binding DepositText}" TextWrapping="Wrap" />
+                  <StackPanel Orientation="Horizontal" Spacing="8" IsVisible="{Binding !HasDeposit}">
+                    <NumericUpDown Value="{Binding DepositAmount}" Minimum="50000" Increment="100000" FormatString="N0" Width="200" />
+                    <ComboBox ItemsSource="{Binding DepositMonths}" SelectedIndex="{Binding DepositMonthIndex}" MinWidth="150" />
+                    <Button Content="{s:L fin.makeDeposit}" Command="{Binding MakeDepositCommand}" />
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+              <Border Classes="card">
+                <StackPanel Spacing="8">
+                  <TextBlock Classes="h3" Text="{s:L fin.shift}" />
+                  <TextBlock Classes="muted small" Text="{s:L fin.shiftHelp}" TextWrapping="Wrap" />
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <NumericUpDown Value="{Binding ShiftAmount}" Minimum="0" Increment="100000" FormatString="N0" Width="200" />
+                    <Button Content="{s:L fin.toTransfer}" Command="{Binding ShiftToTransferCommand}" />
+                    <Button Content="{s:L fin.toWages}" Command="{Binding ShiftToWagesCommand}" />
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </Grid>
+        </ScrollViewer>
+      </TabItem>
+
+      <TabItem Header="{s:L fin.tab.tickets}">
+        <ScrollViewer>
+          <Border Classes="card" HorizontalAlignment="Left" MinWidth="520">
+            <StackPanel Spacing="10">
+              <TextBlock Classes="h3" Text="{s:L fin.prices}" />
+              <Grid ColumnDefinitions="220,180" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="8">
+                <TextBlock Text="{s:L fin.priceStanding}" VerticalAlignment="Center" />
+                <NumericUpDown Grid.Column="1" Value="{Binding Standing}" Minimum="1" Maximum="200" Increment="1" FormatString="N0" />
+                <TextBlock Grid.Row="1" Text="{s:L fin.priceSeating}" VerticalAlignment="Center" />
+                <NumericUpDown Grid.Row="1" Grid.Column="1" Value="{Binding Seating}" Minimum="1" Maximum="400" Increment="1" FormatString="N0" />
+                <TextBlock Grid.Row="2" Text="{s:L fin.priceBox}" VerticalAlignment="Center" />
+                <NumericUpDown Grid.Row="2" Grid.Column="1" Value="{Binding Box}" Minimum="100" Maximum="20000" Increment="100" FormatString="N0" />
+                <TextBlock Grid.Row="3" Text="{s:L fin.seasonDiscount}" VerticalAlignment="Center" />
+                <NumericUpDown Grid.Row="3" Grid.Column="1" Value="{Binding SeasonDiscount}" Minimum="0" Maximum="50" Increment="5" FormatString="N0" />
+                <TextBlock Grid.Row="4" Text="{s:L fin.topSurcharge}" VerticalAlignment="Center" />
+                <NumericUpDown Grid.Row="4" Grid.Column="1" Value="{Binding TopSurcharge}" Minimum="0" Maximum="100" Increment="5" FormatString="N0" />
+              </Grid>
+              <TextBlock Text="{Binding PriceText}" Classes="muted" />
+              <Button Classes="primary" Content="{s:L fin.savePrices}" Command="{Binding SavePricesCommand}" HorizontalAlignment="Left" />
+              <TextBlock Classes="muted small" Text="{s:L fin.priceHelp}" TextWrapping="Wrap" MaxWidth="500" HorizontalAlignment="Left" />
+            </StackPanel>
+          </Border>
+        </ScrollViewer>
+      </TabItem>
+
+      <TabItem Header="{s:L fin.tab.sponsors}">
+        <ScrollViewer>
+          <Border Classes="card">
+            <StackPanel Spacing="4">
+              <TextBlock Classes="h3" Text="{Binding SponsorText}" />
+              <ItemsControl ItemsSource="{Binding Sponsors}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:SponsorLine">
+                    <Grid ColumnDefinitions="200,*,140,100" Margin="0,3">
+                      <TextBlock Text="{Binding Slot}" Classes="muted" />
+                      <TextBlock Grid.Column="1" Text="{Binding Company}" Foreground="{Binding Brush}" FontWeight="SemiBold" />
+                      <TextBlock Grid.Column="2" Text="{Binding Value}" HorizontalAlignment="Right" />
+                      <TextBlock Grid.Column="3" Text="{Binding Until}" Classes="muted" HorizontalAlignment="Right" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <TextBlock Classes="muted small" Text="{s:L fin.sponsorHelp}" TextWrapping="Wrap" Margin="0,8,0,0" />
+            </StackPanel>
+          </Border>
+        </ScrollViewer>
+      </TabItem>
+    </TabControl>
+  </DockPanel>
+</UserControl>

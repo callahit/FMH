@@ -176,8 +176,14 @@ public class CareerTests
             Assert.Equal(n.BuyerId, player.ClubId);
             Assert.True(s.HumanClub.Budget.Balance > balance);
         }
-        s.DelegateDecisions();
-        Assert.NotEqual(StopReason.Decision, s.Advance().Reason);
+        // Weitere Pflichttermine (z. B. Pressekonferenz) halten nur kurz auf, der Kalender läuft weiter.
+        for (var i = 0; i < 10 && s.World.Date == date; i++)
+        {
+            s.DelegateDecisions();
+            var next = s.Advance();
+            if (next.Reason == StopReason.HumanMatch && next.Fixture is { } f) s.PlayInstant(f);
+        }
+        Assert.True(s.World.Date > date);
     }
 
     [Fact]

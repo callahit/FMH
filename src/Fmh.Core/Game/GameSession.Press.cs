@@ -131,7 +131,7 @@ public sealed partial class GameSession
                     break;
                 case PressAnswer.Modest:
                     ChangeTrust(club, 0.5);
-                    career.Media += 0.2;
+                    career.Media += 0.1;
                     if (opp is not null) TeamMorale(opp, -0.15);
                     break;
                 case PressAnswer.Evasive:
@@ -191,7 +191,7 @@ public sealed partial class GameSession
         var hero = scorer is { } id && World.Players.TryGetValue(id, out var p) ? p.ShortName : LastName(HumanManager.Name);
         var score = f.HomeId == club.Id ? $"{r.HomeGoals}:{r.AwayGoals}" : $"{r.AwayGoals}:{r.HomeGoals}";
         Headline(situation, LastName(HumanManager.Name), club.Name, opp.Name, score, hero);
-        HumanManager.Career.Media = Math.Clamp(HumanManager.Career.Media + o * 0.5, 0, 100);
+        HumanManager.Career.Media = Math.Clamp(HumanManager.Career.Media + o * 0.3, 0, 100);
     }
 
     /// <summary>Wöchentlich: Gerüchte und Spielerinterviews.</summary>
