@@ -12,7 +12,7 @@ public static class TacticAdvisor
     public static List<Advice> Analyse(Club club, World world, GameData data)
     {
         var result = new List<Advice>();
-        var formation = data.Formation(club.Tactic.FormationId);
+        var formation = TacticResolver.Resolve(club.Tactic, data);
         var profiles = data.PositionProfiles;
         var eleven = new List<(Player player, FormationSlot slot)>();
         for (var i = 0; i < formation.Slots.Count && i < club.Tactic.Lineup.Count; i++)

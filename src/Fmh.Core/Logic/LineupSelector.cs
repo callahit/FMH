@@ -43,7 +43,7 @@ public static class LineupSelector
     /// <summary>Komplette Aufstellung für einen Verein: Startelf, Bank (mit Ersatztorwart) und Standardschützen.</summary>
     public static void PickBest(Club club, World world, GameData data, int benchSize)
     {
-        var formation = data.Formation(club.Tactic.FormationId);
+        var formation = TacticResolver.Resolve(club.Tactic, data);
         var available = world.SquadOf(club).Where(p => p.IsAvailable).ToList();
         club.Tactic.Lineup = Assign(formation, available, data.PositionProfiles);
         club.Tactic.Bench = PickBench(club.Tactic.Lineup, available, benchSize, data.PositionProfiles);
@@ -87,7 +87,7 @@ public static class LineupSelector
     /// </summary>
     public static bool Repair(Club club, World world, GameData data, int benchSize)
     {
-        var formation = data.Formation(club.Tactic.FormationId);
+        var formation = TacticResolver.Resolve(club.Tactic, data);
         var lineup = club.Tactic.Lineup;
         var changed = false;
         while (lineup.Count < formation.Slots.Count) { lineup.Add(null); changed = true; }
@@ -139,7 +139,7 @@ public static class LineupSelector
     public static List<string> Validate(Club club, World world, GameData data)
     {
         var problems = new List<string>();
-        var formation = data.Formation(club.Tactic.FormationId);
+        var formation = TacticResolver.Resolve(club.Tactic, data);
         var lineup = club.Tactic.Lineup;
         if (lineup.Count != formation.Slots.Count || lineup.Any(id => id is null))
             problems.Add("lineup.incomplete");

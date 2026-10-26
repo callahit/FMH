@@ -128,8 +128,8 @@
   },
   "youth": {
     "intakeMonth": 3,
-    "minPlayers": 8,
-    "maxPlayers": 16,
+    "minPlayers": 4,
+    "maxPlayers": 9,
     "proContractAge": 17,
     "promoteAge": 16
   }

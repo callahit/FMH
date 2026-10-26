@@ -114,10 +114,10 @@ public sealed partial class GameSession
         var headroom = Math.Max(0, h.PotentialAbility - h.CurrentAbility);
         if (headroom == 0) return 0;
         var age = p.Age(World.Date);
-        var ageFactor = age switch { <= 19 => 1.3, <= 21 => 1.15, <= 24 => 1.0, <= 27 => 0.55, <= 30 => 0.3, _ => 0.15 };
+        var ageFactor = age switch { <= 19 => 1.3, <= 21 => 1.1, <= 24 => 0.8, <= 27 => 0.35, <= 30 => 0.12, _ => 0.04 };
         var pro = 0.6 + h.Professionalism / 20.0 * 0.8;
         var morale = 0.9 + (int)p.State.Morale * 0.033;
-        return 0.022 * Math.Min(1.5, headroom / 35.0 + 0.15) * ageFactor * pro * morale * CoachFactor(club) * IntensityFactor(intensity);
+        return 0.014 * Math.Min(1.5, headroom / 35.0 + 0.15) * ageFactor * pro * morale * CoachFactor(club) * IntensityFactor(intensity);
     }
 
     /// <summary>Angesparter Fortschritt ab 1,0 hebt ein Attribut der Gruppe; Positionsgewichtung entscheidet welches.</summary>

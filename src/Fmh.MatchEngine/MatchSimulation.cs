@@ -1292,6 +1292,9 @@ internal sealed class MatchSimulation : IMatchSimulation
         var assignment = LineupSelector.Assign(formation, players, Setup.Profiles);
         team.Formation = formation;
         team.Tactic.FormationId = formation.Id;
+        // Neue Formation: Standardrollen der Positionen, individuelle Anweisungen verfallen.
+        team.Tactic.Orders.Clear();
+        team.Orders = formation.Slots.Select(sl => new ResolvedOrder(Setup.Roles.FirstOrDefault(r => r.Positions.Contains(sl.Position)), false, false, false, false)).ToList();
         for (var slot = 0; slot < assignment.Count; slot++)
         {
             if (assignment[slot] is not { } id) continue;

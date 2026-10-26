@@ -40,7 +40,7 @@ public sealed class CommentaryGenerator
         if (e.Type is MatchEventType.Attack && rng.Chance(0.35)) return null;
 
         var text = Fill(rng.Pick(templates), e);
-        var highlight = e.Type is MatchEventType.Goal or MatchEventType.RedCard or MatchEventType.SecondYellow or MatchEventType.Penalty;
+        var highlight = e.Type is MatchEventType.Goal or MatchEventType.ShootoutEnd or MatchEventType.RedCard or MatchEventType.SecondYellow or MatchEventType.Penalty;
         return new CommentaryLine(e, e.MinuteLabel, text, highlight);
     }
 
@@ -50,6 +50,12 @@ public sealed class CommentaryGenerator
         MatchEventType.SecondHalfKickOff => "secondHalf",
         MatchEventType.HalfTime => "halfTime",
         MatchEventType.FullTime => "fullTime",
+        MatchEventType.EndOfRegularTime => "endOfRegularTime",
+        MatchEventType.ExtraTimeStart => "extraTime",
+        MatchEventType.ExtraTimeSecondHalf => "extraTimeSecondHalf",
+        MatchEventType.ShootoutStart => "shootoutStart",
+        MatchEventType.ShootoutKick => e.Outcome == ShotOutcome.Goal ? "shootoutKick.goal" : e.Outcome == ShotOutcome.Saved ? "shootoutKick.saved" : "shootoutKick.miss",
+        MatchEventType.ShootoutEnd => "shootoutEnd",
         MatchEventType.Stoppage => "stoppage",
         MatchEventType.Attack => "attack",
         MatchEventType.Counter => "counter",
@@ -117,6 +123,7 @@ public sealed class CommentaryGenerator
             .Replace("{away}", _sim.Away.Club.Name)
             .Replace("{score}", $"{e.HomeScore}:{e.AwayScore}")
             .Replace("{side}", side)
+            .Replace("{pens}", $"{e.Value / 100}:{e.Value % 100}")
             .Replace("{n}", e.Value.ToString())
             .Replace("{m}", e.Value.ToString());
     }
