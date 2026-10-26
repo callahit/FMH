@@ -36,7 +36,13 @@ public sealed class ClubBudget
     public long WageBudget { get; set; }
 }
 
-public enum TransactionType { TransferIn, TransferOut, SigningFee, AgentFee, Installment, TrainingCamp, LoanFee, Other }
+public enum TransactionType
+{
+    TransferIn, TransferOut, SigningFee, AgentFee, Installment, TrainingCamp, LoanFee, Other,
+    // Phase 3
+    Tickets, SeasonTickets, Tv, Sponsorship, Merchandise, Catering, PrizeMoney, BuildingIncome,
+    Wages, StaffWages, Bonuses, Upkeep, Construction, Interest, LoanPayout, LoanRepayment, Deposit, Travel, Fines, Event,
+}
 
 /// <summary>Finanzbuchung (Datenmodell Kapitel 12).</summary>
 public sealed class Transaction

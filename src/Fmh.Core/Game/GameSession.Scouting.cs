@@ -16,6 +16,34 @@ public sealed partial class GameSession
 
     public IReadOnlyList<Scout> HumanScouts => World.Scouts.Where(s => s.ClubId == HumanClub.Id).ToList();
 
+    /// <summary>Planstellen für Scouts: zwei plus Ausbau der Scoutingabteilung.</summary>
+    public int ScoutSlots(Club club) => 2 + (int)Effect(club, "scout.slots");
+
+    /// <summary>Kandidat für eine Scoutstelle; Qualität und Gehalt nach gewünschtem Niveau (1–20).</summary>
+    public string? HireScout(int quality)
+    {
+        var club = HumanClub;
+        if (HumanScouts.Count >= ScoutSlots(club)) return "staff.error.slots";
+        var names = Data.Names.TryGetValue(club.CountryCode, out var n) ? n : Data.Names.Values.First();
+        quality = Math.Clamp(quality, 3, 20);
+        var scout = new Scout
+        {
+            Id = World.NextScoutId++, ClubId = club.Id, Name = $"{_rng.Pick(names.FirstNames)} {_rng.Pick(names.LastNames)}",
+            JudgingAbility = quality, JudgingPotential = Math.Clamp(quality + _rng.Next(-2, 2), 3, 20),
+            RegionKnowledge = Math.Clamp(quality + _rng.Next(-3, 3), 3, 20), Region = club.CountryCode,
+        };
+        World.Scouts.Add(scout);
+        return null;
+    }
+
+    public void FireScout(Scout scout)
+    {
+        if (scout.ClubId != HumanClub.Id) return;
+        Book(HumanClub, TransactionType.StaffWages, -(long)ScoutWage(scout) * 8, TR("tx.severance", scout.Name));
+        World.ScoutAssignments.RemoveAll(a => a.ScoutId == scout.Id);
+        World.Scouts.Remove(scout);
+    }
+
     public ScoutAssignment? AssignmentOf(Scout s) => World.ScoutAssignments.FirstOrDefault(a => a.ScoutId == s.Id);
 
     /// <summary>Kenntnisstand des menschlichen Managers über einen Spieler.</summary>
@@ -142,7 +170,7 @@ public sealed partial class GameSession
         if (NextFixture(HumanClub) is not { } f) return;
         var opp = World.Clubs[f.HomeId == HumanClub.Id ? f.AwayId : f.HomeId];
         var squad = World.SquadOf(opp).ToList();
-        foreach (var p in squad) AddKnowledge(p, 15);
+        foreach (var p in squad) AddKnowledge(p, 15 + (int)Effect(HumanClub, "analysis"));
         var formation = Data.Formation(opp.Tactic.FormationId).Name;
         var best = squad.Where(p => p.IsAvailable).OrderByDescending(Rating).Take(3).Select(p => p.Name);
         var absent = squad.Where(p => !p.IsAvailable).OrderByDescending(Rating).Take(3).Select(p => p.Name).ToList();

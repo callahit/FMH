@@ -1,0 +1,300 @@
+[
+ {
+  "id": "rivalTrashTalk",
+  "category": "sport",
+  "options": [
+   {
+    "id": "respond",
+    "effects": {
+     "morale": 0.3,
+     "media": 1,
+     "board": -1
+    }
+   },
+   {
+    "id": "calm",
+    "effects": {
+     "board": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "refereeAssigned",
+  "category": "sport",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "morale": -0.1
+    }
+   }
+  ]
+ },
+ {
+  "id": "youthGem",
+  "category": "sport",
+  "options": [
+   {
+    "id": "promote",
+    "effects": {
+     "morale": 0.1,
+     "fans": 2
+    }
+   },
+   {
+    "id": "wait",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "trainingInjuries",
+  "category": "sport",
+  "options": [
+   {
+    "id": "reduce",
+    "effects": {
+     "playerCondition": 5,
+     "morale": 0.1
+    }
+   },
+   {
+    "id": "continue",
+    "effects": {
+     "morale": -0.1
+    }
+   }
+  ]
+ },
+ {
+  "id": "opponentSpy",
+  "category": "sport",
+  "options": [
+   {
+    "id": "secret",
+    "effects": {
+     "money": -5000,
+     "morale": 0.1
+    }
+   },
+   {
+    "id": "ignore",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "legendCoachAdvice",
+  "category": "sport",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "options": [
+   {
+    "id": "listen",
+    "effects": {
+     "morale": 0.2,
+     "board": 1
+    }
+   },
+   {
+    "id": "ignore",
+    "effects": {
+     "board": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "superstition",
+  "category": "sport",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "when": {
+   "afterWin": true
+  },
+  "options": [
+   {
+    "id": "keep",
+    "effects": {
+     "morale": 0.2
+    }
+   },
+   {
+    "id": "stop",
+    "effects": {
+     "morale": -0.1
+    }
+   }
+  ]
+ },
+ {
+  "id": "militaryCamp",
+  "category": "sport",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "when": {
+   "months": [
+    7,
+    1
+   ]
+  },
+  "options": [
+   {
+    "id": "go",
+    "effects": {
+     "money": -20000,
+     "playerCondition": 5,
+     "morale": -0.2
+    }
+   },
+   {
+    "id": "no",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "tacticsBoardBroken",
+  "category": "sport",
+  "styles": [
+   "Satirical"
+  ],
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "money": -500
+    }
+   }
+  ]
+ },
+ {
+  "id": "nationalTeamCall",
+  "category": "sport",
+  "when": {
+   "player": "star"
+  },
+  "options": [
+   {
+    "id": "proud",
+    "effects": {
+     "playerMorale": 2,
+     "media": 2,
+     "fans": 2
+    }
+   }
+  ]
+ },
+ {
+  "id": "rivalBuysStar",
+  "category": "sport",
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "fans": -2,
+     "morale": -0.1
+    }
+   }
+  ]
+ },
+ {
+  "id": "lostLuggage",
+  "category": "sport",
+  "options": [
+   {
+    "id": "buy",
+    "effects": {
+     "money": -8000
+    }
+   },
+   {
+    "id": "borrow",
+    "effects": {
+     "morale": -0.2,
+     "media": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "assistantOffer",
+  "category": "sport",
+  "options": [
+   {
+    "id": "keep",
+    "effects": {
+     "money": -15000,
+     "morale": 0.1
+    }
+   },
+   {
+    "id": "let",
+    "effects": {
+     "morale": -0.1
+    }
+   }
+  ]
+ },
+ {
+  "id": "fitnessTest",
+  "category": "sport",
+  "when": {
+   "months": [
+    7
+   ]
+  },
+  "options": [
+   {
+    "id": "strict",
+    "effects": {
+     "playerCondition": 5,
+     "morale": -0.2
+    }
+   },
+   {
+    "id": "soft",
+    "effects": {
+     "morale": 0.1
+    }
+   }
+  ]
+ },
+ {
+  "id": "winterBreakTrip",
+  "category": "sport",
+  "when": {
+   "months": [
+    12,
+    1
+   ]
+  },
+  "options": [
+   {
+    "id": "sun",
+    "effects": {
+     "money": -40000,
+     "morale": 0.3,
+     "playerCondition": 3
+    }
+   },
+   {
+    "id": "home",
+    "effects": {
+     "morale": -0.1
+    }
+   }
+  ]
+ }
+]

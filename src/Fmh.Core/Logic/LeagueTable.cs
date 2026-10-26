@@ -14,6 +14,8 @@ public sealed class TableRow
     public int GoalsAgainst { get; set; }
     public int AwayGoals { get; set; }
     public int Points { get; set; }
+    /// <summary>Abgezogene Punkte (Lizenzierung).</summary>
+    public int Deducted { get; set; }
     public int Position { get; set; }
     /// <summary>Letzte Ergebnisse als S/U/N, neuestes zuletzt.</summary>
     public List<char> Form { get; } = new();
@@ -31,6 +33,8 @@ public static class LeagueTable
             .OrderBy(f => f.Matchday)
             .ToList();
         var rows = Accumulate(league.ClubIds, played, league.Format.Points);
+        foreach (var (club, points) in league.Deductions)
+            if (rows.TryGetValue(club, out var row)) { row.Points -= points; row.Deducted = points; }
         var sorted = Sort(rows.Values.ToList(), played, league.Format);
         for (var i = 0; i < sorted.Count; i++) sorted[i].Position = i + 1;
         return sorted;

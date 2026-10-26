@@ -14,7 +14,7 @@ namespace Fmh.Core.Persistence;
 public static class SqliteStore
 {
     /// <summary>Aktuelle Schemaversion. Ältere Spielstände werden beim Laden mit <see cref="Migrations"/> angehoben.</summary>
-    public const int SchemaVersion = 3;
+    public const int SchemaVersion = 4;
 
     /// <summary>Migrationsschritte: Schlüssel = Ausgangsversion; das SQL hebt die Datenbank um eine Version an.</summary>
     private static readonly Dictionary<int, string> Migrations = new()
@@ -83,6 +83,23 @@ public static class SqliteStore
             ALTER TABLE transactions ADD COLUMN text_ref TEXT;
             ALTER TABLE installments ADD COLUMN text_ref TEXT;
             ALTER TABLE scout_reports ADD COLUMN summary_ref TEXT;
+            """,
+        // Phase 3: Finanzen, Stadion, Gelände, Sponsoren, Vorstand, Fans, Personal, Ereignisse, Managerkarriere.
+        [3] = """
+            ALTER TABLE clubs ADD COLUMN finance TEXT;
+            ALTER TABLE clubs ADD COLUMN stadium_data TEXT;
+            ALTER TABLE clubs ADD COLUMN grounds TEXT;
+            ALTER TABLE clubs ADD COLUMN sponsors TEXT NOT NULL DEFAULT '[]';
+            ALTER TABLE clubs ADD COLUMN sponsor_offers TEXT NOT NULL DEFAULT '[]';
+            ALTER TABLE clubs ADD COLUMN board TEXT;
+            ALTER TABLE clubs ADD COLUMN fans TEXT;
+            ALTER TABLE clubs ADD COLUMN rivals TEXT NOT NULL DEFAULT '[]';
+            ALTER TABLE managers ADD COLUMN career TEXT;
+            ALTER TABLE leagues ADD COLUMN deductions TEXT NOT NULL DEFAULT '{}';
+            CREATE TABLE staff (id INTEGER PRIMARY KEY, club_id INTEGER, name TEXT NOT NULL, role TEXT NOT NULL, ability INTEGER NOT NULL,
+                data TEXT NOT NULL);
+            CREATE TABLE events (id INTEGER PRIMARY KEY, event_id TEXT NOT NULL, date TEXT NOT NULL, chosen TEXT, data TEXT NOT NULL);
+            CREATE TABLE event_history (event_id TEXT PRIMARY KEY, date TEXT NOT NULL);
             """,
     };
 
@@ -205,6 +222,13 @@ public static class SqliteStore
             ["next_negotiation_id"] = w.NextNegotiationId.ToString(Inv),
             ["next_scout_id"] = w.NextScoutId.ToString(Inv),
             ["next_assignment_id"] = w.NextAssignmentId.ToString(Inv),
+            ["next_staff_id"] = w.NextStaffId.ToString(Inv),
+            ["next_building_id"] = w.NextBuildingId.ToString(Inv),
+            ["next_project_id"] = w.NextProjectId.ToString(Inv),
+            ["next_sponsor_id"] = w.NextSponsorId.ToString(Inv),
+            ["next_loan_id"] = w.NextLoanId.ToString(Inv),
+            ["next_event_id"] = w.NextEventId.ToString(Inv),
+            ["pending_press"] = w.PendingPress is null ? "" : J(w.PendingPress),
             ["rules"] = JsonSerializer.Serialize(w.Rules, Json.Compact),
             ["packages"] = JsonSerializer.Serialize(w.Packages),
             ["saved_at"] = DateTime.Now.ToString("O", Inv),
@@ -224,24 +248,25 @@ public static class SqliteStore
         using (var cmd = Cmd(con, tx, "INSERT INTO referees VALUES ($a, $b, $c)", "$a", "$b", "$c"))
             foreach (var r in w.Referees) Run(cmd, r.Id, r.Name, r.Strictness);
 
-        using (var cmd = Cmd(con, tx, "INSERT INTO managers VALUES ($a, $b, $c, $d, $e, $f)", "$a", "$b", "$c", "$d", "$e", "$f"))
-            foreach (var m in w.Managers) Run(cmd, m.Id, m.Name, m.Human, m.ClubId, m.Reputation, JsonSerializer.Serialize(m.Profile, Json.Compact));
+        using (var cmd = Cmd(con, tx, "INSERT INTO managers VALUES ($a, $b, $c, $d, $e, $f, $g)", "$a", "$b", "$c", "$d", "$e", "$f", "$g"))
+            foreach (var m in w.Managers) Run(cmd, m.Id, m.Name, m.Human, m.ClubId, m.Reputation, JsonSerializer.Serialize(m.Profile, Json.Compact), J(m.Career));
 
-        var clubParams = Enumerable.Range(0, 27).Select(i => "$c" + i).ToArray();
+        var clubParams = Enumerable.Range(0, 35).Select(i => "$c" + i).ToArray();
         using (var cmd = Cmd(con, tx, $"INSERT INTO clubs VALUES ({string.Join(",", clubParams)})", clubParams))
             foreach (var c in w.Clubs.Values)
                 Run(cmd, c.Id, c.Key, c.Name, c.ShortName, c.City, c.CountryCode, c.Reputation, c.PrimaryColor, c.SecondaryColor,
                     c.StadiumName, c.StadiumCapacity, c.LeagueId, c.ManagerId, J(c.Tactic),
                     c.Budget.Balance, c.Budget.TransferBudget, c.Budget.WageBudget, c.CoachQuality, c.YouthFacilities, c.YouthRecruitment,
-                    J(c.SavedTactics), J(c.Familiarity), J(c.Training), c.Camp is null ? null : J(c.Camp), J(c.YouthIds), J(c.Shortlist), J(c.PlayerIds));
+                    J(c.SavedTactics), J(c.Familiarity), J(c.Training), c.Camp is null ? null : J(c.Camp), J(c.YouthIds), J(c.Shortlist), J(c.PlayerIds),
+                    J(c.Finance), J(c.Stadium), J(c.Grounds), J(c.Sponsors), J(c.SponsorOffers), J(c.Board), J(c.Fans), J(c.Rivals));
 
         WritePlayers(con, tx, w);
 
-        using (var cmd = Cmd(con, tx, "INSERT INTO leagues VALUES ($a,$b,$c,$d,$e,$f)", "$a", "$b", "$c", "$d", "$e", "$f"))
+        using (var cmd = Cmd(con, tx, "INSERT INTO leagues VALUES ($a,$b,$c,$d,$e,$f,$g)", "$a", "$b", "$c", "$d", "$e", "$f", "$g"))
             for (var i = 0; i < w.Leagues.Count; i++)
             {
                 var l = w.Leagues[i];
-                Run(cmd, l.Id, i, l.Name, l.CountryCode, l.Level, JsonSerializer.Serialize(l.Format, Json.Compact));
+                Run(cmd, l.Id, i, l.Name, l.CountryCode, l.Level, JsonSerializer.Serialize(l.Format, Json.Compact), J(l.Deductions));
             }
         using (var cmd = Cmd(con, tx, "INSERT INTO league_clubs VALUES ($a,$b,$c)", "$a", "$b", "$c"))
             foreach (var l in w.Leagues)
@@ -424,6 +449,13 @@ public static class SqliteStore
             NextNegotiationId = meta.ContainsKey("next_negotiation_id") ? I("next_negotiation_id") : 1,
             NextScoutId = meta.ContainsKey("next_scout_id") ? I("next_scout_id") : 1,
             NextAssignmentId = meta.ContainsKey("next_assignment_id") ? I("next_assignment_id") : 1,
+            NextStaffId = meta.ContainsKey("next_staff_id") ? I("next_staff_id") : 1,
+            NextBuildingId = meta.ContainsKey("next_building_id") ? I("next_building_id") : 1,
+            NextProjectId = meta.ContainsKey("next_project_id") ? I("next_project_id") : 1,
+            NextSponsorId = meta.ContainsKey("next_sponsor_id") ? I("next_sponsor_id") : 1,
+            NextLoanId = meta.ContainsKey("next_loan_id") ? I("next_loan_id") : 1,
+            NextEventId = meta.ContainsKey("next_event_id") ? I("next_event_id") : 1,
+            PendingPress = meta.TryGetValue("pending_press", out var press) && press.Length > 0 ? PJ<PressConference>(press) : null,
             Rules = JsonSerializer.Deserialize<WorldRules>(meta["rules"], Json.Compact) ?? new WorldRules(),
             Packages = JsonSerializer.Deserialize<List<string>>(meta["packages"]) ?? new List<string>(),
         };
@@ -437,11 +469,12 @@ public static class SqliteStore
         foreach (var r in Rows(con, "SELECT id, name, strictness FROM referees ORDER BY id"))
             w.Referees.Add(new Referee { Id = r.GetInt32(0), Name = r.GetString(1), Strictness = r.GetInt32(2) });
 
-        foreach (var r in Rows(con, "SELECT id, name, human, club_id, reputation, profile FROM managers ORDER BY id"))
+        foreach (var r in Rows(con, "SELECT id, name, human, club_id, reputation, profile, career FROM managers ORDER BY id"))
             w.Managers.Add(new Manager
             {
                 Id = r.GetInt32(0), Name = r.GetString(1), Human = r.GetInt32(2) == 1, ClubId = NInt(r, 3), Reputation = r.GetInt32(4),
                 Profile = JsonSerializer.Deserialize<ManagerProfile>(r.GetString(5), Json.Compact) ?? new ManagerProfile(),
+                Career = r.IsDBNull(6) ? new ManagerCareer() : PJ<ManagerCareer>(r.GetString(6)) ?? new(),
             });
 
         foreach (var r in Rows(con, "SELECT * FROM clubs ORDER BY id"))
@@ -461,6 +494,14 @@ public static class SqliteStore
                 YouthIds = PJ<List<int>>(r.GetString(24)) ?? new(),
                 Shortlist = PJ<List<int>>(r.GetString(25)) ?? new(),
                 PlayerIds = PJ<List<int>>(r.GetString(26)) ?? new(),
+                Finance = Opt<FinanceState>(r, 27) ?? new(),
+                Stadium = Opt<Stadium>(r, 28) ?? new(),
+                Grounds = Opt<Grounds>(r, 29) ?? new(),
+                Sponsors = Opt<List<SponsorDeal>>(r, 30) ?? new(),
+                SponsorOffers = Opt<List<SponsorDeal>>(r, 31) ?? new(),
+                Board = Opt<BoardState>(r, 32) ?? new(),
+                Fans = Opt<FanState>(r, 33) ?? new(),
+                Rivals = Opt<List<int>>(r, 34) ?? new(),
             };
             w.Clubs[c.Id] = c;
         }
@@ -470,11 +511,12 @@ public static class SqliteStore
         foreach (var club in w.Clubs.Values.Where(c => c.PlayerIds.Count == 0))
             club.PlayerIds = w.Players.Values.Where(p => p.ClubId == club.Id && !p.IsYouth).Select(p => p.Id).Order().ToList();
 
-        foreach (var r in Rows(con, "SELECT id, name, country, level, format FROM leagues ORDER BY ord"))
+        foreach (var r in Rows(con, "SELECT id, name, country, level, format, deductions FROM leagues ORDER BY ord"))
             w.Leagues.Add(new League
             {
                 Id = r.GetString(0), Name = r.GetString(1), CountryCode = r.GetString(2), Level = r.GetInt32(3),
                 Format = JsonSerializer.Deserialize<DivisionConfig>(r.GetString(4), Json.Compact)!,
+                Deductions = PJ<Dictionary<int, int>>(r.GetString(5)) ?? new(),
             });
         var leagues = w.Leagues.ToDictionary(l => l.Id);
         foreach (var r in Rows(con, "SELECT league_id, club_id FROM league_clubs ORDER BY league_id, ord"))
@@ -654,6 +696,12 @@ public static class SqliteStore
                 Run(cmd, r.PlayerId, D(r.Date), r.StrengthStars, r.PotentialStars, r.Recommendation.ToString(), r.SummaryRef?.ToString() ?? r.Summary, Ref(r.SummaryRef));
         using (var cmd = Cmd(con, tx, "INSERT INTO knowledge VALUES ($a,$b)", "$a", "$b"))
             foreach (var (id, v) in w.Knowledge) Run(cmd, id, v);
+        using (var cmd = Cmd(con, tx, "INSERT INTO staff VALUES ($a,$b,$c,$d,$e,$f)", "$a", "$b", "$c", "$d", "$e", "$f"))
+            foreach (var s in w.Staff) Run(cmd, s.Id, s.ClubId, s.Name, s.Role.ToString(), s.Ability, J(s));
+        using (var cmd = Cmd(con, tx, "INSERT INTO events VALUES ($a,$b,$c,$d,$e)", "$a", "$b", "$c", "$d", "$e"))
+            foreach (var e in w.Events) Run(cmd, e.Id, e.EventId, D(e.Date), e.Chosen, J(e));
+        using (var cmd = Cmd(con, tx, "INSERT INTO event_history VALUES ($a,$b)", "$a", "$b"))
+            foreach (var (id, d) in w.EventHistory) Run(cmd, id, D(d));
     }
 
     private static void ReadCareer(SqliteConnection con, World w)
@@ -700,6 +748,12 @@ public static class SqliteStore
             });
         foreach (var r in Rows(con, "SELECT player_id, value FROM knowledge"))
             w.Knowledge[r.GetInt32(0)] = r.GetInt32(1);
+        foreach (var r in Rows(con, "SELECT data FROM staff ORDER BY id"))
+            w.Staff.Add(PJ<StaffMember>(r.GetString(0))!);
+        foreach (var r in Rows(con, "SELECT data FROM events ORDER BY id"))
+            w.Events.Add(PJ<PendingEvent>(r.GetString(0))!);
+        foreach (var r in Rows(con, "SELECT event_id, date FROM event_history"))
+            w.EventHistory[r.GetString(0)] = PD(r.GetString(1));
     }
 
     // ------------------------------------------------------------------ Hilfen
@@ -709,6 +763,7 @@ public static class SqliteStore
     private static TextRef? PRef(SqliteDataReader r, int i) => r.IsDBNull(i) ? null : PJ<TextRef>(r.GetString(i));
     private static string? NStr(SqliteDataReader r, int i) => r.IsDBNull(i) ? null : r.GetString(i);
     private static T? PJ<T>(string s) => JsonSerializer.Deserialize<T>(s, Json.Compact);
+    private static T? Opt<T>(SqliteDataReader r, int i) where T : class => r.IsDBNull(i) ? null : PJ<T>(r.GetString(i));
 
     private static string D(DateOnly d) => d.ToString("yyyy-MM-dd", Inv);
     private static DateOnly PD(string s) => DateOnly.ParseExact(s, "yyyy-MM-dd", Inv);

@@ -49,6 +49,22 @@ public sealed partial class GameSession
         Notify(MessageType.Season, "msg.sender.league",
             TR("msg.seasonEnd.subject", Comp(ownLeague.Id), SeasonLabel(World.SeasonYear)),
             TR("msg.seasonEnd.body", champ.Name, row.Position, row.Points, TR(verdictKey, own.Name)));
+
+        // Phase 3: TV-Leistungsanteil, Vorstand, Sponsorenboni, Karriere, Lizenzierung.
+        SeasonEndFinances();
+        foreach (var club in World.Clubs.Values.Where(c => HasFinances(c) && !IsHuman(c)))
+        {
+            var table = LeagueTable.Compute(World.LeagueOf(club));
+            SponsorBonuses(club, table.First(r => r.ClubId == club.Id).Position <= GoalPosition(club, club.Board.Goal));
+        }
+        if (!AwaitingNewJob)
+        {
+            var reached = EvaluateSeason(own, row.Position);
+            SponsorBonuses(own, reached);
+            if (!AwaitingNewJob)
+                CareerSeasonEnd(own, row.Position, reached, verdictKey is "msg.seasonEnd.promoted", row.Position == 1 && ownLeague.Level == 1);
+        }
+        Licensing();
     }
 
     /// <summary>Zum Saisonstart: Auf- und Abstieg, Vertragsende, Entwicklung, Karriereenden, neue Wettbewerbe.</summary>
@@ -71,20 +87,33 @@ public sealed partial class GameSession
         World.Cups.Clear();
         CreateCups();
 
+        // Punktabzüge aus der Lizenzierung gelten in der Liga der neuen Saison.
+        foreach (var league in World.Leagues) league.Deductions.Clear();
+        foreach (var club in World.Clubs.Values.Where(c => c.Finance.PendingDeduction > 0))
+        {
+            if (World.FindLeague(club.LeagueId) is { } league) league.Deductions[club.Id] = club.Finance.PendingDeduction;
+            club.Finance.PendingDeduction = 0;
+        }
+        RollSeasonFinances();
+        StaffSeasonStart();
         foreach (var club in World.Clubs.Values)
         {
             FillSquad(club);
-            Budgets.SetSeasonBudget(club, World);
+            club.Board.Goal = ExpectedGoal(club);
+            SetSeasonBudget(club);
+            UpdateFavourites(club);
             if (!IsHuman(club)) club.Tactic.FormationId = AiTactics.BestFormation(club, World, Data).Id;
             LineupSelector.Repair(club, World, Data, BenchSize(club));
         }
 
+        SponsorSeasonStart();
         var b = HumanClub.Budget;
         var currency = World.Country(HumanClub.CountryCode).Currency;
         Notify(MessageType.Board, "msg.sender.board",
             TR("msg.newSeason.subject", SeasonLabel(World.SeasonYear)),
             TR("msg.newSeason.body", HumanClub.Name, Comp(HumanClub.LeagueId),
                 TextArg.Money(b.TransferBudget, currency), TextArg.Money(b.WageBudget, currency)));
+        OfferSeasonGoal();
         return true;
     }
 

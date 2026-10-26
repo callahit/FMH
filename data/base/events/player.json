@@ -1,0 +1,972 @@
+[
+ {
+  "id": "nightclub",
+  "category": "player",
+  "weight": 2,
+  "when": {
+   "player": "any"
+  },
+  "options": [
+   {
+    "id": "fine",
+    "effects": {
+     "playerFine": 2,
+     "playerMorale": -1,
+     "board": 1
+    }
+   },
+   {
+    "id": "talk",
+    "effects": {
+     "playerMorale": 1,
+     "media": -2
+    }
+   },
+   {
+    "id": "ignore",
+    "effects": {
+     "morale": -0.2,
+     "media": -3
+    }
+   }
+  ]
+ },
+ {
+  "id": "speeding",
+  "category": "player",
+  "when": {
+   "player": "any"
+  },
+  "options": [
+   {
+    "id": "fine",
+    "effects": {
+     "playerFine": 1,
+     "playerMorale": -1
+    }
+   },
+   {
+    "id": "support",
+    "effects": {
+     "playerMorale": 1,
+     "media": -2
+    }
+   }
+  ]
+ },
+ {
+  "id": "wantsOut",
+  "category": "player",
+  "weight": 1.5,
+  "when": {
+   "player": "star"
+  },
+  "options": [
+   {
+    "id": "refuse",
+    "effects": {
+     "playerMorale": -2,
+     "board": 2
+    }
+   },
+   {
+    "id": "promise",
+    "effects": {
+     "playerMorale": 1,
+     "fans": -3
+    }
+   },
+   {
+    "id": "raise",
+    "effects": {
+     "playerMorale": 2,
+     "money": -150000
+    }
+   }
+  ]
+ },
+ {
+  "id": "birthdayParty",
+  "category": "player",
+  "when": {
+   "player": "any"
+  },
+  "options": [
+   {
+    "id": "allow",
+    "effects": {
+     "morale": 0.4,
+     "playerCondition": -5
+    }
+   },
+   {
+    "id": "forbid",
+    "effects": {
+     "morale": -0.2,
+     "board": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "tattoo",
+  "category": "player",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "when": {
+   "player": "young"
+  },
+  "options": [
+   {
+    "id": "laugh",
+    "effects": {
+     "playerMorale": 1,
+     "media": 1
+    }
+   },
+   {
+    "id": "fine",
+    "effects": {
+     "playerFine": 1,
+     "playerMorale": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "trainingFight",
+  "category": "player",
+  "weight": 1.5,
+  "when": {
+   "player": "any"
+  },
+  "options": [
+   {
+    "id": "suspend",
+    "effects": {
+     "playerSuspend": 1,
+     "morale": 0.2,
+     "board": 1
+    }
+   },
+   {
+    "id": "fine",
+    "effects": {
+     "playerFine": 1
+    }
+   },
+   {
+    "id": "nothing",
+    "effects": {
+     "morale": -0.3
+    }
+   }
+  ]
+ },
+ {
+  "id": "lateTraining",
+  "category": "player",
+  "weight": 2,
+  "when": {
+   "player": "any"
+  },
+  "cooldownDays": 120,
+  "options": [
+   {
+    "id": "fine",
+    "effects": {
+     "playerFine": 0.5
+    }
+   },
+   {
+    "id": "warn",
+    "effects": {
+     "playerMorale": 0
+    }
+   }
+  ]
+ },
+ {
+  "id": "charityGala",
+  "category": "player",
+  "when": {
+   "player": "star"
+  },
+  "options": [
+   {
+    "id": "go",
+    "effects": {
+     "media": 4,
+     "fans": 2,
+     "playerCondition": -3
+    }
+   },
+   {
+    "id": "no",
+    "effects": {
+     "media": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "fanVisit",
+  "category": "player",
+  "when": {
+   "player": "any"
+  },
+  "options": [
+   {
+    "id": "visit",
+    "effects": {
+     "fans": 4,
+     "media": 2,
+     "playerMorale": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "socialMediaRant",
+  "category": "player",
+  "weight": 1.5,
+  "when": {
+   "player": "any"
+  },
+  "options": [
+   {
+    "id": "fine",
+    "effects": {
+     "playerFine": 1,
+     "playerMorale": -1,
+     "media": 1
+    }
+   },
+   {
+    "id": "ignore",
+    "effects": {
+     "media": -3,
+     "morale": -0.2
+    }
+   }
+  ]
+ },
+ {
+  "id": "sickNote",
+  "category": "player",
+  "weight": 2,
+  "when": {
+   "player": "any"
+  },
+  "cooldownDays": 60,
+  "options": [
+   {
+    "id": "rest",
+    "effects": {
+     "playerCondition": 5,
+     "playerForm": -5
+    }
+   }
+  ]
+ },
+ {
+  "id": "weightGain",
+  "category": "player",
+  "when": {
+   "player": "old"
+  },
+  "options": [
+   {
+    "id": "diet",
+    "effects": {
+     "playerCondition": 5,
+     "playerMorale": -1
+    }
+   },
+   {
+    "id": "fine",
+    "effects": {
+     "playerFine": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "homesick",
+  "category": "player",
+  "when": {
+   "player": "foreign"
+  },
+  "options": [
+   {
+    "id": "family",
+    "effects": {
+     "playerMorale": 2,
+     "money": -20000
+    }
+   },
+   {
+    "id": "mentor",
+    "effects": {
+     "playerMorale": 1
+    }
+   },
+   {
+    "id": "nothing",
+    "effects": {
+     "playerMorale": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "languageCourse",
+  "category": "player",
+  "when": {
+   "player": "foreign"
+  },
+  "options": [
+   {
+    "id": "pay",
+    "effects": {
+     "money": -5000,
+     "playerMorale": 1,
+     "playerForm": 5
+    }
+   },
+   {
+    "id": "no",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "talentOffer",
+  "category": "player",
+  "when": {
+   "player": "young"
+  },
+  "options": [
+   {
+    "id": "protect",
+    "effects": {
+     "playerMorale": 1,
+     "board": 1
+    }
+   },
+   {
+    "id": "publicize",
+    "effects": {
+     "media": 3,
+     "playerMorale": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "modelContract",
+  "category": "player",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "when": {
+   "player": "star"
+  },
+  "options": [
+   {
+    "id": "allow",
+    "effects": {
+     "playerMorale": 1,
+     "media": 2,
+     "playerForm": -5
+    }
+   },
+   {
+    "id": "forbid",
+    "effects": {
+     "playerMorale": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "playerBook",
+  "category": "player",
+  "when": {
+   "player": "old"
+  },
+  "options": [
+   {
+    "id": "approve",
+    "effects": {
+     "media": 2,
+     "playerMorale": 1
+    }
+   },
+   {
+    "id": "veto",
+    "effects": {
+     "playerMorale": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "injuryHousehold",
+  "category": "player",
+  "weight": 1.5,
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "when": {
+   "player": "any"
+  },
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "playerInjury": 10
+    }
+   }
+  ]
+ },
+ {
+  "id": "injuryPet",
+  "category": "player",
+  "styles": [
+   "Satirical"
+  ],
+  "when": {
+   "player": "any"
+  },
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "playerInjury": 7
+    }
+   }
+  ]
+ },
+ {
+  "id": "injurySerious",
+  "category": "player",
+  "styles": [
+   "Balanced",
+   "Serious"
+  ],
+  "when": {
+   "player": "any"
+  },
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "playerInjury": 21,
+     "morale": -0.2
+    }
+   }
+  ]
+ },
+ {
+  "id": "religiousFast",
+  "category": "player",
+  "styles": [
+   "Balanced",
+   "Serious"
+  ],
+  "when": {
+   "player": "foreign"
+  },
+  "options": [
+   {
+    "id": "adapt",
+    "effects": {
+     "playerMorale": 2,
+     "playerCondition": -5
+    }
+   },
+   {
+    "id": "normal",
+    "effects": {
+     "playerMorale": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "captainTalk",
+  "category": "player",
+  "when": {
+   "player": "star"
+  },
+  "options": [
+   {
+    "id": "listen",
+    "effects": {
+     "morale": 0.3,
+     "playerMorale": 1
+    }
+   },
+   {
+    "id": "authority",
+    "effects": {
+     "morale": -0.2,
+     "board": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "doping",
+  "category": "player",
+  "weight": 0.5,
+  "styles": [
+   "Balanced",
+   "Serious"
+  ],
+  "when": {
+   "player": "any"
+  },
+  "cooldownDays": 900,
+  "options": [
+   {
+    "id": "support",
+    "effects": {
+     "playerSuspend": 2,
+     "media": -3,
+     "playerMorale": 1
+    }
+   },
+   {
+    "id": "distance",
+    "effects": {
+     "playerSuspend": 2,
+     "playerMorale": -2,
+     "board": 2
+    }
+   }
+  ]
+ },
+ {
+  "id": "secondJob",
+  "category": "player",
+  "when": {
+   "player": "any",
+   "maxReputation": 6
+  },
+  "options": [
+   {
+    "id": "allow",
+    "effects": {
+     "playerMorale": 1,
+     "playerCondition": -5
+    }
+   },
+   {
+    "id": "pay",
+    "effects": {
+     "money": -6000,
+     "playerMorale": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "studies",
+  "category": "player",
+  "when": {
+   "player": "young",
+   "maxReputation": 9
+  },
+  "options": [
+   {
+    "id": "support",
+    "effects": {
+     "playerMorale": 2,
+     "playerForm": -5,
+     "media": 1
+    }
+   },
+   {
+    "id": "no",
+    "effects": {
+     "playerMorale": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "keeperGloves",
+  "category": "player",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "when": {
+   "player": "keeper"
+  },
+  "options": [
+   {
+    "id": "buy",
+    "effects": {
+     "money": -3000,
+     "playerMorale": 1
+    }
+   },
+   {
+    "id": "old",
+    "effects": {
+     "playerMorale": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "strikerDrought",
+  "category": "player",
+  "weight": 1.5,
+  "when": {
+   "player": "striker"
+  },
+  "options": [
+   {
+    "id": "psych",
+    "effects": {
+     "money": -8000,
+     "playerMorale": 2
+    }
+   },
+   {
+    "id": "bench",
+    "effects": {
+     "playerMorale": -1,
+     "morale": 0.1
+    }
+   },
+   {
+    "id": "trust",
+    "effects": {
+     "playerMorale": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "defenderGaffe",
+  "category": "player",
+  "when": {
+   "player": "defender",
+   "afterLoss": true
+  },
+  "options": [
+   {
+    "id": "comfort",
+    "effects": {
+     "playerMorale": 1
+    }
+   },
+   {
+    "id": "criticize",
+    "effects": {
+     "playerMorale": -1,
+     "morale": 0.1
+    }
+   }
+  ]
+ },
+ {
+  "id": "retirementThoughts",
+  "category": "player",
+  "when": {
+   "player": "old"
+  },
+  "options": [
+   {
+    "id": "convince",
+    "effects": {
+     "playerMorale": 2
+    }
+   },
+   {
+    "id": "accept",
+    "effects": {
+     "playerMorale": 0,
+     "fans": 2
+    }
+   }
+  ]
+ },
+ {
+  "id": "hairstyle",
+  "category": "player",
+  "styles": [
+   "Satirical"
+  ],
+  "when": {
+   "player": "young"
+  },
+  "options": [
+   {
+    "id": "laugh",
+    "effects": {
+     "morale": 0.2,
+     "media": 1
+    }
+   },
+   {
+    "id": "ban",
+    "effects": {
+     "playerMorale": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "gamingAddiction",
+  "category": "player",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "when": {
+   "player": "young"
+  },
+  "options": [
+   {
+    "id": "limit",
+    "effects": {
+     "playerCondition": 5,
+     "playerMorale": -1
+    }
+   },
+   {
+    "id": "esports",
+    "effects": {
+     "media": 2,
+     "playerMorale": 1,
+     "playerCondition": -3
+    }
+   }
+  ]
+ },
+ {
+  "id": "politicalStatement",
+  "category": "player",
+  "styles": [
+   "Balanced",
+   "Serious"
+  ],
+  "when": {
+   "player": "any"
+  },
+  "options": [
+   {
+    "id": "support",
+    "effects": {
+     "media": -2,
+     "playerMorale": 1
+    }
+   },
+   {
+    "id": "distance",
+    "effects": {
+     "playerMorale": -1,
+     "board": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "contractDemand",
+  "category": "player",
+  "when": {
+   "player": "star"
+  },
+  "options": [
+   {
+    "id": "raise",
+    "effects": {
+     "money": -100000,
+     "playerMorale": 2
+    }
+   },
+   {
+    "id": "refuse",
+    "effects": {
+     "playerMorale": -2
+    }
+   }
+  ]
+ },
+ {
+  "id": "fanFight",
+  "category": "player",
+  "when": {
+   "player": "any",
+   "afterLoss": true
+  },
+  "options": [
+   {
+    "id": "fine",
+    "effects": {
+     "playerFine": 2,
+     "fans": 2
+    }
+   },
+   {
+    "id": "defend",
+    "effects": {
+     "fans": -4,
+     "playerMorale": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "extraTraining",
+  "category": "player",
+  "when": {
+   "player": "young"
+  },
+  "options": [
+   {
+    "id": "allow",
+    "effects": {
+     "playerForm": 10,
+     "playerCondition": -5,
+     "playerMorale": 1
+    }
+   },
+   {
+    "id": "rest",
+    "effects": {
+     "playerCondition": 5
+    }
+   }
+  ]
+ },
+ {
+  "id": "weddingPlans",
+  "category": "player",
+  "when": {
+   "player": "any",
+   "months": [
+    6,
+    7
+   ]
+  },
+  "options": [
+   {
+    "id": "congrats",
+    "effects": {
+     "playerMorale": 2,
+     "morale": 0.2
+    }
+   },
+   {
+    "id": "noTime",
+    "effects": {
+     "playerMorale": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "babyBorn",
+  "category": "player",
+  "when": {
+   "player": "any"
+  },
+  "options": [
+   {
+    "id": "leave",
+    "effects": {
+     "playerMorale": 2,
+     "playerForm": -5
+    }
+   }
+  ]
+ },
+ {
+  "id": "agentPoach",
+  "category": "player",
+  "when": {
+   "player": "young"
+  },
+  "options": [
+   {
+    "id": "block",
+    "effects": {
+     "playerMorale": -1,
+     "board": 1
+    }
+   },
+   {
+    "id": "allow",
+    "effects": {
+     "playerMorale": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "injuryComeback",
+  "category": "player",
+  "when": {
+   "player": "injured"
+  },
+  "options": [
+   {
+    "id": "rush",
+    "effects": {
+     "playerInjury": -5,
+     "playerCondition": -10
+    },
+    "chance": 0.6,
+    "failEffects": {
+     "playerInjury": 14
+    }
+   },
+   {
+    "id": "careful",
+    "effects": {
+     "playerMorale": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "miracleHealer",
+  "category": "player",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "when": {
+   "player": "injured"
+  },
+  "options": [
+   {
+    "id": "try",
+    "effects": {
+     "money": -10000,
+     "playerInjury": -7
+    },
+    "chance": 0.4,
+    "failEffects": {
+     "money": -10000,
+     "media": -2
+    }
+   },
+   {
+    "id": "no",
+    "effects": {}
+   }
+  ]
+ }
+]

@@ -1,0 +1,276 @@
+[
+ {
+  "id": "fanClubFounded",
+  "category": "fans",
+  "when": {
+   "minFanMood": 55
+  },
+  "options": [
+   {
+    "id": "visit",
+    "effects": {
+     "fans": 4,
+     "playerCondition": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "fanBoycott",
+  "category": "fans",
+  "when": {
+   "maxFanMood": 35
+  },
+  "options": [
+   {
+    "id": "talk",
+    "effects": {
+     "fans": 5,
+     "board": -1
+    }
+   },
+   {
+    "id": "ignore",
+    "effects": {
+     "fans": -4
+    }
+   }
+  ]
+ },
+ {
+  "id": "pyro",
+  "category": "fans",
+  "weight": 1.5,
+  "options": [
+   {
+    "id": "condemn",
+    "effects": {
+     "money": -20000,
+     "fans": -3,
+     "board": 1
+    }
+   },
+   {
+    "id": "understand",
+    "effects": {
+     "money": -20000,
+     "fans": 2,
+     "media": -2
+    }
+   }
+  ]
+ },
+ {
+  "id": "fanBanner",
+  "category": "fans",
+  "when": {
+   "maxBoardTrust": 50
+  },
+  "options": [
+   {
+    "id": "respond",
+    "effects": {
+     "fans": 2,
+     "board": -1
+    }
+   },
+   {
+    "id": "silence",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "fanTravel",
+  "category": "fans",
+  "options": [
+   {
+    "id": "sponsor",
+    "effects": {
+     "money": -15000,
+     "fans": 5
+    }
+   },
+   {
+    "id": "no",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "fanPetition",
+  "category": "fans",
+  "options": [
+   {
+    "id": "accept",
+    "effects": {
+     "fans": 4,
+     "money": -10000
+    }
+   },
+   {
+    "id": "decline",
+    "effects": {
+     "fans": -2
+    }
+   }
+  ]
+ },
+ {
+  "id": "fanFestival",
+  "category": "fans",
+  "when": {
+   "months": [
+    7,
+    8
+   ]
+  },
+  "options": [
+   {
+    "id": "big",
+    "effects": {
+     "money": -30000,
+     "fans": 6,
+     "media": 2
+    }
+   },
+   {
+    "id": "small",
+    "effects": {
+     "fans": 2,
+     "money": -5000
+    }
+   }
+  ]
+ },
+ {
+  "id": "ultraFight",
+  "category": "fans",
+  "styles": [
+   "Balanced",
+   "Serious"
+  ],
+  "options": [
+   {
+    "id": "ban",
+    "effects": {
+     "fans": -3,
+     "board": 2,
+     "media": 2
+    }
+   },
+   {
+    "id": "talk",
+    "effects": {
+     "fans": 1,
+     "media": -2
+    }
+   }
+  ]
+ },
+ {
+  "id": "fanLetter",
+  "category": "fans",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "options": [
+   {
+    "id": "answer",
+    "effects": {
+     "fans": 2,
+     "media": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "fanCoffin",
+  "category": "fans",
+  "styles": [
+   "Satirical"
+  ],
+  "when": {
+   "maxFanMood": 30
+  },
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "board": -2,
+     "media": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "fanChoreoMoney",
+  "category": "fans",
+  "options": [
+   {
+    "id": "pay",
+    "effects": {
+     "money": -8000,
+     "fans": 4
+    }
+   },
+   {
+    "id": "no",
+    "effects": {
+     "fans": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "fanAnniversary",
+  "category": "fans",
+  "options": [
+   {
+    "id": "attend",
+    "effects": {
+     "fans": 3
+    }
+   }
+  ]
+ },
+ {
+  "id": "ticketScalping",
+  "category": "fans",
+  "when": {
+   "minReputation": 10
+  },
+  "options": [
+   {
+    "id": "crack",
+    "effects": {
+     "money": -10000,
+     "fans": 3
+    }
+   },
+   {
+    "id": "ignore",
+    "effects": {
+     "fans": -2
+    }
+   }
+  ]
+ },
+ {
+  "id": "supporterLoan",
+  "category": "fans",
+  "when": {
+   "lowBalance": true
+  },
+  "options": [
+   {
+    "id": "accept",
+    "effects": {
+     "money": 100000,
+     "fans": 3
+    }
+   }
+  ]
+ }
+]

@@ -1,0 +1,413 @@
+[
+ {
+  "id": "goatMascot",
+  "category": "curious",
+  "styles": [
+   "Satirical"
+  ],
+  "options": [
+   {
+    "id": "adopt",
+    "effects": {
+     "money": -2000,
+     "fans": 4,
+     "media": 2
+    }
+   },
+   {
+    "id": "no",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "ufo",
+  "category": "curious",
+  "styles": [
+   "Satirical"
+  ],
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "media": 2
+    }
+   }
+  ]
+ },
+ {
+  "id": "wrongAnthem",
+  "category": "curious",
+  "styles": [
+   "Satirical"
+  ],
+  "options": [
+   {
+    "id": "apologise",
+    "effects": {
+     "fans": -1,
+     "media": 1
+    }
+   },
+   {
+    "id": "laugh",
+    "effects": {
+     "fans": 2,
+     "media": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "psychic",
+  "category": "curious",
+  "styles": [
+   "Satirical"
+  ],
+  "options": [
+   {
+    "id": "hire",
+    "effects": {
+     "money": -5000,
+     "morale": 0.2,
+     "media": -2
+    }
+   },
+   {
+    "id": "no",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "octopus",
+  "category": "curious",
+  "styles": [
+   "Satirical"
+  ],
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "fans": 2,
+     "media": 2
+    }
+   }
+  ]
+ },
+ {
+  "id": "lookalike",
+  "category": "curious",
+  "styles": [
+   "Satirical"
+  ],
+  "options": [
+   {
+    "id": "meet",
+    "effects": {
+     "media": 3,
+     "fans": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "streetNamed",
+  "category": "curious",
+  "when": {
+   "minFanMood": 70
+  },
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "fans": 3,
+     "media": 2
+    }
+   }
+  ]
+ },
+ {
+  "id": "cakeDisaster",
+  "category": "curious",
+  "styles": [
+   "Satirical"
+  ],
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "morale": 0.2
+    }
+   }
+  ]
+ },
+ {
+  "id": "seagulls",
+  "category": "curious",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "options": [
+   {
+    "id": "falcon",
+    "effects": {
+     "money": -4000,
+     "pitch": 3
+    }
+   },
+   {
+    "id": "ignore",
+    "effects": {
+     "pitch": -3
+    }
+   }
+  ]
+ },
+ {
+  "id": "mysteryFan",
+  "category": "curious",
+  "options": [
+   {
+    "id": "invite",
+    "effects": {
+     "fans": 3,
+     "media": 2
+    }
+   }
+  ]
+ },
+ {
+  "id": "wrongBus",
+  "category": "curious",
+  "styles": [
+   "Satirical"
+  ],
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "morale": 0.1,
+     "media": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "ghostStadium",
+  "category": "curious",
+  "styles": [
+   "Satirical"
+  ],
+  "options": [
+   {
+    "id": "exorcist",
+    "effects": {
+     "money": -1000,
+     "media": 2,
+     "morale": 0.1
+    }
+   },
+   {
+    "id": "ignore",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "sausageRecord",
+  "category": "curious",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "money": 8000,
+     "fans": 2
+    }
+   }
+  ]
+ },
+ {
+  "id": "managerDance",
+  "category": "curious",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "when": {
+   "afterWin": true
+  },
+  "options": [
+   {
+    "id": "dance",
+    "effects": {
+     "fans": 3,
+     "media": 2,
+     "board": -1
+    }
+   },
+   {
+    "id": "no",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "pigeonRace",
+  "category": "curious",
+  "styles": [
+   "Satirical"
+  ],
+  "options": [
+   {
+    "id": "sponsor",
+    "effects": {
+     "money": -1000,
+     "fans": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "wrongTransfer",
+  "category": "curious",
+  "styles": [
+   "Satirical"
+  ],
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "media": -1,
+     "money": -2000
+    }
+   }
+  ]
+ },
+ {
+  "id": "vegetarianMenu",
+  "category": "curious",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "options": [
+   {
+    "id": "adopt",
+    "effects": {
+     "playerCondition": 3,
+     "morale": -0.1,
+     "media": 1
+    }
+   },
+   {
+    "id": "no",
+    "effects": {
+     "morale": 0.1
+    }
+   }
+  ]
+ },
+ {
+  "id": "ballboyHero",
+  "category": "curious",
+  "options": [
+   {
+    "id": "reward",
+    "effects": {
+     "fans": 2,
+     "media": 2
+    }
+   }
+  ]
+ },
+ {
+  "id": "pressFlirt",
+  "category": "curious",
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "media": 2
+    }
+   }
+  ]
+ },
+ {
+  "id": "rivalPrank",
+  "category": "curious",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "options": [
+   {
+    "id": "revenge",
+    "effects": {
+     "fans": 3,
+     "money": -2000,
+     "board": -1
+    }
+   },
+   {
+    "id": "ignore",
+    "effects": {
+     "board": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "weatherPray",
+  "category": "curious",
+  "styles": [
+   "Satirical"
+  ],
+  "when": {
+   "months": [
+    11,
+    12,
+    1,
+    2
+   ]
+  },
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "pitch": 3
+    }
+   }
+  ]
+ },
+ {
+  "id": "selfieFine",
+  "category": "curious",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "when": {
+   "player": "young"
+  },
+  "options": [
+   {
+    "id": "fine",
+    "effects": {
+     "playerFine": 0.5
+    }
+   },
+   {
+    "id": "ok",
+    "effects": {
+     "media": 1
+    }
+   }
+  ]
+ }
+]

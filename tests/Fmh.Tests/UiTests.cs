@@ -237,8 +237,10 @@ public class UiTests
         var (w, vm) = Open();
         var shell = StartGame(vm);
         var session = AppState.Current.Session!;
-        for (var i = 0; i < 60 && session.PendingDecisions.Count == 0; i++)
+        bool HasOffer() => session.PendingDecisions.Any(m => m.Action == MessageAction.IncomingOffer);
+        for (var i = 0; i < 150 && !HasOffer(); i++)
         {
+            if (session.PendingDecisions.Count > 0) session.DelegateDecisions();
             if (session.PendingHumanFixture is { } f) session.PlayInstant(f);
             shell.Continue();
         }
@@ -249,7 +251,7 @@ public class UiTests
         AssertNoMissingTexts(w);
         Shot(w, "38_inbox_offer");
         inbox.RejectOfferCommand.Execute(null);
-        Assert.Empty(session.PendingDecisions);
+        Assert.False(HasOffer());
         Assert.False(string.IsNullOrEmpty(inbox.ActionResult));
     }
 
@@ -406,8 +408,10 @@ public class UiTests
         inDialog.ChooseCommand.Execute(inDialog.Options[0]);
         Assert.Null(vm.Dialog);
 
-        for (var i = 0; i < 1000 && match.Stage != MatchStage.PostMatch; i++)
+        for (var i = 0; i < 2000 && match.Stage != MatchStage.PostMatch; i++)
         {
+            // Pokalspiel: bei Gleichstand Pause vor der Verlängerung.
+            if (match.Stage == MatchStage.HalfTime) match.SecondHalf();
             match.Tick(TimeSpan.FromSeconds(1));
             if (match.Paused) match.TogglePause();
         }

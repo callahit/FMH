@@ -24,6 +24,7 @@ public sealed partial class GameSession
     private void DrawRound(Cup cup, CupRound round, List<int> teams)
     {
         CupLogic.Draw(World, cup, round, teams, _rng);
+        CupPrize(cup, round.Number, teams);
         var own = round.Ties.FirstOrDefault(t => t.HomeId == HumanClub.Id || t.AwayId == HumanClub.Id);
         if (own is null || HumanManager is null) return;
         if (own.Decision == "Bye")
@@ -54,6 +55,7 @@ public sealed partial class GameSession
         if (round.Number == cup.Rounds.Count)
         {
             cup.WinnerId = winners[0];
+            if (cup.Kind == CompetitionKind.Cup) CupPrize(cup, cup.Rounds.Count + 1, winners);
             if (cup.Kind == CompetitionKind.Cup)
                 Notify(MessageType.Cup, "msg.sender.association", TR("msg.cupWinner.subject", Comp(cup.Id)), TR("msg.cupWinner.body", Comp(cup.Id), World.Clubs[winners[0]].Name));
             return;
@@ -79,6 +81,7 @@ public sealed partial class GameSession
                 var earliest = World.Date.AddDays(3);
                 foreach (var fx in cup.Fixtures.Where(fx => fx.Date < earliest)) fx.Date = earliest.AddDays(4 * (fx.Leg - 1));
                 World.Cups.Add(cup);
+                CupPrize(cup, 1, new[] { u, l });
                 if (u == HumanClub.Id || l == HumanClub.Id)
                 {
                     var opp = World.Clubs[u == HumanClub.Id ? l : u];

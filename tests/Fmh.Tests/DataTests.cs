@@ -1,5 +1,6 @@
 using System.Text.RegularExpressions;
 using Fmh.Core.Data;
+using Fmh.Core.Game;
 using Fmh.Core.Match;
 using Fmh.Core.Model;
 
@@ -75,13 +76,15 @@ public class DataTests
         var texts = TestData.Data.Texts;
         var missing = new List<string>();
         var src = Path.Combine(TestData.RepoRoot(), "src");
-        var keyPattern = new Regex("\"((?:app|menu|ui|unit|help|tip|filter|radar|toneHint|shoutHint|gameMenu|load|newGame|background|expectation|status|inbox|squad|col|player|foot|suit|suitShort|group|attr|pos|morale|injury|tactics|tactic|mentality|advice|lineup|sub|fixtures|league|club|placeholder|options|match|stat|pause|comm|msg|tone|neg|refuse|tx|cup|scout|camp|youth|score|transfer|training|order|intensity|block|dealType|squadStatus|role|duty|corner|shout|speed|weather)\\.[A-Za-z0-9.]+)\"");
+        var keyPattern = new Regex("\"((?:app|menu|ui|unit|help|tip|filter|radar|toneHint|shoutHint|gameMenu|load|newGame|background|expectation|status|inbox|squad|col|player|foot|suit|suitShort|group|attr|pos|morale|injury|tactics|tactic|mentality|advice|lineup|sub|fixtures|league|club|placeholder|options|match|stat|pause|comm|msg|tone|neg|refuse|tx|cup|scout|camp|youth|score|transfer|training|order|intensity|block|dealType|squadStatus|role|duty|corner|shout|speed|weather|effect|building|slot|staff|license|achievement|project|stand|stadium|headline|rumour|interview|press|event|board|agm|fin|build|sponsor|career|contractor|projectState|difficulty|events|style|bfx)\\.[A-Za-z0-9.]+)\"");
+        // Wirkungsschlüssel der Gebäude (training.winter …) sind Bezeichner, keine Texte.
+        var effectKeys = TestData.Data.Buildings.SelectMany(b => b.Effects.Keys).ToHashSet();
         foreach (var file in Directory.EnumerateFiles(src, "*.cs", SearchOption.AllDirectories))
         {
             foreach (Match m in keyPattern.Matches(File.ReadAllText(file)))
             {
                 var key = m.Groups[1].Value;
-                if (key.EndsWith('.')) continue;
+                if (key.EndsWith('.') || effectKeys.Contains(key)) continue;
                 // Präfix für zusammengesetzte Schlüssel (key + ".subject").
                 if (texts.Has(key + ".subject") && texts.Has(key + ".body")) continue;
                 if (!texts.Has(key)) missing.Add($"{key} ({Path.GetFileName(file)})");
@@ -142,6 +145,40 @@ public class DataTests
         for (var i = 1; i <= 5; i++) if (!texts.Has("speed." + i)) missing.Add("speed." + i);
         foreach (var f in "SUN") if (!texts.Has("form." + f)) missing.Add("form." + f);
         Assert.True(missing.Count == 0, "Fehlende Texte: " + string.Join(", ", missing.Distinct()));
+    }
+
+    [Fact]
+    public void Phase3ContentIsTranslatedInEveryLanguage()
+    {
+        var data = TestData.Data;
+        Assert.True(data.Events.Count >= 150, $"Nur {data.Events.Count} Ereignisse.");
+        Assert.True(data.Buildings.Count >= 80, $"Nur {data.Buildings.Count} Gebäude.");
+        Assert.Equal(data.Events.Count, data.Events.Select(e => e.Id).Distinct().Count());
+        var keys = new List<string>();
+        foreach (var e in data.Events)
+        {
+            keys.Add($"event.{e.Id}.title");
+            keys.Add($"event.{e.Id}.text");
+            keys.AddRange(e.Options.Select(o => $"event.{e.Id}.opt.{o.Id}"));
+        }
+        keys.AddRange(data.PressQuestions.Select(q => "press.q." + q.Key));
+        keys.AddRange(data.Buildings.Select(b => "building." + b.Id));
+        keys.AddRange(data.Buildings.SelectMany(b => b.Effects.Keys).Distinct().Select(k => "bfx." + k));
+        keys.AddRange(GameSession.AchievementIds.SelectMany(a => new[] { "achievement." + a, "achievement." + a + ".info" }));
+        foreach (var situation in new[] { "derbyWin", "derbyLoss", "streakWin", "streakLoss", "bigWin", "bigLoss", "win", "loss", "draw" }
+                     .Concat(System.Enum.GetNames<PressAnswer>().Select(a => "press" + a)))
+            foreach (var style in new[] { "satirical", "balanced", "serious" })
+                for (var v = 1; v <= 2; v++) keys.Add($"headline.{situation}.{style}.{v}");
+        void Enum<T>(string prefix) where T : struct, System.Enum => keys.AddRange(System.Enum.GetNames<T>().Select(n => prefix + n));
+        Enum<StaffRole>("staff."); Enum<SponsorSlot>("slot."); Enum<SeasonGoal>("goal."); Enum<CoachingLicense>("license.");
+        Enum<ProjectKind>("project."); Enum<StandSide>("stand."); Enum<LicenseOutcome>("msg.license."); Enum<PressAnswer>("press.answer.");
+        Enum<Difficulty>("difficulty."); Enum<EventFrequency>("events."); Enum<MediaStyle>("style."); Enum<Contractor>("contractor.");
+        Enum<ProjectState>("projectState."); Enum<BoardRole>("boardRole."); Enum<BoardTrait>("boardTrait.");
+        foreach (var (code, pack) in data.Languages)
+        {
+            var missing = keys.Where(k => !pack.Texts.Entries.ContainsKey(k)).ToList();
+            Assert.True(missing.Count == 0, $"{code}: fehlende Texte: " + string.Join(", ", missing.Take(30)));
+        }
     }
 
     [Fact]

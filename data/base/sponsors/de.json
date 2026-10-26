@@ -1,0 +1,637 @@
+{
+ "country": "DE",
+ "companies": [
+  {
+   "name": "Nordkraft Energie",
+   "industry": "energy",
+   "size": 17,
+   "slots": [
+    "Shirt",
+    "StadiumName",
+    "Board"
+   ]
+  },
+  {
+   "name": "Hansebank",
+   "industry": "bank",
+   "size": 18,
+   "slots": [
+    "Shirt",
+    "StadiumName",
+    "Board"
+   ]
+  },
+  {
+   "name": "Alpina Versicherungen",
+   "industry": "insurance",
+   "size": 19,
+   "slots": [
+    "Shirt",
+    "StadiumName"
+   ]
+  },
+  {
+   "name": "Rheinstahl AG",
+   "industry": "industry",
+   "size": 16,
+   "slots": [
+    "Shirt",
+    "StadiumName"
+   ]
+  },
+  {
+   "name": "Telefonica Nord",
+   "industry": "telecom",
+   "size": 19,
+   "slots": [
+    "Shirt",
+    "Sleeve",
+    "StadiumName"
+   ]
+  },
+  {
+   "name": "Autohaus Brenner",
+   "industry": "cars",
+   "size": 10,
+   "slots": [
+    "Shirt",
+    "Sleeve",
+    "Board"
+   ]
+  },
+  {
+   "name": "Brauerei Kronenhof",
+   "industry": "brewery",
+   "size": 13,
+   "slots": [
+    "Shirt",
+    "Sleeve",
+    "Board",
+    "StadiumName"
+   ]
+  },
+  {
+   "name": "Sparkasse Heidekreis",
+   "industry": "bank",
+   "size": 9,
+   "slots": [
+    "Shirt",
+    "Sleeve",
+    "Board",
+    "StadiumName"
+   ]
+  },
+  {
+   "name": "Bäckerei Krümel & Sohn",
+   "industry": "food",
+   "size": 4,
+   "slots": [
+    "Shirt",
+    "Board"
+   ]
+  },
+  {
+   "name": "Bestattungsinstitut Ruhe sanft",
+   "industry": "funeral",
+   "size": 6,
+   "slots": [
+    "Board"
+   ]
+  },
+  {
+   "name": "Fleischerei Wurst-Willi",
+   "industry": "food",
+   "size": 3,
+   "slots": [
+    "Shirt",
+    "Board"
+   ]
+  },
+  {
+   "name": "Fahrschule Vollgas",
+   "industry": "driving",
+   "size": 3,
+   "slots": [
+    "Shirt",
+    "Board"
+   ]
+  },
+  {
+   "name": "Dachdeckerei Hochhinaus",
+   "industry": "craft",
+   "size": 4,
+   "slots": [
+    "Shirt",
+    "Board"
+   ]
+  },
+  {
+   "name": "Zahnarztpraxis Dr. Bohr",
+   "industry": "health",
+   "size": 5,
+   "slots": [
+    "Board"
+   ]
+  },
+  {
+   "name": "Partyservice Schlemmerkönig",
+   "industry": "catering",
+   "size": 5,
+   "slots": [
+    "Board",
+    "Sleeve"
+   ]
+  },
+  {
+   "name": "Logistik Schnellweg",
+   "industry": "logistics",
+   "size": 12,
+   "slots": [
+    "Shirt",
+    "Sleeve",
+    "Board"
+   ]
+  },
+  {
+   "name": "Elbtal Möbelwelt",
+   "industry": "retail",
+   "size": 11,
+   "slots": [
+    "Shirt",
+    "Sleeve",
+    "Board"
+   ]
+  },
+  {
+   "name": "Kaufhaus Mittelstadt",
+   "industry": "retail",
+   "size": 9,
+   "slots": [
+    "Shirt",
+    "Board"
+   ]
+  },
+  {
+   "name": "Stadtwerke",
+   "industry": "utilities",
+   "size": 8,
+   "slots": [
+    "Shirt",
+    "Board",
+    "StadiumName"
+   ]
+  },
+  {
+   "name": "Optik Scharfblick",
+   "industry": "health",
+   "size": 6,
+   "slots": [
+    "Sleeve",
+    "Board"
+   ]
+  },
+  {
+   "name": "Bauunternehmen Betonfest",
+   "industry": "construction",
+   "size": 10,
+   "slots": [
+    "Shirt",
+    "Board",
+    "StadiumName"
+   ]
+  },
+  {
+   "name": "Gartencenter Grüner Daumen",
+   "industry": "retail",
+   "size": 5,
+   "slots": [
+    "Board"
+   ]
+  },
+  {
+   "name": "Pizzeria Bella Ballo",
+   "industry": "food",
+   "size": 3,
+   "slots": [
+    "Board"
+   ]
+  },
+  {
+   "name": "Reisebüro Fernweh",
+   "industry": "travel",
+   "size": 7,
+   "slots": [
+    "Sleeve",
+    "Board"
+   ]
+  },
+  {
+   "name": "Getränke Durstlöscher",
+   "industry": "drinks",
+   "size": 8,
+   "slots": [
+    "Shirt",
+    "Board"
+   ]
+  },
+  {
+   "name": "Elektro Funkenflug",
+   "industry": "craft",
+   "size": 5,
+   "slots": [
+    "Board"
+   ]
+  },
+  {
+   "name": "Versandhaus Klickundweg",
+   "industry": "retail",
+   "size": 15,
+   "slots": [
+    "Shirt",
+    "Sleeve",
+    "Board"
+   ]
+  },
+  {
+   "name": "Chemiewerke Blau",
+   "industry": "industry",
+   "size": 16,
+   "slots": [
+    "Shirt",
+    "StadiumName"
+   ]
+  },
+  {
+   "name": "Werft Nordstern",
+   "industry": "industry",
+   "size": 12,
+   "slots": [
+    "Shirt",
+    "Board"
+   ]
+  },
+  {
+   "name": "Mineralwasser Quellfrisch",
+   "industry": "drinks",
+   "size": 13,
+   "slots": [
+    "Shirt",
+    "Sleeve",
+    "Board"
+   ]
+  },
+  {
+   "name": "Tierfutter Wuffi",
+   "industry": "retail",
+   "size": 6,
+   "slots": [
+    "Board",
+    "Sleeve"
+   ]
+  },
+  {
+   "name": "Hotel Zur Post",
+   "industry": "hotel",
+   "size": 5,
+   "slots": [
+    "Board"
+   ]
+  },
+  {
+   "name": "Rechtsanwälte Paragraf & Partner",
+   "industry": "legal",
+   "size": 7,
+   "slots": [
+    "Board"
+   ]
+  },
+  {
+   "name": "Kfz-Werkstatt Schraubenkönig",
+   "industry": "cars",
+   "size": 4,
+   "slots": [
+    "Shirt",
+    "Board"
+   ]
+  },
+  {
+   "name": "Waschanlage Glanz & Gloria",
+   "industry": "cars",
+   "size": 4,
+   "slots": [
+    "Board"
+   ]
+  },
+  {
+   "name": "Imbiss Currywurst-Paradies",
+   "industry": "food",
+   "size": 2,
+   "slots": [
+    "Shirt",
+    "Board"
+   ]
+  },
+  {
+   "name": "Bettenhaus Schlummerland",
+   "industry": "retail",
+   "size": 6,
+   "slots": [
+    "Board"
+   ]
+  },
+  {
+   "name": "Brillenmode Durchblick",
+   "industry": "health",
+   "size": 5,
+   "slots": [
+    "Board"
+   ]
+  },
+  {
+   "name": "Solarpark Sonnenschein",
+   "industry": "energy",
+   "size": 11,
+   "slots": [
+    "Shirt",
+    "Sleeve",
+    "Board",
+    "StadiumName"
+   ]
+  },
+  {
+   "name": "Spielbank Glückstreffer",
+   "industry": "gaming",
+   "size": 14,
+   "slots": [
+    "Shirt",
+    "Sleeve",
+    "Board"
+   ]
+  },
+  {
+   "name": "Wettbüro Elfmeter",
+   "industry": "gaming",
+   "size": 9,
+   "slots": [
+    "Shirt",
+    "Board"
+   ]
+  },
+  {
+   "name": "Kaffeerösterei Bohnenstark",
+   "industry": "food",
+   "size": 8,
+   "slots": [
+    "Sleeve",
+    "Board"
+   ]
+  },
+  {
+   "name": "IT-Systemhaus Bitwerk",
+   "industry": "tech",
+   "size": 12,
+   "slots": [
+    "Shirt",
+    "Sleeve",
+    "Board"
+   ]
+  },
+  {
+   "name": "Software Nordlicht",
+   "industry": "tech",
+   "size": 15,
+   "slots": [
+    "Shirt",
+    "Sleeve",
+    "StadiumName"
+   ]
+  },
+  {
+   "name": "Fluggesellschaft Wolkenreiter",
+   "industry": "travel",
+   "size": 18,
+   "slots": [
+    "Shirt",
+    "StadiumName"
+   ]
+  },
+  {
+   "name": "Supermarkt Frischekorb",
+   "industry": "retail",
+   "size": 14,
+   "slots": [
+    "Shirt",
+    "Board",
+    "StadiumName"
+   ]
+  },
+  {
+   "name": "Pharma Heilfroh",
+   "industry": "health",
+   "size": 17,
+   "slots": [
+    "Shirt",
+    "StadiumName"
+   ]
+  },
+  {
+   "name": "Autobauer Vorwärts",
+   "industry": "cars",
+   "size": 20,
+   "slots": [
+    "Shirt",
+    "StadiumName"
+   ]
+  },
+  {
+   "name": "Großbank Kontor",
+   "industry": "bank",
+   "size": 20,
+   "slots": [
+    "Shirt",
+    "StadiumName"
+   ]
+  },
+  {
+   "name": "Reifenhandel Profilneurose",
+   "industry": "cars",
+   "size": 5,
+   "slots": [
+    "Board"
+   ]
+  },
+  {
+   "name": "Malerbetrieb Pinselstrich",
+   "industry": "craft",
+   "size": 3,
+   "slots": [
+    "Board"
+   ]
+  },
+  {
+   "name": "Friseursalon Haarscharf",
+   "industry": "craft",
+   "size": 2,
+   "slots": [
+    "Shirt",
+    "Board"
+   ]
+  },
+  {
+   "name": "Schuhhaus Leisetreter",
+   "industry": "retail",
+   "size": 6,
+   "slots": [
+    "Sleeve",
+    "Board"
+   ]
+  },
+  {
+   "name": "Kiesgrube Steinreich",
+   "industry": "industry",
+   "size": 4,
+   "slots": [
+    "Shirt",
+    "Board"
+   ]
+  },
+  {
+   "name": "Molkerei Weidekuh",
+   "industry": "food",
+   "size": 10,
+   "slots": [
+    "Shirt",
+    "Sleeve",
+    "Board"
+   ]
+  },
+  {
+   "name": "Landmaschinen Ackerfroh",
+   "industry": "industry",
+   "size": 6,
+   "slots": [
+    "Shirt",
+    "Board"
+   ]
+  },
+  {
+   "name": "Tanzschule Taktgefühl",
+   "industry": "leisure",
+   "size": 2,
+   "slots": [
+    "Board"
+   ]
+  },
+  {
+   "name": "Brauerei Hopfenglück",
+   "industry": "brewery",
+   "size": 9,
+   "slots": [
+    "Shirt",
+    "Sleeve",
+    "Board",
+    "StadiumName"
+   ]
+  },
+  {
+   "name": "Versicherung Rundumsorglos",
+   "industry": "insurance",
+   "size": 12,
+   "slots": [
+    "Shirt",
+    "Sleeve",
+    "Board",
+    "StadiumName"
+   ]
+  },
+  {
+   "name": "Sportartikel Torjäger",
+   "industry": "kit",
+   "size": 8,
+   "slots": [
+    "Kit"
+   ]
+  },
+  {
+   "name": "Kickwerk Sportswear",
+   "industry": "kit",
+   "size": 14,
+   "slots": [
+    "Kit"
+   ]
+  },
+  {
+   "name": "Nordsport",
+   "industry": "kit",
+   "size": 11,
+   "slots": [
+    "Kit"
+   ]
+  },
+  {
+   "name": "Rasant Athletics",
+   "industry": "kit",
+   "size": 18,
+   "slots": [
+    "Kit"
+   ]
+  },
+  {
+   "name": "Volksport",
+   "industry": "kit",
+   "size": 5,
+   "slots": [
+    "Kit"
+   ]
+  },
+  {
+   "name": "Trikotdruck Meyer",
+   "industry": "kit",
+   "size": 2,
+   "slots": [
+    "Kit"
+   ]
+  },
+  {
+   "name": "Fitnessstudio Muskelkater",
+   "industry": "leisure",
+   "size": 4,
+   "slots": [
+    "Board",
+    "Sleeve"
+   ]
+  },
+  {
+   "name": "Hörgeräte Lauschangriff",
+   "industry": "health",
+   "size": 5,
+   "slots": [
+    "Board"
+   ]
+  },
+  {
+   "name": "Umzüge Kistenschlepper",
+   "industry": "logistics",
+   "size": 4,
+   "slots": [
+    "Board"
+   ]
+  },
+  {
+   "name": "Pfandhaus Notgroschen",
+   "industry": "finance",
+   "size": 3,
+   "slots": [
+    "Board"
+   ]
+  },
+  {
+   "name": "Schlüsseldienst Sesam",
+   "industry": "craft",
+   "size": 3,
+   "slots": [
+    "Board"
+   ]
+  }
+ ]
+}

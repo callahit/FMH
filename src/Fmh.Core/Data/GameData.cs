@@ -20,6 +20,12 @@ public sealed class GameData
     public List<InjuryType> Injuries { get; init; } = new();
     public List<RoleDef> Roles { get; init; } = new();
     public EngineConfig Engine { get; init; } = new();
+    public List<BuildingDef> Buildings { get; init; } = new();
+    public List<EventDef> Events { get; init; } = new();
+    public List<PressQuestionDef> PressQuestions { get; init; } = new();
+    public Dictionary<string, SponsorList> Sponsors { get; init; } = new();
+
+    public BuildingDef? Building(string id) => Buildings.FirstOrDefault(b => b.Id == id);
     /// <summary>Alle verfügbaren Sprachen (Code → Texte und Kommentarbausteine).</summary>
     public Dictionary<string, LanguagePack> Languages { get; init; } = new();
     /// <summary>Rückfallsprache: fehlende Texte anderer Sprachen kommen von hier.</summary>
