@@ -22,6 +22,7 @@ public sealed partial class SlotVm : ObservableObject
     public IBrush ShirtFore { get; init; } = Brushes.White;
     public IBrush RingBrush { get; init; } = Brushes.Transparent;
     public string Tip { get; init; } = "";
+    public string RoleText { get; init; } = "";
 
     [ObservableProperty] private bool _isSelected;
 }
@@ -66,15 +67,19 @@ public sealed partial class ChoiceSetting : ObservableObject
 
     public event Action? Changed;
 
+    /// <summary>Während eine Seite ihre Einstellungen neu aufbaut, schreiben Auswahlfelder keine Werte zurück.</summary>
+    public static int Suspended { get; set; }
+
     partial void OnSelectedIndexChanged(int value)
     {
-        if (_loading || value < 0) return;
+        if (_loading || value < 0 || Suspended > 0) return;
         _apply(value);
         Changed?.Invoke();
     }
 }
 
 public sealed record AdviceVm(string Text, IBrush Brush);
+public sealed record SavedTacticVm(int Index, string Label, bool Used);
 
 /// <summary>
 /// Taktik (Kapitel 5): Formation auf dem Spielfeld mit Drag &amp; Drop, Bank, Mannschaftsanweisungen,
@@ -89,7 +94,7 @@ public sealed partial class TacticsPageViewModel : PageViewModel, IRefreshable
     public override string Title => T["menu.tactics"];
 
     private Club Club => Session.HumanClub;
-    private Formation Formation => Data.Formation(Club.Tactic.FormationId);
+    private Formation Formation => TacticResolver.Resolve(Club.Tactic, Data);
     private int BenchSize => Session.BenchSize(Club);
 
     [ObservableProperty] private IReadOnlyList<SlotVm> _slots = Array.Empty<SlotVm>();
@@ -103,6 +108,13 @@ public sealed partial class TacticsPageViewModel : PageViewModel, IRefreshable
 
     public void Refresh()
     {
+        ChoiceSetting.Suspended++;
+        try { RefreshCore(); }
+        finally { ChoiceSetting.Suspended--; }
+    }
+
+    private void RefreshCore()
+    {
         var tactic = Club.Tactic;
         var profiles = Data.PositionProfiles;
         var formation = Formation;
@@ -110,9 +122,13 @@ public sealed partial class TacticsPageViewModel : PageViewModel, IRefreshable
         var shirt = Palette.ClubColor(Club.PrimaryColor);
         Player? P(int? id) => id is { } v && Session.World.Players.TryGetValue(v, out var p) ? p : null;
 
+        var orders = TacticResolver.Orders(tactic, formation, Data);
         Slots = formation.Slots.Select((slot, i) =>
         {
             var player = P(tactic.Lineup[i]);
+            var role = orders[i].Role;
+            var roleText = role is null ? "" : $"{T["role." + role.Id]} ({T["duty." + slot.Duty]})";
+            var roleShort = role is null ? "" : $"{T["roleShort." + role.Id]}-{T["dutyShort." + slot.Duty]}";
             var rating = player is null ? 0 : Ratings.EffectiveRating(player, slot.Position, profiles);
             var suit = player?.SuitabilityFor(slot.Position) ?? Suitability.Natural;
             var ring = player is null ? Palette.Current.Muted
@@ -130,7 +146,9 @@ public sealed partial class TacticsPageViewModel : PageViewModel, IRefreshable
                 ShirtBrush = new SolidColorBrush(shirt),
                 ShirtFore = new SolidColorBrush(Palette.Contrast(shirt)),
                 RingBrush = new SolidColorBrush(ring),
-                Tip = player is null ? T["tactics.emptySlot"] : $"{player.Name} – {T["suit." + suit]} {T["tactics.asPosition"]} {UiText.Position(slot.Position)}",
+                Tip = (player is null ? T["tactics.emptySlot"] : $"{player.Name} – {T["suit." + suit]} {T["tactics.asPosition"]} {UiText.Position(slot.Position)}")
+                      + (roleText.Length > 0 ? "\n" + roleText : ""),
+                RoleText = roleShort,
                 IsSelected = _selectedTarget == i,
             };
         }).ToList();
@@ -178,8 +196,9 @@ public sealed partial class TacticsPageViewModel : PageViewModel, IRefreshable
             new(T["tactic.formation"], Data.Formations.Select(f => f.Name).ToList(), Data.Formations.FindIndex(f => f.Id == t.FormationId), i =>
             {
                 var current = t.Lineup.Where(id => id.HasValue).Select(id => Session.World.Players[id!.Value]).ToList();
-                t.FormationId = Data.Formations[i].Id;
+                TacticResolver.ChangeFormation(t, Data.Formations[i].Id);
                 t.Lineup = LineupSelector.Assign(Data.Formations[i], current, Data.PositionProfiles);
+                _selectedTarget = null;
             }),
             new(T["tactic.mentality"], Names<Mentality>("mentality."), Idx(t.Mentality), i => t.Mentality = At<Mentality>(i)),
             new(T["tactic.passing"], Names<PassingLength>("passing."), Idx(ins.PassingLength), i => ins.PassingLength = At<PassingLength>(i)),
@@ -211,7 +230,126 @@ public sealed partial class TacticsPageViewModel : PageViewModel, IRefreshable
             Taker("tactics.penalty", t.PenaltyTakerId, i => t.PenaltyTakerId = xi[i].Id),
             Taker("tactics.freeKick", t.FreeKickTakerId, i => t.FreeKickTakerId = xi[i].Id),
             Taker("tactics.corner", t.CornerTakerId, i => t.CornerTakerId = xi[i].Id),
+            new(T["tactics.cornerRoutine"], Names<CornerRoutine>("corner."), Idx(t.Corners), i => t.Corners = At<CornerRoutine>(i)),
+            new(T["tactics.freeKickRoutine"], Names<FreeKickRoutine>("freeKickRoutine."), Idx(t.FreeKicks), i => t.FreeKicks = At<FreeKickRoutine>(i)),
         };
+        BuildSlotPanel();
+        SavedTactics = Enumerable.Range(0, 3).Select(i =>
+        {
+            var saved = i < Club.SavedTactics.Count ? Club.SavedTactics[i] : null;
+            return new SavedTacticVm(i, saved is null ? T.Format("tactics.savedEmpty", i + 1) : $"{i + 1}. {saved.Name} ({Data.Formation(saved.FormationId).Name})", saved is not null);
+        }).ToList();
+    }
+
+    // ------------------------------------------------------------------ Rollen, Aufgaben, Anweisungen
+
+    [ObservableProperty] private bool _hasSlot;
+    [ObservableProperty] private string _slotTitle = "";
+    [ObservableProperty] private ChoiceSetting? _roleSetting;
+    [ObservableProperty] private ChoiceSetting? _dutySetting;
+    [ObservableProperty] private string _roleDescription = "";
+    [ObservableProperty] private bool _moreShots;
+    [ObservableProperty] private bool _tightMarking;
+    [ObservableProperty] private bool _crossEarly;
+    [ObservableProperty] private bool _holdPosition;
+    [ObservableProperty] private IReadOnlyList<SavedTacticVm> _savedTactics = Array.Empty<SavedTacticVm>();
+    private bool _loadingSlot;
+
+    private void BuildSlotPanel()
+    {
+        var formation = Formation;
+        HasSlot = _selectedTarget is { } sel && sel < formation.Slots.Count;
+        if (!HasSlot) return;
+        _loadingSlot = true;
+        var index = _selectedTarget!.Value;
+        var slot = formation.Slots[index];
+        var order = TacticResolver.OrderFor(Club.Tactic, index);
+        var roles = Data.Roles.Where(r => r.Positions.Contains(slot.Position)).ToList();
+        var role = TacticResolver.RoleOf(order, slot.Position, Data);
+        SlotTitle = T.Format("tactics.slotTitle", UiText.Position(slot.Position), Slots[index].Player?.Name ?? T["tactics.emptySlot"]);
+        RoleSetting = new ChoiceSetting(T["tactics.role"], roles.Select(r => T["role." + r.Id]).ToList(), Math.Max(0, roles.IndexOf(role!)), i =>
+        {
+            order.Role = roles[i].Id;
+            order.Duty = roles[i].DefaultDuty;
+        });
+        RoleSetting.Changed += Refresh;
+        var duties = role?.Duties ?? new List<Duty> { slot.Duty };
+        DutySetting = new ChoiceSetting(T["tactics.duty"], duties.Select(d => T["duty." + d]).ToList(), Math.Max(0, duties.IndexOf(slot.Duty)), i =>
+        {
+            order.Role = role?.Id ?? "";
+            order.Duty = duties[i];
+        });
+        DutySetting.Changed += Refresh;
+        RoleDescription = role is null ? "" : T["roleInfo." + role.Id];
+        MoreShots = order.MoreShots;
+        TightMarking = order.TightMarking;
+        CrossEarly = order.CrossEarly;
+        HoldPosition = order.HoldPosition;
+        _loadingSlot = false;
+    }
+
+    private void ApplyFlags()
+    {
+        if (_loadingSlot || _selectedTarget is not { } sel || sel >= Formation.Slots.Count) return;
+        var o = TacticResolver.OrderFor(Club.Tactic, sel);
+        o.MoreShots = MoreShots;
+        o.TightMarking = TightMarking;
+        o.CrossEarly = CrossEarly;
+        o.HoldPosition = HoldPosition;
+    }
+
+    partial void OnMoreShotsChanged(bool value) => ApplyFlags();
+    partial void OnTightMarkingChanged(bool value) => ApplyFlags();
+    partial void OnCrossEarlyChanged(bool value) => ApplyFlags();
+    partial void OnHoldPositionChanged(bool value) => ApplyFlags();
+
+    /// <summary>Freie Positionierung: gewählten Platz um ein Rasterfeld verschieben (Pfeile, auch per Taste).</summary>
+    [RelayCommand]
+    private void MoveSlot(string? direction)
+    {
+        if (_selectedTarget is not { } sel || sel >= Formation.Slots.Count) return;
+        var slot = Formation.Slots[sel];
+        var (dc, dr) = direction switch { "left" => (-1, 0), "right" => (1, 0), "up" => (0, 1), "down" => (0, -1), _ => (0, 0) };
+        if (!TacticResolver.MoveSlot(Club.Tactic, Data, sel, slot.Col + dc, slot.Row + dr))
+            Shell.StatusMessage = T["tactics.cannotMove"];
+        Refresh();
+    }
+
+    [RelayCommand]
+    private void ResetSlot()
+    {
+        if (_selectedTarget is not { } sel || sel >= Formation.Slots.Count) return;
+        var o = TacticResolver.OrderFor(Club.Tactic, sel);
+        o.Col = null;
+        o.Row = null;
+        o.Role = "";
+        o.Duty = null;
+        Refresh();
+    }
+
+    /// <summary>Drei Taktikvarianten speichern und laden (z. B. Heim, Auswärts, Führung verteidigen).</summary>
+    [RelayCommand]
+    private void SaveTactic(SavedTacticVm? slot)
+    {
+        if (slot is null) return;
+        var copy = Club.Tactic.Clone();
+        copy.Name = T.Format("tactics.variant", slot.Index + 1);
+        while (Club.SavedTactics.Count <= slot.Index) Club.SavedTactics.Add(copy);
+        Club.SavedTactics[slot.Index] = copy;
+        Shell.StatusMessage = T.Format("tactics.savedTo", slot.Index + 1);
+        Refresh();
+    }
+
+    [RelayCommand]
+    private void LoadTactic(SavedTacticVm? slot)
+    {
+        if (slot is null || !slot.Used) return;
+        var saved = Club.SavedTactics[slot.Index].Clone();
+        Club.Tactic = saved;
+        LineupSelector.Repair(Club, Session.World, Data, BenchSize);
+        _selectedTarget = null;
+        Shell.StatusMessage = T.Format("tactics.loadedFrom", slot.Index + 1);
+        Refresh();
     }
 
     // ------------------------------------------------------------------ Bedienung
@@ -304,6 +442,11 @@ public sealed partial class TacticsPageViewModel : PageViewModel, IRefreshable
     public override bool HandleKey(Avalonia.Input.Key key, Avalonia.Input.KeyModifiers modifiers)
     {
         if (key == Avalonia.Input.Key.A) { AutoPick(); return true; }
+        if (HasSlot && modifiers.HasFlag(Avalonia.Input.KeyModifiers.Shift))
+        {
+            var dir = key switch { Avalonia.Input.Key.Left => "left", Avalonia.Input.Key.Right => "right", Avalonia.Input.Key.Up => "up", Avalonia.Input.Key.Down => "down", _ => null };
+            if (dir is not null) { MoveSlot(dir); return true; }
+        }
         if (key == Avalonia.Input.Key.Escape && _selectedTarget is not null)
         {
             _selectedTarget = null;

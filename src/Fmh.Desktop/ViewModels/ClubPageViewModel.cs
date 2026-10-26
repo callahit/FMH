@@ -35,13 +35,21 @@ public sealed class ClubPageViewModel : PageViewModel
             new(T["club.averageAge"], Fmt.Num(squad.Average(p => p.Age(world.Date)), "0.0")),
             new(T["club.teamStrength"], UiText.Strength(Ratings.StrengthFromRating(AiTactics.TeamStrength(club, world, Data)))),
             new(T["club.wageBill"], UiText.Wage((int)Math.Min(int.MaxValue, wages), manager.Profile, UiText.Currency(club))),
+            new(T["transfer.balance"], Fmt.Money(club.Budget.Balance, UiText.Currency(club))),
+            new(T["neg.transferBudget"], Fmt.Money(club.Budget.TransferBudget, UiText.Currency(club))),
+            new(T["transfer.wageBudget"], UiText.Wage((int)Math.Min(int.MaxValue, club.Budget.WageBudget), manager.Profile, UiText.Currency(club))),
+            new(T["club.coachQuality"], $"{club.CoachQuality}/20"),
+            new(T["club.youthFacilities"], $"{club.YouthFacilities}/20"),
+            new(T["club.youthRecruitment"], $"{club.YouthRecruitment}/20"),
+            new(T["club.youthSquad"], club.YouthIds.Count.ToString()),
         };
         Reputation = club.Reputation;
         History = world.History.OrderByDescending(h => h.SeasonYear).ThenBy(h => h.LeagueId).Select(h =>
         {
             var pos = h.FinalOrder.IndexOf(club.Id);
+            var isLeague = world.FindLeague(h.LeagueId) is not null;
             return new HistoryLine(GameSession.SeasonLabel(h.SeasonYear), h.LeagueName, h.ChampionName,
-                pos >= 0 ? T.Format("club.ownPlace", pos + 1) : "",
+                pos >= 0 && isLeague ? T.Format("club.ownPlace", pos + 1) : "",
                 new SolidColorBrush(h.ChampionId == club.Id ? P.Gold : P.Text));
         }).ToList();
     }

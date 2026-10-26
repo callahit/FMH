@@ -84,7 +84,7 @@ public sealed partial class MatchViewModel : ViewModelBase
     public bool IsHalfTime => Stage == MatchStage.HalfTime;
     public bool IsLiveOrHalf => Stage is MatchStage.Live or MatchStage.HalfTime or MatchStage.PreTalk;
     public bool IsPostMatch => Stage == MatchStage.PostMatch;
-    public string TalkTitle => Stage == MatchStage.HalfTime ? T["match.halfTime"] : T["match.preTalk"];
+    public string TalkTitle => Stage == MatchStage.HalfTime ? (_sim is { Minute: >= 90 } ? T["match.beforeExtraTime"] : T["match.halfTime"]) : T["match.preTalk"];
 
     [ObservableProperty] private string _score = "– : –";
     [ObservableProperty] private string _clock = "";
@@ -131,6 +131,9 @@ public sealed partial class MatchViewModel : ViewModelBase
         var cup = world.FindCup(_fixture.CompetitionId);
         var round = cup?.Rounds.FirstOrDefault(r => r.Number == _fixture.Matchday)?.Name ?? "";
         var leg = _fixture.Leg switch { 1 => " · " + T["cup.firstLeg"], 2 => " · " + T["cup.secondLeg"], _ => "" };
+        // Rückspiel: Ergebnis des Hinspiels anzeigen.
+        if (_fixture.Leg == 2 && cup?.Fixtures.FirstOrDefault(f => f.TieId == _fixture.TieId && f.Leg == 1) is { Result: { } first })
+            leg += " · " + T.Format("cup.firstLegResult", first.HomeGoals, first.AwayGoals);
         return $"{cup?.Name}, {round}{leg}";
     }
 
@@ -357,6 +360,8 @@ public sealed partial class MatchViewModel : ViewModelBase
         var sim = _sim;
         if (sim is null) return;
         Score = $"{sim.Home.Goals} : {sim.Away.Goals}";
+        if (sim.PenaltiesHome is { } ph && sim.PenaltiesAway is { } pa) Score += "  " + T.Format("score.penalties", ph, pa);
+        else if (sim.IsExtraTime) Score += "  " + T["score.extraTime"];
         Clock = sim.IsFinished ? T["match.final"] : sim.StoppageMinute > 0 ? $"{sim.Minute}+{sim.StoppageMinute}'" : $"{sim.Minute}'";
         var h = sim.Home.Stats;
         var a = sim.Away.Stats;
@@ -381,7 +386,7 @@ public sealed partial class MatchViewModel : ViewModelBase
             UiText.Position(mp.Position), mp.Player.LastName, mp.Condition, new SolidColorBrush(P.ConditionColor(mp.Condition)),
             UiText.Grade(mp.Grade), new SolidColorBrush(P.GradeColor(mp.Grade)),
             (mp.Goals > 0 ? new string('●', mp.Goals) + " " : "") + (mp.Yellow ? "▮" : "") + (mp.Injured ? " ✚" : ""))).ToList();
-        SubsLeft = T.Format("match.subsLeftValue", sim.Setup.Substitutions - own.SubstitutionsUsed);
+        SubsLeft = T.Format("match.subsLeftValue", sim.MaxSubstitutions - own.SubstitutionsUsed);
         XgSeriesHome = _xgHome.Append(new Point(Math.Min(90, sim.Minute), _xgHome[^1].Y)).ToList();
         XgSeriesAway = _xgAway.Append(new Point(Math.Min(90, sim.Minute), _xgAway[^1].Y)).ToList();
         GoalMarksHome = _goalsHome.ToList();
@@ -433,7 +438,7 @@ public sealed partial class MatchViewModel : ViewModelBase
         var team = sim.Team(_side);
         var wasPaused = Paused;
         Paused = true;
-        if (team.SubstitutionsUsed >= sim.Setup.Substitutions)
+        if (team.SubstitutionsUsed >= sim.MaxSubstitutions)
         {
             _main.ShowDialog(new MessageDialogViewModel(T["match.substitution"], new[] { T["sub.noneLeft"] }));
             return;

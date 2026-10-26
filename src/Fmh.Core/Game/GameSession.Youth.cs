@@ -44,7 +44,7 @@ public sealed partial class GameSession
     }
 
     /// <summary>Neuer Jahrgang: Anzahl nach Rekrutierung, Qualität nach Einrichtungen und Reputation; 2 % "goldene Generation".</summary>
-    private void YouthIntake(Club club, int min, int max)
+    private void YouthIntake(Club club, int min, int max, bool initial = false)
     {
         var count = Math.Clamp(min + (int)Math.Round((max - min) * club.YouthRecruitment / 20.0) + _rng.Next(-2, 2), min, max);
         count = Math.Min(count, MaxYouthSquad - club.YouthIds.Count);
@@ -55,7 +55,7 @@ public sealed partial class GameSession
         for (var i = 0; i < count; i++)
         {
             var pos = PlayerGenerator.SquadTemplate[_rng.WeightedIndex(PlayerGenerator.SquadTemplate.Select(t => (double)t.count).ToList())].pos;
-            var age = _rng.Next(15, 16);
+            var age = initial ? _rng.Next(15, 18) : _rng.Next(15, 16);
             var p = PlayerGenerator.Create(World, Data, _rng, pos, Math.Clamp(level + _rng.Normal(0, 1.2), 2, 14), age, club.CountryCode);
             var bonus = (golden ? 25 : 0) + (int)(club.YouthRecruitment / 20.0 * 8) + _rng.Next(-5, 10);
             p.Hidden.PotentialAbility = Math.Clamp(p.Hidden.CurrentAbility + _rng.Next(15, 45) + bonus, p.Hidden.CurrentAbility, 200);
@@ -68,11 +68,21 @@ public sealed partial class GameSession
             club.YouthIds.Add(p.Id);
             created.Add(p);
         }
-        if (club.Id != HumanClub.Id) return;
+        if (club.Id != HumanClub.Id || initial) return;
         var best = created.OrderByDescending(p => p.Hidden.PotentialAbility).Take(3).Select(p => $"{p.Name} ({T["pos." + p.MainPosition]})");
         Notify(MessageType.Youth, "msg.sender.youthCoach", T["msg.youthIntake.subject"],
             T.Format(golden ? "msg.youthIntake.golden" : "msg.youthIntake.body", created.Count, string.Join(", ", best)),
             MessageAction.YouthIntake);
+    }
+
+    /// <summary>Neue Spielwelt: jeder Verein startet mit einer Jugendmannschaft.</summary>
+    private void InitialYouth()
+    {
+        foreach (var club in World.Clubs.Values.Where(c => c.YouthIds.Count == 0))
+        {
+            var y = World.Country(club.CountryCode).Youth;
+            YouthIntake(club, y.MinPlayers * 2, y.MaxPlayers * 2, initial: true);
+        }
     }
 
     /// <summary>Saisonwechsel: KI übernimmt Talente, zu alte Jugendspieler werden freigegeben.</summary>

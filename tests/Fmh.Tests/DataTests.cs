@@ -75,7 +75,7 @@ public class DataTests
         var texts = TestData.Data.Texts;
         var missing = new List<string>();
         var src = Path.Combine(TestData.RepoRoot(), "src");
-        var keyPattern = new Regex("\"((?:app|menu|ui|unit|help|tip|filter|radar|toneHint|shoutHint|gameMenu|load|newGame|background|expectation|status|inbox|squad|col|player|foot|suit|suitShort|group|attr|pos|morale|injury|tactics|tactic|mentality|advice|lineup|sub|fixtures|league|club|placeholder|options|match|stat|pause|comm|msg|tone|neg|refuse|tx|cup|scout|camp|youth|score|transfer|shout|speed|weather)\\.[A-Za-z0-9.]+)\"");
+        var keyPattern = new Regex("\"((?:app|menu|ui|unit|help|tip|filter|radar|toneHint|shoutHint|gameMenu|load|newGame|background|expectation|status|inbox|squad|col|player|foot|suit|suitShort|group|attr|pos|morale|injury|tactics|tactic|mentality|advice|lineup|sub|fixtures|league|club|placeholder|options|match|stat|pause|comm|msg|tone|neg|refuse|tx|cup|scout|camp|youth|score|transfer|training|order|intensity|block|dealType|squadStatus|role|duty|corner|shout|speed|weather)\\.[A-Za-z0-9.]+)\"");
         foreach (var file in Directory.EnumerateFiles(src, "*.cs", SearchOption.AllDirectories))
         {
             foreach (Match m in keyPattern.Matches(File.ReadAllText(file)))
@@ -119,6 +119,24 @@ public class DataTests
         Enum<Weather>("weather.");
         Enum<Tone>("tone.");
         Enum<Shout>("shout.");
+        Enum<SquadStatus>("squadStatus.");
+        Enum<DealType>("dealType.");
+        Enum<DealType>("neg.title.");
+        Enum<NegotiationStage>("neg.stage.");
+        Enum<TrainingBlock>("block.");
+        Enum<TrainingIntensity>("intensity.");
+        Enum<CampGoal>("camp.goal.");
+        Enum<Duty>("duty.");
+        Enum<Duty>("dutyShort.");
+        Enum<CornerRoutine>("corner.");
+        Enum<FreeKickRoutine>("freeKickRoutine.");
+        foreach (var r in TestData.Data.Roles)
+        {
+            if (!texts.Has("role." + r.Id)) missing.Add("role." + r.Id);
+            if (!texts.Has("roleInfo." + r.Id)) missing.Add("roleInfo." + r.Id);
+            if (!texts.Has("roleShort." + r.Id)) missing.Add("roleShort." + r.Id);
+        }
+        foreach (var d in new[] { "mo", "tu", "we", "th", "fr", "sa", "su" }) if (!texts.Has("day." + d)) missing.Add("day." + d);
         Enum<ConsoleColor>("color.");
         foreach (var i in TestData.Data.Injuries) if (!texts.Has("injury." + i.Key)) missing.Add("injury." + i.Key);
         for (var i = 1; i <= 5; i++) if (!texts.Has("speed." + i)) missing.Add("speed." + i);

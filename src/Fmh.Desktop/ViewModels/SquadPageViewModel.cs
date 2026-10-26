@@ -101,14 +101,19 @@ public sealed partial class SquadPageViewModel : PageViewModel, IRefreshable
     [ObservableProperty] private IReadOnlyList<PlayerRow> _rows = Array.Empty<PlayerRow>();
     [ObservableProperty] private PlayerRow? _selected;
     [ObservableProperty] private string _summary = "";
+    [ObservableProperty] private bool _showYouth;
+    [ObservableProperty] private string _youthLabel = "";
 
     partial void OnFilterChanged(FilterOption value) => Refresh();
+    partial void OnShowYouthChanged(bool value) => Refresh();
 
     public void Refresh()
     {
         var club = Session.HumanClub;
         var squad = Session.World.SquadOf(club).ToList();
-        Rows = squad.Where(p => Filter.Match(p.MainPosition))
+        var youth = Session.YouthOf(club);
+        YouthLabel = T.Format("squad.youthToggle", youth.Count);
+        Rows = (ShowYouth ? youth : squad).Where(p => Filter.Match(p.MainPosition))
             .OrderBy(p => (int)p.MainPosition).ThenByDescending(p => Ratings.Strength(p, Data.PositionProfiles))
             .Select(p => new PlayerRow(p, club)).ToList();
         var injured = squad.Count(p => p.State.Injury is not null);
