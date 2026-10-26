@@ -58,6 +58,16 @@ public sealed partial class NewGameViewModel : ViewModelBase
     public IReadOnlyList<OptionItem> Backgrounds { get; }
     public IReadOnlyList<OptionItem> InjuryOptions { get; }
 
+    public IReadOnlyList<string> Difficulties { get; } = Enum.GetValues<Difficulty>().Select(d => T["difficulty." + d]).ToList();
+    public IReadOnlyList<string> Styles { get; } = Enum.GetValues<MediaStyle>().Select(d => T["style." + d]).ToList();
+    public IReadOnlyList<string> EventLevels { get; } = Enum.GetValues<EventFrequency>().Select(d => T["events." + d]).ToList();
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(DifficultyInfo))]
+    private int _difficultyIndex = (int)Difficulty.Normal;
+    [ObservableProperty] private int _styleIndex = (int)MediaStyle.Balanced;
+    [ObservableProperty] private int _eventIndex = (int)EventFrequency.Normal;
+    public string DifficultyInfo => T["difficulty." + (Difficulty)DifficultyIndex + ".info"];
+
     [ObservableProperty] private string _managerName;
     [ObservableProperty] private string _seed;
     [ObservableProperty] private bool _ironman;
@@ -119,6 +129,11 @@ public sealed partial class NewGameViewModel : ViewModelBase
             Rules = new WorldRules { InjuryFrequency = InjuryLevels[SelectedInjury.Value], Ironman = Ironman },
         });
         world.Managers[0].Reputation = BackgroundDefs[SelectedBackground.Value].reputation;
+        // Vor dem Anlegen der Sitzung setzen: Budgets und Kreditrahmen hängen von der Schwierigkeit ab.
+        var profile = world.Managers[0].Profile;
+        profile.Difficulty = (Difficulty)DifficultyIndex;
+        profile.Style = (MediaStyle)StyleIndex;
+        profile.Events = (EventFrequency)EventIndex;
         State.Session = new GameSession(world, Data, State.Engine);
         _main.Navigate(new ShellViewModel(_main));
     }

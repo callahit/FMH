@@ -118,6 +118,12 @@ public sealed partial class GameSession
             var club = World.Clubs[s.ClubId!.Value];
             if (IsHuman(club))
             {
+                // Eigenes Personal verlängert zu gleichen Bezügen, wenn es motiviert ist; sonst geht es.
+                if (s.Motivation >= 8 || _rng.Chance(0.7))
+                {
+                    s.ContractUntil = new DateOnly(World.SeasonYear + 2, 6, 30);
+                    continue;
+                }
                 s.ClubId = null;
                 Notify(MessageType.Info, "msg.sender.assistant", TR("msg.staffLeft.subject", s.Name), TR("msg.staffLeft.body", s.Name, TR("staff." + s.Role)));
                 continue;

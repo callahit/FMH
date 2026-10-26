@@ -5,47 +5,251 @@
              xmlns:s="using:Fmh.Desktop.Services"
              x:Class="Fmh.Desktop.Views.ClubPageView"
              x:DataType="vm:ClubPageViewModel">
-  <Grid ColumnDefinitions="340,*" ColumnSpacing="16">
-    <Border Classes="card" VerticalAlignment="Top">
-      <StackPanel Spacing="12">
-        <c:Crest Width="180" Height="206" Primary="{Binding Primary}" Secondary="{Binding Secondary}" Initials="{Binding Initials}" HorizontalAlignment="Center" />
-        <TextBlock Classes="h1" Text="{Binding Name}" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
-        <TextBlock Classes="h3" Text="{s:L club.reputation}" />
-        <c:Meter Value="{Binding Reputation}" Maximum="20" Height="8" Fill="{DynamicResource GoldBrush}" Track="{DynamicResource LineBrush}" />
-      </StackPanel>
-    </Border>
-    <StackPanel Grid.Column="1" Spacing="14">
-      <Border Classes="card">
-        <ItemsControl ItemsSource="{Binding Facts}">
-          <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="2" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
-          <ItemsControl.ItemTemplate>
-            <DataTemplate x:DataType="vm:InfoLine">
-              <StackPanel Margin="0,6,16,6">
-                <TextBlock Text="{Binding Label}" Classes="muted small" />
-                <TextBlock Text="{Binding Value}" FontSize="15" FontWeight="SemiBold" />
+  <DockPanel>
+    <TextBlock DockPanel.Dock="Top" Text="{Binding Result}" Foreground="{DynamicResource AccentBrush}" FontWeight="SemiBold" Margin="0,0,0,8"
+               TextWrapping="Wrap" IsVisible="{Binding Result, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+    <TabControl>
+      <TabItem Header="{s:L club.tab.overview}">
+        <ScrollViewer>
+          <Grid ColumnDefinitions="340,*" ColumnSpacing="16">
+            <Border Classes="card" VerticalAlignment="Top">
+              <StackPanel Spacing="12">
+                <c:Crest Width="180" Height="206" Primary="{Binding Primary}" Secondary="{Binding Secondary}" Initials="{Binding Initials}" HorizontalAlignment="Center" />
+                <TextBlock Classes="h1" Text="{Binding Name}" HorizontalAlignment="Center" TextWrapping="Wrap" TextAlignment="Center" />
+                <TextBlock Classes="h3" Text="{s:L club.reputation}" />
+                <c:Meter Value="{Binding Reputation}" Maximum="20" Height="8" Fill="{DynamicResource GoldBrush}" Track="{DynamicResource LineBrush}" />
               </StackPanel>
-            </DataTemplate>
-          </ItemsControl.ItemTemplate>
-        </ItemsControl>
-      </Border>
-      <Border Classes="card">
-        <StackPanel Spacing="6">
-          <TextBlock Classes="h3" Text="{s:L club.history}" />
-          <TextBlock Classes="muted" Text="{s:L club.noHistory}" IsVisible="{Binding NoHistory}" />
-          <ItemsControl ItemsSource="{Binding History}">
-            <ItemsControl.ItemTemplate>
-              <DataTemplate x:DataType="vm:HistoryLine">
-                <Grid ColumnDefinitions="80,90,*,140" Margin="0,3">
-                  <TextBlock Text="{Binding Season}" />
-                  <TextBlock Grid.Column="1" Text="{Binding League}" Classes="muted" />
-                  <TextBlock Grid.Column="2" Text="{Binding Champion}" Foreground="{Binding Brush}" FontWeight="SemiBold" />
-                  <TextBlock Grid.Column="3" Text="{Binding Own}" Classes="muted" />
+            </Border>
+            <StackPanel Grid.Column="1" Spacing="14">
+              <Border Classes="card">
+                <ItemsControl ItemsSource="{Binding Facts}">
+                  <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="2" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:InfoLine">
+                      <StackPanel Margin="0,6,16,6">
+                        <TextBlock Text="{Binding Label}" Classes="muted small" />
+                        <TextBlock Text="{Binding Value}" FontSize="15" FontWeight="SemiBold" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </Border>
+              <Border Classes="card">
+                <StackPanel Spacing="6">
+                  <TextBlock Classes="h3" Text="{s:L club.history}" />
+                  <TextBlock Classes="muted" Text="{s:L club.noHistory}" IsVisible="{Binding NoHistory}" />
+                  <ItemsControl ItemsSource="{Binding History}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:HistoryLine">
+                        <Grid ColumnDefinitions="80,90,*,140" Margin="0,3">
+                          <TextBlock Text="{Binding Season}" />
+                          <TextBlock Grid.Column="1" Text="{Binding League}" Classes="muted" />
+                          <TextBlock Grid.Column="2" Text="{Binding Champion}" Foreground="{Binding Brush}" FontWeight="SemiBold" />
+                          <TextBlock Grid.Column="3" Text="{Binding Own}" Classes="muted" />
+                        </Grid>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+          </Grid>
+        </ScrollViewer>
+      </TabItem>
+
+      <TabItem Header="{s:L club.tab.board}">
+        <ScrollViewer>
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
+            <StackPanel Spacing="14">
+              <Border Classes="card">
+                <StackPanel Spacing="8">
+                  <TextBlock Classes="h3" Text="{Binding TrustText}" />
+                  <c:Meter Value="{Binding Trust}" Maximum="100" Height="10" Fill="{DynamicResource GoldBrush}" Track="{DynamicResource LineBrush}" />
+                  <ItemsControl ItemsSource="{Binding BoardFacts}">
+                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="2" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:InfoLine">
+                      <StackPanel Margin="0,6,16,6">
+                        <TextBlock Text="{Binding Label}" Classes="muted small" />
+                        <TextBlock Text="{Binding Value}" FontSize="15" FontWeight="SemiBold" Foreground="{Binding Fore}" TextWrapping="Wrap" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </Border>
+              <Border Classes="card">
+                <StackPanel Spacing="6">
+                  <TextBlock Classes="h3" Text="{s:L board.requests}" />
+                  <ItemsControl ItemsSource="{Binding Requests}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:DecisionOption">
+                        <Button Content="{Binding Label}" Command="{Binding Command}" HorizontalAlignment="Stretch" Margin="0,3" />
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                  <TextBlock Classes="muted small" Text="{s:L board.requestHelp}" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+            </StackPanel>
+            <Border Grid.Column="1" Classes="card" VerticalAlignment="Top">
+              <StackPanel Spacing="6">
+                <TextBlock Classes="h3" Text="{s:L board.members}" />
+                <ItemsControl ItemsSource="{Binding BoardMembers}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:InfoLine">
+                      <StackPanel Margin="0,6,16,6">
+                        <TextBlock Text="{Binding Label}" Classes="muted small" />
+                        <TextBlock Text="{Binding Value}" FontSize="15" FontWeight="SemiBold" Foreground="{Binding Fore}" TextWrapping="Wrap" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+          </Grid>
+        </ScrollViewer>
+      </TabItem>
+
+      <TabItem Header="{s:L club.tab.staff}">
+        <ScrollViewer>
+          <StackPanel Spacing="14">
+            <Border Classes="card">
+              <StackPanel Spacing="6">
+                <TextBlock Classes="h3" Text="{s:L staff.own}" />
+                <ItemsControl ItemsSource="{Binding OwnStaff}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:StaffLine">
+                      <Grid ColumnDefinitions="*,150,60,120,Auto" Margin="0,3" ColumnSpacing="8">
+                        <StackPanel>
+                          <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                          <TextBlock Text="{Binding Detail}" Classes="muted small" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Text="{Binding Role}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="2" Text="{Binding Ability}" FontWeight="Bold" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="3" Text="{Binding Wage}" Classes="muted" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                        <Button Grid.Column="4" Content="{Binding ActionText}" Command="{Binding Action}" VerticalAlignment="Center" MinWidth="90" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+            <Border Classes="card">
+              <StackPanel Spacing="6">
+                <Grid ColumnDefinitions="*,Auto">
+                  <TextBlock Classes="h3" Text="{s:L staff.market}" />
+                  <ComboBox Grid.Column="1" ItemsSource="{Binding Roles}" SelectedIndex="{Binding RoleIndex}" MinWidth="200" />
                 </Grid>
-              </DataTemplate>
-            </ItemsControl.ItemTemplate>
-          </ItemsControl>
-        </StackPanel>
-      </Border>
-    </StackPanel>
-  </Grid>
+                <ItemsControl ItemsSource="{Binding Market}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:StaffLine">
+                      <Grid ColumnDefinitions="*,150,60,120,Auto" Margin="0,3" ColumnSpacing="8">
+                        <StackPanel>
+                          <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                          <TextBlock Text="{Binding Detail}" Classes="muted small" />
+                        </StackPanel>
+                        <TextBlock Grid.Column="1" Text="{Binding Role}" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="2" Text="{Binding Ability}" FontWeight="Bold" VerticalAlignment="Center" />
+                        <TextBlock Grid.Column="3" Text="{Binding Wage}" Classes="muted" VerticalAlignment="Center" HorizontalAlignment="Right" />
+                        <Button Grid.Column="4" Content="{Binding ActionText}" Command="{Binding Action}" VerticalAlignment="Center" MinWidth="90" />
+                      </Grid>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
+      <TabItem Header="{s:L club.tab.fans}">
+        <ScrollViewer>
+          <Border Classes="card" VerticalAlignment="Top">
+            <StackPanel Spacing="8">
+              <TextBlock Classes="h3" Text="{Binding FanText}" />
+              <c:Meter Value="{Binding FanMood}" Maximum="100" Height="10" Fill="{DynamicResource AccentBrush}" Track="{DynamicResource LineBrush}" />
+              <ItemsControl ItemsSource="{Binding FanFacts}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="2" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:InfoLine">
+                      <StackPanel Margin="0,6,16,6">
+                        <TextBlock Text="{Binding Label}" Classes="muted small" />
+                        <TextBlock Text="{Binding Value}" FontSize="15" FontWeight="SemiBold" Foreground="{Binding Fore}" TextWrapping="Wrap" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <TextBlock Classes="muted small" Text="{s:L fans.help}" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+        </ScrollViewer>
+      </TabItem>
+
+      <TabItem Header="{s:L club.tab.career}">
+        <ScrollViewer>
+          <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
+            <StackPanel Spacing="14">
+              <Border Classes="card">
+                <StackPanel Spacing="8">
+                  <ItemsControl ItemsSource="{Binding CareerFacts}">
+                    <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="2" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                    <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:InfoLine">
+                      <StackPanel Margin="0,6,16,6">
+                        <TextBlock Text="{Binding Label}" Classes="muted small" />
+                        <TextBlock Text="{Binding Value}" FontSize="15" FontWeight="SemiBold" Foreground="{Binding Fore}" TextWrapping="Wrap" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                  <TextBlock Classes="muted small" Text="{s:L career.media}" />
+                  <c:Meter Value="{Binding Media}" Maximum="100" Height="8" Fill="{DynamicResource GoldBrush}" Track="{DynamicResource LineBrush}" />
+                  <TextBlock Text="{Binding CourseText}" TextWrapping="Wrap" Margin="0,6,0,0" />
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <Button Classes="primary" Content="{s:L career.startCourse}" Command="{Binding StartCourseCommand}" />
+                    <Button Content="{s:L career.resign}" Command="{Binding ResignCommand}" />
+                  </StackPanel>
+                </StackPanel>
+              </Border>
+              <Border Classes="card">
+                <StackPanel Spacing="4">
+                  <TextBlock Classes="h3" Text="{s:L career.stations}" />
+                  <ItemsControl ItemsSource="{Binding Stations}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:StationLine">
+                        <StackPanel Margin="0,4">
+                          <Grid ColumnDefinitions="*,Auto">
+                            <TextBlock Text="{Binding Club}" FontWeight="SemiBold" />
+                            <TextBlock Grid.Column="1" Text="{Binding Exit}" Classes="muted small" />
+                          </Grid>
+                          <TextBlock Text="{Binding Period}" Classes="muted small" />
+                          <TextBlock Text="{Binding Record}" Classes="small" />
+                        </StackPanel>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </Border>
+            </StackPanel>
+            <Border Grid.Column="1" Classes="card" VerticalAlignment="Top">
+              <StackPanel Spacing="4">
+                <TextBlock Classes="h3" Text="{s:L career.hallOfFame}" />
+                <ItemsControl ItemsSource="{Binding Achievements}">
+                  <ItemsControl.ItemTemplate>
+                    <DataTemplate x:DataType="vm:AchievementLine">
+                      <StackPanel Margin="0,4" Opacity="{Binding Opacity}">
+                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                        <TextBlock Text="{Binding Info}" Classes="muted small" TextWrapping="Wrap" />
+                      </StackPanel>
+                    </DataTemplate>
+                  </ItemsControl.ItemTemplate>
+                </ItemsControl>
+              </StackPanel>
+            </Border>
+          </Grid>
+        </ScrollViewer>
+      </TabItem>
+    </TabControl>
+  </DockPanel>
 </UserControl>

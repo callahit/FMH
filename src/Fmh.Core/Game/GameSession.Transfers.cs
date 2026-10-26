@@ -194,6 +194,9 @@ public sealed partial class GameSession
     /// <summary>Überlässt offene Pflicht-Entscheidungen dem Assistenten: Angebote werden abgelehnt.</summary>
     public void DelegateDecisions()
     {
+        // Offene Sponsorenangebote: je Werbeplatz das beste annehmen.
+        foreach (var best in HumanClub.SponsorOffers.GroupBy(o => (o.Slot, o.Index)).Select(g => g.MaxBy(o => o.PerSeason)!).ToList())
+            AcceptSponsor(best);
         foreach (var m in PendingDecisions)
         {
             switch (m.Action)
@@ -645,6 +648,7 @@ public sealed partial class GameSession
     /// <summary>Ein KI-Verein bietet für einen Spieler des menschlichen Vereins (Pflicht-Entscheidung im Posteingang).</summary>
     private void MakeIncomingOffer()
     {
+        if (AwaitingNewJob) return; // ohne Verein entscheidet der Interimstrainer
         var human = HumanClub;
         if (World.Date.Month == 7 && World.Date.Day < 15) return; // Neue Manager bekommen zwei Wochen Ruhe.
         if (OpenNegotiations.Any(n => n.Incoming)) return;

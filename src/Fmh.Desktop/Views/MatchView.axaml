@@ -128,11 +128,45 @@
           </ScrollViewer>
         </DockPanel>
       </Border>
-      <StackPanel Grid.Column="1" Spacing="14">
+      <ScrollViewer Grid.Column="1">
+      <StackPanel Spacing="14">
         <Border Classes="card">
           <ItemsControl ItemsSource="{Binding Stats}" />
         </Border>
-        <Border Classes="card" Height="170">
+        <Border Classes="card" IsVisible="{Binding IsConference}">
+          <StackPanel Spacing="4">
+            <TextBlock Classes="h3" Text="{s:L match.conference}" />
+            <ItemsControl ItemsSource="{Binding ConferenceGames}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:ConferenceLine">
+                  <Grid ColumnDefinitions="*,54,*" Margin="0,2">
+                    <TextBlock Text="{Binding Home}" Foreground="{Binding Brush}" FontWeight="{Binding Weight}" TextTrimming="CharacterEllipsis" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Column="1" Text="{Binding Score}" Foreground="{Binding Brush}" FontWeight="Bold" HorizontalAlignment="Center" />
+                    <TextBlock Grid.Column="2" Text="{Binding Away}" Foreground="{Binding Brush}" FontWeight="{Binding Weight}" TextTrimming="CharacterEllipsis" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+        <Border Classes="card" IsVisible="{Binding HasLiveTable}">
+          <StackPanel Spacing="2">
+            <TextBlock Classes="h3" Text="{s:L match.liveTable}" />
+            <ItemsControl ItemsSource="{Binding LiveTable}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:LiveTableRow">
+                  <Grid ColumnDefinitions="30,*,60,36" Margin="0,1">
+                    <TextBlock Text="{Binding Position}" Classes="muted small" />
+                    <TextBlock Grid.Column="1" Text="{Binding Club}" Foreground="{Binding Brush}" FontWeight="{Binding Weight}" Classes="small" />
+                    <TextBlock Grid.Column="2" Text="{Binding Goals}" Classes="muted small" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Column="3" Text="{Binding Points}" FontWeight="{Binding Weight}" Classes="small" HorizontalAlignment="Right" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </Border>
+        <Border Classes="card" Height="170" IsVisible="{Binding !IsConference}">
           <DockPanel>
             <TextBlock DockPanel.Dock="Top" Classes="h3" Text="{s:L match.xgTimeline}" />
             <c:LineChart SeriesA="{Binding XgSeriesHome}" SeriesB="{Binding XgSeriesAway}" MarkersA="{Binding GoalMarksHome}" MarkersB="{Binding GoalMarksAway}"
@@ -140,6 +174,7 @@
           </DockPanel>
         </Border>
       </StackPanel>
+      </ScrollViewer>
       <Border Grid.Column="2" Classes="card" Padding="12">
         <DockPanel>
           <Grid DockPanel.Dock="Top" ColumnDefinitions="*,Auto" Margin="0,0,0,8">

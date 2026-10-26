@@ -147,8 +147,9 @@ public sealed partial class GameSession
         var standingShare = attendance == 0 ? 0 : standing / (double)attendance;
         var gate = (long)(paying * (standingShare * prices.Standing + (1 - standingShare) * prices.Seating) * surcharge)
                    + (long)(boxes * prices.Box * surcharge);
-        var catering = (long)(attendance * (1.8 + Effect(home, "income.catering")) + boxes * 600 * (1 + Effect(home, "income.box")));
-        var merch = (long)(attendance * (1.0 + Effect(home, "income.merch")) * Math.Clamp(home.Fans.Mood / 60, 0.5, 1.4));
+        // Gebäudewirkungen auf Catering und Fanartikel wirken anteilig (Wert je Stufe x 20 %).
+        var catering = (long)(attendance * 1.2 * (1 + Effect(home, "income.catering") * 0.2) + boxes * 600 * (1 + Effect(home, "income.box")));
+        var merch = (long)(attendance * 0.8 * (1 + Effect(home, "income.merch") * 0.2) * Math.Clamp(home.Fans.Mood / 60, 0.5, 1.4));
         var extra = (long)(Effect(home, "income.matchday") + home.Stadium.Scoreboard * 6_000);
         var text = TR("tx.match", away.Name);
         if (f.Kind == CompetitionKind.League)
@@ -209,7 +210,7 @@ public sealed partial class GameSession
                     + World.Scouts.Where(s => s.ClubId == club.Id).Sum(s => (long)ScoutWage(s))
                     + (IsHuman(club) ? club.Board.ManagerWeeklyWage : (long)(club.Board.ManagerWeeklyWage > 0 ? club.Board.ManagerWeeklyWage : 2_000 * Scale(club)));
         if (staff > 0) Book(club, TransactionType.StaffWages, -staff, TR("tx.staffWages"));
-        var weekly = Effect(club, "income.weekly") + Effect(club, "income.events") + Effect(club, "income.patients")
+        var weekly = (Effect(club, "income.weekly") + Effect(club, "income.events") + Effect(club, "income.patients")) * 0.5
                      + club.Grounds.Buildings.Where(b => b.Leased).Sum(b => MonthlyUpkeep(club, b) * 0.4);
         if (weekly > 0) Book(club, TransactionType.BuildingIncome, (long)weekly, TR("tx.buildings"));
     }
@@ -236,7 +237,7 @@ public sealed partial class GameSession
         // Sponsoren monatlich, Mitgliedsbeiträge.
         var sponsorMonthly = club.Sponsors.Where(s => s.UntilSeason >= World.SeasonYear).Sum(s => s.PerSeason) / 12;
         if (sponsorMonthly > 0) Book(club, TransactionType.Sponsorship, sponsorMonthly, TR("tx.sponsors"));
-        var members = (long)(club.Fans.Members * 6);
+        var members = (long)(club.Fans.Members * 4);
         if (members > 0) Book(club, TransactionType.BuildingIncome, members, TR("tx.members"));
 
         // Kredite: Annuität, Zinsanteil getrennt.
@@ -430,17 +431,26 @@ public sealed partial class GameSession
             Budgets.SetSeasonBudget(club, World);
             return;
         }
-        var share = !IsHuman(club) ? 0.66 : HumanManager.Profile.Difficulty switch
+        // Anteil des frei verfügbaren Geldes (Einnahmen minus Fixkosten), der in Spielergehälter fließt.
+        var share = !IsHuman(club) ? 0.85 : HumanManager.Profile.Difficulty switch
         {
-            Difficulty.Easy => 0.75,
-            Difficulty.Hard => 0.6,
-            Difficulty.Realistic => 0.56,
-            _ => 0.66,
+            Difficulty.Easy => 0.95,
+            Difficulty.Hard => 0.78,
+            Difficulty.Realistic => 0.72,
+            _ => 0.85,
         };
         var goal = club.Board.Goal switch { SeasonGoal.Title or SeasonGoal.Europe => 1.08, SeasonGoal.Promotion => 1.05, SeasonGoal.Survival => 0.95, _ => 1.0 };
-        var income = ExpectedIncome(club);
+        // Nach Auf- oder Abstieg passt die Vorjahreszahl nicht mehr: zur Hälfte mit der Schätzung für die aktuelle Liga mischen.
+        var last = ExpectedIncome(club);
+        var income = club.Finance.LastSeason.Count == 0 ? last : (last + EstimateIncome(club)) / 2;
+        var fixedCosts = -club.Finance.LastSeason.Where(kv => kv.Key is TransactionType.StaffWages or TransactionType.Upkeep or TransactionType.Travel or TransactionType.Interest)
+            .Sum(kv => Math.Min(0, kv.Value));
+        if (fixedCosts == 0) fixedCosts = (long)(income * 0.22);
         var bill = Budgets.WageBill(club, World);
-        b.WageBudget = Math.Max((long)(bill * 1.02), (long)(income * share * goal / 52));
+        var target = (long)(Math.Max(income * 0.3, income - fixedCosts) * share * goal / 52);
+        // KI: Budget folgt den Einnahmen (im Minus sparsamer), sonst schaukeln sich die Gehälter jedes Jahr hoch.
+        // Mensch: etwas Luft über den laufenden Gehältern, damit Verlängerungen und Neuzugänge möglich bleiben.
+        b.WageBudget = IsHuman(club) ? Math.Max((long)(bill * 1.05), target) : b.Balance < 0 ? (long)(target * 0.9) : target;
         b.TransferBudget = MarketValue.Round(Math.Max(0, b.Balance) * 0.45);
         if (club.Finance.LastLicense is LicenseOutcome.Conditions or LicenseOutcome.PointDeduction) b.TransferBudget = Math.Min(b.TransferBudget, MarketValue.Round(b.Balance * 0.2));
     }

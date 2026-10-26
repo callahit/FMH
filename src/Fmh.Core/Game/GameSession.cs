@@ -64,7 +64,7 @@ public sealed partial class GameSession
 
     /// <summary>Heutiges, noch nicht gespieltes Spiel des menschlichen Vereins.</summary>
     public Fixture? PendingHumanFixture =>
-        AllFixtures.FirstOrDefault(f => f.Date == World.Date && f.Result is null && f.Involves(HumanClub.Id));
+        AwaitingNewJob ? null : AllFixtures.FirstOrDefault(f => f.Date == World.Date && f.Result is null && f.Involves(HumanClub.Id));
 
     public Fixture? NextFixture(Club club) =>
         AllFixtures.Where(f => f.Result is null && f.Involves(club.Id)).OrderBy(f => f.Date).FirstOrDefault();
@@ -125,7 +125,7 @@ public sealed partial class GameSession
 
         foreach (var f in today.Where(f => f.Result is null))
         {
-            if (f.Involves(HumanClub.Id)) continue;
+            if (HumanPlays(f)) continue;
             PlayInstant(f);
         }
         DailyUpdate();
@@ -155,7 +155,7 @@ public sealed partial class GameSession
     /// <summary>Simuliert alle anderen Spiele des heutigen Tages (z. B. für die Ergebnisse im Nachbericht).</summary>
     public void PlayOtherFixturesToday()
     {
-        foreach (var f in AllFixtures.Where(f => f.Date == World.Date && f.Result is null && !f.Involves(HumanClub.Id)).ToList())
+        foreach (var f in AllFixtures.Where(f => f.Date == World.Date && f.Result is null && !HumanPlays(f)).ToList())
             PlayInstant(f);
     }
 
@@ -196,6 +196,9 @@ public sealed partial class GameSession
         };
         return Engine.Create(setup);
     }
+
+    /// <summary>Spiel, das der Mensch selbst bestreitet (nicht während er ohne Verein ist).</summary>
+    private bool HumanPlays(Fixture f) => !AwaitingNewJob && f.Involves(HumanClub.Id);
 
     private bool IsHuman(Club club) => club.ManagerId is { } mid && World.Managers.First(m => m.Id == mid).Human;
 

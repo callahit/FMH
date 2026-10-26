@@ -16,6 +16,11 @@ namespace Fmh.Desktop.ViewModels;
 
 public enum MatchStage { PreMatch, PreTalk, Live, HalfTime, PostMatch }
 
+/// <summary>Ein anderes Spiel in der Konferenz: Spielstand bis zur aktuellen Minute.</summary>
+public sealed record ConferenceLine(string Home, string Score, string Away, IBrush Brush, FontWeight Weight);
+
+public sealed record LiveTableRow(string Position, string Club, string Goals, string Points, FontWeight Weight, IBrush Brush);
+
 public sealed record TickerLine(string Minute, string Text, IBrush Brush, IBrush Marker, FontWeight Weight);
 public sealed record StatLine(string Label, string Home, string Away, double HomeValue, double AwayValue);
 public sealed record LivePlayer(string Position, string Name, double Condition, IBrush ConditionBrush, string Grade, IBrush GradeBrush, string Marks);
@@ -51,6 +56,8 @@ public sealed partial class MatchViewModel : ViewModelBase
     private readonly List<Point> _xgAway = new() { new Point(0, 0) };
     private readonly List<double> _goalsHome = new();
     private readonly List<double> _goalsAway = new();
+    private bool _conference;
+    private readonly HashSet<(int fixture, int goal)> _announced = new();
 
     public MatchViewModel(MainWindowViewModel main, ShellViewModel shell, Fixture fixture)
     {
@@ -213,7 +220,11 @@ public sealed partial class MatchViewModel : ViewModelBase
         var instant = Profile.MatchDisplay == MatchDisplayMode.Instant;
         _sim = Session.StartMatch(_fixture, humanControlled: !instant);
         _commentary = new CommentaryGenerator(Data, _sim);
-        TickerMode = Profile.MatchDisplay == MatchDisplayMode.Ticker;
+        TickerMode = Profile.MatchDisplay is MatchDisplayMode.Ticker or MatchDisplayMode.Conference;
+        _conference = Profile.MatchDisplay == MatchDisplayMode.Conference;
+        // Konferenz: die übrigen Spiele werden vorab berechnet und minutengenau aufgedeckt.
+        if (_conference) Session.PlayOtherFixturesToday();
+        IsConference = _conference;
         if (instant)
         {
             _sim.RunToEnd();
@@ -392,6 +403,67 @@ public sealed partial class MatchViewModel : ViewModelBase
         GoalMarksHome = _goalsHome.ToList();
         GoalMarksAway = _goalsAway.ToList();
         if (!Paused && Stage == MatchStage.Live && own.Shout != Shout.None) Status = T.Format("match.shoutActive", T["shout." + own.Shout]);
+        if (_conference) UpdateConference(sim);
+    }
+
+    [ObservableProperty] private bool _isConference;
+    [ObservableProperty] private IReadOnlyList<ConferenceLine> _conferenceGames = Array.Empty<ConferenceLine>();
+    [ObservableProperty] private IReadOnlyList<LiveTableRow> _liveTable = Array.Empty<LiveTableRow>();
+    public bool HasLiveTable => LiveTable.Count > 0;
+    partial void OnLiveTableChanged(IReadOnlyList<LiveTableRow> value) => OnPropertyChanged(nameof(HasLiveTable));
+
+    /// <summary>Konferenz: Zwischenstände der anderen Partien, Torblitz und Live-Tabelle zur aktuellen Spielminute.</summary>
+    private void UpdateConference(IMatchSimulation sim)
+    {
+        var world = Session.World;
+        var minute = sim.IsFinished ? 200 : sim.Minute;
+        var others = world.AllFixtures.Where(f => f.CompetitionId == _fixture.CompetitionId && f.Date == _fixture.Date && f != _fixture && f.Result is not null).ToList();
+        var partial = new Dictionary<Fixture, (int home, int away)>();
+        var lines = new List<ConferenceLine>();
+        foreach (var f in others)
+        {
+            var goals = f.Result!.Goals.Where(g => g.Minute <= minute).ToList();
+            var score = (goals.Count(g => g.Home), goals.Count(g => !g.Home));
+            partial[f] = score;
+            var fresh = goals.Any(g => g.Minute > minute - 3);
+            for (var i = 0; i < goals.Count; i++)
+            {
+                if (!_announced.Add((f.Id, i))) continue;
+                var g = goals[i];
+                var scorer = world.Players.TryGetValue(g.ScorerId, out var p) ? p.ShortName : "";
+                Ticker.Insert(0, new TickerLine($"{g.Minute}'", T.Format("match.conferenceGoal", world.Clubs[f.HomeId].Name,
+                        $"{goals.Take(i + 1).Count(x => x.Home)}:{goals.Take(i + 1).Count(x => !x.Home)}", world.Clubs[f.AwayId].Name, scorer),
+                    new SolidColorBrush(P.Gold), new SolidColorBrush(P.Gold), FontWeight.SemiBold));
+            }
+            lines.Add(new ConferenceLine(world.Clubs[f.HomeId].Name, $"{score.Item1} : {score.Item2}", world.Clubs[f.AwayId].Name,
+                new SolidColorBrush(fresh ? P.Gold : P.Text), fresh ? FontWeight.Bold : FontWeight.Normal));
+        }
+        ConferenceGames = lines;
+        partial[_fixture] = (sim.Home.Goals, sim.Away.Goals);
+
+        if (_fixture.Kind != CompetitionKind.League || world.FindLeague(_fixture.CompetitionId) is not { } league)
+        {
+            LiveTable = Array.Empty<LiveTableRow>();
+            return;
+        }
+        var rows = league.ClubIds.ToDictionary(id => id, _ => (pts: 0, gf: 0, ga: 0));
+        void Add(int home, int away, int hg, int ag)
+        {
+            var h = rows[home];
+            var a = rows[away];
+            rows[home] = (h.pts + (hg > ag ? 3 : hg == ag ? 1 : 0), h.gf + hg, h.ga + ag);
+            rows[away] = (a.pts + (ag > hg ? 3 : hg == ag ? 1 : 0), a.gf + ag, a.ga + hg);
+        }
+        foreach (var f in league.Fixtures.Where(f => f.Result is not null && f.Date < _fixture.Date))
+            Add(f.HomeId, f.AwayId, f.Result!.HomeGoals, f.Result.AwayGoals);
+        foreach (var (f, score) in partial) Add(f.HomeId, f.AwayId, score.home, score.away);
+        var own = Session.HumanClub.Id;
+        LiveTable = rows.Select(kv => (id: kv.Key, pts: kv.Value.pts - league.Deductions.GetValueOrDefault(kv.Key), kv.Value.gf, kv.Value.ga))
+            .OrderByDescending(r => r.pts).ThenByDescending(r => r.gf - r.ga).ThenByDescending(r => r.gf)
+            .Select((r, i) => new LiveTableRow($"{i + 1}.", world.Clubs[r.id].ShortName, $"{r.gf}:{r.ga}", r.pts.ToString(),
+                r.id == own ? FontWeight.Bold : FontWeight.Normal,
+                new SolidColorBrush(r.id == own ? P.Gold : partial.Keys.Any(f => f.Involves(r.id)) ? P.Text : P.Muted)))
+            .ToList();
     }
 
     [RelayCommand]
@@ -413,7 +485,7 @@ public sealed partial class MatchViewModel : ViewModelBase
     private void ToggleTicker()
     {
         TickerMode = !TickerMode;
-        Profile.MatchDisplay = TickerMode ? MatchDisplayMode.Ticker : MatchDisplayMode.Commentary;
+        if (!_conference) Profile.MatchDisplay = TickerMode ? MatchDisplayMode.Ticker : MatchDisplayMode.Commentary;
     }
 
     [RelayCommand]

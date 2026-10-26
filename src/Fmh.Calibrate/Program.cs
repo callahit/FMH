@@ -148,9 +148,34 @@ public static class Program
                 .Average(p => Ratings.PositionRating(p, p.MainPosition, profiles))).Average();
             Console.WriteLine($"{league.Name}: Top-11 Ø {top:F2}, U21 {Avg(p => p.Age(w.Date) <= 21)}, 22-29 {Avg(p => p.Age(w.Date) is > 21 and < 30)}, 30+ {Avg(p => p.Age(w.Date) >= 30)}, Alter Ø {players.Average(p => p.Age(w.Date)):F1}");
         }
+        PrintFinanceStats(session);
         var b = session.HumanClub.Budget;
         Console.WriteLine($"Eigener Verein: Kontostand {b.Balance / 1_000_000.0:F1} Mio., Transferbudget {b.TransferBudget / 1_000_000.0:F1} Mio.");
         Console.WriteLine();
+    }
+
+    /// <summary>Finanzkennzahlen je Liga: Einnahmen, Ausgaben, Saldo und Kontostände (Kalibrierung Phase 3).</summary>
+    private static void PrintFinanceStats(GameSession session)
+    {
+        var w = session.World;
+        static string M(double v) => (v / 1_000_000).ToString("F1", CultureInfo.InvariantCulture);
+        foreach (var league in w.Leagues)
+        {
+            var clubs = league.ClubIds.Select(id => w.Clubs[id]).ToList();
+            var income = clubs.Average(c => c.Finance.Season.Values.Where(v => v > 0).Sum());
+            var expenses = clubs.Average(c => c.Finance.Season.Values.Where(v => v < 0).Sum());
+            var balances = clubs.Select(c => (double)c.Budget.Balance).ToList();
+            Console.WriteLine($"{league.Name} Finanzen: Einnahmen Ø {M(income)} Mio., Ausgaben Ø {M(expenses)} Mio., Saldo Ø {M(income + expenses)} Mio., " +
+                              $"Konto Ø {M(balances.Average())} (min {M(balances.Min())}, max {M(balances.Max())}), im Minus {balances.Count(x => x < 0)}, " +
+                              $"Zuschauer Ø {clubs.Average(c => c.Stadium.Capacity):F0} Plätze");
+            var types = clubs.SelectMany(c => c.Finance.Season).GroupBy(kv => kv.Key)
+                .Select(g => (g.Key, avg: g.Sum(kv => kv.Value) / (double)clubs.Count)).Where(x => Math.Abs(x.avg) >= 10_000).OrderByDescending(x => x.avg);
+            Console.WriteLine("  " + string.Join(", ", types.Select(x => $"{x.Key} {M(x.avg)}")));
+        }
+        var h = session.HumanClub;
+        Console.WriteLine($"Eigener Verein: Vorstand {h.Board.Trust:F0}, Fans {h.Fans.Mood:F0}, Medien {session.HumanManager.Career.Media:F0}, " +
+                          $"Ereignisse {w.Events.Count(e => e.ClubId == h.Id)}, Erfolge {session.HumanManager.Career.Achievements.Count}, " +
+                          $"Sponsoren {h.Sponsors.Count}, Personal {w.Staff.Count(s => s.ClubId == h.Id)}, Gebäude {h.Grounds.Buildings.Count}");
     }
 
     private static int RunSeasons(GameData data, ulong seed, int seasons)
@@ -167,6 +192,7 @@ public static class Program
         {
             var result = session.Advance();
             if (result.Reason == StopReason.Decision) session.DelegateDecisions();
+            if (session.AwaitingNewJob) { Console.WriteLine($"Entlassen am {world.Date}."); break; }
             if (dayWatch is not null)
             {
                 // Spieltag gemessen vom eigenen Spiel bis alle übrigen Spiele des Tages berechnet sind.

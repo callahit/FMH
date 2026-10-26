@@ -6,17 +6,17 @@ Ein Fußball-Manager ohne 3D-Darstellung: Spielgefühl und Humor wie Anstoß 3, 
 Taktiktiefe wie Football Manager, der Spieltag läuft als Text-Kommentar oder Ticker. Grundlage ist das
 Fachkonzept „Fußball-Manager (Textmodus)".
 
-Dieser Stand umfasst **Phase 1 (Prototyp)** und **Phase 2 (Karriere)** der Roadmap:
+Dieser Stand umfasst **Phase 1 (Prototyp)**, **Phase 2 (Karriere)** und **Phase 3 (Beta)** der Roadmap:
 
 - Phase 1: Matchengine, Attribute, zwei Ligen, Kommentarmodus.
 - Phase 2: Training, vollständige Taktik mit Rollen, Transfers, Verträge, Scouting, Pokal,
   Relegation und Jugend.
+- Phase 3: Finanzen, Stadion, Vereinsgelände, Personal, Sponsoren, Vorstand, Fans, Presse,
+  Zufallsereignisse, Managerkarriere, Konferenz und Mehrsprachigkeit (siehe [Umfeld](#umfeld-phase-3)
+  und [Sprachen](#sprachen)).
 
 Die Karriere läuft über beliebig viele Saisons, gespielt wird in einer Desktop-Oberfläche mit Maus und
 Tastatur. Spielstände sind SQLite-Datenbanken.
-
-**Phase 3** hat begonnen. Als Erstes ist die **Mehrsprachigkeit** umgesetzt: Deutsch und Englisch,
-im Spiel umschaltbar und um weitere Sprachen erweiterbar (siehe [Sprachen](#sprachen)).
 
 ## Schnellstart
 
@@ -86,8 +86,8 @@ Farbthemen: Klassik, Hell, Terminal.
   - Ansicht mit allen Runden und Duellen.
 - **Jugend:** Jahrgang im März, ein Anfangsjahrgang bei Spielstart und 2 % Chance auf eine
   „goldene Generation". Profiverträge ab 16, Freigabe mit 19; die KI übernimmt Talente selbst.
-- **Budgets:** Kontostand, Transfer- und Gehaltsbudget je Saison aus der Reputation. Die volle
-  Finanzsimulation folgt in Phase 3.
+- **Budgets:** Kontostand, Transfer- und Gehaltsbudget je Saison; seit Phase 3 aus den Einnahmen
+  des Vereins berechnet (siehe unten).
 
 Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
 
@@ -95,6 +95,66 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
 - Das Durchschnittsalter liegt bei 26 Jahren.
 - Pro Saison gibt es rund 60 Transfers mit Ablöse und 25–70 Leihen.
 - Die Spielstärke der Ligen steigt nur leicht, um etwa 0,07 Punkte pro Saison.
+
+## Umfeld (Phase 3)
+
+- **Finanzen** (Kapitel 8):
+  - Einnahmen: Zuschauer nach Preis, Stärke, Wetter, Derby und Fanstimmung; Dauerkarten bis Ende Juli;
+    Fernsehgelder in zehn Raten plus Leistungsanteil; Sponsoren; Catering, Fanartikel und Gelände;
+    Pokal- und Relegationsprämien.
+  - Ausgaben: Gehälter, Personal, Unterhalt, Reisen, Prämien, Zinsen.
+  - Bank: Kredite (3–12 % Zins je nach Verschuldung), Festgeld, Umschichten zwischen Transfer- und
+    Gehaltsbudget (52:1), Eintrittspreise mit Fanreaktion.
+  - Lizenzierung zum Saisonende: Eigenkapital und Infrastruktur, Auflagen oder Punktabzug.
+    Insolvenz nach 30 Tagen unter dem Kreditrahmen: KI-Vereine bekommen neun Punkte Abzug, der
+    Mensch wird entlassen.
+  - Saisonbilanz, Monatsverlauf als Diagramm.
+- **Stadion:** vier Tribünen mit Steh- und Sitzplätzen, Dach und Logen; Flutlicht, Rasenheizung,
+  Anzeigetafel, Rasenzustand. Bauprojekte brauchen ab 2 Mio. die Freigabe des Vorstands und ab
+  1 Mio. eine Baugenehmigung. Drei Baufirmen (billig und riskant, normal, teuer und schnell),
+  Verzögerungen und Pleiten, Finanzierung über Kredit.
+- **Vereinsgelände** (Kapitel 9): 83 Gebäude in neun Bereichen (Training, Medizin, Jugend, Fans,
+  Kommerz, Verwaltung, Infrastruktur, Energie, Mannschaften).
+  - Bis zu fünf Ausbaustufen, Zustand, Unterhalt, Voraussetzungen, Lagebonus und Synergien.
+  - Gebäude lassen sich verpachten oder abreißen, Bauland ist zukaufbar.
+  - Anklickbares Raster mit Baumenü.
+- **Personal:** neun Rollen (Co-Trainer, Fitness-, Torwart- und Jugendtrainer, Physiotherapeut,
+  Arzt, Sportpsychologe, Pressesprecher, Platzwart) mit Arbeitsmarkt, Einstellung, Entlassung mit
+  Abfindung. Das Personal wirkt auf Training, Verletzungen, Jugend, Moral, Presse und Rasen.
+- **Sponsoren:** Trikot, Ärmel, Ausrüster, zehn Banden und Stadionname. Angebote kommen in den
+  Posteingang, Erfolgsprämie beim Saisonziel. Es gibt 70 fiktive Firmen.
+- **Vorstand:** Saisonziel zum Saisonstart, Vertrauen 0–100, Mitglieder mit Eigenschaften, Bitten
+  (Budget, Vertrag, Jugendzuschuss), Ultimatum, Entlassung, Jahreshauptversammlung mit Abstimmung
+  über Bauprojekte.
+- **Fans:** Stimmung, Mitglieder, Fanclubs, Publikumslieblinge, Choreos vor Derbys und Topspielen,
+  Proteste. Die Stimmung wirkt auf Zuschauer, Fanartikel und Dauerkarten.
+- **Presse:**
+  - Pressekonferenzen vor und nach dem Spiel mit 44 Fragen und vier Antworttönen; Wirkung auf
+    Moral, Gegner, Vorstand, Medienansehen, Fehden und Strafen. Pressekonferenzen lassen sich auch
+    an den Pressesprecher delegieren.
+  - Schlagzeilen, Gerüchte und Spielerinterviews in drei Tonfällen (satirisch, ausgewogen, seriös).
+- **Zufallsereignisse** (Kapitel 10): 166 Ereignisse als Daten (`data/base/events/*.json`) in den
+  Bereichen Spieler, Verein, Fans, Medien, Finanzen, Stadion, Sport und Kurioses.
+  - Bedingungen: Spieler, Monat, Ruf, Sieg oder Niederlage, Stimmung, Kontostand.
+  - Antworten mit Erfolgschance; Häufigkeit und Tonfall sind einstellbar.
+- **Managerkarriere:** Trainerlizenzen C bis Pro mit Lehrgängen im Sommer, Stationen mit Bilanz, 25
+  Erfolge in der Ruhmeshalle, Jobangebote, Rücktritt, Entlassung und Vereinswechsel. Während der
+  Vereinslosigkeit spielt ein Interimstrainer weiter.
+- **Konferenz:** Anzeigemodus, in dem die anderen Spiele des Spieltags minutengenau mitlaufen, mit
+  Torblitz im Ticker und Live-Tabelle.
+- **Einstellungen:** Schwierigkeit (Leicht, Normal, Schwer, Realistisch) beim Spielstart;
+  Tonfall, Ereignishäufigkeit und Pressedelegation jederzeit in den Optionen.
+- **Statuszeile:** Kontostand, Vorstand, Fans, Moral und nächstes Spiel.
+
+Die Finanzsimulation über fünf Saisons ergibt folgende Werte je Verein:
+
+| Liga | Einnahmen | Ausgaben | Saldo pro Saison |
+|---|---|---|---|
+| 1. Liga | 26–32 Mio. | 21–26 Mio. | +4 bis +6 Mio. |
+| 2. Liga | 7–8 Mio. | 7–8 Mio. | etwa ±0 Mio. |
+
+Absteiger geraten mit ihren Gehältern ins Minus. Es gibt keine Kettenpleiten. Die Kennzahlen zeigt
+`fmh-calibrate --season --seasons 5` je Liga und Buchungsart an.
 
 ## Umfang nach Kapiteln des Fachkonzepts
 
@@ -104,9 +164,11 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
 | 3 Spielwelt, Wettbewerbe | Tagesgenauer Kalender, Ligen als Daten, Deutschland mit 1. und 2. Liga und Amateurbereich, **Pokal**, **Relegation**, Transferfenster, Pflicht-Entscheidungen | Europapokal, weitere Länder (Phase 3) |
 | 4 Spielerdatenmodell | 44 Attribute, versteckte Werte, Kondition, Form, Moral, Spielpraxis, Positionseignung, Entwicklung durch **Training** und Saisonwechsel, Karriereende, Dauerschäden | Zufriedenheit, Tutor-System |
 | 5 Kader, Training, Taktik | Kader, Profil, **Training**, **Trainingslager**, 25 Formationen, **Rollen und Aufgaben**, **Spieleranweisungen**, **freie Positionierung**, **Taktikvertrautheit**, **3 Taktikvarianten**, Standardvarianten, Co-Trainer | – |
-| 6 Spieltag und Matchengine | Vorbericht, Kabinenansprache, Kommentar/Ticker/Sofort, Wechsel, Taktik und Zurufe live, Nachbericht mit Noten und Statistik, **Verlängerung und Elfmeterschießen**, Hin- und Rückspiel | Konferenz, Pressekonferenz (Phase 3) |
+| 6 Spieltag und Matchengine | Vorbericht, Kabinenansprache, Kommentar/Ticker/Sofort/**Konferenz**, Wechsel, Taktik und Zurufe live, Nachbericht mit Noten und Statistik, **Verlängerung und Elfmeterschießen**, Hin- und Rückspiel, **Pressekonferenzen** | – |
 | 7 Transfers, Verträge, Scouting | **vollständig** (siehe oben) | – |
-| 8–10 Finanzen, Gelände, Umfeld | Budgets und Buchungen (Ablösen, Raten, Handgeld, Trainingslager) | Phase 3 |
+| 8 Finanzen, Stadion, Personal | **vollständig**: Einnahmen und Ausgaben, Bank, Lizenz, Insolvenz, Stadionausbau, Personal, Sponsoren | – |
+| 9 Vereinsgelände | **83 Gebäude** mit Stufen, Lage und Synergien, Baufirmen, Genehmigungen | – |
+| 10 Umfeld, Karriere | **Vorstand, Fans, Presse, 166 Zufallsereignisse, Managerkarriere** mit Lizenzen und Erfolgen | Nationalmannschaft, Medienhaus |
 | 11 Oberfläche | Desktop-Oberfläche (Avalonia) mit Maus, Drag & Drop, sortierbaren Tabellen, Diagrammen (Radar, Formkurve, xG, Heatmap), Wappen, Farbthemen | Tastenbelegung |
 | 12 Nicht-funktional | Determinismus, **SQLite-Spielstände** mit Schemamigration, **Mehrsprachigkeit (Deutsch, Englisch, erweiterbar)**, Datenpakete mit Überlagerung, Datenvalidierung, Kalibrierungs-CLI | Editor, Plugins |
 
@@ -153,11 +215,14 @@ SELECT date, player_id, fee FROM transfers WHERE to_club = 6;
 ```
 
 Verschachtelte Konfigurationen (Ligaformat, Taktik, Pokalrunden, Verhandlungen) liegen als JSON-Spalten
-daneben. Die Tabelle `meta` enthält die Schemaversion (aktuell 3). Ältere Spielstände werden beim Laden
+daneben. Die Tabelle `meta` enthält die Schemaversion (aktuell 4). Ältere Spielstände werden beim Laden
 schrittweise angehoben:
 
 - Version 1 (Phase 1) bekommt die Karrieredaten: Budgets, Scouts, Pokal und Amateurvereine.
 - Version 2 bekommt die Spalten für sprachneutrale Texte.
+- Version 3 bekommt das Umfeld: Spalten für Finanzen, Stadion, Gelände, Sponsoren, Vorstand, Fans
+  und Rivalen; Karriere des Managers; Punktabzüge; Tabellen `staff`, `events` und `event_history`.
+  Fehlende Daten werden beim Laden erzeugt.
 
 ## Kalibrierung der Matchengine
 
@@ -180,7 +245,8 @@ Leistung: ca. 2,5 ms pro Spiel; der langsamste Spieltag (alle Ligen und Pokal) b
 ```
 src/
   Fmh.Core/          Kern: Datenmodell, Kalender und Tagesablauf (GameSession, aufgeteilt in Saison,
-                     Pokal, Transfers, Training, Scouting, Jugend), Ligen und Tabellen, Weltgenerator,
+                     Pokal, Transfers, Training, Scouting, Jugend, Finanzen, Gelände, Personal,
+                     Sponsoren, Vorstand, Presse, Ereignisse), Ligen und Tabellen, Weltgenerator,
                      Aufstellung/KI-Taktik, Verhandlungslogik, Marktwerte, SQLite-Speicher, Datenpakete,
                      Schnittstelle IMatchEngine
   Fmh.MatchEngine/   Text-Matchengine (Phasen, 5x7-Zonen, Duelle, Rollen, Verlängerung, Elfmeterschießen)
@@ -208,6 +274,10 @@ frühere, Sprachdateien werden schlüsselweise zusammengeführt.
 | `formations.json` | Formationen auf dem 5x7-Raster |
 | `rules/roles.json` | Rollen mit erlaubten Positionen, Aufgaben und Wirkung in der Engine |
 | `rules/positions.json`, `rules/injuries.json`, `rules/engine.json` | Attributgewichte, Verletzungen, Engine-Gewichte |
+| `rules/buildings.json` | 83 Gebäude: Größe, Stufen, Kosten, Unterhalt, Wirkungen, Voraussetzungen, Lage, Synergien |
+| `rules/press.json` | Pressefragen mit Zeitpunkt, Spielsituation, Kategorie und Tonfall |
+| `events/*.json` | Zufallsereignisse mit Bedingungen, Antworten, Wirkungen und Erfolgschance |
+| `sponsors/*.json` | Fiktive Sponsorenfirmen je Land mit Größe und Werbeplätzen |
 | `lang/<code>.json`, `lang/<code>.commentary.json` | Texte der Oberfläche und Kommentarbausteine je Sprache (`de`, `en`) |
 
 Beim Start prüft `DataValidator` die Pakete und bricht mit einer Fehlerliste ab. Geprüft werden unter
@@ -218,4 +288,8 @@ anderem Teamzahlen, Pools, Pokaltermine und Relegationsplätze.
 - **Lizenz:** Das Fachkonzept schlägt GPL-3.0 für den Code und CC BY-SA 4.0 für Daten und Texte vor.
   Eine Lizenzdatei ist noch nicht enthalten.
 - **Spielstärke-Drift:** Über viele Saisons steigt die Ligastärke leicht, um etwa 0,07 pro Saison.
-  Mit Finanzen und Gehältern in Phase 3 sollte das neu kalibriert werden.
+- **Vereinslose Spieler:** Die Zahl der vereinslosen Spieler wächst über die Saisons (rund 300 nach
+  fünf Jahren), die Kader schrumpfen leicht auf durchschnittlich 22 Spieler. Das gab es schon vor
+  Phase 3. Vereinslose sollten früher ihr Karriereende erreichen oder günstiger unterschreiben.
+- **Stadionneubau:** Ein Neubau an anderer Stelle (Kapitel 8) ist noch nicht umgesetzt; das Stadion
+  wächst über Tribünenausbau.

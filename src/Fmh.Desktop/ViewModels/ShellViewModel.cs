@@ -48,7 +48,6 @@ public sealed partial class ShellViewModel : ViewModelBase
         _main = main;
         Palette.Apply(Session.HumanManager.Profile.Theme);
         Geometry Icon(string key) => (Geometry)Avalonia.Application.Current!.FindResource(key)!;
-        PlaceholderPageViewModel Later(string title, string text) => new(this, title, text);
         var defs = new (string key, string icon, Type type, Func<PageViewModel> create, bool later)[]
         {
             ("menu.inbox", "IconInbox", typeof(InboxPageViewModel), () => new InboxPageViewModel(this), false),
@@ -57,8 +56,8 @@ public sealed partial class ShellViewModel : ViewModelBase
             ("menu.training", "IconTraining", typeof(TrainingPageViewModel), () => new TrainingPageViewModel(this), false),
             ("menu.fixtures", "IconFixtures", typeof(FixturesPageViewModel), () => new FixturesPageViewModel(this), false),
             ("menu.transfers", "IconTransfers", typeof(TransfersPageViewModel), () => new TransfersPageViewModel(this), false),
-            ("menu.finances", "IconFinances", typeof(PlaceholderPageViewModel), () => Later("menu.finances", "placeholder.finances"), true),
-            ("menu.stadium", "IconStadium", typeof(PlaceholderPageViewModel), () => Later("menu.stadium", "placeholder.stadium"), true),
+            ("menu.finances", "IconFinances", typeof(FinancesPageViewModel), () => new FinancesPageViewModel(this), false),
+            ("menu.stadium", "IconStadium", typeof(StadiumPageViewModel), () => new StadiumPageViewModel(this), false),
             ("menu.club", "IconClub", typeof(ClubPageViewModel), () => new ClubPageViewModel(this), false),
             ("menu.league", "IconLeague", typeof(LeaguePageViewModel), () => new LeaguePageViewModel(this), false),
         };
@@ -73,9 +72,12 @@ public sealed partial class ShellViewModel : ViewModelBase
     {
         var shell = new ShellViewModel(_main);
         var type = Nav.FirstOrDefault(n => n.IsActive)?.PageType;
-        if (shell.Nav.FirstOrDefault(n => n.PageType == type && type != typeof(PlaceholderPageViewModel)) is { } item) shell.Open(item);
+        if (shell.Nav.FirstOrDefault(n => n.PageType == type) is { } item) shell.Open(item);
         return shell;
     }
+
+    /// <summary>Nach einem Vereinswechsel: Shell mit neuen Farben und Daten.</summary>
+    public void Rebuild() => _main.Navigate(Recreate());
 
     [ObservableProperty] private PageViewModel? _page;
     [ObservableProperty] private string? _statusMessage;
@@ -117,6 +119,17 @@ public sealed partial class ShellViewModel : ViewModelBase
             return $"{T["status.morale"]}: {T[Ratings.MoraleKey(m)]}";
         }
     }
+    /// <summary>Statuszeile (Kapitel 11): Kontostand | Vorstand | Fans | Moral.</summary>
+    public string EconomyText
+    {
+        get
+        {
+            if (Session.AwaitingNewJob) return T["status.unemployed"];
+            return T.Format("status.economy", Fmt.Money(Club.Budget.Balance, UiText.Currency(Club)), (int)Math.Round(Club.Board.Trust), (int)Math.Round(Club.Fans.Mood));
+        }
+    }
+    public IBrush BalanceBrush => new SolidColorBrush(Club.Budget.Balance < 0 ? P.Bad : P.Text);
+
     public string NextText
     {
         get
@@ -139,6 +152,8 @@ public sealed partial class ShellViewModel : ViewModelBase
         OnPropertyChanged(nameof(LeagueText));
         OnPropertyChanged(nameof(ContinueText));
         OnPropertyChanged(nameof(MoraleText));
+        OnPropertyChanged(nameof(EconomyText));
+        OnPropertyChanged(nameof(BalanceBrush));
         OnPropertyChanged(nameof(NextText));
         OnPropertyChanged(nameof(Unread));
         OnPropertyChanged(nameof(HasUnread));
@@ -279,17 +294,4 @@ public sealed partial class ShellViewModel : ViewModelBase
 public interface IRefreshable
 {
     void Refresh();
-}
-
-public sealed class PlaceholderPageViewModel : PageViewModel
-{
-    public PlaceholderPageViewModel(ShellViewModel shell, string titleKey, string textKey) : base(shell)
-    {
-        Title = T[titleKey];
-        Text = T[textKey];
-    }
-
-    public override string Title { get; }
-    public string Text { get; }
-    public string Roadmap => T["placeholder.roadmap"];
 }

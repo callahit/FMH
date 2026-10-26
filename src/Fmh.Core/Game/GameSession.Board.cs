@@ -403,7 +403,7 @@ public sealed partial class GameSession
             m.Career.Offers.Add(offer);
             Notify(MessageType.Career, "msg.sender.agent", TR("msg.jobOffer.subject", club.Name),
                 TR("msg.jobOffer.body", club.Name, Comp(club.LeagueId), TR("goal." + ExpectedGoal(club)), TextArg.Money(offer.WeeklyWage, Currency)),
-                MessageAction.JobOffer, club.Id, required: afterSacking);
+                MessageAction.JobOffer, club.Id, required: false);
         }
     }
 
@@ -413,6 +413,8 @@ public sealed partial class GameSession
         var club = HumanClub;
         if (HumanManager.Career.Stations.LastOrDefault() is { } st && st.To is null) { st.To = World.Date; st.Exit = "sacked"; }
         club.Board.Ultimatum = null;
+        // Ein Interimstrainer (KI) übernimmt bis zur Neubesetzung.
+        club.ManagerId = null;
         Notify(MessageType.Board, "msg.sender.board", TR("msg.sacked.subject"), TR("msg.sacked.body", HumanManager.Name, club.Name, reason));
         HumanManager.Reputation = Math.Max(1, HumanManager.Reputation - 2);
         MakeJobOffers(afterSacking: true);
@@ -424,6 +426,7 @@ public sealed partial class GameSession
     public void Resign()
     {
         if (HumanManager.Career.Stations.LastOrDefault() is { } st && st.To is null) { st.To = World.Date; st.Exit = "resigned"; }
+        HumanClub.ManagerId = null;
         Notify(MessageType.Career, "msg.sender.board", TR("msg.resigned.subject"), TR("msg.resigned.body", HumanClub.Name));
         MakeJobOffers(afterSacking: true);
     }
