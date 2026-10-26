@@ -122,7 +122,7 @@ public sealed partial class NegotiationViewModel : ViewModelBase
             NegotiationStage.PlayerTalks => T.Format("neg.stage.player", _n.PlayerRounds + 1, Negotiations.MaxRounds),
             _ => T["neg.stage." + _n.Stage],
         };
-        if (!string.IsNullOrEmpty(_n.LastResponse)) Response = _n.LastResponse;
+        if (_n.ResponseText(T) is { Length: > 0 } text) Response = text;
         ResponseBrush = new SolidColorBrush(_n.Stage switch
         {
             NegotiationStage.Completed => P.Good,

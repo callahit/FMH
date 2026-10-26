@@ -28,7 +28,10 @@ public sealed class Cup
 public sealed class CupRound
 {
     public int Number { get; set; }
+    /// <summary>Name aus Spielständen vor der Mehrsprachigkeit bzw. aus den Daten (Relegation).</summary>
     public string Name { get; set; } = "";
+    /// <summary>Textschlüssel des Rundennamens, Platzhalter {0} = Rundennummer.</summary>
+    public string NameKey { get; set; } = "";
     public List<DateOnly> Dates { get; set; } = new();
     public List<CupTie> Ties { get; set; } = new();
     public bool Drawn => Ties.Count > 0;

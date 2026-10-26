@@ -1,3 +1,4 @@
+using Fmh.Core.Data;
 using Fmh.Core.Logic;
 using Fmh.Core.Model;
 
@@ -13,7 +14,7 @@ public sealed partial class GameSession
         {
             foreach (var cfg in country.Cups)
             {
-                var cup = CupLogic.CreateCup(World, country, cfg, T);
+                var cup = CupLogic.CreateCup(World, country, cfg);
                 World.Cups.Add(cup);
                 DrawRound(cup, cup.Rounds[0], cup.ParticipantIds);
             }
@@ -27,13 +28,13 @@ public sealed partial class GameSession
         if (own is null || HumanManager is null) return;
         if (own.Decision == "Bye")
         {
-            Notify(MessageType.Cup, "msg.sender.association", T.Format("msg.cupDraw.subject", cup.Name, round.Name), T.Format("msg.cupDraw.bye", cup.Name, round.Name));
+            Notify(MessageType.Cup, "msg.sender.association", TR("msg.cupDraw.subject", Comp(cup.Id), Round(round)), TR("msg.cupDraw.bye", Comp(cup.Id), Round(round)));
             return;
         }
         var home = own.HomeId == HumanClub.Id;
         var opp = World.Clubs[home ? own.AwayId : own.HomeId];
-        Notify(MessageType.Cup, "msg.sender.association", T.Format("msg.cupDraw.subject", cup.Name, round.Name),
-            T.Format("msg.cupDraw.body", cup.Name, round.Name, opp.Name, home ? T["ui.homeGame"] : T["ui.awayGame"], Fmt.Date(round.Dates[0])));
+        Notify(MessageType.Cup, "msg.sender.association", TR("msg.cupDraw.subject", Comp(cup.Id), Round(round)),
+            TR("msg.cupDraw.body", Comp(cup.Id), Round(round), opp.Name, home ? TR("ui.homeGame") : TR("ui.awayGame"), TextArg.OfDate(round.Dates[0])));
     }
 
     /// <summary>Nach einem Pokalspiel: Duell entscheiden, nächste Runde auslosen, Sieger ehren.</summary>
@@ -46,7 +47,7 @@ public sealed partial class GameSession
         {
             var won = tie.WinnerId == HumanClub.Id;
             var key = cup.Kind == CompetitionKind.Playoff ? (won ? "msg.playoff.won" : "msg.playoff.lost") : (won ? "msg.cup.won" : "msg.cup.out");
-            Notify(MessageType.Cup, "msg.sender.association", T.Format(key + ".subject", cup.Name, round.Name), T.Format(key + ".body", cup.Name, round.Name, CupLogic.TieScore(cup, tie)));
+            Notify(MessageType.Cup, "msg.sender.association", TR(key + ".subject", Comp(cup.Id), Round(round)), TR(key + ".body", Comp(cup.Id), Round(round), CupLogic.TieScore(cup, tie)));
         }
         if (!round.Complete) return;
         var winners = round.Ties.Select(t => t.WinnerId!.Value).ToList();
@@ -54,7 +55,7 @@ public sealed partial class GameSession
         {
             cup.WinnerId = winners[0];
             if (cup.Kind == CompetitionKind.Cup)
-                Notify(MessageType.Cup, "msg.sender.association", T.Format("msg.cupWinner.subject", cup.Name), T.Format("msg.cupWinner.body", cup.Name, World.Clubs[winners[0]].Name));
+                Notify(MessageType.Cup, "msg.sender.association", TR("msg.cupWinner.subject", Comp(cup.Id)), TR("msg.cupWinner.body", Comp(cup.Id), World.Clubs[winners[0]].Name));
             return;
         }
         DrawRound(cup, cup.Rounds[round.Number], winners);
@@ -81,7 +82,7 @@ public sealed partial class GameSession
                 if (u == HumanClub.Id || l == HumanClub.Id)
                 {
                     var opp = World.Clubs[u == HumanClub.Id ? l : u];
-                    Notify(MessageType.Cup, "msg.sender.league", T.Format("msg.playoff.subject", cfg.Name), T.Format("msg.playoff.body", opp.Name, Fmt.Date(cup.Fixtures[0].Date)));
+                    Notify(MessageType.Cup, "msg.sender.league", TR("msg.playoff.subject", Comp(cfg.Id)), TR("msg.playoff.body", opp.Name, TextArg.OfDate(cup.Fixtures[0].Date)));
                 }
             }
         }

@@ -196,6 +196,8 @@ public sealed class PackageManifest
     public string Name { get; set; } = "";
     public string Version { get; set; } = "1.0.0";
     public List<string> DependsOn { get; set; } = new();
+    /// <summary>Rückfallsprache für fehlende Texte anderer Sprachen (nur im Grundpaket nötig).</summary>
+    public string? DefaultLanguage { get; set; }
 
     /// <summary>Verzeichnis des Pakets auf der Platte (nicht Teil der Datei).</summary>
     [System.Text.Json.Serialization.JsonIgnore]

@@ -87,8 +87,8 @@ public sealed partial class TransfersPageViewModel : PageViewModel, IRefreshable
         };
         _filter = Filters[0];
         Leagues = new[] { new ValueOption(T["transfer.allLeagues"], null) }
-            .Concat(w.Leagues.Select(l => new ValueOption(l.Name, l.Id)))
-            .Concat(w.Countries.SelectMany(c => c.Pools).Select(p => new ValueOption(p.Name, p.Id)))
+            .Concat(w.Leagues.Select(l => new ValueOption(UiText.Competition(l.Id), l.Id)))
+            .Concat(w.Countries.SelectMany(c => c.Pools).Select(p => new ValueOption(T.TryGet("competition." + p.Id) ?? p.Name, p.Id)))
             .Append(new ValueOption(T["transfer.freeAgents"], ""))
             .ToList();
         _league = Leagues[0];
@@ -193,7 +193,7 @@ public sealed partial class TransfersPageViewModel : PageViewModel, IRefreshable
         Negotiations = Session.OpenNegotiations.Concat(w.Negotiations.Where(n => n.BuyerId == Session.HumanClub.Id && n.Stage is NegotiationStage.Completed or NegotiationStage.Failed).TakeLast(8))
             .Distinct()
             .Select(n => new NegotiationRow(n, w.Players[n.PlayerId].Name, T["dealType." + n.Type] + (n.Incoming ? " · " + T["transfer.incoming"] : ""),
-                T["neg.stage." + n.Stage], n.LastResponse, !n.Incoming && n.Stage is NegotiationStage.ClubTalks or NegotiationStage.PlayerTalks))
+                T["neg.stage." + n.Stage], n.ResponseText(T), !n.Incoming && n.Stage is NegotiationStage.ClubTalks or NegotiationStage.PlayerTalks))
             .ToList();
     }
 
@@ -211,7 +211,7 @@ public sealed partial class TransfersPageViewModel : PageViewModel, IRefreshable
                 Assignment = a is null ? T["scout.idle"] : a.Task switch
                 {
                     ScoutTask.WatchPlayer => T.Format("scout.task.watch", w.Players[a.PlayerId!.Value].Name, Fmt.Date(a.End)),
-                    ScoutTask.SearchRegion => T.Format("scout.task.search", a.LeagueId is { } l ? w.CompetitionName(l) : T["transfer.allLeagues"], Fmt.Date(a.End)),
+                    ScoutTask.SearchRegion => T.Format("scout.task.search", a.LeagueId is { Length: > 0 } l ? UiText.Competition(l) : a.LeagueId == "" ? T["transfer.freeAgents"] : T["transfer.allLeagues"], Fmt.Date(a.End)),
                     _ => T.Format("scout.task.opponent", Fmt.Date(a.End)),
                 },
             };

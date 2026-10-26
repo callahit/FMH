@@ -43,7 +43,7 @@ public sealed partial class NewGameViewModel : ViewModelBase
         var divisions = Data.Countries.SelectMany(c => c.Divisions).ToDictionary(d => d.Id);
         Clubs = Data.Clubs
             .OrderBy(c => c.Division).ThenByDescending(c => c.Reputation).ThenBy(c => c.Name)
-            .Select(c => new ClubChoice { Def = c, LeagueName = divisions.TryGetValue(c.Division, out var d) ? d.Name : c.Division })
+            .Select(c => new ClubChoice { Def = c, LeagueName = T.TryGet("competition." + c.Division) ?? (divisions.TryGetValue(c.Division, out var d) ? d.Name : c.Division) })
             .ToList();
         Backgrounds = BackgroundDefs.Select((b, i) => new OptionItem(T[b.key], i)).ToList();
         InjuryOptions = Enumerable.Range(0, 3).Select(i => new OptionItem(T[$"newGame.injuries.{i}"], i)).ToList();

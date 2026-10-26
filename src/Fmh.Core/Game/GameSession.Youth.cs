@@ -1,3 +1,4 @@
+using Fmh.Core.Data;
 using Fmh.Core.Logic;
 using Fmh.Core.Model;
 
@@ -69,9 +70,9 @@ public sealed partial class GameSession
             created.Add(p);
         }
         if (club.Id != HumanClub.Id || initial) return;
-        var best = created.OrderByDescending(p => p.Hidden.PotentialAbility).Take(3).Select(p => $"{p.Name} ({T["pos." + p.MainPosition]})");
-        Notify(MessageType.Youth, "msg.sender.youthCoach", T["msg.youthIntake.subject"],
-            T.Format(golden ? "msg.youthIntake.golden" : "msg.youthIntake.body", created.Count, string.Join(", ", best)),
+        var best = created.OrderByDescending(p => p.Hidden.PotentialAbility).Take(3).Select(p => (object?)TR("msg.youthIntake.line", p.Name, TR("pos." + p.MainPosition)));
+        Notify(MessageType.Youth, "msg.sender.youthCoach", TR("msg.youthIntake.subject"),
+            TR(golden ? "msg.youthIntake.golden" : "msg.youthIntake.body", created.Count, TextArg.Join(", ", best)),
             MessageAction.YouthIntake);
     }
 
@@ -104,7 +105,7 @@ public sealed partial class GameSession
         {
             ReleaseYouthInternal(p);
             if (club.Id == HumanClub.Id)
-                Notify(MessageType.Youth, "msg.sender.youthCoach", T.Format("msg.youthReleased.subject", p.Name), T.Format("msg.youthReleased.body", p.Name, ReleaseAge));
+                Notify(MessageType.Youth, "msg.sender.youthCoach", TR("msg.youthReleased.subject", p.Name), TR("msg.youthReleased.body", p.Name, ReleaseAge));
         }
     }
 
@@ -133,7 +134,7 @@ public sealed partial class GameSession
         if (p.Age(World.Date) < World.Country(club.CountryCode).Youth.PromoteAge) return "youth.error.tooYoung";
         if (club.PlayerIds.Count >= World.Country(club.CountryCode).Squad.MaxSquad) return "youth.error.squadFull";
         PromoteYouthInternal(club, p);
-        Notify(MessageType.Youth, "msg.sender.youthCoach", T.Format("msg.youthPromoted.subject", p.Name), T.Format("msg.youthPromoted.body", p.Name));
+        Notify(MessageType.Youth, "msg.sender.youthCoach", TR("msg.youthPromoted.subject", p.Name), TR("msg.youthPromoted.body", p.Name));
         return null;
     }
 

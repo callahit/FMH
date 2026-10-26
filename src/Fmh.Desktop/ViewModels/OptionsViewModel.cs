@@ -18,6 +18,7 @@ public sealed partial class OptionsViewModel : ViewModelBase
         TEnum At<TEnum>(int i) where TEnum : struct, Enum => Enum.GetValues<TEnum>()[i];
         var yesNo = new[] { T["ui.no"], T["ui.yes"] };
         var themes = Palette.All.Select(t => t.Name).ToList();
+        var languages = State.Languages;
         Settings = new List<ChoiceSetting>
         {
             new(T["options.wage"], Names<WageDisplay>("wage."), Idx(p.WageDisplay), i => p.WageDisplay = At<WageDisplay>(i)),
@@ -26,7 +27,14 @@ public sealed partial class OptionsViewModel : ViewModelBase
             new(T["options.matchSpeed"], Enumerable.Range(1, 5).Select(i => T["speed." + i]).ToList(), p.MatchSpeed - 1, i => p.MatchSpeed = i + 1),
             new(T["options.pauseGoals"], yesNo, p.PauseOnGoals ? 1 : 0, i => p.PauseOnGoals = i == 1),
             new(T["options.pauseRed"], yesNo, p.PauseOnRedCards ? 1 : 0, i => p.PauseOnRedCards = i == 1),
-            new(T["options.theme"], themes, Math.Max(0, themes.IndexOf(p.Theme)), i =>
+            new(T["options.language"], languages.Select(l => l.Name).ToList(), Math.Max(0, languages.ToList().FindIndex(l => l.Code == State.Language)), i =>
+            {
+                if (languages[i].Code == State.Language) return;
+                State.SetLanguage(languages[i].Code);
+                // Erst nach dem Auswahlereignis neu aufbauen, die Auswahlbox gehört zur alten Ansicht.
+                Avalonia.Threading.Dispatcher.UIThread.Post(() => MainWindowViewModel.Instance?.Reload());
+            }),
+            new(T["options.theme"], themes.Select(t => T.TryGet("theme." + t) ?? t).ToList(), Math.Max(0, themes.IndexOf(p.Theme)), i =>
             {
                 p.Theme = themes[i];
                 Palette.Apply(p.Theme);

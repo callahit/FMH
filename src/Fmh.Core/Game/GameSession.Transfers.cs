@@ -92,7 +92,7 @@ public sealed partial class GameSession
         n.ClubRounds++;
         n.Offer = offer.Clone();
         var resp = Negotiations.EvaluateClubOffer(n, p, seller, World, Data);
-        n.LastResponse = T.Format(resp.TextKey, Fmt.Money(resp.Amount, Currency));
+        n.Response = TR(resp.TextKey, TextArg.Money(resp.Amount, Currency));
         switch (resp.Kind)
         {
             case ResponseKind.Accept:
@@ -128,7 +128,7 @@ public sealed partial class GameSession
         n.PlayerRounds++;
         n.Contract = offer.Clone();
         var resp = Negotiations.EvaluateContract(n, p, buyer, World, Data);
-        n.LastResponse = T.Format(resp.TextKey, Fmt.Money(resp.Amount, Currency) + T["unit.perWeek"]);
+        n.Response = TR(resp.TextKey, TextArg.Join("", new object?[] { TextArg.Money(resp.Amount, Currency), TR("unit.perWeek") }));
         switch (resp.Kind)
         {
             case ResponseKind.Accept:
@@ -157,17 +157,17 @@ public sealed partial class GameSession
     }
 
     /// <summary>Antwort auf ein eingehendes Angebot eines KI-Vereins.</summary>
-    public string RespondIncoming(Negotiation n, ResponseKind answer, long counterFee = 0)
+    public TextRef RespondIncoming(Negotiation n, ResponseKind answer, long counterFee = 0)
     {
         var p = World.Players[n.PlayerId];
         var buyer = World.Clubs[n.BuyerId];
         foreach (var m in World.Messages.Where(m => m.Action == MessageAction.IncomingOffer && m.ActionRefId == n.Id)) m.Resolved = true;
-        if (n.Stage != NegotiationStage.Pending) return T["neg.error.stage"];
+        if (n.Stage != NegotiationStage.Pending) return TR("neg.error.stage");
 
         if (answer == ResponseKind.Reject)
         {
             n.Stage = NegotiationStage.Failed;
-            return T.Format("neg.incoming.rejected", buyer.Name);
+            return TR("neg.incoming.rejected", buyer.Name);
         }
         if (answer == ResponseKind.Counter)
         {
@@ -175,7 +175,7 @@ public sealed partial class GameSession
             if (counterFee > limit)
             {
                 n.Stage = NegotiationStage.Failed;
-                return T.Format("neg.incoming.counterRejected", buyer.Name);
+                return TR("neg.incoming.counterRejected", buyer.Name);
             }
             n.Offer.Fee = counterFee;
         }
@@ -184,11 +184,11 @@ public sealed partial class GameSession
         if (Negotiations.RefusalReason(p, buyer, World, Data) is { } refusal)
         {
             n.Stage = NegotiationStage.Failed;
-            return T.Format("neg.incoming.playerRefused", p.Name, T[refusal]);
+            return TR("neg.incoming.playerRefused", p.Name, TR(refusal));
         }
         n.Stage = NegotiationStage.PlayerTalks;
         Complete(n);
-        return T.Format("neg.incoming.sold", p.Name, buyer.Name, Fmt.Money(n.Offer.Fee, Currency));
+        return TR("neg.incoming.sold", p.Name, buyer.Name, TextArg.Money(n.Offer.Fee, Currency));
     }
 
     /// <summary>Überlässt offene Pflicht-Entscheidungen dem Assistenten: Angebote werden abgelehnt.</summary>
@@ -265,16 +265,16 @@ public sealed partial class GameSession
             case DealType.PreContract:
                 p.PreContract = new PreContract { ClubId = buyer.Id, Contract = MakeContract(n.Contract, new DateOnly(World.SeasonYear + 1, 7, 1)) };
                 if (buyer.Id == HumanClub.Id || p.ClubId == HumanClub.Id)
-                    Notify(MessageType.Transfer, "msg.sender.assistant", T.Format("msg.preContract.subject", p.Name),
-                        T.Format("msg.preContract.body", p.Name, buyer.Name));
+                    Notify(MessageType.Transfer, "msg.sender.assistant", TR("msg.preContract.subject", p.Name),
+                        TR("msg.preContract.body", p.Name, buyer.Name));
                 break;
             case DealType.Renewal:
                 var old = p.Contract;
                 p.Contract = MakeContract(n.Contract, World.Date);
                 if (old is not null) p.Contract.Start = old.Start;
                 if (buyer.Id == HumanClub.Id)
-                    Notify(MessageType.Contract, "msg.sender.assistant", T.Format("msg.renewed.subject", p.Name),
-                        T.Format("msg.renewed.body", p.Name, Fmt.Date(p.Contract.Until)));
+                    Notify(MessageType.Contract, "msg.sender.assistant", TR("msg.renewed.subject", p.Name),
+                        TR("msg.renewed.body", p.Name, TextArg.OfDate(p.Contract.Until)));
                 break;
         }
     }
@@ -299,10 +299,10 @@ public sealed partial class GameSession
         };
     }
 
-    private void Book(Club club, TransactionType type, long amount, string text)
+    private void Book(Club club, TransactionType type, long amount, TextRef text)
     {
         club.Budget.Balance += amount;
-        World.Transactions.Add(new Transaction { Date = World.Date, ClubId = club.Id, Type = type, Amount = amount, Text = text });
+        World.Transactions.Add(new Transaction { Date = World.Date, ClubId = club.Id, Type = type, Amount = amount, TextRef = text });
     }
 
     private void ExecuteTransfer(Player p, Club buyer, Club? seller, ClubOffer offer, ContractOffer contract)
@@ -311,23 +311,23 @@ public sealed partial class GameSession
         if (seller is not null && fee > 0)
         {
             var upfront = offer.InstallmentYears > 0 ? fee / (offer.InstallmentYears + 1) : fee;
-            Book(buyer, TransactionType.TransferIn, -upfront, T.Format("tx.transferIn", p.Name));
-            Book(seller, TransactionType.TransferOut, upfront, T.Format("tx.transferOut", p.Name));
+            Book(buyer, TransactionType.TransferIn, -upfront, TR("tx.transferIn", p.Name));
+            Book(seller, TransactionType.TransferOut, upfront, TR("tx.transferOut", p.Name));
             for (var k = 1; k <= offer.InstallmentYears; k++)
-                World.Installments.Add(new Installment { FromClubId = buyer.Id, ToClubId = seller.Id, Due = World.Date.AddDays(365 * k), Amount = (fee - upfront) / offer.InstallmentYears, Text = T.Format("tx.installment", p.Name) });
+                World.Installments.Add(new Installment { FromClubId = buyer.Id, ToClubId = seller.Id, Due = World.Date.AddDays(365 * k), Amount = (fee - upfront) / offer.InstallmentYears, TextRef = TR("tx.installment", p.Name) });
             buyer.Budget.TransferBudget -= fee;
             seller.Budget.TransferBudget += fee / 2;
             // Weiterverkaufsbeteiligung eines früheren Vereins.
             if (p.Transfer.SellOnClubId is { } soc && soc != buyer.Id && World.Clubs.TryGetValue(soc, out var sellOnClub) && p.Transfer.SellOnPercent > 0)
             {
                 var share = fee * p.Transfer.SellOnPercent / 100;
-                Book(seller, TransactionType.Other, -share, T.Format("tx.sellOnPaid", p.Name));
-                Book(sellOnClub, TransactionType.Other, share, T.Format("tx.sellOnReceived", p.Name));
+                Book(seller, TransactionType.Other, -share, TR("tx.sellOnPaid", p.Name));
+                Book(sellOnClub, TransactionType.Other, share, TR("tx.sellOnReceived", p.Name));
             }
             var agent = Negotiations.AgentFee(p, fee);
-            Book(buyer, TransactionType.AgentFee, -agent, T.Format("tx.agentFee", p.Name));
+            Book(buyer, TransactionType.AgentFee, -agent, TR("tx.agentFee", p.Name));
         }
-        if (contract.SigningFee > 0) Book(buyer, TransactionType.SigningFee, -contract.SigningFee, T.Format("tx.signingFee", p.Name));
+        if (contract.SigningFee > 0) Book(buyer, TransactionType.SigningFee, -contract.SigningFee, TR("tx.signingFee", p.Name));
 
         if (offer.SwapPlayerId is { } swapId && seller is not null && World.Players.TryGetValue(swapId, out var swap))
         {
@@ -353,8 +353,8 @@ public sealed partial class GameSession
         if (buyer.Id == HumanClub.Id || seller?.Id == HumanClub.Id)
         {
             var key = buyer.Id == HumanClub.Id ? "msg.signed" : "msg.sold";
-            Notify(MessageType.Transfer, "msg.sender.assistant", T.Format(key + ".subject", p.Name),
-                T.Format(key + ".body", p.Name, seller?.Name ?? T["transfer.freeAgent"], buyer.Name, Fmt.Money(fee, World.Country(buyer.CountryCode).Currency)));
+            Notify(MessageType.Transfer, "msg.sender.assistant", TR(key + ".subject", p.Name),
+                TR(key + ".body", p.Name, seller is null ? TR("transfer.freeAgent") : seller.Name, buyer.Name, TextArg.Money(fee, World.Country(buyer.CountryCode).Currency)));
         }
     }
 
@@ -377,8 +377,8 @@ public sealed partial class GameSession
         World.Transfers.Add(new TransferRecord { Date = World.Date, PlayerId = p.Id, FromClubId = parent.Id, ToClubId = buyer.Id, Loan = true, SeasonYear = World.SeasonYear });
         if (buyer.Id == HumanClub.Id) World.Knowledge[p.Id] = 100;
         if (buyer.Id == HumanClub.Id || parent.Id == HumanClub.Id)
-            Notify(MessageType.Transfer, "msg.sender.assistant", T.Format("msg.loan.subject", p.Name),
-                T.Format("msg.loan.body", p.Name, parent.Name, buyer.Name, Fmt.Date(until)));
+            Notify(MessageType.Transfer, "msg.sender.assistant", TR("msg.loan.subject", p.Name),
+                TR("msg.loan.body", p.Name, parent.Name, buyer.Name, TextArg.OfDate(until)));
     }
 
     private void ReturnLoan(Player p)
@@ -397,7 +397,7 @@ public sealed partial class GameSession
         p.ClubId = parent.Id;
         parent.PlayerIds.Add(p.Id);
         if (parent.Id == HumanClub.Id || current?.Id == HumanClub.Id)
-            Notify(MessageType.Transfer, "msg.sender.assistant", T.Format("msg.loanReturn.subject", p.Name), T.Format("msg.loanReturn.body", p.Name, parent.Name));
+            Notify(MessageType.Transfer, "msg.sender.assistant", TR("msg.loanReturn.subject", p.Name), TR("msg.loanReturn.body", p.Name, parent.Name));
     }
 
     /// <summary>Zum Saisonwechsel: Verträge enden, Vorverträge greifen, Leihen laufen aus.</summary>
@@ -446,7 +446,7 @@ public sealed partial class GameSession
             RemoveFromClub(p);
             p.Contract = null;
             if (oldClub?.Id == HumanClub.Id)
-                Notify(MessageType.Contract, "msg.sender.assistant", T.Format("msg.contractEnded.subject", p.Name), T.Format("msg.contractEnded.body", p.Name));
+                Notify(MessageType.Contract, "msg.sender.assistant", TR("msg.contractEnded.subject", p.Name), TR("msg.contractEnded.body", p.Name));
         }
     }
 
@@ -468,8 +468,8 @@ public sealed partial class GameSession
     {
         foreach (var inst in World.Installments.Where(i => i.Due == World.Date).ToList())
         {
-            Book(World.Clubs[inst.FromClubId], TransactionType.Installment, -inst.Amount, inst.Text);
-            Book(World.Clubs[inst.ToClubId], TransactionType.Installment, inst.Amount, inst.Text);
+            Book(World.Clubs[inst.FromClubId], TransactionType.Installment, -inst.Amount, inst.TextRef ?? TextRef.Literal(inst.Text));
+            Book(World.Clubs[inst.ToClubId], TransactionType.Installment, inst.Amount, inst.TextRef ?? TextRef.Literal(inst.Text));
             World.Installments.Remove(inst);
         }
         foreach (var lockKey in World.NegotiationLocks.Where(kv => kv.Value <= World.Date).Select(kv => kv.Key).ToList())
@@ -618,8 +618,8 @@ public sealed partial class GameSession
             var contract = Negotiations.SuggestContract(target, club, World, Data);
             target.PreContract = new PreContract { ClubId = club.Id, Contract = MakeContract(contract, new DateOnly(World.SeasonYear + 1, 7, 1)) };
             if (target.ClubId == HumanClub.Id)
-                Notify(MessageType.Transfer, "msg.sender.assistant", T.Format("msg.preContractLost.subject", target.Name),
-                    T.Format("msg.preContractLost.body", target.Name, club.Name));
+                Notify(MessageType.Transfer, "msg.sender.assistant", TR("msg.preContractLost.subject", target.Name),
+                    TR("msg.preContractLost.body", target.Name, club.Name));
         }
     }
 
@@ -651,8 +651,8 @@ public sealed partial class GameSession
             Offer = new ClubOffer { Fee = fee },
         };
         World.Negotiations.Add(n);
-        Notify(MessageType.Transfer, "msg.sender.assistant", T.Format("msg.incoming.subject", buyer.Name, target.Name),
-            T.Format("msg.incoming.body", buyer.Name, target.Name, Fmt.Money(fee, Currency), Fmt.Money(ValueOf(target), Currency)),
+        Notify(MessageType.Transfer, "msg.sender.assistant", TR("msg.incoming.subject", buyer.Name, target.Name),
+            TR("msg.incoming.body", buyer.Name, target.Name, TextArg.Money(fee, Currency), TextArg.Money(ValueOf(target), Currency)),
             MessageAction.IncomingOffer, n.Id, required: true);
     }
 }

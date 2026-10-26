@@ -17,7 +17,7 @@ public static class CupLogic
         _ => "cup.round.n",
     };
 
-    public static Cup CreateCup(World world, CountryConfig country, CupConfig cfg, Texts texts)
+    public static Cup CreateCup(World world, CountryConfig country, CupConfig cfg)
     {
         var participants = world.Clubs.Values
             .Where(c => c.CountryCode == country.Code && cfg.Participants.Contains(c.LeagueId))
@@ -42,7 +42,7 @@ public static class CupLogic
             cup.Rounds.Add(new CupRound
             {
                 Number = r + 1,
-                Name = texts.Format(RoundKey(teamsLeft, r + 1), r + 1),
+                NameKey = RoundKey(teamsLeft, r + 1),
                 Dates = dates.Select(d => ToWeekday(ScheduleGenerator.ParseDate(d.Trim(), world.SeasonYear, country.Season.StartMonth), DayOfWeek.Wednesday)).ToList(),
             });
         }
@@ -74,6 +74,7 @@ public static class CupLogic
         {
             Number = 1,
             Name = cfg.Name,
+            NameKey = "competition." + cfg.Id,
             Dates = cfg.Dates.Select(d => ScheduleGenerator.ParseDate(d, world.SeasonYear, country.Season.StartMonth)).ToList(),
         });
         // Hinspiel beim Unterklassigen, Rückspiel beim Erstligisten.
@@ -188,17 +189,20 @@ public static class CupLogic
         return true;
     }
 
-    public static string TieScore(Cup cup, CupTie tie)
+    /// <summary>Gesamtergebnis eines Duells aus Sicht des erstgenannten Teams, mit Zusatz für Verlängerung bzw. Elfmeterschießen.</summary>
+    public static TextRef TieScore(Cup cup, CupTie tie)
     {
-        if (tie.Decision == "Bye") return "";
+        if (tie.Decision == "Bye") return TextRef.Of("cup.bye");
         var legs = tie.FixtureIds.Select(id => cup.Fixtures.First(x => x.Id == id)).Where(l => l.Result is not null).ToList();
-        if (legs.Count == 0) return "–:–";
+        if (legs.Count == 0) return TextRef.Literal("–:–");
         var hg = legs.Sum(l => l.HomeId == tie.HomeId ? l.Result!.HomeGoals : l.Result!.AwayGoals);
         var ag = legs.Sum(l => l.HomeId == tie.AwayId ? l.Result!.HomeGoals : l.Result!.AwayGoals);
         var last = legs[^1].Result!;
-        var pens = last.PenaltiesHome is { } ph && last.PenaltiesAway is { } pa
-            ? $" ({(legs[^1].HomeId == tie.HomeId ? $"{ph}:{pa}" : $"{pa}:{ph}")} i. E.)"
-            : last.ExtraTime ? " n. V." : "";
-        return $"{hg}:{ag}{pens}";
+        if (last.PenaltiesHome is { } ph && last.PenaltiesAway is { } pa)
+        {
+            var (a, b) = legs[^1].HomeId == tie.HomeId ? (ph, pa) : (pa, ph);
+            return TextRef.Of("cup.scorePenalties", $"{hg}:{ag}", $"{a}:{b}");
+        }
+        return last.ExtraTime ? TextRef.Of("cup.scoreExtraTime", $"{hg}:{ag}") : TextRef.Literal($"{hg}:{ag}");
     }
 }

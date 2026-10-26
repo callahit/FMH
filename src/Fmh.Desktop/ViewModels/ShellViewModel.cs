@@ -68,6 +68,15 @@ public sealed partial class ShellViewModel : ViewModelBase
 
     public IReadOnlyList<NavItem> Nav { get; }
 
+    /// <summary>Neue Shell in der aktuellen Sprache, auf derselben Seite.</summary>
+    public ShellViewModel Recreate()
+    {
+        var shell = new ShellViewModel(_main);
+        var type = Nav.FirstOrDefault(n => n.IsActive)?.PageType;
+        if (shell.Nav.FirstOrDefault(n => n.PageType == type && type != typeof(PlaceholderPageViewModel)) is { } item) shell.Open(item);
+        return shell;
+    }
+
     [ObservableProperty] private PageViewModel? _page;
     [ObservableProperty] private string? _statusMessage;
     [ObservableProperty] private int _revision;
@@ -95,7 +104,7 @@ public sealed partial class ShellViewModel : ViewModelBase
         {
             var league = Session.World.LeagueOf(Club);
             var row = LeagueTable.Compute(league).First(r => r.ClubId == Club.Id);
-            return $"{league.Name} · {T.Format("ui.place", row.Position)} · {row.Points} {T["col.points"]}";
+            return $"{UiText.Competition(league.Id)} · {T.Format("ui.place", row.Position)} · {row.Points} {T["col.points"]}";
         }
     }
     public string ContinueText => Session.PendingHumanFixture is null ? T["ui.continueButton"] : T["ui.toMatchButton"];
@@ -188,7 +197,7 @@ public sealed partial class ShellViewModel : ViewModelBase
                 break;
             case StopReason.SeasonEnd:
                 OpenPage<LeaguePageViewModel>();
-                _main.ShowDialog(new MessageDialogViewModel(T["ui.seasonEnd"], result.NewMessages.Select(m => m.Subject)));
+                _main.ShowDialog(new MessageDialogViewModel(T["ui.seasonEnd"], result.NewMessages.Select(m => m.SubjectText(T))));
                 break;
             case StopReason.Decision:
                 StatusMessage = T["ui.decisionPending"];

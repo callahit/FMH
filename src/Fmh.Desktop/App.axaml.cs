@@ -11,9 +11,6 @@ public sealed class App : Application
 {
     public override void Initialize()
     {
-        // Zahlenfelder und Formatierungen mit deutschen Trennzeichen (Fmt.Culture, auch ohne ICU).
-        System.Globalization.CultureInfo.DefaultThreadCurrentCulture = Fmh.Core.Fmt.Culture;
-        System.Globalization.CultureInfo.CurrentCulture = Fmh.Core.Fmt.Culture;
         AvaloniaXamlLoader.Load(this);
         Palette.Apply(Palette.Classic.Name);
     }

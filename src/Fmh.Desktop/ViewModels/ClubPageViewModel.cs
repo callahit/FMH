@@ -26,7 +26,7 @@ public sealed class ClubPageViewModel : PageViewModel
         Facts = new List<InfoLine>
         {
             new(T["club.city"], club.City),
-            new(T["club.league"], world.LeagueOf(club).Name),
+            new(T["club.league"], UiText.Competition(club.LeagueId)),
             new(T["club.stadium"], $"{club.StadiumName} ({Fmt.Int(club.StadiumCapacity)} {T["unit.seats"]})"),
             new(T["club.reputation"], $"{club.Reputation}/20"),
             new(T["club.colors"], $"{T["color." + club.PrimaryColor]} / {T["color." + club.SecondaryColor]}"),
@@ -48,7 +48,7 @@ public sealed class ClubPageViewModel : PageViewModel
         {
             var pos = h.FinalOrder.IndexOf(club.Id);
             var isLeague = world.FindLeague(h.LeagueId) is not null;
-            return new HistoryLine(GameSession.SeasonLabel(h.SeasonYear), h.LeagueName, h.ChampionName,
+            return new HistoryLine(GameSession.SeasonLabel(h.SeasonYear), T.TryGet("competition." + h.LeagueId) ?? h.LeagueName, h.ChampionName,
                 pos >= 0 && isLeague ? T.Format("club.ownPlace", pos + 1) : "",
                 new SolidColorBrush(h.ChampionId == club.Id ? P.Gold : P.Text));
         }).ToList();

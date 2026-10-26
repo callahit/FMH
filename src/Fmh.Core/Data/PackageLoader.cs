@@ -57,20 +57,10 @@ public static class PackageLoader
         var clubs = PathsUnder("clubs").SelectMany(Json.Load<List<ClubDefinition>>).ToList();
         var names = PathsUnder("names").Select(Json.Load<NameList>).ToDictionary(n => n.Country);
 
-        var texts = new Dictionary<string, string>();
-        var commentary = new Dictionary<string, List<string>>();
-        foreach (var m in ordered)
-        {
-            // Sprachdateien werden schlüsselweise zusammengeführt, damit Pakete einzelne Texte ändern können.
-            var langFile = Path.Combine(m.Directory, "lang", language + ".json");
-            if (File.Exists(langFile))
-                foreach (var kv in Json.Load<Dictionary<string, string>>(langFile)) texts[kv.Key] = kv.Value;
-            var commentaryFile = Path.Combine(m.Directory, "lang", language + ".commentary.json");
-            if (File.Exists(commentaryFile))
-                foreach (var kv in Json.Load<Dictionary<string, List<string>>>(commentaryFile)) commentary[kv.Key] = kv.Value;
-        }
+        var languages = LoadLanguages(ordered);
+        var defaultLanguage = ordered.Select(m => m.DefaultLanguage).LastOrDefault(l => !string.IsNullOrEmpty(l)) ?? "de";
 
-        return new GameData
+        var data = new GameData
         {
             Packages = ordered,
             Countries = countries,
@@ -81,9 +71,58 @@ public static class PackageLoader
             Injuries = Path1("rules/injuries.json") is { } i ? Json.Load<List<InjuryType>>(i) : new(),
             Roles = Path1("rules/roles.json") is { } ro ? Json.Load<List<RoleDef>>(ro) : new(),
             Engine = Path1("rules/engine.json") is { } e ? Json.Load<EngineConfig>(e) : new(),
-            Texts = new Texts(texts, language),
-            Commentary = commentary,
+            Languages = languages,
+            DefaultLanguage = defaultLanguage,
         };
+        data.UseLanguage(language);
+        return data;
+    }
+
+    /// <summary>
+    /// Findet alle Sprachen (lang/&lt;code&gt;.json in irgendeinem Paket). Texte werden schlüsselweise über die Pakete
+    /// zusammengeführt; fehlende Texte und Kommentarbausteine kommen aus der Standardsprache.
+    /// </summary>
+    private static Dictionary<string, LanguagePack> LoadLanguages(List<PackageManifest> ordered)
+    {
+        var codes = ordered
+            .Select(m => Path.Combine(m.Directory, "lang"))
+            .Where(Directory.Exists)
+            .SelectMany(d => Directory.GetFiles(d, "*.json"))
+            .Select(Path.GetFileName)
+            .Where(f => f is not null && !f.EndsWith(".commentary.json", StringComparison.Ordinal))
+            .Select(f => f![..^".json".Length])
+            .Distinct()
+            .OrderBy(c => c, StringComparer.Ordinal)
+            .ToList();
+        var defaultLanguage = ordered.Select(m => m.DefaultLanguage).LastOrDefault(l => !string.IsNullOrEmpty(l)) ?? "de";
+
+        (Dictionary<string, string> texts, Dictionary<string, List<string>> commentary) Read(string code)
+        {
+            var texts = new Dictionary<string, string>();
+            var commentary = new Dictionary<string, List<string>>();
+            foreach (var m in ordered)
+            {
+                var langFile = Path.Combine(m.Directory, "lang", code + ".json");
+                if (File.Exists(langFile))
+                    foreach (var kv in Json.Load<Dictionary<string, string>>(langFile)) texts[kv.Key] = kv.Value;
+                var commentaryFile = Path.Combine(m.Directory, "lang", code + ".commentary.json");
+                if (File.Exists(commentaryFile))
+                    foreach (var kv in Json.Load<Dictionary<string, List<string>>>(commentaryFile)) commentary[kv.Key] = kv.Value;
+            }
+            return (texts, commentary);
+        }
+
+        var result = new Dictionary<string, LanguagePack>();
+        var (baseTexts, baseCommentary) = Read(defaultLanguage);
+        var fallback = new Texts(baseTexts, defaultLanguage);
+        result[defaultLanguage] = new LanguagePack(defaultLanguage, fallback, baseCommentary);
+        foreach (var code in codes.Where(c => c != defaultLanguage))
+        {
+            var (texts, commentary) = Read(code);
+            foreach (var kv in baseCommentary) commentary.TryAdd(kv.Key, kv.Value);
+            result[code] = new LanguagePack(code, new Texts(texts, code, fallback), commentary);
+        }
+        return result;
     }
 
     private static Dictionary<string, string> Overlay(IEnumerable<PackageManifest> ordered)

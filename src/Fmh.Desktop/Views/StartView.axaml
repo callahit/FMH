@@ -31,7 +31,11 @@
         <TextBlock Classes="h3" Text="{s:L menu.load}" Margin="0,18,0,0" />
         <TextBlock Classes="muted" Text="{s:L load.none}" IsVisible="{Binding !HasSaves}" />
       </StackPanel>
-      <Button DockPanel.Dock="Bottom" Classes="ghost" Content="{s:L menu.quit}" Command="{Binding QuitCommand}" HorizontalAlignment="Left" />
+      <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto,Auto">
+        <Button Classes="ghost" Content="{s:L menu.quit}" Command="{Binding QuitCommand}" HorizontalAlignment="Left" />
+        <TextBlock Grid.Column="1" Text="{s:L options.language}" Classes="muted" VerticalAlignment="Center" Margin="0,0,10,0" />
+        <ComboBox Grid.Column="2" x:Name="LanguageBox" ItemsSource="{Binding Languages}" SelectedIndex="{Binding LanguageIndex}" MinWidth="150" />
+      </Grid>
       <ScrollViewer Margin="0,8">
         <ItemsControl ItemsSource="{Binding Saves}">
           <ItemsControl.ItemTemplate>

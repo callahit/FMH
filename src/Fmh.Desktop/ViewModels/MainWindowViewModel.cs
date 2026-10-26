@@ -33,6 +33,19 @@ public sealed partial class MainWindowViewModel : ViewModelBase
 
     public void CloseDialog() => Dialog = null;
 
+    /// <summary>Nach einem Sprachwechsel: aktuellen Bildschirm neu aufbauen (Texte aus XAML werden beim Laden gelesen).</summary>
+    public void Reload()
+    {
+        Dialog = null;
+        Screen = Screen switch
+        {
+            ShellViewModel shell => shell.Recreate(),
+            NewGameViewModel => new NewGameViewModel(this),
+            MatchViewModel m => m,
+            _ => new StartViewModel(this),
+        };
+    }
+
     public override bool HandleKey(Key key, KeyModifiers modifiers)
     {
         if (Dialog is { } d) return d.HandleKey(key, modifiers) || (key == Key.Escape && Close());

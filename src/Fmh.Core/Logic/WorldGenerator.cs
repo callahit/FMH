@@ -95,9 +95,9 @@ public static class WorldGenerator
         if (!world.Scouts.Any(s => s.ClubId == humanClub.Id))
             Game.GameSession.CreateScouts(world, humanClub, data, rng, 2);
 
-        Messages.Add(world, manager, MessageType.Board, data.Texts["msg.sender.board"],
-            data.Texts.Format("msg.welcome.subject", humanClub.Name),
-            data.Texts.Format("msg.welcome.body", manager.Name, humanClub.Name, world.LeagueOf(humanClub).Name));
+        Messages.Add(world, manager, MessageType.Board, "msg.sender.board",
+            TextRef.Of("msg.welcome.subject", humanClub.Name),
+            TextRef.Of("msg.welcome.body", manager.Name, humanClub.Name, Messages.Competition(world, humanClub.LeagueId)));
 
         world.RngState = rng.GetState();
         return world;
@@ -214,7 +214,10 @@ public static class WorldGenerator
 
 public static class Messages
 {
-    public static Message Add(World world, Manager manager, MessageType type, string sender, string subject, string body)
+    /// <summary>Wettbewerbsname als Text: übersetzbar über "competition.&lt;id&gt;", sonst der Name aus den Daten.</summary>
+    public static TextArg Competition(World world, string id) => TextArg.Key("competition." + id, world.CompetitionName(id));
+
+    public static Message Add(World world, Manager manager, MessageType type, string senderKey, TextRef subject, TextRef body)
     {
         var m = new Message
         {
@@ -222,9 +225,9 @@ public static class Messages
             ManagerId = manager.Id,
             Date = world.Date,
             Type = type,
-            Sender = sender,
-            Subject = subject,
-            Body = body,
+            SenderKey = senderKey,
+            SubjectRef = subject,
+            BodyRef = body,
         };
         world.Messages.Add(m);
         return m;

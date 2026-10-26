@@ -39,5 +39,9 @@ public sealed class ScoutReport
     public double StrengthStars { get; set; }
     public double PotentialStars { get; set; }
     public char Recommendation { get; set; } = 'C';
+    /// <summary>Fazit aus Spielständen vor der Mehrsprachigkeit.</summary>
     public string Summary { get; set; } = "";
+    public Data.TextRef? SummaryRef { get; set; }
+
+    public string SummaryText(Data.Texts t) => SummaryRef is { } r ? t.Render(r) : Summary;
 }

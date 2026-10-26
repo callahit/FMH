@@ -10,11 +10,12 @@ namespace Fmh.Desktop.ViewModels;
 public sealed partial class MessageItem : ObservableObject
 {
     public required Message Message { get; init; }
-    public string Subject => Message.Subject;
-    public string Sender => Message.Sender;
+    private static Fmh.Core.Data.Texts T => Fmh.Desktop.Services.AppState.Current.T;
+    public string Subject => Message.SubjectText(T);
+    public string Sender => Message.SenderText(T);
     public string Date => Fmt.ShortDate(Message.Date);
     public string FullDate => Fmt.Date(Message.Date);
-    public string Body => Message.Body;
+    public string Body => Message.BodyText(T);
     public IBrush TypeBrush { get; init; } = Brushes.Gray;
     public FontWeight Weight => IsRead ? FontWeight.Normal : FontWeight.Bold;
     public bool Open => Message.Required && !Message.Resolved;
@@ -93,7 +94,7 @@ public sealed partial class InboxPageViewModel : PageViewModel, IRefreshable
     private void Answer(ResponseKind kind)
     {
         if (Offer is not { } n) return;
-        ActionResult = Session.RespondIncoming(n, kind, (long)CounterFee);
+        ActionResult = T.Render(Session.RespondIncoming(n, kind, (long)CounterFee));
         IsOffer = false;
         Shell.RefreshHeader();
     }

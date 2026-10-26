@@ -56,7 +56,7 @@ public sealed partial class FixturesPageViewModel : PageViewModel, IRefreshable
         var league = world.LeagueOf(club);
         var fixtures = league.Fixtures.Where(f => f.Matchday == Matchday).ToList();
         Day = fixtures.Select(f => Make(f, club.Id)).ToList();
-        DayTitle = T.Format("fixtures.matchday", league.Name, Matchday, league.MatchdayCount)
+        DayTitle = T.Format("fixtures.matchday", UiText.Competition(league.Id), Matchday, league.MatchdayCount)
                    + (fixtures.Count > 0 ? $" · {Fmt.Weekday(fixtures[0].Date)}, {Fmt.Date(fixtures[0].Date)}" : "");
     }
 

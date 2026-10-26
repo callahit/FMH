@@ -15,6 +15,9 @@ Dieser Stand umfasst **Phase 1 (Prototyp)** und **Phase 2 (Karriere)** der Roadm
 Die Karriere läuft über beliebig viele Saisons, gespielt wird in einer Desktop-Oberfläche mit Maus und
 Tastatur. Spielstände sind SQLite-Datenbanken.
 
+**Phase 3** hat begonnen. Als Erstes ist die **Mehrsprachigkeit** umgesetzt: Deutsch und Englisch,
+im Spiel umschaltbar und um weitere Sprachen erweiterbar (siehe [Sprachen](#sprachen)).
+
 ## Schnellstart
 
 Voraussetzung: [.NET 10 SDK](https://dotnet.microsoft.com/download).
@@ -22,14 +25,14 @@ Voraussetzung: [.NET 10 SDK](https://dotnet.microsoft.com/download).
 ```bash
 dotnet build -c Release
 dotnet run -c Release --project src/Fmh.Desktop     # das Spiel (Fenster, Maus und Tastatur)
-dotnet test                                          # 65 Tests, davon 10 Oberflächentests ohne Bildschirm
+dotnet test                                          # 74 Tests, davon 11 Oberflächentests ohne Bildschirm
 dotnet run -c Release --project src/Fmh.Calibrate -- --matches 10000           # Engine-Kalibrierung
 dotnet run -c Release --project src/Fmh.Calibrate -- --season --seasons 8      # Karriere-Simulation
 ```
 
 Spielstände (`*.fmh`, SQLite) landen unter `%APPDATA%/FMH/saves` bzw. `~/.config/FMH/saves`,
 änderbar mit `--saves <pfad>` oder der Umgebungsvariable `FMH_SAVE_DIR`. Eigene Datenpakete lädt
-`--data <pfad>`.
+`--data <pfad>`, eine bestimmte Sprache `--lang en`.
 
 ## Bedienung
 
@@ -104,8 +107,39 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
 | 6 Spieltag und Matchengine | Vorbericht, Kabinenansprache, Kommentar/Ticker/Sofort, Wechsel, Taktik und Zurufe live, Nachbericht mit Noten und Statistik, **Verlängerung und Elfmeterschießen**, Hin- und Rückspiel | Konferenz, Pressekonferenz (Phase 3) |
 | 7 Transfers, Verträge, Scouting | **vollständig** (siehe oben) | – |
 | 8–10 Finanzen, Gelände, Umfeld | Budgets und Buchungen (Ablösen, Raten, Handgeld, Trainingslager) | Phase 3 |
-| 11 Oberfläche | Desktop-Oberfläche (Avalonia) mit Maus, Drag & Drop, sortierbaren Tabellen, Diagrammen (Radar, Formkurve, xG, Heatmap), Wappen, Farbthemen | weitere Sprachen, Tastenbelegung |
-| 12 Nicht-funktional | Determinismus, **SQLite-Spielstände** mit Schemamigration, Texte in Sprachdateien, Datenpakete mit Überlagerung, Datenvalidierung, Kalibrierungs-CLI | Editor, Plugins |
+| 11 Oberfläche | Desktop-Oberfläche (Avalonia) mit Maus, Drag & Drop, sortierbaren Tabellen, Diagrammen (Radar, Formkurve, xG, Heatmap), Wappen, Farbthemen | Tastenbelegung |
+| 12 Nicht-funktional | Determinismus, **SQLite-Spielstände** mit Schemamigration, **Mehrsprachigkeit (Deutsch, Englisch, erweiterbar)**, Datenpakete mit Überlagerung, Datenvalidierung, Kalibrierungs-CLI | Editor, Plugins |
+
+## Sprachen
+
+Die Sprache wird im Hauptmenü (unten rechts) oder im Spiel unter **Einstellungen → Sprache** gewählt.
+Die Oberfläche baut sich sofort neu auf, das Spiel läuft auf derselben Seite weiter. Die Wahl gilt für
+das ganze Gerät und steht in `settings.json` neben dem Spielstandordner. Beim ersten Start wird die
+Sprache aus der Systemumgebung erkannt (`LANG`), sonst gilt Deutsch. `--lang <code>` überschreibt beides.
+
+Übersetzt werden:
+
+- alle Texte der Oberfläche, Spielmeldungen und der Spielkommentar;
+- Zahlen-, Datums- und Geldformate, z. B. „4,21 Mio. EUR · 01.07.2026“ bzw. „EUR 4.21m · 01/07/2026“;
+- Namen von Wettbewerben, Positionen, Rollen und Verletzungen.
+
+Spielstände sind sprachneutral. Nachrichten, Buchungen, Scoutberichte und Verhandlungsantworten werden
+als Textschlüssel mit Argumenten gespeichert und bei jeder Anzeige in der gewählten Sprache aufgebaut.
+Ein Sprachwechsel übersetzt deshalb auch den bisherigen Posteingang. Nachrichten aus Spielständen vor
+dieser Version bleiben wörtlich erhalten.
+
+**Eine Sprache hinzufügen:** Eine Datei `lang/<code>.json` in einem Datenpaket anlegen (zum Beispiel
+`data/base/lang/fr.json` oder in einem eigenen Paket). Optional kommt `lang/<code>.commentary.json`
+für den Spielkommentar dazu. Die Sprache erscheint danach automatisch in der Auswahl.
+
+- Pflicht ist `"lang.name"` (Anzeigename in der Sprache selbst, z. B. „Français“).
+- Die Formate stehen in den Schlüsseln `fmt.*` (Dezimal- und Tausendertrennzeichen, Datumsmuster,
+  Wochentage, Geldmuster).
+- Fehlende Texte und Kommentarbausteine kommen aus der Standardsprache des Grundpakets
+  (`"defaultLanguage": "de"` in `package.json`).
+- Pakete können auch einzelne Texte einer Sprache überschreiben, zum Beispiel `"competition.DE1": "Premier League"`.
+- Für Sprachen im Repository prüft ein Test, dass alle Schlüssel vorhanden sind, dieselben Platzhalter
+  `{0}`, `{1}` … verwendet werden und der Kommentar übersetzt ist.
 
 ## Spielstände (SQLite)
 
@@ -119,9 +153,11 @@ SELECT date, player_id, fee FROM transfers WHERE to_club = 6;
 ```
 
 Verschachtelte Konfigurationen (Ligaformat, Taktik, Pokalrunden, Verhandlungen) liegen als JSON-Spalten
-daneben. Die Tabelle `meta` enthält die Schemaversion. Ältere Spielstände (Version 1 aus Phase 1)
-werden beim Laden per Migration angehoben und mit Karrieredaten nachgerüstet: Budgets, Scouts, Pokal
-und Amateurvereine.
+daneben. Die Tabelle `meta` enthält die Schemaversion (aktuell 3). Ältere Spielstände werden beim Laden
+schrittweise angehoben:
+
+- Version 1 (Phase 1) bekommt die Karrieredaten: Budgets, Scouts, Pokal und Amateurvereine.
+- Version 2 bekommt die Spalten für sprachneutrale Texte.
 
 ## Kalibrierung der Matchengine
 
@@ -172,7 +208,7 @@ frühere, Sprachdateien werden schlüsselweise zusammengeführt.
 | `formations.json` | Formationen auf dem 5x7-Raster |
 | `rules/roles.json` | Rollen mit erlaubten Positionen, Aufgaben und Wirkung in der Engine |
 | `rules/positions.json`, `rules/injuries.json`, `rules/engine.json` | Attributgewichte, Verletzungen, Engine-Gewichte |
-| `lang/de.json`, `lang/de.commentary.json` | Texte der Oberfläche und Kommentarbausteine |
+| `lang/<code>.json`, `lang/<code>.commentary.json` | Texte der Oberfläche und Kommentarbausteine je Sprache (`de`, `en`) |
 
 Beim Start prüft `DataValidator` die Pakete und bricht mit einer Fehlerliste ab. Geprüft werden unter
 anderem Teamzahlen, Pools, Pokaltermine und Relegationsplätze.
