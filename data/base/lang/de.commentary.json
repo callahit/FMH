@@ -222,5 +222,42 @@
  "substitution": [
   "Wechsel bei {t}: {p} kommt für {o}.",
   "{t} wechselt: {o} geht, {p} kommt."
+ ],
+ "endOfRegularTime": [
+  "Nach 90 Minuten steht es {score} – es geht in die Verlängerung!",
+  "Abpfiff der regulären Spielzeit beim Stand von {score}. Jetzt kommen 30 Extra-Minuten.",
+  "Keine Entscheidung nach 90 Minuten: {score}. Verlängerung!"
+ ],
+ "extraTime": [
+  "Die Verlängerung läuft.",
+  "Weiter geht's mit der ersten Hälfte der Verlängerung.",
+  "Die Kräfte schwinden, jetzt beginnt die Verlängerung."
+ ],
+ "extraTimeSecondHalf": [
+  "Seitenwechsel in der Verlängerung, noch 15 Minuten.",
+  "Die letzte Viertelstunde der Verlängerung beginnt."
+ ],
+ "shootoutStart": [
+  "Elfmeterschießen! Die Nerven liegen blank.",
+  "Es geht ins Elfmeterschießen – jetzt entscheidet der Punkt.",
+  "Keine Entscheidung nach 120 Minuten: Elfmeterschießen!"
+ ],
+ "shootoutKick.goal": [
+  "{p} tritt an … und trifft! ({pens})",
+  "{p} verwandelt sicher. ({pens})",
+  "{p} schickt {g} in die falsche Ecke. ({pens})"
+ ],
+ "shootoutKick.saved": [
+  "{p} scheitert an {g}! ({pens})",
+  "{g} ahnt die Ecke und pariert gegen {p}! ({pens})"
+ ],
+ "shootoutKick.miss": [
+  "{p} setzt den Ball neben das Tor! ({pens})",
+  "Drüber! {p} vergibt. ({pens})"
+ ],
+ "shootoutEnd": [
+  "{t} gewinnt das Elfmeterschießen mit {pens}!",
+  "Entschieden! {t} setzt sich im Elfmeterschießen durch ({pens}).",
+  "Der Jubel bei {t} kennt keine Grenzen – {pens} im Elfmeterschießen!"
  ]
 }

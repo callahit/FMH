@@ -57,8 +57,8 @@ public sealed partial class GameSession
             var pos = PlayerGenerator.SquadTemplate[_rng.WeightedIndex(PlayerGenerator.SquadTemplate.Select(t => (double)t.count).ToList())].pos;
             var age = _rng.Next(15, 16);
             var p = PlayerGenerator.Create(World, Data, _rng, pos, Math.Clamp(level + _rng.Normal(0, 1.2), 2, 14), age, club.CountryCode);
-            var bonus = (golden ? 25 : 0) + (int)(club.YouthRecruitment / 20.0 * 15) + _rng.Next(0, 20);
-            p.Hidden.PotentialAbility = Math.Clamp(p.Hidden.PotentialAbility + bonus, p.Hidden.CurrentAbility, 200);
+            var bonus = (golden ? 25 : 0) + (int)(club.YouthRecruitment / 20.0 * 8) + _rng.Next(-5, 10);
+            p.Hidden.PotentialAbility = Math.Clamp(p.Hidden.CurrentAbility + _rng.Next(15, 45) + bonus, p.Hidden.CurrentAbility, 200);
             p.IsYouth = true;
             p.Reputation = 1;
             p.ClubId = club.Id;
@@ -84,11 +84,13 @@ public sealed partial class GameSession
         {
             var level = PlayerGenerator.ClubLevel(club.Reputation);
             var promote = youth.Where(p => p.Age(World.Date) >= proAge)
-                .Where(p => Rating(p) >= level - 2.5 || p.Age(World.Date) >= 18 && p.Hidden.PotentialAbility >= Ratings.CurrentAbility(p, Data.PositionProfiles) + 30)
-                .OrderByDescending(p => p.Hidden.PotentialAbility).Take(3).ToList();
+                .Where(p => Rating(p) >= level - 2.0 || p.Age(World.Date) >= 18 && p.Hidden.PotentialAbility >= p.Hidden.CurrentAbility + 40)
+                .OrderByDescending(p => p.Hidden.PotentialAbility).Take(2).ToList();
             foreach (var p in promote) PromoteYouthInternal(club, p);
         }
-        foreach (var p in YouthOf(club).Where(p => p.Age(World.Date) >= ReleaseAge).ToList())
+        // KI-Vereine geben nicht übernommene 18-Jährige frei, der Mensch entscheidet bis 19 selbst.
+        var releaseAge = IsHuman(club) ? ReleaseAge : ReleaseAge - 1;
+        foreach (var p in YouthOf(club).Where(p => p.Age(World.Date) >= releaseAge).ToList())
         {
             ReleaseYouthInternal(p);
             if (club.Id == HumanClub.Id)

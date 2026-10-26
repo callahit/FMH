@@ -135,7 +135,8 @@ public class DataTests
             "kickoff", "secondHalf", "halfTime", "fullTime", "stoppage", "attack", "counter", "dribble", "cross", "aerialWon",
             "goal", "goal.header", "goal.longShot", "goal.freeKick", "goal.penalty", "goal.oneOnOne",
             "foul", "foul.dangerous", "yellow", "secondYellow", "red", "freeKick", "freeKick.direct", "penalty", "corner",
-            "offside", "goalKick", "injury", "substitution",
+            "offside", "goalKick", "injury", "substitution", "endOfRegularTime", "extraTime", "extraTimeSecondHalf",
+            "shootoutStart", "shootoutKick.goal", "shootoutKick.saved", "shootoutKick.miss", "shootoutEnd",
         };
         foreach (var kind in new[] { "normal", "header", "longShot", "freeKick", "penalty", "oneOnOne" })
             foreach (var outcome in new[] { "wide", "saved", "blocked", "post" })

@@ -450,10 +450,16 @@ public sealed partial class GameSession
         }
     }
 
+    /// <summary>Vereinslose ohne Perspektive beenden ihre Laufbahn (auch freigegebene Jugendspieler unterhalb des Amateurniveaus).</summary>
     private void RetireFreeAgents()
     {
-        foreach (var p in FreeAgents.Where(p => p.Age(World.Date) >= 34 || (p.Age(World.Date) >= 31 && _rng.Chance(0.35))).ToList())
-            p.Retired = true;
+        var floor = PlayerGenerator.ClubLevel(1) - 2;
+        foreach (var p in FreeAgents.ToList())
+        {
+            var age = p.Age(World.Date);
+            var chance = age >= 33 ? 1.0 : age >= 30 ? 0.6 : Rating(p) < floor ? 0.8 : 0.45;
+            if (_rng.Chance(chance)) p.Retired = true;
+        }
     }
 
     // ================================================================== KI
@@ -482,6 +488,7 @@ public sealed partial class GameSession
             if (window && _rng.Chance(0.3)) TryAiSigning(club);
         }
         if (window && _rng.Chance(0.3)) MakeIncomingOffer();
+        if (window) foreach (var club in aiClubs.Where(_ => _rng.Chance(0.15))) TryAiLoanOut(club);
         if (World.Date.Month is >= 2 and <= 5 && World.Date.Day <= 7) AiPreContracts(aiClubs);
     }
 
@@ -536,6 +543,24 @@ public sealed partial class GameSession
         }
     }
 
+    /// <summary>KI verleiht junge Ergänzungsspieler an schwächere Vereine, die auf der Position Bedarf haben.</summary>
+    private void TryAiLoanOut(Club club)
+    {
+        if (club.PlayerIds.Count <= 22) return;
+        var ranked = World.SquadOf(club).OrderByDescending(Rating).ToList();
+        var candidate = ranked.Skip(16).FirstOrDefault(p => p.Age(World.Date) <= 21 && p.Loan is null && p.PreContract is null
+                                                           && p.Hidden.PotentialAbility - p.Hidden.CurrentAbility >= 15);
+        if (candidate is null) return;
+        var target = World.Clubs.Values
+            .Where(c => c.Id != club.Id && !IsHuman(c) && c.Reputation < club.Reputation && c.PlayerIds.Count < 26)
+            .Where(c => NeededPosition(c) == candidate.MainPosition)
+            .Where(c => Rating(candidate) >= PlayerGenerator.ClubLevel(c.Reputation) - 1)
+            .OrderByDescending(c => c.Reputation)
+            .FirstOrDefault();
+        if (target is null) return;
+        ExecuteLoan(candidate, target, club, new ClubOffer { LoanMonths = 12, WageSharePercent = _rng.Pick(new[] { 50, 75, 100 }), RecallInWinter = _rng.Chance(0.3) });
+    }
+
     public bool SignBestFreeAgent(Club club, Position pos)
     {
         var level = PlayerGenerator.ClubLevel(club.Reputation);
@@ -573,7 +598,7 @@ public sealed partial class GameSession
     private bool ShouldAiRenew(Club club, Player p)
     {
         var rank = World.SquadOf(club).OrderByDescending(Rating).ToList().IndexOf(p);
-        return rank is >= 0 and < 18 && p.Age(World.Date) <= 31;
+        return rank is >= 0 and < 18 && p.Age(World.Date) <= 33;
     }
 
     /// <summary>KI-Vereine sichern sich ablösefreie Spieler mit auslaufendem Vertrag per Vorvertrag.</summary>

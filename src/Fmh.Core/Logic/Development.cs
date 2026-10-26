@@ -4,7 +4,7 @@ using Fmh.Core.Model;
 namespace Fmh.Core.Logic;
 
 /// <summary>
-/// Spielerentwicklung zum Saisonende (Kapitel 4): Wachstum bis ca. 24, Plateau bis 29,
+/// Spielerentwicklung zum Saisonende (Kapitel 4), ergänzt das tägliche Training um Spielpraxis und Alterung: Wachstum bis ca. 24, Plateau bis 29,
 /// Abbau physischer Werte ab 30, mentale Werte können bis 33 noch steigen.
 /// </summary>
 public static class Development
@@ -22,9 +22,9 @@ public static class Development
             var group = AttrInfo.GroupOf(a);
             double change = 0;
             if (age <= 24)
-                change = headroom / 40.0 * practice * pro * rng.Range(0.3, 1.2);
+                change = headroom / 75.0 * practice * pro * rng.Range(0.3, 1.2);
             else if (age <= 29)
-                change = headroom / 80.0 * practice * pro * rng.Range(0, 1) - 0.05;
+                change = headroom / 150.0 * practice * pro * rng.Range(0, 1) - 0.08;
             else
             {
                 if (group == AttrGroup.Physical) change = -rng.Range(0.3, 1.0) * (age - 29) * 0.35;
@@ -49,8 +49,8 @@ public static class Development
         return age switch
         {
             < 32 => 0,
-            < 34 => 0.15,
-            < 36 => 0.45,
+            < 34 => 0.06,
+            < 36 => 0.3,
             _ => 0.85,
         };
     }

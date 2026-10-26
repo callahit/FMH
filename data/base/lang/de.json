@@ -727,5 +727,7 @@
  "youth.error.squadFull": "Der Profikader ist voll.",
  "youth.error.tooOld": "Nur Spieler bis 18 Jahre können in die Jugend zurück.",
  "youth.error.tooYoung": "Profiverträge gibt es erst ab 16 Jahren.",
- "ui.decisionPending": "Eine Entscheidung wartet im Posteingang."
+ "ui.decisionPending": "Eine Entscheidung wartet im Posteingang.",
+ "msg.emergency.subject": "Notfall: {0} rückt in den Kader",
+ "msg.emergency.body": "Wir hatten nicht genug einsatzfähige Spieler für eine Elf. {0} wurde kurzfristig in den Profikader aufgenommen."
 }

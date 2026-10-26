@@ -122,6 +122,36 @@ public static class Program
         return inRange;
     }
 
+    /// <summary>Kennzahlen der Karriere-Simulation: Pokal, Relegation, Transfers, Kader, Spielstärke nach Alter.</summary>
+    private static void PrintCareerStats(GameSession session)
+    {
+        var w = session.World;
+        var profiles = session.Data.PositionProfiles;
+        foreach (var cup in w.Cups.Where(c => c.SeasonYear == w.SeasonYear))
+        {
+            var winner = cup.WinnerId is { } id ? w.Clubs[id].Name : "-";
+            var final = cup.Fixtures.Where(f => f.Matchday == cup.Rounds.Count).Select(f => $"{w.Clubs[f.HomeId].ShortName} {f.Result?.HomeGoals}:{f.Result?.AwayGoals} {w.Clubs[f.AwayId].ShortName}{(f.Result?.PenaltiesHome is { } ph ? $" i.E. {ph}:{f.Result.PenaltiesAway}" : f.Result?.ExtraTime == true ? " n.V." : "")}");
+            Console.WriteLine($"{cup.Name}: Sieger {winner} ({string.Join(", ", final)})");
+        }
+        var season = w.Transfers.Where(t => t.SeasonYear == w.SeasonYear).ToList();
+        Console.WriteLine($"Transfers: {season.Count(t => !t.Loan && t.FromClubId is not null)} mit Ablöse ({season.Sum(t => t.Fee) / 1_000_000.0:F1} Mio.), " +
+                          $"{season.Count(t => t.FromClubId is null)} ablösefrei, {season.Count(t => t.Loan)} Leihen");
+        var leagueClubs = w.Clubs.Values.Where(c => w.FindLeague(c.LeagueId) is not null).ToList();
+        Console.WriteLine($"Kader: Ø {leagueClubs.Average(c => c.PlayerIds.Count):F1} (min {leagueClubs.Min(c => c.PlayerIds.Count)}, max {leagueClubs.Max(c => c.PlayerIds.Count)}), " +
+                          $"Jugend Ø {w.Clubs.Values.Average(c => c.YouthIds.Count):F1}, vereinslos {session.FreeAgents.Count()}, Spieler gesamt {w.Players.Count}");
+        foreach (var league in w.Leagues)
+        {
+            var players = league.ClubIds.SelectMany(id => w.SquadOf(w.Clubs[id])).ToList();
+            string Avg(Func<Player, bool> f) => players.Where(f).Select(p => Ratings.PositionRating(p, p.MainPosition, profiles)).DefaultIfEmpty(0).Average().ToString("F2", CultureInfo.InvariantCulture);
+            var top = league.ClubIds.Select(id => w.SquadOf(w.Clubs[id]).OrderByDescending(p => Ratings.PositionRating(p, p.MainPosition, profiles)).Take(11)
+                .Average(p => Ratings.PositionRating(p, p.MainPosition, profiles))).Average();
+            Console.WriteLine($"{league.Name}: Top-11 Ø {top:F2}, U21 {Avg(p => p.Age(w.Date) <= 21)}, 22-29 {Avg(p => p.Age(w.Date) is > 21 and < 30)}, 30+ {Avg(p => p.Age(w.Date) >= 30)}, Alter Ø {players.Average(p => p.Age(w.Date)):F1}");
+        }
+        var b = session.HumanClub.Budget;
+        Console.WriteLine($"Eigener Verein: Kontostand {b.Balance / 1_000_000.0:F1} Mio., Transferbudget {b.TransferBudget / 1_000_000.0:F1} Mio.");
+        Console.WriteLine();
+    }
+
     private static int RunSeasons(GameData data, ulong seed, int seasons)
     {
         var session = NewSession(data, seed);
@@ -135,6 +165,7 @@ public static class Program
         while (world.SeasonYear < targetSeason)
         {
             var result = session.Advance();
+            if (result.Reason == StopReason.Decision) session.DelegateDecisions();
             if (dayWatch is not null)
             {
                 // Spieltag gemessen vom eigenen Spiel bis alle übrigen Spiele des Tages berechnet sind.
@@ -159,6 +190,7 @@ public static class Program
                     }
                     Console.WriteLine();
                 }
+                PrintCareerStats(session);
             }
         }
         sw.Stop();

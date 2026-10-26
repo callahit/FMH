@@ -190,6 +190,36 @@ public sealed partial class GameSession
             LineupSelector.Repair(club, World, Data, BenchSize(club));
         else
             AiTactics.Prepare(club, opponent, home, World, Data, BenchSize(club));
+        EnsureEleven(club);
+    }
+
+    /// <summary>Notfall: zu wenige einsatzfähige Spieler. Erst Talente aus der Jugend, dann Spieler aus dem Umfeld des Vereins.</summary>
+    private void EnsureEleven(Club club)
+    {
+        var guard = 0;
+        while (club.Tactic.Lineup.Any(id => id is null) && guard++ < 11)
+        {
+            var youth = YouthOf(club).Where(p => p.IsAvailable).OrderByDescending(Rating).FirstOrDefault();
+            Player p;
+            if (youth is not null)
+            {
+                PromoteYouthInternal(club, youth);
+                p = youth;
+            }
+            else
+            {
+                var level = PlayerGenerator.ClubLevel(club.Reputation) - 2;
+                p = PlayerGenerator.Create(World, Data, _rng, NeededPosition(club), Math.Max(3, level), _rng.Next(19, 30), club.CountryCode);
+                p.ClubId = club.Id;
+                p.Contract!.Until = new DateOnly(World.SeasonYear + 1, 6, 30);
+                p.SeasonStats = new PlayerSeasonStats { SeasonYear = World.SeasonYear, ClubId = club.Id };
+                World.Players[p.Id] = p;
+                club.PlayerIds.Add(p.Id);
+            }
+            if (club.Id == HumanClub.Id)
+                Notify(MessageType.Info, "msg.sender.assistant", T.Format("msg.emergency.subject", p.Name), T.Format("msg.emergency.body", p.Name));
+            LineupSelector.Repair(club, World, Data, BenchSize(club));
+        }
     }
 
     private TeamSetup TeamSetupFor(Club club, bool human)
