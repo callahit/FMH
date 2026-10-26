@@ -14,7 +14,7 @@ public sealed class SaveItem
     public string Subtitle => Info.Valid
         ? $"{Info.ManagerName} · {(Info.GameDate is { } d ? Fmt.Date(d) : "")} · {Info.Name}"
         : T["load.invalid"];
-    public string Saved => Info.Modified.ToString("dd.MM.yyyy HH:mm");
+    public string Saved => $"{Fmt.Date(DateOnly.FromDateTime(Info.Modified))} {Info.Modified:HH:mm}";
     public string Primary { get; init; } = "Gray";
     public string Secondary { get; init; } = "White";
     public string Initials => Crest.InitialsOf(Info.ClubName);
@@ -40,6 +40,21 @@ public sealed partial class StartViewModel : ViewModelBase
     }
 
     public IReadOnlyList<SaveItem> Saves { get; }
+
+    /// <summary>Sprachauswahl im Hauptmenü.</summary>
+    public IReadOnlyList<string> Languages => State.Languages.Select(l => l.Name).ToList();
+
+    public int LanguageIndex
+    {
+        get => State.Languages.ToList().FindIndex(l => l.Code == State.Language);
+        set
+        {
+            var langs = State.Languages;
+            if (value < 0 || value >= langs.Count || langs[value].Code == State.Language) return;
+            State.SetLanguage(langs[value].Code);
+            Avalonia.Threading.Dispatcher.UIThread.Post(() => _main.Reload());
+        }
+    }
     public bool HasSaves => Saves.Count > 0;
     public string Version => typeof(StartViewModel).Assembly.GetName().Version?.ToString(3) ?? "";
 

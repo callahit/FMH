@@ -14,7 +14,7 @@ namespace Fmh.Core.Persistence;
 public static class SqliteStore
 {
     /// <summary>Aktuelle Schemaversion. Ältere Spielstände werden beim Laden mit <see cref="Migrations"/> angehoben.</summary>
-    public const int SchemaVersion = 2;
+    public const int SchemaVersion = 3;
 
     /// <summary>Migrationsschritte: Schlüssel = Ausgangsversion; das SQL hebt die Datenbank um eine Version an.</summary>
     private static readonly Dictionary<int, string> Migrations = new()
@@ -74,6 +74,15 @@ public static class SqliteStore
             CREATE TABLE scout_reports (player_id INTEGER PRIMARY KEY, date TEXT NOT NULL, strength REAL NOT NULL, potential REAL NOT NULL,
                 recommendation TEXT NOT NULL, summary TEXT NOT NULL);
             CREATE TABLE knowledge (player_id INTEGER PRIMARY KEY, value INTEGER NOT NULL);
+            """,
+        // Phase 3, Mehrsprachigkeit: Texte als sprachneutrale Verweise (Schlüssel + Argumente, JSON).
+        [2] = """
+            ALTER TABLE messages ADD COLUMN sender_key TEXT;
+            ALTER TABLE messages ADD COLUMN subject_ref TEXT;
+            ALTER TABLE messages ADD COLUMN body_ref TEXT;
+            ALTER TABLE transactions ADD COLUMN text_ref TEXT;
+            ALTER TABLE installments ADD COLUMN text_ref TEXT;
+            ALTER TABLE scout_reports ADD COLUMN summary_ref TEXT;
             """,
     };
 
@@ -264,11 +273,12 @@ public static class SqliteStore
             }
         }
 
-        var msgParams = Enumerable.Range(0, 12).Select(i => "$m" + i).ToArray();
+        var msgParams = Enumerable.Range(0, 15).Select(i => "$m" + i).ToArray();
         using (var cmd = Cmd(con, tx, $"INSERT INTO messages VALUES ({string.Join(",", msgParams)})", msgParams))
             foreach (var m in w.Messages)
                 Run(cmd, m.Id, m.ManagerId, D(m.Date), m.Type.ToString(), m.Sender, m.Subject, m.Body, m.Read,
-                    m.Action.ToString(), m.ActionRefId, m.Required, m.Resolved);
+                    m.Action.ToString(), m.ActionRefId, m.Required, m.Resolved,
+                    m.SenderKey, Ref(m.SubjectRef), Ref(m.BodyRef));
 
         WriteCareer(con, tx, w);
 
@@ -517,6 +527,7 @@ public static class SqliteStore
                 Sender = r.GetString(4), Subject = r.GetString(5), Body = r.GetString(6), Read = r.GetInt32(7) == 1,
                 Action = Enum.Parse<MessageAction>(r.GetString(8)), ActionRefId = NInt(r, 9),
                 Required = r.GetInt32(10) == 1, Resolved = r.GetInt32(11) == 1,
+                SenderKey = NStr(r, 12), SubjectRef = PRef(r, 13), BodyRef = PRef(r, 14),
             });
 
         ReadCareer(con, w);
@@ -617,17 +628,17 @@ public static class SqliteStore
                 var t = w.Transfers[i];
                 Run(cmd, i, D(t.Date), t.PlayerId, t.FromClubId, t.ToClubId, t.Fee, t.Loan, t.SeasonYear);
             }
-        using (var cmd = Cmd(con, tx, "INSERT INTO transactions VALUES ($a,$b,$c,$d,$e,$f)", "$a", "$b", "$c", "$d", "$e", "$f"))
+        using (var cmd = Cmd(con, tx, "INSERT INTO transactions VALUES ($a,$b,$c,$d,$e,$f,$g)", "$a", "$b", "$c", "$d", "$e", "$f", "$g"))
             for (var i = 0; i < w.Transactions.Count; i++)
             {
                 var t = w.Transactions[i];
-                Run(cmd, i, D(t.Date), t.ClubId, t.Type.ToString(), t.Amount, t.Text);
+                Run(cmd, i, D(t.Date), t.ClubId, t.Type.ToString(), t.Amount, t.TextRef?.ToString() ?? t.Text, Ref(t.TextRef));
             }
-        using (var cmd = Cmd(con, tx, "INSERT INTO installments VALUES ($a,$b,$c,$d,$e,$f)", "$a", "$b", "$c", "$d", "$e", "$f"))
+        using (var cmd = Cmd(con, tx, "INSERT INTO installments VALUES ($a,$b,$c,$d,$e,$f,$g)", "$a", "$b", "$c", "$d", "$e", "$f", "$g"))
             for (var i = 0; i < w.Installments.Count; i++)
             {
                 var t = w.Installments[i];
-                Run(cmd, i, t.FromClubId, t.ToClubId, D(t.Due), t.Amount, t.Text);
+                Run(cmd, i, t.FromClubId, t.ToClubId, D(t.Due), t.Amount, t.TextRef?.ToString() ?? t.Text, Ref(t.TextRef));
             }
         using (var cmd = Cmd(con, tx, "INSERT INTO negotiations VALUES ($a,$b,$c,$d,$e,$f,$g)", "$a", "$b", "$c", "$d", "$e", "$f", "$g"))
             foreach (var n in w.Negotiations) Run(cmd, n.Id, n.PlayerId, n.BuyerId, n.SellerId, n.Type.ToString(), n.Stage.ToString(), J(n));
@@ -638,8 +649,9 @@ public static class SqliteStore
         using (var cmd = Cmd(con, tx, "INSERT INTO scout_assignments VALUES ($a,$b,$c,$d,$e,$f,$g,$h,$i)", "$a", "$b", "$c", "$d", "$e", "$f", "$g", "$h", "$i"))
             foreach (var a in w.ScoutAssignments)
                 Run(cmd, a.Id, a.ScoutId, a.Task.ToString(), a.PlayerId, a.LeagueId, a.Position?.ToString(), a.MaxAge, D(a.Start), D(a.End));
-        using (var cmd = Cmd(con, tx, "INSERT INTO scout_reports VALUES ($a,$b,$c,$d,$e,$f)", "$a", "$b", "$c", "$d", "$e", "$f"))
-            foreach (var r in w.ScoutReports) Run(cmd, r.PlayerId, D(r.Date), r.StrengthStars, r.PotentialStars, r.Recommendation.ToString(), r.Summary);
+        using (var cmd = Cmd(con, tx, "INSERT INTO scout_reports VALUES ($a,$b,$c,$d,$e,$f,$g)", "$a", "$b", "$c", "$d", "$e", "$f", "$g"))
+            foreach (var r in w.ScoutReports)
+                Run(cmd, r.PlayerId, D(r.Date), r.StrengthStars, r.PotentialStars, r.Recommendation.ToString(), r.SummaryRef?.ToString() ?? r.Summary, Ref(r.SummaryRef));
         using (var cmd = Cmd(con, tx, "INSERT INTO knowledge VALUES ($a,$b)", "$a", "$b"))
             foreach (var (id, v) in w.Knowledge) Run(cmd, id, v);
     }
@@ -652,16 +664,16 @@ public static class SqliteStore
                 Date = PD(r.GetString(0)), PlayerId = r.GetInt32(1), FromClubId = NInt(r, 2), ToClubId = NInt(r, 3),
                 Fee = r.GetInt64(4), Loan = r.GetInt32(5) == 1, SeasonYear = r.GetInt32(6),
             });
-        foreach (var r in Rows(con, "SELECT date, club_id, type, amount, text FROM transactions ORDER BY ord"))
+        foreach (var r in Rows(con, "SELECT date, club_id, type, amount, text, text_ref FROM transactions ORDER BY ord"))
             w.Transactions.Add(new Transaction
             {
                 Date = PD(r.GetString(0)), ClubId = r.GetInt32(1), Type = Enum.Parse<TransactionType>(r.GetString(2)),
-                Amount = r.GetInt64(3), Text = r.GetString(4),
+                Amount = r.GetInt64(3), Text = r.GetString(4), TextRef = PRef(r, 5),
             });
-        foreach (var r in Rows(con, "SELECT from_club, to_club, due, amount, text FROM installments ORDER BY ord"))
+        foreach (var r in Rows(con, "SELECT from_club, to_club, due, amount, text, text_ref FROM installments ORDER BY ord"))
             w.Installments.Add(new Installment
             {
-                FromClubId = r.GetInt32(0), ToClubId = r.GetInt32(1), Due = PD(r.GetString(2)), Amount = r.GetInt64(3), Text = r.GetString(4),
+                FromClubId = r.GetInt32(0), ToClubId = r.GetInt32(1), Due = PD(r.GetString(2)), Amount = r.GetInt64(3), Text = r.GetString(4), TextRef = PRef(r, 5),
             });
         foreach (var r in Rows(con, "SELECT data FROM negotiations ORDER BY id"))
             w.Negotiations.Add(PJ<Negotiation>(r.GetString(0))!);
@@ -684,7 +696,7 @@ public static class SqliteStore
             w.ScoutReports.Add(new ScoutReport
             {
                 PlayerId = r.GetInt32(0), Date = PD(r.GetString(1)), StrengthStars = r.GetDouble(2), PotentialStars = r.GetDouble(3),
-                Recommendation = r.GetString(4)[0], Summary = r.GetString(5),
+                Recommendation = r.GetString(4)[0], Summary = r.GetString(5), SummaryRef = PRef(r, 6),
             });
         foreach (var r in Rows(con, "SELECT player_id, value FROM knowledge"))
             w.Knowledge[r.GetInt32(0)] = r.GetInt32(1);
@@ -693,6 +705,9 @@ public static class SqliteStore
     // ------------------------------------------------------------------ Hilfen
 
     private static string J<T>(T value) => JsonSerializer.Serialize(value, Json.Compact);
+    private static string? Ref(TextRef? r) => r is null ? null : J(r);
+    private static TextRef? PRef(SqliteDataReader r, int i) => r.IsDBNull(i) ? null : PJ<TextRef>(r.GetString(i));
+    private static string? NStr(SqliteDataReader r, int i) => r.IsDBNull(i) ? null : r.GetString(i);
     private static T? PJ<T>(string s) => JsonSerializer.Deserialize<T>(s, Json.Compact);
 
     private static string D(DateOnly d) => d.ToString("yyyy-MM-dd", Inv);

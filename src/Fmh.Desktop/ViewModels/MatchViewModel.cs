@@ -127,7 +127,7 @@ public sealed partial class MatchViewModel : ViewModelBase
     {
         var world = Session.World;
         if (_fixture.Kind == CompetitionKind.League)
-            return T.Format("match.matchdayLabel", world.CompetitionName(_fixture.CompetitionId), _fixture.Matchday);
+            return T.Format("match.matchdayLabel", UiText.Competition(_fixture.CompetitionId), _fixture.Matchday);
         var cup = world.FindCup(_fixture.CompetitionId);
         var round = cup?.Rounds.FirstOrDefault(r => r.Number == _fixture.Matchday)?.Name ?? "";
         var leg = _fixture.Leg switch { 1 => " · " + T["cup.firstLeg"], 2 => " · " + T["cup.secondLeg"], _ => "" };
@@ -158,10 +158,10 @@ public sealed partial class MatchViewModel : ViewModelBase
         {
             new(T["match.opponent"], $"{opp.Name} ({(_side == Side.Home ? T["match.atHome"] : T["match.away"])})"),
             new(T["match.tablePosition"], oppRow is null
-                ? T.Format("match.positionsOther", ownRow.Position, ownRow.Points, world.CompetitionName(opp.LeagueId))
+                ? T.Format("match.positionsOther", ownRow.Position, ownRow.Points, UiText.Competition(opp.LeagueId))
                 : oppLeague == world.LeagueOf(own)
                     ? T.Format("match.positions", ownRow.Position, ownRow.Points, oppRow.Position, oppRow.Points)
-                    : T.Format("match.positionsLeague", ownRow.Position, ownRow.Points, oppRow.Position, oppLeague!.Name)),
+                    : T.Format("match.positionsLeague", ownRow.Position, ownRow.Points, oppRow.Position, UiText.Competition(oppLeague!.Id))),
             new(T["match.oppForm"], oppRow is null || oppRow.Form.Count == 0 ? "–" : string.Join(" ", oppRow.Form.Select(f => T["form." + f]))),
             new(T["match.oppFormation"], Data.Formation(opp.Tactic.FormationId).Name),
             new(T["match.keyPlayers"], string.Join(", ", keyPlayers)),

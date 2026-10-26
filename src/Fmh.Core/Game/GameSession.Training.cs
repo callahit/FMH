@@ -1,3 +1,4 @@
+using Fmh.Core.Data;
 using Fmh.Core.Logic;
 using Fmh.Core.Model;
 
@@ -166,8 +167,8 @@ public sealed partial class GameSession
         p.Training.RetrainProgress = 0;
         p.Positions[target] = current + 1;
         if (p.ClubId == HumanClub.Id)
-            Notify(MessageType.Training, "msg.sender.assistant", T.Format("msg.retrain.subject", p.Name),
-                T.Format("msg.retrain.body", p.Name, T["pos." + target], T["suit." + (current + 1)]));
+            Notify(MessageType.Training, "msg.sender.assistant", TR("msg.retrain.subject", p.Name),
+                TR("msg.retrain.body", p.Name, TR("pos." + target), TR("suit." + (current + 1))));
         if (current + 1 == Suitability.Natural) p.Training.Retrain = null;
     }
 
@@ -224,14 +225,14 @@ public sealed partial class GameSession
         var cost = CampCost(club, days);
         if (cost > club.Budget.Balance) return "neg.error.balance";
         club.Camp = new TrainingCamp { Goal = goal, Start = start, End = end, Cost = cost, Location = location };
-        Book(club, TransactionType.Other, -cost, T.Format("tx.camp", location));
+        Book(club, TransactionType.Other, -cost, TR("tx.camp", location));
         return null;
     }
 
     public void CancelCamp()
     {
         if (HumanClub.Camp is not { } camp || camp.Start <= World.Date) return;
-        Book(HumanClub, TransactionType.Other, camp.Cost / 2, T.Format("tx.campRefund", camp.Location));
+        Book(HumanClub, TransactionType.Other, camp.Cost / 2, TR("tx.campRefund", camp.Location));
         HumanClub.Camp = null;
     }
 }

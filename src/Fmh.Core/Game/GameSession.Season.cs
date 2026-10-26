@@ -47,8 +47,8 @@ public sealed partial class GameSession
             : row.Position > ownTable.Count - ownLeague.Format.Relegation ? "msg.seasonEnd.relegated"
             : row.Position == 1 ? "msg.seasonEnd.champion" : "msg.seasonEnd.neutral";
         Notify(MessageType.Season, "msg.sender.league",
-            T.Format("msg.seasonEnd.subject", ownLeague.Name, SeasonLabel(World.SeasonYear)),
-            T.Format("msg.seasonEnd.body", champ.Name, row.Position, row.Points, T.Format(verdictKey, own.Name)));
+            TR("msg.seasonEnd.subject", Comp(ownLeague.Id), SeasonLabel(World.SeasonYear)),
+            TR("msg.seasonEnd.body", champ.Name, row.Position, row.Points, TR(verdictKey, own.Name)));
     }
 
     /// <summary>Zum Saisonstart: Auf- und Abstieg, Vertragsende, Entwicklung, Karriereenden, neue Wettbewerbe.</summary>
@@ -82,9 +82,9 @@ public sealed partial class GameSession
         var b = HumanClub.Budget;
         var currency = World.Country(HumanClub.CountryCode).Currency;
         Notify(MessageType.Board, "msg.sender.board",
-            T.Format("msg.newSeason.subject", SeasonLabel(World.SeasonYear)),
-            T.Format("msg.newSeason.body", HumanClub.Name, World.LeagueOf(HumanClub).Name,
-                Fmt.Money(b.TransferBudget, currency), Fmt.Money(b.WageBudget, currency)));
+            TR("msg.newSeason.subject", SeasonLabel(World.SeasonYear)),
+            TR("msg.newSeason.body", HumanClub.Name, Comp(HumanClub.LeagueId),
+                TextArg.Money(b.TransferBudget, currency), TextArg.Money(b.WageBudget, currency)));
         return true;
     }
 
@@ -147,7 +147,7 @@ public sealed partial class GameSession
             p.Contract = null;
             if (club.Id == HumanClub.Id)
                 Notify(MessageType.Info, "msg.sender.assistant",
-                    T.Format("msg.retired.subject", p.Name), T.Format("msg.retired.body", p.Name, p.Age(today)));
+                    TR("msg.retired.subject", p.Name), TR("msg.retired.body", p.Name, p.Age(today)));
         }
         YouthSeasonStart(club);
     }
@@ -213,15 +213,15 @@ public sealed partial class GameSession
         var start = country.Season.StartMonth;
         if (World.Date == ScheduleGenerator.ParseDate(tw.WinterStart, World.SeasonYear, start))
         {
-            Notify(MessageType.Transfer, "msg.sender.assistant", T["msg.windowOpen.subject"], T["msg.windowOpen.winter"]);
+            Notify(MessageType.Transfer, "msg.sender.assistant", TR("msg.windowOpen.subject"), TR("msg.windowOpen.winter"));
             var expiring = World.SquadOf(HumanClub).Where(p => p.Contract is { } c && c.Until <= new DateOnly(World.SeasonYear + 1, 6, 30) && p.Loan is null).ToList();
             if (expiring.Count > 0)
-                Notify(MessageType.Contract, "msg.sender.assistant", T["msg.expiring.subject"],
-                    T.Format("msg.expiring.body", string.Join(", ", expiring.Select(p => p.Name))), MessageAction.ContractExpiring);
+                Notify(MessageType.Contract, "msg.sender.assistant", TR("msg.expiring.subject"),
+                    TR("msg.expiring.body", string.Join(", ", expiring.Select(p => p.Name))), MessageAction.ContractExpiring);
         }
         if (World.Date == ScheduleGenerator.ParseDate(tw.SummerEnd, World.SeasonYear, start).AddDays(1) ||
             World.Date == ScheduleGenerator.ParseDate(tw.WinterEnd, World.SeasonYear, start).AddDays(1))
-            Notify(MessageType.Transfer, "msg.sender.assistant", T["msg.windowClosed.subject"], T["msg.windowClosed.body"]);
+            Notify(MessageType.Transfer, "msg.sender.assistant", TR("msg.windowClosed.subject"), TR("msg.windowClosed.body"));
     }
 
     public bool IsTransferWindowOpen(Club? club = null)

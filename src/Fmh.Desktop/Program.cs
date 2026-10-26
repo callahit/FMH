@@ -5,17 +5,18 @@ using Fmh.Desktop.Services;
 
 namespace Fmh.Desktop;
 
-/// <summary>FMH – Fußball-Manager. Start: fmh [--data pfad] [--saves pfad]</summary>
+/// <summary>FMH – Fußball-Manager. Start: fmh [--data pfad] [--saves pfad] [--lang de|en|...]</summary>
 public static class Program
 {
     [STAThread]
     public static int Main(string[] args)
     {
-        string? dataPath = null, savePath = null;
+        string? dataPath = null, savePath = null, language = null;
         for (var i = 0; i < args.Length - 1; i++)
         {
             if (args[i] == "--data") dataPath = args[i + 1];
             if (args[i] == "--saves") savePath = args[i + 1];
+            if (args[i] == "--lang") language = args[i + 1];
         }
 
         GameData data;
@@ -36,7 +37,7 @@ public static class Program
             return 2;
         }
 
-        AppState.Initialise(data, savePath ?? SaveGame.DefaultDirectory());
+        AppState.Initialise(data, savePath ?? SaveGame.DefaultDirectory(), language);
         return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
     }
 

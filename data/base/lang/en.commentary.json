@@ -1,0 +1,263 @@
+{
+ "kickoff": [
+  "Kick-off! {home} against {away} – the ball is rolling.",
+  "Here we go! {home} welcome {away}.",
+  "The referee gets us underway: {home} against {away}."
+ ],
+ "secondHalf": [
+  "We are back for the second half.",
+  "The second half is underway, {t} kick off.",
+  "Play resumes! 45 minutes to go."
+ ],
+ "halfTime": [
+  "Half-time! It's {score}.",
+  "The break comes with the score at {score}.",
+  "The referee blows for half-time – {score}."
+ ],
+ "fullTime": [
+  "Full time! Final score {score}.",
+  "It's all over! {score}.",
+  "That's it! The match ends {score}."
+ ],
+ "stoppage": [
+  "Added time: {n} min.",
+  "The fourth official signals {n} minutes.",
+  "The board goes up: +{n}."
+ ],
+ "attack": [
+  "{p} drives forward {side}.",
+  "{t} combine {side}, {p} on the ball.",
+  "{p} looks for a way forward {side}.",
+  "{t} in possession, {p} gets involved {side}."
+ ],
+ "counter": [
+  "COUNTER! {p} is away {side} ...",
+  "Lightning transition from {t}, {p} breaks clear!",
+  "{t} on the counter, {p} has space to run into!"
+ ],
+ "dribble": [
+  "{p} leaves {o} for dead!",
+  "Lovely turn from {p}, {o} is left grasping at thin air.",
+  "{p} dances past {o}!"
+ ],
+ "cross": [
+  "Cross from {p} into the box ...",
+  "{p} whips the ball in from wide ...",
+  "High ball in from {p} ..."
+ ],
+ "aerialWon": [
+  "{p} rises highest!",
+  "{p} wins the header against {o}!",
+  "{p} gets his head to it!"
+ ],
+ "shot.normal.wide": [
+  "{p} lets fly ... just wide!",
+  "Shot from {p} ... past the post.",
+  "{p} tries his luck ... over!"
+ ],
+ "shot.normal.saved": [
+  "{p} shoots ... {g} saves!",
+  "Effort from {p} ... great save by {g}!",
+  "{p} from close range ... {g} is there!"
+ ],
+ "shot.normal.blocked": [
+  "Shot from {p} ... blocked!",
+  "{p} shoots, but a defender throws himself in the way.",
+  "{p}'s effort is blocked by a defender."
+ ],
+ "shot.normal.post": [
+  "{p} ... OFF THE POST! What bad luck!",
+  "{p} only hits the woodwork!",
+  "Crossbar! {p} was already celebrating."
+ ],
+ "shot.header.wide": [
+  "HEADER ... just over the bar!",
+  "Header from {p} ... wide!",
+  "{p} heads ... off target!"
+ ],
+ "shot.header.saved": [
+  "Header from {p} ... {g} claws it out!",
+  "{p} heads goalwards ... {g} holds it!"
+ ],
+ "shot.header.blocked": [
+  "Header from {p} ... deflected!"
+ ],
+ "shot.header.post": [
+  "Header from {p} ... off the bar!",
+  "{p} heads against the post!"
+ ],
+ "shot.longShot.wide": [
+  "{p} from distance ... well over.",
+  "Long-range effort from {p} ... well wide.",
+  "{p} just has a go ... wide."
+ ],
+ "shot.longShot.saved": [
+  "Long-range shot from {p} ... {g} gathers comfortably.",
+  "{p} from 25 yards ... {g} tips it over the bar!"
+ ],
+ "shot.longShot.blocked": [
+  "{p} tries from distance ... blocked."
+ ],
+ "shot.longShot.post": [
+  "{p} from distance ... off the angle of post and bar!"
+ ],
+ "shot.freeKick.wide": [
+  "... over the wall ... and just wide!",
+  "... the free kick goes over."
+ ],
+ "shot.freeKick.saved": [
+  "... over the wall ... {g} is equal to it!",
+  "... towards the keeper's corner ... {g} saves!"
+ ],
+ "shot.freeKick.blocked": [
+  "... into the wall."
+ ],
+ "shot.freeKick.post": [
+  "... over the wall ... off the post!"
+ ],
+ "shot.penalty.wide": [
+  "{p} runs up ... missed! Wide!",
+  "{p} shoots ... over the bar!"
+ ],
+ "shot.penalty.saved": [
+  "{p} runs up ... {g} SAVES! Penalty saved!",
+  "{p} steps up ... {g} guesses right!"
+ ],
+ "shot.penalty.blocked": [
+  "{p} runs up ... {g} saves!"
+ ],
+ "shot.penalty.post": [
+  "{p} runs up ... off the post!"
+ ],
+ "shot.oneOnOne.wide": [
+  "{p} one on one with {g} ... slides it wide!",
+  "{p} clear in front of goal ... and misses!"
+ ],
+ "shot.oneOnOne.saved": [
+  "{p} one on one with {g} ... saved!",
+  "{g} wins the duel against {p}!"
+ ],
+ "shot.oneOnOne.blocked": [
+  "{p} one on one with {g} ... cleared at the last second!"
+ ],
+ "shot.oneOnOne.post": [
+  "{p} one on one with {g} ... post!"
+ ],
+ "goal": [
+  "GOAL!!! {score} to {t}! {p} scores!",
+  "GOAL!!! {p} slots it home – {score}!",
+  "GOOOAL! {p} makes it {score} for {t}!"
+ ],
+ "goal.header": [
+  "GOAL!!! {score} to {t}! {p} heads in!",
+  "GOAL!!! A header from {p}, {score}!"
+ ],
+ "goal.longShot": [
+  "GOAL!!! {score}! {p} from distance – unstoppable!",
+  "GOAL!!! What a strike from {p}! {score}."
+ ],
+ "goal.freeKick": [
+  "GOAL!!! {score} to {t}! {p} curls it into the top corner!",
+  "GOAL!!! Free-kick goal from {p}, {score}!"
+ ],
+ "goal.penalty": [
+  "GOAL!!! {p} converts calmly, {score}.",
+  "GOAL!!! {p} keeps his cool from the spot – {score}."
+ ],
+ "goal.oneOnOne": [
+  "GOAL!!! {p} gives {g} no chance, {score}!",
+  "GOAL!!! {p} chips it over {g} – {score}!"
+ ],
+ "foul": [
+  "Foul by {p} on {o}.",
+  "{p} brings down {o}.",
+  "Free kick: {p} has fouled {o}."
+ ],
+ "foul.dangerous": [
+  "Foul by {p} on {o}, {m} metres from goal.",
+  "{p} brings {o} down – free kick from {m} metres!"
+ ],
+ "yellow": [
+  "YELLOW CARD for {p} ({t}).",
+  "Booked: {p} ({t}).",
+  "The referee shows yellow: {p} ({t})."
+ ],
+ "secondYellow": [
+  "SECOND YELLOW for {p} ({t})! {t} are down to ten men.",
+  "A second yellow for {p} – sent off!"
+ ],
+ "red": [
+  "RED CARD! {p} ({t}) has to go!",
+  "Straight red for {p} ({t})!"
+ ],
+ "freeKick": [
+  "Free kick to {t}, {p} takes it.",
+  "{p} places the ball ..."
+ ],
+ "freeKick.direct": [
+  "Free kick {p} from {n} metres ...",
+  "{p} steps up to the free kick from {n} metres ..."
+ ],
+ "penalty": [
+  "PENALTY to {t}! {o} has brought down {p} in the box!",
+  "The referee points to the spot! {o} fouls {p}."
+ ],
+ "corner": [
+  "Corner to {t}. {p} takes it.",
+  "Corner kick {t}, {p} swings it in."
+ ],
+ "offside": [
+  "Offside! {p} was too far forward.",
+  "The flag goes up – {p} offside."
+ ],
+ "goalKick": [
+  "Goal kick to {t}.",
+  "Goal kick, {t} build again."
+ ],
+ "injury": [
+  "{p} stays down ... that doesn't look good.",
+  "{p} ({t}) needs treatment.",
+  "Stoppage for an injury: {p} is holding his leg."
+ ],
+ "substitution": [
+  "Substitution for {t}: {p} replaces {o}.",
+  "{t} make a change: {o} off, {p} on."
+ ],
+ "endOfRegularTime": [
+  "After 90 minutes it's {score} – we're going to extra time!",
+  "The end of normal time with the score at {score}. Now for 30 more minutes.",
+  "No winner after 90 minutes: {score}. Extra time!"
+ ],
+ "extraTime": [
+  "Extra time is underway.",
+  "We're off again for the first half of extra time.",
+  "Legs are tiring, extra time begins."
+ ],
+ "extraTimeSecondHalf": [
+  "Change of ends in extra time, 15 minutes left.",
+  "The last quarter of an hour of extra time begins."
+ ],
+ "shootoutStart": [
+  "Penalty shoot-out! Nerves are frayed.",
+  "It's going to penalties – the spot will decide it.",
+  "No winner after 120 minutes: penalty shoot-out!"
+ ],
+ "shootoutKick.goal": [
+  "{p} steps up … and scores! ({pens})",
+  "{p} converts calmly. ({pens})",
+  "{p} sends {g} the wrong way. ({pens})"
+ ],
+ "shootoutKick.saved": [
+  "{p} is denied by {g}! ({pens})",
+  "{g} guesses right and saves from {p}! ({pens})"
+ ],
+ "shootoutKick.miss": [
+  "{p} puts it wide! ({pens})",
+  "Over! {p} misses. ({pens})"
+ ],
+ "shootoutEnd": [
+  "{t} win the shoot-out {pens}!",
+  "It's decided! {t} prevail on penalties ({pens}).",
+  "Wild celebrations from {t} – {pens} in the shoot-out!"
+ ]
+}

@@ -43,8 +43,8 @@ public sealed partial class LeaguePageViewModel : PageViewModel, IRefreshable
 {
     public LeaguePageViewModel(ShellViewModel shell) : base(shell)
     {
-        Leagues = Session.World.Leagues.Select(l => new LeagueChoice(l.Id, l.Name))
-            .Concat(Session.World.Cups.Where(c => c.SeasonYear == Session.World.SeasonYear).Select(c => new LeagueChoice(c.Id, c.Name, true)))
+        Leagues = Session.World.Leagues.Select(l => new LeagueChoice(l.Id, UiText.Competition(l.Id)))
+            .Concat(Session.World.Cups.Where(c => c.SeasonYear == Session.World.SeasonYear).Select(c => new LeagueChoice(c.Id, UiText.Competition(c.Id), true)))
             .ToList();
         _league = Leagues.First(l => l.Id == Session.HumanClub.LeagueId);
         Refresh();
@@ -130,7 +130,7 @@ public sealed partial class LeaguePageViewModel : PageViewModel, IRefreshable
         if (cup is null) { CupRounds = Array.Empty<CupRoundVm>(); return; }
         var own = Session.HumanClub.Id;
         var fixtures = cup.Fixtures.ToDictionary(f => f.Id);
-        CupRounds = cup.Rounds.Select(r => new CupRoundVm(r.Name, string.Join(", ", r.Dates.Select(Fmt.ShortDate)),
+        CupRounds = cup.Rounds.Select(r => new CupRoundVm(UiText.Round(r), string.Join(", ", r.Dates.Select(Fmt.ShortDate)),
             r.Ties.Select(t =>
             {
                 var score = t.Decision == "Bye" ? T["cup.bye"] : string.Join(" / ", t.FixtureIds.Select(id => fixtures.TryGetValue(id, out var f) && f.Result is { } res ? UiText.Score(res) : "– : –"));

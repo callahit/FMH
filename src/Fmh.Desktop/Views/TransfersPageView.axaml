@@ -54,7 +54,7 @@
               <DataGrid.Columns>
                 <DataGridTextColumn Header="{s:L col.pos}" Binding="{Binding Position}" SortMemberPath="PositionOrder" Width="64" />
                 <DataGridTextColumn Header="{s:L col.name}" Binding="{Binding Name}" Width="*" MinWidth="150" />
-                <DataGridTextColumn Header="{s:L col.age}" Binding="{Binding Age}" Width="60" />
+                <DataGridTextColumn Header="{s:L col.age}" Binding="{Binding Age}" Width="68" />
                 <DataGridTextColumn Header="{s:L col.club}" Binding="{Binding Club}" Width="170" />
                 <DataGridTemplateColumn Header="{s:L col.strength}" SortMemberPath="Strength" Width="84">
                   <DataGridTemplateColumn.CellTemplate>
@@ -65,9 +65,9 @@
                     </DataTemplate>
                   </DataGridTemplateColumn.CellTemplate>
                 </DataGridTemplateColumn>
-                <DataGridTextColumn Header="{s:L col.knowledge}" Binding="{Binding Knowledge}" Width="100" />
+                <DataGridTextColumn Header="{s:L col.knowledge}" Binding="{Binding Knowledge}" Width="118" />
                 <DataGridTextColumn Header="{s:L col.value}" Binding="{Binding ValueText}" SortMemberPath="Value" Width="130" />
-                <DataGridTextColumn Header="{s:L col.contract}" Binding="{Binding Contract}" SortMemberPath="ContractOrder" Width="92" />
+                <DataGridTextColumn Header="{s:L col.contract}" Binding="{Binding Contract}" SortMemberPath="ContractOrder" Width="104" />
                 <DataGridTextColumn Header="{s:L col.report}" Binding="{Binding Report}" Width="90" />
                 <DataGridTextColumn Header="{s:L col.flags}" Binding="{Binding Flags}" Width="120" />
               </DataGrid.Columns>
@@ -85,12 +85,12 @@
               <DataGrid.Columns>
                 <DataGridTextColumn Header="{s:L col.pos}" Binding="{Binding Position}" SortMemberPath="PositionOrder" Width="64" />
                 <DataGridTextColumn Header="{s:L col.name}" Binding="{Binding Name}" Width="*" MinWidth="150" />
-                <DataGridTextColumn Header="{s:L col.age}" Binding="{Binding Age}" Width="60" />
+                <DataGridTextColumn Header="{s:L col.age}" Binding="{Binding Age}" Width="68" />
                 <DataGridTextColumn Header="{s:L col.club}" Binding="{Binding Club}" Width="170" />
                 <DataGridTextColumn Header="{s:L col.strength}" Binding="{Binding StrengthText}" SortMemberPath="Strength" Width="84" />
-                <DataGridTextColumn Header="{s:L col.knowledge}" Binding="{Binding Knowledge}" Width="100" />
+                <DataGridTextColumn Header="{s:L col.knowledge}" Binding="{Binding Knowledge}" Width="118" />
                 <DataGridTextColumn Header="{s:L col.value}" Binding="{Binding ValueText}" SortMemberPath="Value" Width="130" />
-                <DataGridTextColumn Header="{s:L col.contract}" Binding="{Binding Contract}" SortMemberPath="ContractOrder" Width="92" />
+                <DataGridTextColumn Header="{s:L col.contract}" Binding="{Binding Contract}" SortMemberPath="ContractOrder" Width="104" />
                 <DataGridTextColumn Header="{s:L col.report}" Binding="{Binding Report}" Width="90" />
               </DataGrid.Columns>
             </DataGrid>

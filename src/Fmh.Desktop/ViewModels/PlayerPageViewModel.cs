@@ -198,7 +198,7 @@ public sealed partial class PlayerPageViewModel : PageViewModel
 
         var report = s.ReportFor(p);
         HasReport = report is not null && !IsOwn;
-        ReportText = report is null ? "" : $"{T["player.report"]} {report.Recommendation} · {UiText.Stars(report.StrengthStars)} / {UiText.Stars(report.PotentialStars)}\n{report.Summary}";
+        ReportText = report is null ? "" : $"{T["player.report"]} {report.Recommendation} · {UiText.Stars(report.StrengthStars)} / {UiText.Stars(report.PotentialStars)}\n{report.SummaryText(T)}";
 
         var actions = new List<ActionButton>();
         if (IsOwn && p.IsYouth)

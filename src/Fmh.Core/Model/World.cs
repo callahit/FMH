@@ -116,9 +116,18 @@ public sealed class Message
     public int ManagerId { get; set; }
     public DateOnly Date { get; set; }
     public MessageType Type { get; set; }
+    /// <summary>Wörtliche Texte aus Spielständen vor der Mehrsprachigkeit; neue Nachrichten nutzen die Verweise.</summary>
     public string Sender { get; set; } = "";
     public string Subject { get; set; } = "";
     public string Body { get; set; } = "";
+    /// <summary>Sprachneutrale Texte, die bei jeder Anzeige in der gewählten Sprache aufgebaut werden.</summary>
+    public string? SenderKey { get; set; }
+    public Data.TextRef? SubjectRef { get; set; }
+    public Data.TextRef? BodyRef { get; set; }
+
+    public string SenderText(Data.Texts t) => SenderKey is { Length: > 0 } k ? t[k] : Sender;
+    public string SubjectText(Data.Texts t) => SubjectRef is { } r ? t.Render(r) : Subject;
+    public string BodyText(Data.Texts t) => BodyRef is { } r ? t.Render(r) : Body;
     public bool Read { get; set; }
     public MessageAction Action { get; set; }
     public int? ActionRefId { get; set; }

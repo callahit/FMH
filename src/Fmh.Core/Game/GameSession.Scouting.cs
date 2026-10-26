@@ -1,3 +1,4 @@
+using Fmh.Core.Data;
 using Fmh.Core.Logic;
 using Fmh.Core.Model;
 
@@ -89,8 +90,8 @@ public sealed partial class GameSession
             {
                 case ScoutTask.WatchPlayer when a.PlayerId is { } id && World.Players.TryGetValue(id, out var p):
                     var report = MakeReport(scout, p);
-                    Notify(MessageType.Scouting, "msg.sender.scout", T.Format("msg.scoutReport.subject", p.Name),
-                        T.Format("msg.scoutReport.body", scout.Name, p.Name, report.Recommendation, report.Summary),
+                    Notify(MessageType.Scouting, "msg.sender.scout", TR("msg.scoutReport.subject", p.Name),
+                        TR("msg.scoutReport.body", scout.Name, p.Name, report.Recommendation.ToString(), report.SummaryRef),
                         MessageAction.ScoutReport, p.Id);
                     break;
                 case ScoutTask.SearchRegion:
@@ -119,22 +120,22 @@ public sealed partial class GameSession
             .ToList();
         if (found.Count == 0)
         {
-            Notify(MessageType.Scouting, "msg.sender.scout", T["msg.scoutSearch.subject"], T.Format("msg.scoutSearch.none", scout.Name));
+            Notify(MessageType.Scouting, "msg.sender.scout", TR("msg.scoutSearch.subject"), TR("msg.scoutSearch.none", scout.Name));
             return;
         }
-        var lines = new List<string>();
+        var lines = new List<TextRef>();
         foreach (var p in found)
         {
             AddKnowledge(p, 30 + scout.JudgingAbility);
             var r = MakeReport(scout, p);
-            lines.Add($"{r.Recommendation} · {p.Name} ({T["pos." + p.MainPosition]}, {p.Age(World.Date)}) – {ClubName(p)}");
+            lines.Add(TR("msg.scoutSearch.line", r.Recommendation.ToString(), p.Name, TR("pos." + p.MainPosition), p.Age(World.Date), ClubName(p)));
             if (!HumanClub.Shortlist.Contains(p.Id) && r.Recommendation is 'A' or 'B') HumanClub.Shortlist.Add(p.Id);
         }
-        Notify(MessageType.Scouting, "msg.sender.scout", T["msg.scoutSearch.subject"],
-            T.Format("msg.scoutSearch.body", scout.Name, string.Join("\n", lines)));
+        Notify(MessageType.Scouting, "msg.sender.scout", TR("msg.scoutSearch.subject"),
+            TR("msg.scoutSearch.body", scout.Name, TextArg.Join("\n", lines)));
     }
 
-    private string ClubName(Player p) => p.ClubId is { } c ? World.Clubs[c].Name : T["transfer.freeAgent"];
+    private TextArg ClubName(Player p) => p.ClubId is { } c ? TextArg.Literal(World.Clubs[c].Name) : TextArg.Key("transfer.freeAgent");
 
     private void OpponentReport(Scout scout)
     {
@@ -145,9 +146,9 @@ public sealed partial class GameSession
         var formation = Data.Formation(opp.Tactic.FormationId).Name;
         var best = squad.Where(p => p.IsAvailable).OrderByDescending(Rating).Take(3).Select(p => p.Name);
         var absent = squad.Where(p => !p.IsAvailable).OrderByDescending(Rating).Take(3).Select(p => p.Name).ToList();
-        Notify(MessageType.Scouting, "msg.sender.scout", T.Format("msg.opponentReport.subject", opp.Name),
-            T.Format("msg.opponentReport.body", scout.Name, opp.Name, formation, T["mentality." + opp.Tactic.Mentality],
-                string.Join(", ", best), absent.Count == 0 ? T["ui.none"] : string.Join(", ", absent)));
+        Notify(MessageType.Scouting, "msg.sender.scout", TR("msg.opponentReport.subject", opp.Name),
+            TR("msg.opponentReport.body", scout.Name, opp.Name, formation, TR("mentality." + opp.Tactic.Mentality),
+                string.Join(", ", best), absent.Count == 0 ? TR("ui.none") : TextRef.Literal(string.Join(", ", absent))));
     }
 
     // ------------------------------------------------------------------ Berichte
@@ -190,7 +191,7 @@ public sealed partial class GameSession
         var report = new ScoutReport
         {
             PlayerId = p.Id, Date = World.Date, StrengthStars = strength, PotentialStars = potential,
-            Recommendation = rec, Summary = T.Format(summaryKey, p.ShortName),
+            Recommendation = rec, SummaryRef = TR(summaryKey, p.ShortName),
         };
         World.ScoutReports.RemoveAll(r => r.PlayerId == p.Id);
         World.ScoutReports.Add(report);

@@ -40,9 +40,10 @@ public static class Program
             data = new GameData
             {
                 Packages = data.Packages, Countries = data.Countries, Clubs = data.Clubs, Names = data.Names,
-                Formations = data.Formations, PositionProfiles = data.PositionProfiles, Injuries = data.Injuries,
-                Texts = data.Texts, Commentary = data.Commentary, Engine = Json.Load<EngineConfig>(enginePath),
+                Formations = data.Formations, PositionProfiles = data.PositionProfiles, Injuries = data.Injuries, Roles = data.Roles,
+                Languages = data.Languages, DefaultLanguage = data.DefaultLanguage, Engine = Json.Load<EngineConfig>(enginePath),
             };
+            data.UseLanguage(data.DefaultLanguage);
         }
 
         var seed = ulong.Parse(opts.Get("seed") ?? "1", CultureInfo.InvariantCulture);

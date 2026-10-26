@@ -10,6 +10,12 @@ public static class UiText
 {
     private static Texts T => AppState.Current.T;
 
+    /// <summary>Name eines Wettbewerbs in der gewählten Sprache ("competition.&lt;id&gt;"), sonst der Name aus den Daten.</summary>
+    public static string Competition(string id) =>
+        T.TryGet("competition." + id) ?? AppState.Current.Session?.World.CompetitionName(id) ?? id;
+
+    public static string Round(CupRound r) => r.NameKey is { Length: > 0 } k ? T.Format(k, r.Number) : r.Name;
+
     /// <summary>Ergebnis mit Zusatz für Verlängerung und Elfmeterschießen, z. B. "2 : 2 i. E. 4 : 3".</summary>
     public static string Score(MatchResult r)
     {

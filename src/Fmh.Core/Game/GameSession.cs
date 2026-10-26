@@ -73,10 +73,18 @@ public sealed partial class GameSession
     /// <summary>Ungelesene Pflicht-Entscheidungen blockieren das Weiterspielen (Kapitel 3).</summary>
     public IReadOnlyList<Message> PendingDecisions => Inbox.Where(m => m.Required && !m.Resolved).ToList();
 
-    private Message Notify(MessageType type, string senderKey, string subject, string body,
+    private static TextRef TR(string key, params object?[] args) => TextRef.Of(key, args);
+
+    /// <summary>Wettbewerbsname (Liga, Pokal, Relegation) als übersetzbarer Text.</summary>
+    private TextArg Comp(string id) => Messages.Competition(World, id);
+
+    /// <summary>Rundenname eines Pokals als übersetzbarer Text.</summary>
+    private static TextArg Round(CupRound r) => r.NameKey is { Length: > 0 } k ? TextArg.Of(TR(k, r.Number)) : TextArg.Literal(r.Name);
+
+    private Message Notify(MessageType type, string senderKey, TextRef subject, TextRef body,
                            MessageAction action = MessageAction.None, int? refId = null, bool required = false)
     {
-        var m = Messages.Add(World, HumanManager, type, T[senderKey], subject, body);
+        var m = Messages.Add(World, HumanManager, type, senderKey, subject, body);
         m.Action = action;
         m.ActionRefId = refId;
         m.Required = required;
@@ -220,7 +228,7 @@ public sealed partial class GameSession
                 club.PlayerIds.Add(p.Id);
             }
             if (club.Id == HumanClub.Id)
-                Notify(MessageType.Info, "msg.sender.assistant", T.Format("msg.emergency.subject", p.Name), T.Format("msg.emergency.body", p.Name));
+                Notify(MessageType.Info, "msg.sender.assistant", TR("msg.emergency.subject", p.Name), TR("msg.emergency.body", p.Name));
             LineupSelector.Repair(club, World, Data, BenchSize(club));
         }
     }
@@ -312,7 +320,7 @@ public sealed partial class GameSession
             p.State.SuspendedMatches--;
             if (p.State.SuspendedMatches == 0 && club.Id == HumanClub.Id)
                 Notify(MessageType.Discipline, "msg.sender.assistant",
-                    T.Format("msg.suspensionOver.subject", p.Name), T.Format("msg.suspensionOver.body", p.Name));
+                    TR("msg.suspensionOver.subject", p.Name), TR("msg.suspensionOver.body", p.Name));
         }
     }
 
@@ -356,7 +364,7 @@ public sealed partial class GameSession
                 p.State.SuspendedMatches += secondYellow ? discipline.SecondYellowBan : _rng.Next(discipline.RedCardBanMin, discipline.RedCardBanMax);
                 if (human)
                     Notify(MessageType.Discipline, "msg.sender.association",
-                        T.Format("msg.suspension.subject", p.Name), T.Format("msg.suspension.body", p.Name, p.State.SuspendedMatches));
+                        TR("msg.suspension.subject", p.Name), TR("msg.suspension.body", p.Name, p.State.SuspendedMatches));
             }
             else if (mp.Yellow)
             {
@@ -367,7 +375,7 @@ public sealed partial class GameSession
                     p.State.SuspendedMatches += 1;
                     if (human)
                         Notify(MessageType.Discipline, "msg.sender.association",
-                            T.Format("msg.yellowBan.subject", p.Name), T.Format("msg.yellowBan.body", p.Name, discipline.YellowCardsForSuspension));
+                            TR("msg.yellowBan.subject", p.Name), TR("msg.yellowBan.body", p.Name, discipline.YellowCardsForSuspension));
                 }
             }
 
@@ -385,7 +393,7 @@ public sealed partial class GameSession
         p.State.Injury = new Injury { Type = type, DaysRemaining = days, TotalDays = days };
         if (notify)
             Notify(MessageType.Medical, "msg.sender.doctor",
-                T.Format("msg.injury.subject", p.Name), T.Format("msg.injury.body", p.Name, T["injury." + type], days));
+                TR("msg.injury.subject", p.Name), TR("msg.injury.body", p.Name, TR("injury." + type), days));
     }
 
     private PlayerSeasonStats EnsureSeasonStats(Player p, Club club)
@@ -422,7 +430,7 @@ public sealed partial class GameSession
                     }
                     if (p.ClubId == HumanClub.Id && !p.IsYouth)
                         Notify(MessageType.Medical, "msg.sender.doctor",
-                            T.Format("msg.fit.subject", p.Name), T.Format("msg.fit.body", p.Name));
+                            TR("msg.fit.subject", p.Name), TR("msg.fit.body", p.Name));
                 }
             }
             else

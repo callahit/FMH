@@ -20,7 +20,10 @@ public static class TestAppBuilder
 {
     public static AppBuilder BuildAvaloniaApp()
     {
-        AppState.Initialise(TestData.Data, Path.Combine(Path.GetTempPath(), "fmh-ui-" + Guid.NewGuid()));
+        // Eigene Datenkopie und Einstellungsdatei: Sprachwechsel in Oberflächentests betreffen andere Tests nicht.
+        var dir = Path.Combine(Path.GetTempPath(), "fmh-ui-" + Guid.NewGuid());
+        var data = Fmh.Core.Data.PackageLoader.Load(Fmh.Core.Data.PackageLoader.FindDataRoot());
+        AppState.Initialise(data, Path.Combine(dir, "saves"), "de", Path.Combine(dir, "settings.json"));
         MatchViewModel.UseTimer = false;
         return AppBuilder.Configure<App>()
             .UseSkia()
@@ -32,6 +35,7 @@ public static class TestAppBuilder
 /// <summary>
 /// Oberflächentests ohne Bildschirm (Avalonia Headless). Mit FMH_SHOTS=&lt;ordner&gt; werden Bildschirmfotos gespeichert.
 /// </summary>
+[Collection("Sprache")]
 public class UiTests
 {
     private static (Window window, MainWindowViewModel vm) Open()
@@ -247,6 +251,52 @@ public class UiTests
         inbox.RejectOfferCommand.Execute(null);
         Assert.Empty(session.PendingDecisions);
         Assert.False(string.IsNullOrEmpty(inbox.ActionResult));
+    }
+
+    [AvaloniaFact]
+    public void LanguageCanBeSwitchedAtStartAndInGame()
+    {
+        var (w, vm) = Open();
+        try
+        {
+            var start = Assert.IsType<StartViewModel>(vm.Screen);
+            Assert.Contains("English", start.Languages);
+            start.LanguageIndex = start.Languages.ToList().IndexOf("English");
+            Pump();
+            Assert.Equal("en", AppState.Current.Language);
+            Assert.Contains(VisibleTexts(w), t => t == "New game");
+            AssertNoMissingTexts(w);
+            Shot(w, "40_start_en");
+            // Die Wahl wird gespeichert und gilt beim nächsten Start.
+            Assert.Equal("en", Fmh.Desktop.Services.AppSettings.Load(AppState.Current.SettingsFile).Language);
+
+            var shell = StartGame(vm);
+            Pump();
+            Assert.Contains(VisibleTexts(w), t => t == "Inbox");
+            var welcome = AppState.Current.Session!.Inbox.Last();
+            Assert.StartsWith("Welcome to", welcome.SubjectText(AppState.Current.T));
+            shell.OpenPage<TransfersPageViewModel>();
+            Pump();
+            AssertNoMissingTexts(w);
+            Shot(w, "41_transfers_en");
+
+            // Wechsel im laufenden Spiel über die Einstellungen: dieselbe Seite, jetzt auf Deutsch, auch ältere Nachrichten.
+            shell.OptionsCommand.Execute(null);
+            var options = Assert.IsType<OptionsViewModel>(vm.Dialog);
+            var lang = options.Settings.First(x => x.Label == "Language");
+            lang.SelectedIndex = lang.Options.ToList().IndexOf("Deutsch");
+            Pump();
+            Assert.Equal("de", AppState.Current.Language);
+            var shell2 = Assert.IsType<ShellViewModel>(vm.Screen);
+            Assert.IsType<TransfersPageViewModel>(shell2.Page);
+            Assert.StartsWith("Willkommen bei", welcome.SubjectText(AppState.Current.T));
+            Assert.Contains(VisibleTexts(w), t => t == "Posteingang");
+            AssertNoMissingTexts(w);
+        }
+        finally
+        {
+            AppState.Current.SetLanguage("de");
+        }
     }
 
     [AvaloniaFact]

@@ -34,7 +34,7 @@
             </DataGridTemplateColumn.CellTemplate>
           </DataGridTemplateColumn>
           <DataGridTextColumn Header="{s:L col.name}" Binding="{Binding Name}" Width="*" MinWidth="150" />
-          <DataGridTextColumn Header="{s:L col.age}" Binding="{Binding Age}" Width="60" />
+          <DataGridTextColumn Header="{s:L col.age}" Binding="{Binding Age}" Width="68" />
           <DataGridTemplateColumn Header="{s:L col.strength}" SortMemberPath="Strength" Width="84">
             <DataGridTemplateColumn.CellTemplate>
               <DataTemplate x:DataType="vm:PlayerRow">
@@ -72,7 +72,7 @@
           <DataGridTextColumn Header="{s:L col.apps}" Binding="{Binding Apps}" Width="56" />
           <DataGridTextColumn Header="{s:L col.goals}" Binding="{Binding Goals}" Width="62" />
           <DataGridTextColumn Header="{s:L col.grade}" Binding="{Binding GradeText}" SortMemberPath="Grade" Width="66" />
-          <DataGridTextColumn Header="{s:L col.contract}" Binding="{Binding ContractUntil}" SortMemberPath="ContractOrder" Width="92" />
+          <DataGridTextColumn Header="{s:L col.contract}" Binding="{Binding ContractUntil}" SortMemberPath="ContractOrder" Width="104" />
           <DataGridTextColumn Header="{s:L col.wage}" Binding="{Binding Wage}" SortMemberPath="WageValue" Width="130" />
         </DataGrid.Columns>
       </DataGrid>

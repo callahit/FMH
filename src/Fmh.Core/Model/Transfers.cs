@@ -45,7 +45,11 @@ public sealed class Transaction
     public int ClubId { get; set; }
     public TransactionType Type { get; set; }
     public long Amount { get; set; }
+    /// <summary>Wörtlicher Text aus Spielständen vor der Mehrsprachigkeit.</summary>
     public string Text { get; set; } = "";
+    public Data.TextRef? TextRef { get; set; }
+
+    public string Display(Data.Texts t) => TextRef is { } r ? t.Render(r) : Text;
 }
 
 /// <summary>Ratenzahlung einer Ablöse: wird jeweils am Stichtag fällig.</summary>
@@ -55,7 +59,11 @@ public sealed class Installment
     public int ToClubId { get; set; }
     public DateOnly Due { get; set; }
     public long Amount { get; set; }
+    /// <summary>Wörtlicher Text aus Spielständen vor der Mehrsprachigkeit.</summary>
     public string Text { get; set; } = "";
+    public Data.TextRef? TextRef { get; set; }
+
+    public string Display(Data.Texts t) => TextRef is { } r ? t.Render(r) : Text;
 }
 
 public sealed class TransferRecord
@@ -130,7 +138,11 @@ public sealed class Negotiation
     public long? CounterFee { get; set; }
     /// <summary>Forderung des Spielers (Wochengehalt).</summary>
     public int? WageDemand { get; set; }
+    /// <summary>Letzte Antwort (wörtlich, aus Spielständen vor der Mehrsprachigkeit).</summary>
     public string LastResponse { get; set; } = "";
+    public Data.TextRef? Response { get; set; }
+
+    public string ResponseText(Data.Texts t) => Response is { } r ? t.Render(r) : LastResponse;
     /// <summary>Angebot eines KI-Vereins an den menschlichen Manager (wartet auf Entscheidung).</summary>
     public bool Incoming { get; set; }
 }
