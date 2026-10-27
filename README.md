@@ -88,8 +88,8 @@ Farbthemen: Klassik, Hell, Terminal.
 - **Pokal und Relegation:**
   - Pokal mit 64 Teams: alle Vereine der 1. bis 3. Liga und die acht Regionalligisten mit dem höchsten
     Ruf; Freilose und Heimrecht für Unterklassige; Verlängerung und Elfmeterschießen; neutrales Finale.
-  - Relegation 16. gegen 3. in Hin- und Rückspiel (1./2. und 2./3. Liga), Aufstiegsspiele der
-    Regionalliga-Meister aus Nord und Nordost.
+  - Relegation 16. gegen 3. in Hin- und Rückspiel (1./2. und 2./3. Liga), Aufstiegsspiele der beiden
+    Regionalliga-Meister ohne Direktplatz (jährlich wechselnd).
   - Ansicht mit allen Runden und Duellen.
 - **Jugend:** Nachwuchsleistungszentrum mit drei Altersstufen, siehe
   [Nachwuchsleistungszentrum](#nachwuchsleistungszentrum).
@@ -434,6 +434,10 @@ Ein Land beschreibt seine Pyramide als Ebenen mit Divisionen. Formate ändern si
   Abgänge je Ebene gleichen sich immer aus.
 - **Eigene Regeln je Staffel:** `groups[].movements` ersetzt die Regeln der Division für diese Staffel, z. B. steigen
   in der Regionalliga nur drei Meister direkt auf, die übrigen zwei spielen den vierten Platz aus.
+- **Rotation:** `cycle`/`cycleStart` an Bewegungsregeln und Relegationen lassen sie nur jede n-te Saison gelten. So
+  wechselt der dritte Direktaufstieg der Regionalliga wie in der Realität jährlich zwischen Nordost (2026/27), Süd
+  (Bayern, 2027/28) und Nord (2028/29); West und Südwest steigen immer direkt auf, die beiden anderen Meister spielen
+  den vierten Aufsteiger aus. Der Validator prüft jede Saison eines vollen Zyklus.
 - **Pool unter der untersten Ebene:** Ein Pool mit `feeds: "<Division>"` nimmt deren Absteiger auf; dafür steigen
   ebenso viele Poolvereine mit Lizenz auf (nach Ruf mit Zufallsanteil, bevorzugt aus der Region des Absteigers).
   Der Pool spielt keine Liga. Ohne `feeds` nimmt er nur am Pokal teil.
@@ -463,10 +467,8 @@ Mannschaften liegt unter `tests/Fmh.Tests/Packages/testland` (nur für Tests).
   ausländische Vereine. Echte Partien brauchen weitere Länder als Datenpakete.
 - **Saisonphasen:** Umgesetzt ist eine zweite Phase je Saison; mehrere Folgephasen (z. B. Play-offs um den Titel nach
   der Meisterrunde) folgen, wenn ein Land sie braucht.
-- **Deutschland:** Die Regionalliga-Aufstiegsregel ist fest (West, Südwest und Süd direkt, Nord gegen Nordost);
-  real wechselt der Aufstiegsmodus jährlich zwischen den Staffeln. Pokalplätze für Amateure gehen nach Ruf statt
-  über Landespokale. Die fiktiven Ortsnamen sind zusammengesetzt; Übereinstimmungen mit kleinen realen Orten sind
-  möglich, bekannte Vereinsorte sind ausgeschlossen.
+- **Deutschland:** Pokalplätze für Amateure gehen nach Ruf statt über Landespokale. Die fiktiven Ortsnamen sind
+  zusammengesetzt; Übereinstimmungen mit kleinen realen Orten sind möglich, bekannte Vereinsorte sind ausgeschlossen.
 - **Finanzen in Ebene 3–4:** Die Kosten steigen über fünf Saisons leicht stärker als die Einnahmen; in der
   fünften Saison bekommen einzelne Vereine der 3. Liga und Regionalliga Punktabzüge. Feinabstimmung mit
   weiteren Ländern (AP 4b).

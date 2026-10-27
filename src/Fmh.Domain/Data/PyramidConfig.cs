@@ -40,8 +40,11 @@ public sealed class MovementRule
     public string? Playoff { get; set; }
     /// <summary>Übergangsregel, die nur in dieser Saison (Startjahr) gilt, z. B. Sonderabsteiger vor einer Reform.</summary>
     public int? OnlySeason { get; set; }
+    /// <summary>Rotation: Die Regel gilt nur alle <see cref="Cycle"/> Saisons, erstmals in <see cref="CycleStart"/> (Startjahr).</summary>
+    public int? Cycle { get; set; }
+    public int CycleStart { get; set; }
 
-    public bool AppliesTo(int seasonYear) => OnlySeason is null || OnlySeason == seasonYear;
+    public bool AppliesTo(int seasonYear) => (OnlySeason is null || OnlySeason == seasonYear) && SeasonCycle.InCycle(Cycle, CycleStart, seasonYear);
 
     /// <summary>Plätze als Liste (1-basiert); leer bei ungültiger Angabe.</summary>
     public IReadOnlyList<int> PositionList()
@@ -52,6 +55,13 @@ public sealed class MovementRule
         if (parts.Length > 1 && !int.TryParse(parts[1], out to)) return Array.Empty<int>();
         return from <= to ? Enumerable.Range(from, to - from + 1).ToList() : Array.Empty<int>();
     }
+}
+
+/// <summary>Rotierende Regeln, z. B. wechselnde Direktaufstiegsplätze der Regionalliga.</summary>
+public static class SeasonCycle
+{
+    public static bool InCycle(int? cycle, int start, int seasonYear) =>
+        cycle is not { } c || c < 1 || ((seasonYear - start) % c + c) % c == 0;
 }
 
 /// <summary>Teilnehmer einer Relegation: Tabellenplatz einer Liga (bei geteilten Ligen aus jeder Staffel).</summary>
@@ -101,7 +111,7 @@ public static class FormatNormalizer
                 div.Movements.Add(new MovementRule { Positions = $"{div.Teams - div.Relegation + 1}-{div.Teams}", To = MovementDirection.Down });
             return div;
         }
-        var regular = div.Movements.Where(m => m.Kind == MovementKind.Direct && m.OnlySeason is null).ToList();
+        var regular = div.Movements.Where(m => m.Kind == MovementKind.Direct && m.OnlySeason is null && m.Cycle is null).ToList();
         if (div.Promotion == 0)
         {
             var up = regular.Where(m => m.To == MovementDirection.Up).SelectMany(m => m.PositionList()).ToHashSet();

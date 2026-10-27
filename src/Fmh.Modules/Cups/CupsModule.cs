@@ -68,7 +68,7 @@ public sealed partial class CupsModule : GameModule, ICupsService
     }
 
     private IEnumerable<PlayoffConfig> ActivePlayoffs(CountryConfig country) =>
-        country.Playoffs.Where(p => p.OnlySeason is null || p.OnlySeason == World.SeasonYear);
+        country.Playoffs.Where(p => p.AppliesTo(World.SeasonYear));
 
     /// <summary>Teilnehmer einer Relegation, sobald alle beteiligten Ligen fertig sind; bei geteilten Ligen aus jeder Staffel.</summary>
     private List<int>? Entrants(PlayoffConfig cfg)
