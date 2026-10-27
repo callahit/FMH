@@ -188,8 +188,10 @@ public sealed partial class FinanceModule
     public void CupPrize(Cup cup, int roundReached, IEnumerable<int> clubs)
     {
         var fin = World.Country(cup.CountryCode).Finance;
+        // Prämien des Pokals selbst, sonst die des Landes.
+        var prizes = cup.Config.Prizes ?? fin.CupPrizes;
         long amount = cup.Kind == CompetitionKind.Playoff ? fin.PlayoffPrize
-            : roundReached - 1 < fin.CupPrizes.Count ? fin.CupPrizes[Math.Max(0, roundReached - 1)] : fin.CupWinnerPrize;
+            : roundReached - 1 < prizes.Count ? prizes[Math.Max(0, roundReached - 1)] : cup.Config.WinnerPrize ?? fin.CupWinnerPrize;
         if (amount <= 0) return;
         foreach (var id in clubs)
             Book(World.Clubs[id], TransactionType.PrizeMoney, amount, TR("tx.cupPrize", Comp(cup.Id)));
