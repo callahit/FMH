@@ -172,7 +172,7 @@ public sealed partial class FinanceModule
             {
                 var pick = Rng.Pick(candidates);
                 var def = Data.Building(pick.Type)!;
-                var cost = FacilitiesModule.LevelCost(def, pick.Level + 1);
+                var cost = ClubRules.LevelCost(def, pick.Level + 1);
                 if (cost < b.Balance * 0.3) Facilities.Order(club, new ConstructionProject { Kind = ProjectKind.UpgradeBuilding, BuildingId = pick.Id, BuildingType = pick.Type, X = pick.X, Y = pick.Y, Amount = pick.Level + 1 }, cost, def.BuildDays / 2, Contractor.Standard, false);
             }
             if (club.Stadium.Capacity < 10_000 + club.Reputation * 3_500 && b.Balance > income)
@@ -198,11 +198,8 @@ public sealed partial class FinanceModule
         if (!running && club.Stadium.Floodlight < floodlight && Facilities.StadiumProjectQuote(club, ProjectKind.Floodlight, null) is { } q && q.cost < club.Budget.Balance + CreditLimit(club) / 2)
             Facilities.Order(club, new ConstructionProject { Kind = ProjectKind.Floodlight, Amount = 1 }, q.cost, q.days, Contractor.Premium, false);
         if (club.Academy.Stars < stars && club.Grounds.Buildings.FirstOrDefault(x => x.Type == "youthCentre") is { UnderConstruction: false } centre
-            && Data.Building("youthCentre") is { } def && centre.Level < def.MaxLevel && FacilitiesModule.LevelCost(def, centre.Level + 1) < club.Budget.Balance + CreditLimit(club) / 2)
+            && Data.Building("youthCentre") is { } def && centre.Level < def.MaxLevel && ClubRules.LevelCost(def, centre.Level + 1) < club.Budget.Balance + CreditLimit(club) / 2)
             Facilities.Order(club, new ConstructionProject { Kind = ProjectKind.UpgradeBuilding, BuildingId = centre.Id, BuildingType = centre.Type, X = centre.X, Y = centre.Y, Amount = centre.Level + 1 },
-                FacilitiesModule.LevelCost(def, centre.Level + 1), def.BuildDays / 2, Contractor.Premium, false);
+                ClubRules.LevelCost(def, centre.Level + 1), def.BuildDays / 2, Contractor.Premium, false);
     }
-
-    /// <summary>Wochengehalt eines Scouts aus seiner Urteilskraft.</summary>
-    public static int ScoutWage(Scout s) => (int)(Math.Round(250 * Math.Pow(1.2, (s.JudgingAbility + s.JudgingPotential) / 2.0) / 100) * 100);
 }

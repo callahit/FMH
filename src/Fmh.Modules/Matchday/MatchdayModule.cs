@@ -176,17 +176,7 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
         Training.AddFamiliarity(home, home.Tactic.FormationId, 2.5);
         Training.AddFamiliarity(away, away.Tactic.FormationId, 2.5);
 
-        if (f.Kind != CompetitionKind.League && World.FindCup(f.CompetitionId) is { } cup)
-            Cups.CupMatchPlayed(cup, f);
-        if (f.Involves(HumanClub.Id) && !Board.AwaitingNewJob)
-        {
-            Board.AfterHumanMatch(f);
-            if (!Board.AwaitingNewJob)
-            {
-                Press.MatchHeadline(f);
-                Press.SchedulePress(f, after: true);
-            }
-        }
+        Bus.Publish(new MatchPlayed(f, f.Involves(HumanClub.Id) && !Board.AwaitingNewJob));
     }
 
     private void ServeSuspensions(Club club)

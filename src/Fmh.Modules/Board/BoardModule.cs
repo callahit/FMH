@@ -30,7 +30,7 @@ public sealed partial class BoardModule : GameModule, IBoardService
             .ToList();
         b.Goal = ExpectedGoal(club);
         b.ManagerContractUntil = World.SeasonYear + 2;
-        b.ManagerWeeklyWage = (int)(Math.Round(2_500 * FacilitiesModule.Scale(club) / 100) * 100);
+        b.ManagerWeeklyWage = (int)(Math.Round(2_500 * ClubRules.Scale(club) / 100) * 100);
     }
 
     private bool HasTrait(Club club, BoardTrait t) => club.Board.Members.Any(m => m.Trait == t);
@@ -224,7 +224,7 @@ public sealed partial class BoardModule : GameModule, IBoardService
                     ChangeTrust(club, -1);
                     return TR("board.request.budget.no");
                 }
-                var extra = MarketValue.Round(Math.Max(club.Budget.TransferBudget * 0.15, 200_000 * FacilitiesModule.Scale(club)));
+                var extra = MarketValue.Round(Math.Max(club.Budget.TransferBudget * 0.15, 200_000 * ClubRules.Scale(club)));
                 club.Budget.TransferBudget += extra;
                 club.Budget.WageBudget = (long)(club.Budget.WageBudget * 1.05);
                 return TR("board.request.budget.yes", TextArg.Money(extra, Currency));
@@ -234,8 +234,8 @@ public sealed partial class BoardModule : GameModule, IBoardService
                 b.ManagerWeeklyWage = (int)(b.ManagerWeeklyWage * 1.15);
                 return TR("board.request.contract.yes", b.ManagerContractUntil + 1);
             case "youth":
-                if (b.Trust < 55 || club.Budget.Balance < 500_000 * FacilitiesModule.Scale(club)) return TR("board.request.youth.no");
-                var grant = MarketValue.Round(400_000 * FacilitiesModule.Scale(club));
+                if (b.Trust < 55 || club.Budget.Balance < 500_000 * ClubRules.Scale(club)) return TR("board.request.youth.no");
+                var grant = MarketValue.Round(400_000 * ClubRules.Scale(club));
                 Finance.Book(club, TransactionType.Other, grant, TR("tx.boardGrant"));
                 return TR("board.request.youth.yes", TextArg.Money(grant, Currency));
         }

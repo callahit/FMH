@@ -28,7 +28,7 @@ public sealed partial class PressModule : GameModule, IPressService
         var ctx = new HashSet<string> { "any" };
         if (club.Rivals.Contains(opp.Id)) ctx.Add("derby");
         if (opp.Reputation >= club.Reputation + 3 || f.Kind != CompetitionKind.League) ctx.Add("bigGame");
-        var recent = AllFixtures.Where(x => x.Involves(club.Id) && x.Result is not null && x != f).OrderByDescending(x => x.Date).Take(3).Select(x => Outcome(club, x)).ToList();
+        var recent = AllFixtures.Where(x => x.Involves(club.Id) && x.Result is not null && x != f).OrderByDescending(x => x.Date).Take(3).Select(x => ClubRules.Outcome(club, x)).ToList();
         if (recent.Count == 3 && recent.All(o => o > 0)) ctx.Add("streakWin");
         if (recent.Count == 3 && recent.All(o => o < 0)) ctx.Add("streakLoss");
         if (World.SquadOf(club).OrderByDescending(Transfers.Rating).Take(5).Any(p => p.State.Injury is not null)) ctx.Add("injury");
@@ -36,22 +36,13 @@ public sealed partial class PressModule : GameModule, IPressService
         if (club.Board.Trust < 35) ctx.Add("pressure");
         if (after && f.Result is not null)
         {
-            var o = Outcome(club, f);
+            var o = ClubRules.Outcome(club, f);
             ctx.Add(o > 0 ? "win" : o < 0 ? "loss" : "draw");
             var diff = Math.Abs(f.Result.HomeGoals - f.Result.AwayGoals);
             if (diff >= 3) ctx.Add(o > 0 ? "bigWin" : "bigLoss");
             if (f.Result.Cards.Any(c => c.Red && c.Home == (f.HomeId == club.Id))) ctx.Add("redCard");
         }
         return ctx;
-    }
-
-    public static int Outcome(Club club, Fixture f)
-    {
-        var r = f.Result!;
-        var home = f.HomeId == club.Id;
-        var diff = home ? r.HomeGoals - r.AwayGoals : r.AwayGoals - r.HomeGoals;
-        if (diff == 0 && r.PenaltiesHome is { } ph && r.PenaltiesAway is { } pa) diff = home ? ph - pa : pa - ph;
-        return Math.Sign(diff);
     }
 
     /// <summary>Pressekonferenz ansetzen; bei Delegation antwortet der Pressesprecher.</summary>
@@ -128,7 +119,7 @@ public sealed partial class PressModule : GameModule, IPressService
                     }
                     if (q.Category == "referee" && Rng.Chance(0.35 - Facilities.Effect(club, "fines") * 0.2))
                     {
-                        var fine = MarketValue.Round(15_000 * FacilitiesModule.Scale(club));
+                        var fine = MarketValue.Round(15_000 * ClubRules.Scale(club));
                         Finance.Book(club, TransactionType.Fines, -fine, TR("tx.pressFine"));
                         Notify(MessageType.Discipline, "msg.sender.association", TR("msg.pressFine.subject"), TR("msg.pressFine.body", TextArg.Money(fine, Currency)));
                     }
@@ -180,11 +171,11 @@ public sealed partial class PressModule : GameModule, IPressService
     {
         var club = HumanClub;
         var opp = World.Clubs[f.HomeId == club.Id ? f.AwayId : f.HomeId];
-        var o = Outcome(club, f);
+        var o = ClubRules.Outcome(club, f);
         var r = f.Result!;
         var diff = Math.Abs(r.HomeGoals - r.AwayGoals);
         var derby = club.Rivals.Contains(opp.Id);
-        var recent = AllFixtures.Where(x => x.Involves(club.Id) && x.Result is not null).OrderByDescending(x => x.Date).Take(4).Select(x => Outcome(club, x)).ToList();
+        var recent = AllFixtures.Where(x => x.Involves(club.Id) && x.Result is not null).OrderByDescending(x => x.Date).Take(4).Select(x => ClubRules.Outcome(club, x)).ToList();
         string? situation = derby && o != 0 ? (o > 0 ? "derbyWin" : "derbyLoss")
             : recent.Count == 4 && recent.All(x => x > 0) ? "streakWin"
             : recent.Count == 4 && recent.All(x => x < 0) ? "streakLoss"

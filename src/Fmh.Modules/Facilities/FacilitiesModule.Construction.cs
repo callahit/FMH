@@ -9,15 +9,6 @@ namespace Fmh.Core.Modules;
 /// <summary>Vereinsgelände: Bauaufträge, Baustellen und Startausstattung.</summary>
 public sealed partial class FacilitiesModule
 {
-    // ================================================================== Bauaufträge
-
-    public static (double cost, double days) ContractorFactors(Contractor c) => c switch
-    {
-        Contractor.Cheap => (0.85, 1.4),
-        Contractor.Premium => (1.3, 0.7),
-        _ => (1.0, 1.0),
-    };
-
     /// <summary>Was ein Stadionausbau kostet und wie lange er dauert (Standardunternehmen).</summary>
     public (long cost, int days)? StadiumProjectQuote(Club club, ProjectKind kind, StandSide? side)
     {
@@ -72,7 +63,7 @@ public sealed partial class FacilitiesModule
         if (b.Level >= def.MaxLevel) return "build.error.maxLevel";
         if (b.UnderConstruction) return "build.error.running";
         return Order(club, new ConstructionProject { Kind = ProjectKind.UpgradeBuilding, BuildingId = b.Id, BuildingType = b.Type, X = b.X, Y = b.Y, Amount = b.Level + 1 },
-            LevelCost(def, b.Level + 1), Math.Max(10, def.BuildDays / 2), contractor, financed);
+            ClubRules.LevelCost(def, b.Level + 1), Math.Max(10, def.BuildDays / 2), contractor, financed);
     }
 
     public string? MissingRequirement(Club club, BuildingDef def)
@@ -100,7 +91,7 @@ public sealed partial class FacilitiesModule
     public string? BuyLand()
     {
         var club = HumanClub;
-        var price = LandPrice(club) * club.Grounds.Height;
+        var price = ClubRules.LandPrice(club) * club.Grounds.Height;
         if (price > club.Budget.Balance) return "neg.error.balance";
         if (club.Grounds.ExtraColumns >= 6) return "build.error.noLand";
         Finance.Book(club, TransactionType.Construction, -price, TR("tx.land"));
@@ -110,7 +101,7 @@ public sealed partial class FacilitiesModule
 
     public string? Order(Club club, ConstructionProject p, long baseCost, int baseDays, Contractor contractor, bool financed)
     {
-        var (cf, df) = ContractorFactors(contractor);
+        var (cf, df) = ClubRules.ContractorFactors(contractor);
         var fin = World.Country(club.CountryCode).Finance;
         p.Id = World.NextProjectId++;
         p.Cost = MarketValue.Round(baseCost * cf);
@@ -257,7 +248,7 @@ public sealed partial class FacilitiesModule
             case ProjectKind.Heating: st.UndersoilHeating = true; break;
             case ProjectKind.Scoreboard: st.Scoreboard = Math.Min(3, st.Scoreboard + 1); break;
             case ProjectKind.NewStadium when p.Design is { } design:
-                club.Stadium = StadiumPlansModule.BuildNewStadium(club, design);
+                club.Stadium = StadiumBuilder.BuildNewStadium(club, design);
                 st = club.Stadium;
                 club.StadiumName = design.Name;
                 if (st.Capacity >= 50_000 && IsHuman(club)) Board.Achieve("bigStadium");
@@ -287,37 +278,6 @@ public sealed partial class FacilitiesModule
         var pitchCare = Effect(club, "pitch") + Staff.StaffAbility(club, StaffRole.Groundsman) * 0.25;
         club.Stadium.Pitch = Math.Clamp(club.Stadium.Pitch + pitchCare - 3 + (club.Stadium.UndersoilHeating ? 1 : 0), 30, 100);
         InvalidateEffects(club);
-    }
-
-    // ================================================================== Startausstattung
-
-    /// <summary>Stadion aus der Kapazität ableiten: vier Tribünen, Stehplatzanteil nach Vereinsgröße.</summary>
-    public static Stadium CreateStadium(Club club, Rng rng)
-    {
-        var cap = Math.Max(1_000, club.StadiumCapacity);
-        var standingShare = Math.Clamp(0.55 - club.Reputation * 0.02, 0.15, 0.55);
-        var shares = new[] { (StandSide.North, 0.22), (StandSide.South, 0.22), (StandSide.East, 0.28), (StandSide.West, 0.28) };
-        var st = new Stadium
-        {
-            Floodlight = club.Reputation >= 9 ? 3 + (club.Reputation >= 15 ? 1 : 0) : club.Reputation >= 5 ? 2 : 1,
-            UndersoilHeating = club.Reputation >= 11,
-            Scoreboard = Math.Clamp(club.Reputation / 6, 0, 3),
-            Pitch = 75 + club.Reputation,
-        };
-        foreach (var (side, share) in shares)
-        {
-            var c = (int)(cap * share);
-            // Stehplätze vor allem in den Kurven (Nord/Süd).
-            var standing = side is StandSide.North or StandSide.South ? (int)(c * Math.Min(0.95, standingShare * 1.8)) : (int)(c * standingShare * 0.2);
-            st.Stands.Add(new Stand
-            {
-                Side = side, Standing = standing, Seating = c - standing,
-                Roof = club.Reputation >= 8 || side == StandSide.West,
-                Boxes = side == StandSide.West ? Math.Clamp((club.Reputation - 4) * 3, 0, 40) : side == StandSide.East ? Math.Clamp((club.Reputation - 12) * 2, 0, 20) : 0,
-            });
-        }
-        club.StadiumCapacity = st.Capacity;
-        return st;
     }
 
     /// <summary>Startgebäude nach Vereinsgröße.</summary>

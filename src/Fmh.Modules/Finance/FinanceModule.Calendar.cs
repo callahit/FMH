@@ -31,8 +31,8 @@ public sealed partial class FinanceModule
         var wages = Budgets.WageBill(club, World);
         if (wages > 0) Book(club, TransactionType.Wages, -wages, TR("tx.wages"));
         var staff = World.Staff.Where(s => s.ClubId == club.Id).Sum(s => (long)s.WeeklyWage)
-                    + World.Scouts.Where(s => s.ClubId == club.Id).Sum(s => (long)ScoutWage(s))
-                    + (IsHuman(club) ? club.Board.ManagerWeeklyWage : (long)(club.Board.ManagerWeeklyWage > 0 ? club.Board.ManagerWeeklyWage : 2_000 * FacilitiesModule.Scale(club)));
+                    + World.Scouts.Where(s => s.ClubId == club.Id).Sum(s => (long)ClubRules.ScoutWage(s))
+                    + (IsHuman(club) ? club.Board.ManagerWeeklyWage : (long)(club.Board.ManagerWeeklyWage > 0 ? club.Board.ManagerWeeklyWage : 2_000 * ClubRules.Scale(club)));
         if (staff > 0) Book(club, TransactionType.StaffWages, -staff, TR("tx.staffWages"));
         var weekly = (Facilities.Effect(club, "income.weekly") + Facilities.Effect(club, "income.events") + Facilities.Effect(club, "income.patients")) * 0.5
                      + club.Grounds.Buildings.Where(b => b.Leased).Sum(b => Facilities.MonthlyUpkeep(club, b) * 0.4);
@@ -47,7 +47,7 @@ public sealed partial class FinanceModule
         Facilities.FacilitiesMonthly(club);
         var reduction = Math.Min(0.4, Facilities.Effect(club, "upkeep.reduction"));
         var upkeep = club.Grounds.Buildings.Where(b => !b.Leased && b.Level > 0).Sum(b => Facilities.MonthlyUpkeep(club, b))
-                     + StadiumUpkeep(club.Stadium);
+                     + ClubRules.StadiumUpkeep(club.Stadium);
         upkeep = (long)(upkeep * (1 - reduction));
         if (upkeep > 0) Book(club, TransactionType.Upkeep, -upkeep, TR("tx.upkeep"));
 
@@ -95,9 +95,6 @@ public sealed partial class FinanceModule
         while (f.History.Count > 36) f.History.RemoveAt(0);
         if (!IsHuman(club)) AiFinance(club);
     }
-
-    public static long StadiumUpkeep(Stadium st) =>
-        (long)(st.Capacity * 0.6 + st.Boxes * 400 + st.Floodlight * 3_000 + (st.UndersoilHeating ? 6_000 : 0) + st.Scoreboard * 1_500);
 
     /// <summary>Dauerkarten werden zum Stichtag verkauft (Kapitel 8).</summary>
     private void SeasonTicketSales()

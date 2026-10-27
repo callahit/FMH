@@ -157,7 +157,7 @@ public sealed partial class LicenseModule : GameModule, ILicenseService
             var upperOpen = LicenseGaps(club, div).Intersect(lic.UpperConditions).ToList();
             if (upperOpen.Count > 0)
             {
-                Finance.Book(club, TransactionType.Fines, -MarketValue.Round(100_000 * FacilitiesModule.Scale(club)), TR("tx.licenseFine"));
+                Finance.Book(club, TransactionType.Fines, -MarketValue.Round(100_000 * ClubRules.Scale(club)), TR("tx.licenseFine"));
                 if (human) Notify(MessageType.Finance, "msg.sender.league", TR("msg.licenseFinal.subject"), TR("msg.licenseFinal.upper", GapList(upperOpen, div)), MessageAction.License);
             }
             if (lic.Outcome != LicenseOutcome.Conditions) continue;
@@ -173,7 +173,7 @@ public sealed partial class LicenseModule : GameModule, ILicenseService
             club.Finance.PendingDeduction += penalty;
             club.Finance.LastLicense = LicenseOutcome.PointDeduction;
             lic.Outcome = LicenseOutcome.PointDeduction;
-            Finance.Book(club, TransactionType.Fines, -MarketValue.Round(50_000 * FacilitiesModule.Scale(club)), TR("tx.licenseFine"));
+            Finance.Book(club, TransactionType.Fines, -MarketValue.Round(50_000 * ClubRules.Scale(club)), TR("tx.licenseFine"));
             if (human)
                 Notify(MessageType.Finance, "msg.sender.league", TR("msg.licenseFinal.subject"),
                     TR("msg.licenseFinal.missed", GapList(open, Finance.DivisionFinance(club)), penalty), MessageAction.License);

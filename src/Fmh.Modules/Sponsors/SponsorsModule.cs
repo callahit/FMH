@@ -30,7 +30,7 @@ public sealed partial class SponsorsModule : GameModule, ISponsorsService
         var level = World.FindLeague(club.LeagueId)?.Level ?? 3;
         var leagueFactor = level switch { 1 => 1.0, 2 => 0.72, _ => 0.25 };
         var media = IsHuman(club) ? 0.8 + HumanManager.Career.Media / 250 : 1.0;
-        return 3_000_000 * FacilitiesModule.Scale(club) * leagueFactor * media * (1 + Facilities.Effect(club, "sponsor") + club.Stadium.Scoreboard * 0.02);
+        return 3_000_000 * ClubRules.Scale(club) * leagueFactor * media * (1 + Facilities.Effect(club, "sponsor") + club.Stadium.Scoreboard * 0.02);
     }
 
     public IEnumerable<(SponsorSlot slot, int index)> AllSlots()
