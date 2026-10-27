@@ -1,0 +1,353 @@
+[
+ {
+  "id": "pitchMoles",
+  "category": "stadium",
+  "weight": 1.5,
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "options": [
+   {
+    "id": "expert",
+    "effects": {
+     "money": -5000,
+     "pitch": 5
+    }
+   },
+   {
+    "id": "ignore",
+    "effects": {
+     "pitch": -10
+    }
+   }
+  ]
+ },
+ {
+  "id": "pitchFrost",
+  "category": "stadium",
+  "when": {
+   "months": [
+    12,
+    1,
+    2
+   ]
+  },
+  "options": [
+   {
+    "id": "covers",
+    "effects": {
+     "money": -8000,
+     "pitch": 5
+    }
+   },
+   {
+    "id": "nothing",
+    "effects": {
+     "pitch": -12
+    }
+   }
+  ]
+ },
+ {
+  "id": "pitchConcert",
+  "category": "stadium",
+  "when": {
+   "months": [
+    5,
+    6,
+    7
+   ]
+  },
+  "options": [
+   {
+    "id": "allow",
+    "effects": {
+     "money": 120000,
+     "pitch": -25
+    }
+   },
+   {
+    "id": "no",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "floodlightFail",
+  "category": "stadium",
+  "options": [
+   {
+    "id": "repair",
+    "effects": {
+     "money": -20000
+    }
+   }
+  ]
+ },
+ {
+  "id": "roofLeak",
+  "category": "stadium",
+  "options": [
+   {
+    "id": "repair",
+    "effects": {
+     "money": -30000,
+     "fans": 1
+    }
+   },
+   {
+    "id": "bucket",
+    "effects": {
+     "fans": -3
+    }
+   }
+  ]
+ },
+ {
+  "id": "stormDamage",
+  "category": "stadium",
+  "when": {
+   "months": [
+    10,
+    11,
+    12,
+    1,
+    2,
+    3
+   ]
+  },
+  "options": [
+   {
+    "id": "repair",
+    "effects": {
+     "money": -45000
+    }
+   }
+  ]
+ },
+ {
+  "id": "heatWave",
+  "category": "stadium",
+  "when": {
+   "months": [
+    6,
+    7,
+    8
+   ]
+  },
+  "options": [
+   {
+    "id": "water",
+    "effects": {
+     "money": -6000,
+     "pitch": 5,
+     "fans": 1
+    }
+   },
+   {
+    "id": "nothing",
+    "effects": {
+     "pitch": -8,
+     "fans": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "flooding",
+  "category": "stadium",
+  "options": [
+   {
+    "id": "pump",
+    "effects": {
+     "money": -25000,
+     "pitch": -5
+    }
+   }
+  ]
+ },
+ {
+  "id": "neighbourComplaint",
+  "category": "stadium",
+  "options": [
+   {
+    "id": "pay",
+    "effects": {
+     "money": -10000
+    }
+   },
+   {
+    "id": "ignore",
+    "effects": {
+     "media": -2
+    }
+   }
+  ]
+ },
+ {
+  "id": "historicFind",
+  "category": "stadium",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "options": [
+   {
+    "id": "museum",
+    "effects": {
+     "money": -10000,
+     "fans": 3,
+     "media": 2
+    }
+   },
+   {
+    "id": "sell",
+    "effects": {
+     "money": 20000,
+     "fans": -2
+    }
+   }
+  ]
+ },
+ {
+  "id": "seatVandalism",
+  "category": "stadium",
+  "when": {
+   "afterLoss": true
+  },
+  "options": [
+   {
+    "id": "repair",
+    "effects": {
+     "money": -15000
+    }
+   }
+  ]
+ },
+ {
+  "id": "parkingChaos",
+  "category": "stadium",
+  "options": [
+   {
+    "id": "shuttle",
+    "effects": {
+     "money": -12000,
+     "fans": 3
+    }
+   },
+   {
+    "id": "nothing",
+    "effects": {
+     "fans": -2
+    }
+   }
+  ]
+ },
+ {
+  "id": "pitchInvasion",
+  "category": "stadium",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "options": [
+   {
+    "id": "security",
+    "effects": {
+     "money": -10000,
+     "board": 1
+    }
+   },
+   {
+    "id": "ok",
+    "effects": {
+     "media": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "groundsmanGenius",
+  "category": "stadium",
+  "options": [
+   {
+    "id": "raise",
+    "effects": {
+     "money": -5000,
+     "pitch": 10
+    }
+   }
+  ]
+ },
+ {
+  "id": "bombScare",
+  "category": "stadium",
+  "styles": [
+   "Balanced",
+   "Serious"
+  ],
+  "options": [
+   {
+    "id": "evacuate",
+    "effects": {
+     "money": -20000,
+     "fans": -1,
+     "board": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "snowClearing",
+  "category": "stadium",
+  "when": {
+   "months": [
+    12,
+    1,
+    2
+   ]
+  },
+  "options": [
+   {
+    "id": "volunteers",
+    "effects": {
+     "fans": 4,
+     "pitch": -2
+    }
+   },
+   {
+    "id": "company",
+    "effects": {
+     "money": -12000
+    }
+   }
+  ]
+ },
+ {
+  "id": "citySite",
+  "category": "stadium",
+  "weight": 0.5,
+  "when": {
+   "minReputation": 6,
+   "noStadiumSite": true
+  },
+  "cooldownDays": 1800,
+  "options": [
+   {
+    "id": "accept",
+    "effects": {
+     "stadiumSite": 1,
+     "board": 2,
+     "media": 2
+    }
+   },
+   {
+    "id": "decline",
+    "effects": {
+     "fans": 2
+    }
+   }
+  ]
+ }
+]

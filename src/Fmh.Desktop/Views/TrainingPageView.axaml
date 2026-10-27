@@ -1,0 +1,115 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Fmh.Desktop.ViewModels"
+             xmlns:c="using:Fmh.Desktop.Controls"
+             xmlns:s="using:Fmh.Desktop.Services"
+             x:Class="Fmh.Desktop.Views.TrainingPageView"
+             x:DataType="vm:TrainingPageViewModel">
+  <DockPanel>
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*" Margin="0,0,0,12">
+      <TextBlock Classes="h1" Text="{Binding Title}" />
+      <TextBlock Grid.Column="1" Classes="muted" Text="{Binding CoachText}" VerticalAlignment="Bottom" Margin="18,0" />
+    </Grid>
+    <TextBlock DockPanel.Dock="Bottom" Classes="muted small" Text="{s:L help.training}" Margin="0,8,0,0" TextWrapping="Wrap" />
+    <ScrollViewer>
+      <Grid ColumnDefinitions="3*,2*" ColumnSpacing="14">
+        <StackPanel Spacing="14">
+          <!-- Wochenplan -->
+          <Border Classes="card">
+            <StackPanel Spacing="8">
+              <Grid ColumnDefinitions="*,Auto,Auto">
+                <TextBlock Classes="h3" Text="{s:L training.weekPlan}" VerticalAlignment="Center" />
+                <ComboBox Grid.Column="1" ItemsSource="{Binding Intensities}" SelectedIndex="{Binding IntensityIndex}" MinWidth="140" Margin="0,0,8,0" />
+                <Button Grid.Column="2" Content="{s:L training.reset}" Command="{Binding ResetPlanCommand}" />
+              </Grid>
+              <Grid ColumnDefinitions="60,*,*,*" Margin="0,4,0,0">
+                <TextBlock Grid.Column="1" Text="{s:L training.morning}" Classes="muted small" />
+                <TextBlock Grid.Column="2" Text="{s:L training.afternoon}" Classes="muted small" Margin="8,0,0,0" />
+              </Grid>
+              <ItemsControl ItemsSource="{Binding Days}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:TrainingDay">
+                    <Grid ColumnDefinitions="60,*,*,*" Margin="0,3" ColumnSpacing="8">
+                      <TextBlock Text="{Binding Day}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                      <ComboBox Grid.Column="1" ItemsSource="{Binding Morning.Options}" SelectedIndex="{Binding Morning.SelectedIndex}" HorizontalAlignment="Stretch" />
+                      <ComboBox Grid.Column="2" ItemsSource="{Binding Afternoon.Options}" SelectedIndex="{Binding Afternoon.SelectedIndex}" HorizontalAlignment="Stretch" />
+                      <TextBlock Grid.Column="3" Text="{Binding Fixture}" Foreground="{Binding FixtureBrush}" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <TextBlock Text="{Binding LoadText}" Foreground="{Binding LoadBrush}" FontWeight="SemiBold" Margin="0,6,0,0" />
+            </StackPanel>
+          </Border>
+
+          <!-- Individualtraining -->
+          <Border Classes="card">
+            <StackPanel Spacing="6">
+              <TextBlock Classes="h3" Text="{s:L training.individual}" />
+              <TextBlock Classes="muted" Text="{s:L training.individualEmpty}" IsVisible="{Binding !Individual.Count}" TextWrapping="Wrap" />
+              <ItemsControl ItemsSource="{Binding Individual}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:IndividualLine">
+                    <Grid ColumnDefinitions="200,50,*,*,90" Margin="0,3" ColumnSpacing="8">
+                      <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                      <TextBlock Grid.Column="1" Text="{Binding Position}" Classes="muted" />
+                      <TextBlock Grid.Column="2" Text="{Binding Focus}" />
+                      <TextBlock Grid.Column="3" Text="{Binding Retrain}" />
+                      <c:Meter Grid.Column="4" Height="6" Maximum="100" Value="{Binding Progress}" Fill="{DynamicResource AccentBrush}"
+                               Track="{DynamicResource LineBrush}" IsVisible="{Binding HasRetrain}" VerticalAlignment="Center" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+        </StackPanel>
+
+        <StackPanel Grid.Column="1" Spacing="14">
+          <!-- Taktikvertrautheit -->
+          <Border Classes="card">
+            <StackPanel Spacing="6">
+              <TextBlock Classes="h3" Text="{s:L training.familiarity}" />
+              <ItemsControl ItemsSource="{Binding Familiarity}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:FamiliarityLine">
+                    <Grid ColumnDefinitions="*,120,50" Margin="0,3">
+                      <TextBlock Text="{Binding Formation}" FontWeight="{Binding Weight}" />
+                      <c:Meter Grid.Column="1" Height="6" Maximum="100" Value="{Binding Value}" Fill="{Binding Brush}" Track="{DynamicResource LineBrush}" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="2" Text="{Binding Text}" HorizontalAlignment="Right" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </StackPanel>
+          </Border>
+
+          <!-- Trainingslager -->
+          <Border Classes="card">
+            <StackPanel Spacing="8">
+              <TextBlock Classes="h3" Text="{s:L camp.title}" />
+              <TextBlock Text="{Binding CampInfo}" TextWrapping="Wrap" IsVisible="{Binding HasCamp}" Foreground="{DynamicResource GoodBrush}" />
+              <Button Content="{s:L camp.cancel}" Command="{Binding CancelCampCommand}" IsVisible="{Binding HasCamp}" />
+              <Grid ColumnDefinitions="130,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="8" IsVisible="{Binding !HasCamp}">
+                <TextBlock Text="{s:L camp.goal}" Classes="muted" VerticalAlignment="Center" />
+                <ComboBox Grid.Column="1" ItemsSource="{Binding CampGoals}" SelectedIndex="{Binding CampGoalIndex}" HorizontalAlignment="Stretch" />
+                <TextBlock Grid.Row="1" Text="{s:L camp.inDays}" Classes="muted" VerticalAlignment="Center" />
+                <NumericUpDown Grid.Row="1" Grid.Column="1" Value="{Binding CampInDays}" Minimum="1" Maximum="120" Increment="1" />
+                <TextBlock Grid.Row="2" Text="{s:L camp.length}" Classes="muted" VerticalAlignment="Center" />
+                <NumericUpDown Grid.Row="2" Grid.Column="1" Value="{Binding CampLength}" Minimum="3" Maximum="10" Increment="1" />
+                <TextBlock Grid.Row="3" Text="{s:L camp.location}" Classes="muted" VerticalAlignment="Center" />
+                <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding CampLocation}" />
+                <TextBlock Grid.Row="4" Text="{s:L camp.cost}" Classes="muted" VerticalAlignment="Center" />
+                <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" Spacing="12">
+                  <TextBlock Text="{Binding CampCost}" VerticalAlignment="Center" FontWeight="SemiBold" />
+                  <Button Classes="primary" Content="{s:L camp.book}" Command="{Binding BookCampCommand}" />
+                </StackPanel>
+              </Grid>
+              <TextBlock Text="{Binding Message}" Foreground="{DynamicResource AccentBrush}" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+        </StackPanel>
+      </Grid>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

@@ -1,0 +1,54 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Fmh.Desktop.ViewModels"
+             xmlns:c="using:Fmh.Desktop.Controls"
+             xmlns:s="using:Fmh.Desktop.Services"
+             x:Class="Fmh.Desktop.Views.FixturesPageView"
+             x:DataType="vm:FixturesPageViewModel">
+  <UserControl.DataTemplates>
+    <DataTemplate x:DataType="vm:FixtureVm">
+      <Border Classes="inset" Margin="0,3" Padding="12,8">
+        <Grid ColumnDefinitions="70,110,*,96,*,220">
+          <TextBlock Text="{Binding Matchday}" Classes="muted small" VerticalAlignment="Center" />
+          <TextBlock Grid.Column="1" Text="{Binding Date}" VerticalAlignment="Center" />
+          <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+            <TextBlock Text="{Binding HomeName}" VerticalAlignment="Center" FontWeight="{Binding Weight}" />
+            <c:Crest Width="26" Height="30" Primary="{Binding Home.PrimaryColor}" Secondary="{Binding Home.SecondaryColor}" Initials="{Binding HomeInitials}" />
+          </StackPanel>
+          <Border Grid.Column="3" Background="{Binding ResultBrush}" CornerRadius="6" Padding="8,3" Margin="10,0" HorizontalAlignment="Center">
+            <TextBlock Text="{Binding Result}" Foreground="White" FontWeight="Bold" />
+          </Border>
+          <StackPanel Grid.Column="4" Orientation="Horizontal" Spacing="8">
+            <c:Crest Width="26" Height="30" Primary="{Binding Away.PrimaryColor}" Secondary="{Binding Away.SecondaryColor}" Initials="{Binding AwayInitials}" />
+            <TextBlock Text="{Binding AwayName}" VerticalAlignment="Center" FontWeight="{Binding Weight}" />
+          </StackPanel>
+          <TextBlock Grid.Column="5" Text="{Binding Detail}" Classes="muted small" VerticalAlignment="Center" Margin="16,0,0,0" TextTrimming="CharacterEllipsis" />
+        </Grid>
+      </Border>
+    </DataTemplate>
+  </UserControl.DataTemplates>
+  <DockPanel>
+    <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,12">
+      <TextBlock Classes="h1" Text="{Binding Title}" />
+      <TextBlock Grid.Column="1" Classes="muted" Text="{Binding Season}" VerticalAlignment="Bottom" Margin="16,0" />
+      <ToggleButton Grid.Column="2" IsChecked="{Binding LeagueView}" Content="{s:L fixtures.leagueView}" />
+    </Grid>
+    <Border Classes="card" Padding="12">
+      <Panel>
+        <ScrollViewer IsVisible="{Binding !LeagueView}">
+          <ItemsControl ItemsSource="{Binding Own}" />
+        </ScrollViewer>
+        <DockPanel IsVisible="{Binding LeagueView}">
+          <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,10">
+            <Button Content="◄" Command="{Binding PreviousDayCommand}" />
+            <TextBlock Grid.Column="1" Classes="h2" Text="{Binding DayTitle}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+            <Button Grid.Column="2" Content="►" Command="{Binding NextDayCommand}" />
+          </Grid>
+          <ScrollViewer>
+            <ItemsControl ItemsSource="{Binding Day}" />
+          </ScrollViewer>
+        </DockPanel>
+      </Panel>
+    </Border>
+  </DockPanel>
+</UserControl>
