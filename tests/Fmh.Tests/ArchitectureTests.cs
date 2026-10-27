@@ -47,6 +47,7 @@ public class ArchitectureTests
     [Theory]
     [InlineData("Fmh.Simulation")]
     [InlineData("Fmh.Modules")]
+    [InlineData("Fmh.MatchEngine")]
     public void NoFileExceedsFourHundredLines(string project)
     {
         var tooLong = Directory.EnumerateFiles(Path.Combine(Src, project), "*.cs", SearchOption.AllDirectories)
