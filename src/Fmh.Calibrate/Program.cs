@@ -15,6 +15,9 @@ namespace Fmh.Calibrate;
 /// Kommandozeilen-Simulator zur Kalibrierung der Matchengine (Kapitel 12).
 ///   fmh-calibrate [--matches 10000] [--seed 1] [--data pfad] [--strict]
 ///   fmh-calibrate --season [--seasons 1]       simuliert ganze Saisons und misst die Rechenzeit
+///   --strict                                   Exitcode 1, wenn eine Kennzahl die Toleranz verlässt
+///   --max-ms 3                                 zusätzlich Rechenzeit je Spiel prüfen (nur auf vergleichbarer Hardware)
+///   --max-drift 0.05                           zusätzlich Ligastärke-Drift je Saison prüfen
 ///   fmh-calibrate --engine datei.json          rechnet mit alternativen Engine-Gewichten
 ///   fmh-calibrate --write-config datei.json    schreibt die Standard-Engine-Gewichte als JSON
 /// </summary>
@@ -48,10 +51,11 @@ public static class Program
 
         var seed = ulong.Parse(opts.Get("seed") ?? "1", CultureInfo.InvariantCulture);
         if (opts.Has("season"))
-            return RunSeasons(data, seed, int.Parse(opts.Get("seasons") ?? "1", CultureInfo.InvariantCulture));
+            return RunSeasons(data, seed, int.Parse(opts.Get("seasons") ?? "1", CultureInfo.InvariantCulture), opts.Has("strict"),
+                opts.Get("max-drift") is { } d ? double.Parse(d, CultureInfo.InvariantCulture) : null);
 
         var matches = int.Parse(opts.Get("matches") ?? "10000", CultureInfo.InvariantCulture);
-        return RunMatches(data, seed, matches, opts.Has("strict"));
+        return RunMatches(data, seed, matches, opts.Has("strict"), opts.Get("max-ms") is { } ms ? double.Parse(ms, CultureInfo.InvariantCulture) : null);
     }
 
     private static GameSession NewSession(GameData data, ulong seed)
@@ -60,7 +64,7 @@ public static class Program
         return new GameSession(world, data, new TextMatchEngine());
     }
 
-    private static int RunMatches(GameData data, ulong seed, int count, bool strict)
+    private static int RunMatches(GameData data, ulong seed, int count, bool strict, double? maxMs)
     {
         var session = NewSession(data, seed);
         var world = session.World;
@@ -86,13 +90,20 @@ public static class Program
         Console.WriteLine($"{"Kennzahl",-34} {"Ist",10} {"Ziel",10} {"Toleranz",10}  ");
         Console.WriteLine(new string('-', 72));
         var ok = true;
-        ok &= Row("Tore pro Spiel", m.Goals / count, 2.8, 0.2);
-        ok &= Row("Unentschieden (%)", 100.0 * m.Draws / count, 25, 3);
-        ok &= Row("Heimsiege (%)", 100.0 * m.HomeWins / count, 45, 3);
+        // Toleranzen nach Abschnitt 8.1 des Umsetzungskonzepts (docs/umsetzungskonzept.md).
+        ok &= Row("Tore pro Spiel", m.Goals / count, 2.8, 0.15);
+        ok &= Row("Unentschieden (%)", 100.0 * m.Draws / count, 25, 2.5);
+        ok &= Row("Heimsiege (%)", 100.0 * m.HomeWins / count, 45, 2.5);
         Row("Auswärtssiege (%)", 100.0 * m.AwayWins / count, null, null);
-        ok &= Row("Gelbe Karten pro Spiel", m.Yellow / count, 3.8, 0.4);
-        ok &= Row("Rote Karten pro Spiel", m.Red / count, 0.2, 0.08);
-        ok &= Row("Verletzungen pro Team und Spiel", m.Injuries / (2.0 * count), 0.3, 0.08);
+        ok &= Row("Gelbe Karten pro Spiel", m.Yellow / count, 3.8, 0.3);
+        ok &= Row("Rote Karten pro Spiel", m.Red / count, 0.2, 0.05);
+        ok &= Row("Verletzungen pro Team und Spiel", m.Injuries / (2.0 * count), 0.3, 0.05);
+        if (maxMs is { } limit)
+        {
+            var ms = sw.Elapsed.TotalMilliseconds / count;
+            Console.WriteLine($"{"Rechenzeit je Spiel (ms)",-34} {ms.ToString("0.00", De),10} {"≤ " + limit.ToString("0.00", De),10} {"",10}  {(ms <= limit ? "ok" : "ABWEICHUNG")}");
+            ok &= ms <= limit;
+        }
         Console.WriteLine(new string('-', 72));
         Row("Schüsse pro Team", m.Shots / (2.0 * count), null, null);
         Row("Schüsse aufs Tor pro Team", m.OnTarget / (2.0 * count), null, null);
@@ -181,7 +192,7 @@ public static class Program
                               $"Absolventen Ø {clubs.Average(c => c.Academy.Graduates.Count):F1}; Lizenz: {string.Join(", ", clubs.GroupBy(c => c.License.Outcome).Select(g => $"{g.Key} {g.Count()}"))}, " +
                               $"Europa-Lizenz {clubs.Count(c => c.License.UefaLicense)}, FFP {string.Join(", ", clubs.GroupBy(c => c.License.Ffp).Select(g => $"{g.Key} {g.Count()}"))}");
         }
-        foreach (var c in w.Leagues.SelectMany(l => l.ClubIds).Select(id => w.Clubs[id]).Where(c => c.License.Outcome != LicenseOutcome.Granted || !c.License.UefaLicense && c.LeagueId == "DE1"))
+        foreach (var c in w.Leagues.SelectMany(l => l.ClubIds).Select(id => w.Clubs[id]).Where(c => c.License.Outcome != LicenseOutcome.Granted || !c.License.UefaLicense && w.FindLeague(c.LeagueId)?.Level == 1))
             Console.WriteLine($"  Lizenz {c.ShortName} ({c.LeagueId}): {c.License.Outcome}, Eigenkapital {M(session.Equity(c))}, Kredite {M(c.Finance.Loans.Sum(l => l.Remaining))}, " +
                               $"Sterne {c.Academy.Stars}, Flutlicht {c.Stadium.Floodlight}, Sitze {c.Stadium.SeatingTotal}, Auflagen [{string.Join(",", c.License.Conditions)}], Europa [{string.Join(",", c.License.UefaReasons)}]");
         Console.WriteLine("Europa: " + string.Join(", ", w.EuropeanEntries.Select(e => $"{w.Clubs[e.ClubId].ShortName} {e.CompetitionId} {e.SeasonYear} R{e.Stage}{(e.Replacement ? " (nachgerückt)" : "")}")));
@@ -191,7 +202,7 @@ public static class Program
                           $"Sponsoren {h.Sponsors.Count}, Personal {w.Staff.Count(s => s.ClubId == h.Id)}, Gebäude {h.Grounds.Buildings.Count}");
     }
 
-    private static int RunSeasons(GameData data, ulong seed, int seasons)
+    private static int RunSeasons(GameData data, ulong seed, int seasons, bool strict, double? maxDrift)
     {
         var session = NewSession(data, seed);
         var world = session.World;
@@ -199,6 +210,8 @@ public static class Program
         var matchdays = 0;
         var slowest = TimeSpan.Zero;
         var targetSeason = world.SeasonYear + seasons;
+        var topLeague = world.Leagues.OrderBy(l => l.Level).First();
+        var strengthStart = TopEleven(session, topLeague);
 
         Stopwatch? dayWatch = null;
         while (world.SeasonYear < targetSeason)
@@ -235,7 +248,20 @@ public static class Program
         }
         sw.Stop();
         Console.WriteLine($"{seasons} Saison(s) in {sw.Elapsed.TotalSeconds:F1} s, {matchdays} Spieltage des eigenen Vereins, langsamster Spieltag {slowest.TotalMilliseconds:F0} ms (Ziel < 5000 ms).");
-        return 0;
+        var drift = (TopEleven(session, topLeague) - strengthStart) / Math.Max(1, seasons);
+        Console.WriteLine($"Ligastärke-Drift {topLeague.Name}: {drift:+0.000;-0.000} je Saison" + (maxDrift is { } md ? $" (Grenze {md:0.000})" : " (Ziel ≤ 0,05, offener Punkt)"));
+        var ok = slowest.TotalMilliseconds < 5000 && world.SeasonYear >= targetSeason && (maxDrift is not { } m || drift <= m);
+        if (!ok) Console.WriteLine("ACHTUNG: Saisonlauf außerhalb der Vorgaben.");
+        return strict && !ok ? 1 : 0;
+    }
+
+    /// <summary>Durchschnitt der besten elf Spieler je Verein einer Liga.</summary>
+    private static double TopEleven(GameSession session, League league)
+    {
+        var w = session.World;
+        var profiles = session.Data.PositionProfiles;
+        return league.ClubIds.Select(id => w.SquadOf(w.Clubs[id]).Select(p => Ratings.PositionRating(p, p.MainPosition, profiles))
+            .OrderDescending().Take(11).DefaultIfEmpty(0).Average()).Average();
     }
 
     private sealed class Metrics
