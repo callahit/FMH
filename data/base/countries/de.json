@@ -306,7 +306,7 @@
         "travelPerAwayMatch": 20000
       },
       "DE3": {
-        "tvPool": 16000000,
+        "tvPool": 24000000,
         "tvEqualShare": 0.7,
         "standing": 6,
         "seating": 11,
@@ -314,17 +314,20 @@
         "floodlightRequired": 1,
         "youthCenterRequired": 0,
         "minEquity": -1000000,
-        "travelPerAwayMatch": 10000
+        "travelPerAwayMatch": 10000,
+        "wageLevel": 0.55
       },
       "DE4": {
-        "tvPool": 0,
+        "tvPool": 12600000,
         "standing": 5,
         "seating": 9,
         "box": 400,
         "floodlightRequired": 0,
         "youthCenterRequired": 0,
         "minEquity": -400000,
-        "travelPerAwayMatch": 5000
+        "travelPerAwayMatch": 5000,
+        "wageLevel": 0.3,
+        "tvEqualShare": 1.0
       },
       "DE-AMA": {
         "tvPool": 0,
@@ -334,7 +337,8 @@
         "floodlightRequired": 0,
         "youthCenterRequired": 0,
         "minEquity": -200000,
-        "travelPerAwayMatch": 3000
+        "travelPerAwayMatch": 3000,
+        "wageLevel": 0.25
       }
     },
     "cupPrizes": [

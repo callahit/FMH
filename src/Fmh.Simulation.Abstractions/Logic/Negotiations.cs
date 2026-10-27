@@ -102,6 +102,7 @@ public static class Negotiations
             _ => 1.0,
         };
         if (p.Hidden.Ambition >= 15) demand *= 1.05;
+        demand *= ClubRules.DivisionFinance(world, buyer).WageLevel;
         if (p.IsYouth || p.Age(world.Date) < 18) demand = Math.Min(demand, fair * 0.6);
         return (int)(Math.Round(demand / 100) * 100);
     }

@@ -9,6 +9,11 @@ public static class ClubRules
     /// <summary>Größe des Vereins für Geldbeträge: 1,0 bei Reputation 10, ca. ×1,19 je Punkt.</summary>
     public static double Scale(Club club) => Math.Max(0.15, Math.Pow(1.19, club.Reputation - 10));
 
+    /// <summary>Finanzrahmen der Spielklasse eines Vereins: Liga bzw. Staffel, sonst ihre Division, sonst Standardwerte.</summary>
+    public static DivisionFinance DivisionFinance(World world, Club club) =>
+        world.Country(club.CountryCode).Finance.Divisions is var all && (all.TryGetValue(club.LeagueId, out var d)
+        || (world.FindLeague(club.LeagueId) is { } l && all.TryGetValue(l.Format.Id, out d))) ? d : new DivisionFinance();
+
     public static long LevelCost(BuildingDef def, int level) => (long)(def.Cost * Math.Pow(def.CostGrowth, level - 1));
 
     public static long LandPrice(Club club) => MarketValue.Round(120_000 * Scale(club));

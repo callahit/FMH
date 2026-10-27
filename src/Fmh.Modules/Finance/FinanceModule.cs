@@ -23,9 +23,7 @@ public sealed partial class FinanceModule : GameModule, IFinanceService
         TransactionType.TransferIn, TransactionType.SigningFee, TransactionType.AgentFee,
     };
 
-    public DivisionFinance DivisionFinance(Club club) =>
-        World.Country(club.CountryCode).Finance.Divisions is var all && (all.TryGetValue(club.LeagueId, out var d)
-        || (World.FindLeague(club.LeagueId) is { } l && all.TryGetValue(l.Format.Id, out d))) ? d : new DivisionFinance();
+    public DivisionFinance DivisionFinance(Club club) => ClubRules.DivisionFinance(World, club);
 
     public bool HasFinances(Club club) => World.FindLeague(club.LeagueId) is not null;
 

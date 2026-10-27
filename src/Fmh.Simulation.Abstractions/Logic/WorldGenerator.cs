@@ -94,6 +94,7 @@ public static class WorldGenerator
                 foreach (var (id, name) in div.Groups.Count == 0 ? new[] { (div.Id, div.Name) } : div.Groups.Select(g => (g.Id, g.Name)).ToArray())
                 {
                     var league = new League { Id = id, Name = name, CountryCode = country.Code, Level = level.Level, Format = div };
+                    world.Leagues.Add(league);
                     var defs = data.Clubs.Where(c => c.Division == id).ToList();
                     if (div.Groups.Count == 0 && defs.Count != div.Teams)
                         throw new InvalidDataException($"Liga '{div.Name}' braucht {div.Teams} Vereine, Daten enthalten {defs.Count}.");
@@ -103,7 +104,6 @@ public static class WorldGenerator
                         league.ClubIds.Add(club.Id);
                         CreateSquad(world, data, rng, club, country.Code, def.ReserveOf is null ? null : country.Reserves);
                     }
-                    world.Leagues.Add(league);
                     groups.Add(league);
                 }
                 if (div.Groups.Count == 0) continue;
@@ -203,6 +203,7 @@ public static class WorldGenerator
     public static void CreateSquad(World world, GameData data, Rng rng, Club club, string country, ReserveRules? reserve = null)
     {
         var level = PlayerGenerator.ClubLevel(club.Reputation);
+        var wageLevel = ClubRules.DivisionFinance(world, club).WageLevel;
         var older = 0;
         foreach (var (pos, count) in PlayerGenerator.SquadTemplate)
         {
@@ -214,6 +215,7 @@ public static class WorldGenerator
                 var playerLevel = level + (i == 0 ? 0.8 : -0.6) + rng.Normal(0, 1.1) + AgeLevelOffset(age);
                 var p = PlayerGenerator.Create(world, data, rng, pos, Math.Clamp(playerLevel, 3, 19), age, country);
                 p.ClubId = club.Id;
+                if (wageLevel != 1.0) p.Contract!.WeeklyWage = (int)(Math.Round(p.Contract.WeeklyWage * wageLevel / 100) * 100);
                 p.SeasonStats = new PlayerSeasonStats { SeasonYear = world.SeasonYear, ClubId = club.Id };
                 world.Players[p.Id] = p;
                 club.PlayerIds.Add(p.Id);
