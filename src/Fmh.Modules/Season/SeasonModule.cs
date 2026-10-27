@@ -142,12 +142,13 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
 
     /// <summary>
     /// Ligaabhängige Verträge (in Deutschland unterhalb der Bundesliga üblich): Wechselt ein Verein in eine Spielklasse mit
-    /// anderem Gehaltsniveau, ändern sich alle Spielergehälter im selben Verhältnis.
+    /// anderem Gehaltsniveau, ändern sich die Gehälter seiner eigenen Spieler im selben Verhältnis.
     /// </summary>
     private void ApplyLeagueWages(Club club, double ratio)
     {
         var max = ClubRules.DivisionFinance(World, club).MaxWeeklyWage;
-        foreach (var p in World.SquadOf(club))
+        // Leihspieler bleiben außen vor: Ihren Vertrag trägt der abgebende Verein.
+        foreach (var p in World.SquadOf(club).Where(p => p.Loan is null))
             if (p.Contract is { Youth: false } c)
                 c.WeeklyWage = Math.Min(max, Math.Max(100, (int)(Math.Round(c.WeeklyWage * ratio / 100) * 100)));
     }

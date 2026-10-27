@@ -152,6 +152,9 @@ public static class Negotiations
         var age = p.Age(world.Date);
         if (age < 18 && o.Years > 3) return new NegotiationResponse(ResponseKind.Counter, "neg.player.minorYears", 3);
         if (o.Years is < 1 or > 5) return new NegotiationResponse(ResponseKind.Counter, "neg.player.years", 0);
+        // Mehr als das Spitzengehalt der Spielklasse lässt das Gehaltsgefüge nicht zu.
+        var max = ClubRules.DivisionFinance(world, buyer).MaxWeeklyWage;
+        if (o.WeeklyWage > max) return new NegotiationResponse(ResponseKind.Counter, "neg.player.wageCap", max, max);
 
         var demand = (double)WageDemand(p, buyer, o.Status, world, data);
         var (minY, maxY) = PreferredYears(p, world.Date);
