@@ -31,6 +31,7 @@ public static class PyramidValidator
             if (div.Rounds is < 1 or > 4) errors.Add($"Liga '{div.Name}': {div.Rounds} Runden (erlaubt 1–4).");
             foreach (var dup in div.Groups.GroupBy(g => g.Id).Where(g => g.Count() > 1))
                 errors.Add($"Liga '{div.Name}': Staffel '{dup.Key}' ist mehrfach definiert.");
+            ValidatePhases(div, errors);
             ValidateMovements(country, div, div.Name, div.Movements, errors);
             foreach (var g in div.Groups.Where(g => g.Movements.Count > 0))
                 ValidateMovements(country, div, g.Name, g.Movements, errors);
@@ -79,6 +80,21 @@ public static class PyramidValidator
             .SelectMany(m => m.PositionList()).Distinct().Count());
 
     private static bool HasDirect(DivisionConfig d, MovementDirection to, int? season) => Direct(d, to, season) > 0;
+
+    /// <summary>Saisonphasen: höchstens eine zweite Phase; ihre Gruppen decken alle Plätze genau einmal ab.</summary>
+    private static void ValidatePhases(DivisionConfig div, List<string> errors)
+    {
+        if (div.Phases.Count > 1) errors.Add($"Liga '{div.Name}': mehr als eine zweite Saisonphase ist nicht umgesetzt.");
+        foreach (var phase in div.Phases)
+        {
+            var positions = phase.Groups.SelectMany(g => g.PositionList()).ToList();
+            if (positions.Count != div.Teams || positions.Distinct().Count() != div.Teams || positions.Any(p => p < 1 || p > div.Teams))
+                errors.Add($"Liga '{div.Name}': Die Gruppen der Phase '{phase.Name}' decken nicht alle Plätze genau einmal ab.");
+            if (phase.Groups.Any(g => g.PositionList().Count < 2)) errors.Add($"Liga '{div.Name}': Eine Gruppe der Phase '{phase.Name}' hat weniger als zwei Teams.");
+            if (phase.PointsCarry is <= 0 or > 1) errors.Add($"Liga '{div.Name}': Punkteübernahme {phase.PointsCarry} liegt außerhalb von (0, 1].");
+            if (phase.Rounds is < 1 or > 4) errors.Add($"Liga '{div.Name}': {phase.Rounds} Runden in der Phase '{phase.Name}' (erlaubt 1–4).");
+        }
+    }
 
     private static int Leagues(DivisionConfig d) => Math.Max(1, d.Groups.Count);
 

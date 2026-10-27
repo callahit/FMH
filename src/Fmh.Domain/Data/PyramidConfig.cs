@@ -115,3 +115,40 @@ public static class FormatNormalizer
         return div;
     }
 }
+
+public enum PointsRounding { Down, Up, Nearest }
+
+/// <summary>
+/// Zweite Saisonphase nach dem Grunddurchgang (Umsetzungskonzept 6.1), z. B. Meister- und Abstiegsrunde: Die Liga
+/// teilt sich nach Tabellenplätzen in Gruppen, die Punkte werden mit <see cref="PointsCarry"/> übernommen.
+/// Die Endtabelle reiht die Gruppen hintereinander; Bewegungsregeln gelten für diese Endtabelle.
+/// </summary>
+public sealed class PhaseConfig
+{
+    public string Id { get; set; } = "";
+    public string Name { get; set; } = "";
+    public List<PhaseGroup> Groups { get; set; } = new();
+    /// <summary>Runden innerhalb jeder Gruppe (1 = jeder gegen jeden einmal).</summary>
+    public int Rounds { get; set; } = 2;
+    /// <summary>Anteil der Punkte aus dem Grunddurchgang (1,0 oder 0,5).</summary>
+    public double PointsCarry { get; set; } = 1.0;
+    public PointsRounding Rounding { get; set; } = PointsRounding.Down;
+
+    public int Carry(int points) => Rounding switch
+    {
+        PointsRounding.Up => (int)Math.Ceiling(points * PointsCarry),
+        PointsRounding.Nearest => (int)Math.Round(points * PointsCarry, MidpointRounding.AwayFromZero),
+        _ => (int)Math.Floor(points * PointsCarry),
+    };
+}
+
+/// <summary>Gruppe einer Saisonphase: die Tabellenplätze des Grunddurchgangs, die in ihr spielen.</summary>
+public sealed class PhaseGroup
+{
+    public string Id { get; set; } = "";
+    public string Name { get; set; } = "";
+    /// <summary>Plätze, z. B. "1-6".</summary>
+    public string Positions { get; set; } = "";
+
+    public IReadOnlyList<int> PositionList() => new MovementRule { Positions = Positions }.PositionList();
+}

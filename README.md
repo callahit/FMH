@@ -331,6 +331,8 @@ des Umsetzungskonzepts:
 Mit `--strict` endet das Programm mit Exitcode 1, wenn eine Kennzahl außerhalb liegt; die CI nutzt das.
 Weitere Prüfungen:
 
+- `--max-level 4` bezieht die unteren Ebenen in die Engine-Kalibrierung ein (Standard: Ebene 1–2, für die die
+  Toleranzen gelten).
 - `--max-ms 3` prüft zusätzlich die Rechenzeit je Spiel. Sie hängt von der Hardware ab und läuft
   deshalb nicht in der CI (gemessen: 2,4 ms in der Cloud-Umgebung, davon etwa 0,4 ms Aufstellung und
   KI-Taktik, der Rest Engine).
@@ -435,6 +437,9 @@ Ein Land beschreibt seine Pyramide als Ebenen mit Divisionen. Formate ändern si
   einer Ebene die Vereine mit dem höchsten Ruf.
 - **Relegation und Aufstiegsrunden:** `playoffs` mit `entrants` (Liga oder Division und Tabellenplatz; bei einer
   Division aus jeder Staffel) und `places`. Zwei Teilnehmer spielen ein Duell, mehr ein K.-o.-Turnier.
+- **Saisonphasen:** `phases` mit einer zweiten Phase nach dem Grunddurchgang, z. B. Meister- und Abstiegsrunde:
+  `groups` nach Tabellenplätzen, `rounds`, `pointsCarry` (z. B. 0,5) und `rounding` (`Down`, `Up`, `Nearest`). Die
+  Endtabelle reiht die Gruppen hintereinander; Bewegungsregeln und Relegation gelten für sie.
 - **Zweite Mannschaften:** Vereine mit `reserveOf` (Schlüssel der ersten Mannschaft). `reserves` im Land regelt den
   Mindestabstand in Ebenen (`minLevelGap`), die Pokalteilnahme und das Spielrecht (`ageLimit`, `overAgePlayers`).
 - **Gültigkeit:** `validFrom`/`validTo` je Formatversion; beim Saisonwechsel gilt die passende Version, Ligen und
@@ -452,12 +457,15 @@ Mannschaften liegt unter `tests/Fmh.Tests/Packages/testland` (nur für Tests).
   5-Saison-Lauf um etwa 0,14 je Saison; Ziel ist ≤ 0,05. Die CI prüft das noch nicht.
 - **Europapokal:** Die europäischen Wettbewerbe laufen vereinfacht ohne eigene Spiele und ohne
   ausländische Vereine. Echte Partien brauchen weitere Länder als Datenpakete.
-- **Saisonphasen:** Grunddurchgang mit Meister- und Abstiegsrunde (`phases`, `pointsCarry`, Konzept 6.1) ist noch
-  nicht umgesetzt; die Pyramide kennt bisher nur eine Phase je Saison.
+- **Saisonphasen:** Umgesetzt ist eine zweite Phase je Saison; mehrere Folgephasen (z. B. Play-offs um den Titel nach
+  der Meisterrunde) folgen, wenn ein Land sie braucht.
 - **Deutschland:** Die Regionalliga-Aufstiegsregel ist fest (West, Südwest und Süd direkt, Nord gegen Nordost);
   real wechselt der Aufstiegsmodus jährlich zwischen den Staffeln. Pokalplätze für Amateure gehen nach Ruf statt
   über Landespokale. Die fiktiven Ortsnamen sind zusammengesetzt; Übereinstimmungen mit kleinen realen Orten sind
   möglich, bekannte Vereinsorte sind ausgeschlossen.
+- **Karten in unteren Ligen:** Über alle vier Ebenen zeigt die Engine 3,2 Gelbe und 0,13 Rote Karten je Spiel
+  (Ziel 3,8 bzw. 0,2), weil schwächere Spieler seltener in Zweikämpfe kommen. Die Kalibrierung prüft deshalb
+  Ebene 1–2 (`--max-level`); ob untere Ligen eigene Zielwerte bekommen, ist offen.
 - **Zweite Mannschaften als eigene Vereine:** Eine zweite Mannschaft ist bisher ein eigener Verein mit Verweis
   `reserveOf` (eigener Kader, eigene Finanzen). Die Mannschaft eines Vereins (`Team`) übernimmt das, sobald
   Spiele Mannschaften statt Vereine referenzieren.
