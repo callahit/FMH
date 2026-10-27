@@ -18,6 +18,12 @@ Dieser Stand umfasst **Phase 1 (Prototyp)**, **Phase 2 (Karriere)** und **Phase 
 Die Karriere läuft über beliebig viele Saisons, gespielt wird in einer Desktop-Oberfläche mit Maus und
 Tastatur. Spielstände sind SQLite-Datenbanken.
 
+Die Weiterentwicklung zu einem modularen, europaweiten Manager folgt dem
+[Umsetzungskonzept](docs/umsetzungskonzept.md): Arbeitspakete (AP 0–15) mit je einem Branch und einem
+Pull Request, Abnahmekriterien und Definition of Done.
+
+**Lizenz:** Open Source; die konkrete Lizenz folgt.
+
 ## Schnellstart
 
 Voraussetzung: [.NET 10 SDK](https://dotnet.microsoft.com/download).
@@ -245,7 +251,7 @@ Amateurfußball, und Vereine mit dünnem Kader verpflichten unter der Saison nac
 | 9 Vereinsgelände | **83 Gebäude** mit Stufen, Lage und Synergien, Baufirmen, Genehmigungen | – |
 | 10 Umfeld, Karriere | **Vorstand, Fans, Presse, 166 Zufallsereignisse, Managerkarriere** mit Lizenzen und Erfolgen | Nationalmannschaft, Medienhaus |
 | 11 Oberfläche | Desktop-Oberfläche (Avalonia) mit Maus, Drag & Drop, sortierbaren Tabellen, Diagrammen (Radar, Formkurve, xG, Heatmap), Wappen, Farbthemen | Tastenbelegung |
-| 12 Nicht-funktional | Determinismus, **SQLite-Spielstände** mit Schemamigration, **Mehrsprachigkeit (Deutsch, Englisch, erweiterbar)**, Datenpakete mit Überlagerung, Datenvalidierung, Kalibrierungs-CLI | Editor, Plugins |
+| 12 Nicht-funktional | Determinismus, **SQLite-Spielstände** mit Schemamigration, **Mehrsprachigkeit (Deutsch, Englisch, erweiterbar)**, Datenpakete mit Überlagerung, Datenvalidierung, Kalibrierungs-CLI mit Toleranzprüfung, **CI auf Linux und Windows**, Warnungen als Fehler | Editor (AP 6), Modularisierung (AP 1), Mod-Verwaltung (AP 14) |
 
 ## Sprachen
 
@@ -303,19 +309,35 @@ schrittweise angehoben:
 
 ## Kalibrierung der Matchengine
 
-`fmh-calibrate --matches 10000` (Seed 1), Zielwerte aus Kapitel 6:
+`fmh-calibrate --matches 10000 --strict` (Seed 1), Zielwerte aus Kapitel 6, Toleranzen nach Abschnitt 8.1
+des Umsetzungskonzepts:
 
-| Kennzahl | Ist | Ziel |
-|---|---|---|
-| Tore pro Spiel | 2,82 | 2,8 |
-| Unentschieden | 23,7 % | 25 % |
-| Heimsiege | 44,5 % | 45 % |
-| Gelbe Karten pro Spiel | 3,76 | 3,8 |
-| Rote Karten pro Spiel | 0,20 | 0,2 |
-| Verletzungen pro Team und Spiel | 0,30 | 0,3 |
+| Kennzahl | Ist | Ziel | Toleranz |
+|---|---|---|---|
+| Tore pro Spiel | 2,79 | 2,8 | ± 0,15 |
+| Unentschieden | 23,6 % | 25 % | ± 2,5 Pp. |
+| Heimsiege | 44,8 % | 45 % | ± 2,5 Pp. |
+| Gelbe Karten pro Spiel | 3,76 | 3,8 | ± 0,3 |
+| Rote Karten pro Spiel | 0,19 | 0,2 | ± 0,05 |
+| Verletzungen pro Team und Spiel | 0,30 | 0,3 | ± 0,05 |
 
-Leistung: ca. 2,5 ms pro Spiel; der langsamste Spieltag (alle Ligen und Pokal) braucht unter 1 s
-(Ziel: unter 5 s). Die Gewichte stehen in `data/base/rules/engine.json`.
+Mit `--strict` endet das Programm mit Exitcode 1, wenn eine Kennzahl außerhalb liegt; die CI nutzt das.
+Weitere Prüfungen:
+
+- `--max-ms 3` prüft zusätzlich die Rechenzeit je Spiel. Sie hängt von der Hardware ab und läuft
+  deshalb nicht in der CI (gemessen: 2,5–4,2 ms je nach Maschine).
+- `--season --seasons 5 --strict` prüft den Karrierelauf: Der langsamste Spieltag muss unter 5 s
+  liegen und alle Saisons müssen durchlaufen.
+- `--max-drift 0.05` prüft zusätzlich die Ligastärke-Drift.
+
+Die Gewichte stehen in `data/base/rules/engine.json`.
+
+## Entwicklung
+
+- Arbeit auf Feature-Branches, ein Arbeitspaket je Pull Request (siehe Umsetzungskonzept, Abschnitt 1).
+- CI (`.github/workflows/ci.yml`): Build und Tests auf Linux und Windows, Warnungen gelten als Fehler,
+  dazu ein Kalibrierungsjob mit Toleranzprüfung.
+- Keine Länder- oder Wettbewerbscodes im C#-Code; Regeln, Zahlen und Texte gehören in Datenpakete.
 
 ## Aufbau
 
@@ -362,8 +384,9 @@ anderem Teamzahlen, Pools, Pokaltermine und Relegationsplätze.
 
 ## Offene Entscheidungen
 
-- **Lizenz:** Das Fachkonzept schlägt GPL-3.0 für den Code und CC BY-SA 4.0 für Daten und Texte vor.
-  Eine Lizenzdatei ist noch nicht enthalten.
-- **Spielstärke-Drift:** Über viele Saisons steigt die Ligastärke leicht, um etwa 0,07 pro Saison.
+- **Lizenz:** Open Source ist gesetzt, die konkrete Lizenz klärt der Projektinhaber später (Vorschlag
+  GPL-3.0 für Code, CC BY-SA 4.0 für Daten). Bis dahin gibt es keine Lizenzdatei.
+- **Spielstärke-Drift:** Die Stärke der 1. Liga (Durchschnitt der besten elf je Verein) steigt im
+  5-Saison-Lauf um etwa 0,14 je Saison; Ziel ist ≤ 0,05. Die CI prüft das noch nicht.
 - **Europapokal:** Die europäischen Wettbewerbe laufen vereinfacht ohne eigene Spiele und ohne
   ausländische Vereine. Echte Partien brauchen weitere Länder als Datenpakete.
