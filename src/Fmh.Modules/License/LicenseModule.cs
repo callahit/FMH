@@ -70,7 +70,7 @@ public sealed partial class LicenseModule : GameModule, ILicenseService
     private List<string> LicenseGaps(Club club, DivisionFinance div)
     {
         var gaps = new List<string>();
-        if (Finance.Equity(club) < div.MinEquity) gaps.Add("license.gap.equity");
+        if (Finance.LicenseEquity(club) < div.MinEquity) gaps.Add("license.gap.equity");
         if (club.Stadium.Floodlight < div.FloodlightRequired) gaps.Add("license.gap.floodlight");
         if (club.Academy.Stars < div.YouthCenterRequired) gaps.Add("license.gap.academy");
         return gaps;
@@ -94,7 +94,7 @@ public sealed partial class LicenseModule : GameModule, ILicenseService
             var gaps = LicenseGaps(club, div);
             Notify(MessageType.Finance, "msg.sender.league", TR("msg.licenseApplied.subject", SeasonLabel(World.SeasonYear + 1)),
                 TR("msg.licenseApplied.body", TextArg.OfDate(SeasonDate(country.Finance.LicenseDecision)), TextArg.OfDate(SeasonDate(country.Finance.LicenseDeadline)),
-                    TextArg.Money(Finance.Equity(club), Currency), TextArg.Money(div.MinEquity, Currency), club.Stadium.Floodlight, div.FloodlightRequired,
+                    TextArg.Money(Finance.LicenseEquity(club), Currency), TextArg.Money(div.MinEquity, Currency), club.Stadium.Floodlight, div.FloodlightRequired,
                     club.Academy.Stars, div.YouthCenterRequired,
                     gaps.Count == 0 ? TR("license.allMet") : GapList(gaps, div),
                     upper ? TR("license.upperLeague") : TextRef.Literal("")),
@@ -110,7 +110,7 @@ public sealed partial class LicenseModule : GameModule, ILicenseService
             var lic = club.License;
             var div = TargetDivision(club, out var upper);
             var current = Finance.DivisionFinance(club);
-            var equity = Finance.Equity(club);
+            var equity = Finance.LicenseEquity(club);
             // Die wirtschaftliche Prüfung gilt der aktuellen Liga; für die höhere Liga entscheidet sie nur über den Aufstieg.
             lic.PromotionAllowed = !upper || equity >= div.MinEquity * 1.5;
             var lowest = World.FindLeague(club.LeagueId) is { } league && !World.Leagues.Any(l => l.CountryCode == league.CountryCode && l.Level > league.Level);

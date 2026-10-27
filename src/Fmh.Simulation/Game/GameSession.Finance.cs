@@ -11,6 +11,7 @@ public sealed partial class GameSession
 {
     public DivisionFinance DivisionFinance(Club club) => _finance.DivisionFinance(club);
     public long Equity(Club club) => _finance.Equity(club);
+    public long LicenseEquity(Club club) => _finance.LicenseEquity(club);
     public long ExpectedIncome(Club club) => _finance.ExpectedIncome(club);
     public long EstimateIncome(Club club) => _finance.EstimateIncome(club);
     public long CreditLimit(Club club) => _finance.CreditLimit(club);

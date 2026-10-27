@@ -9,7 +9,7 @@
     "primaryColor": "Red",
     "secondaryColor": "White",
     "stadium": "Rheinfelser Arena",
-    "capacity": 75000,
+    "capacity": 75700,
     "region": "Nord"
   },
   {
@@ -35,7 +35,7 @@
     "primaryColor": "Blue",
     "secondaryColor": "White",
     "stadium": "Elbufer-Stadion",
-    "capacity": 57000,
+    "capacity": 59700,
     "region": "West"
   },
   {
@@ -48,7 +48,7 @@
     "primaryColor": "DarkRed",
     "secondaryColor": "White",
     "stadium": "Weserpark",
-    "capacity": 50000,
+    "capacity": 53400,
     "region": "Südwest"
   },
   {
@@ -61,7 +61,7 @@
     "primaryColor": "Red",
     "secondaryColor": "White",
     "stadium": "Am Kai",
-    "capacity": 45000,
+    "capacity": 49000,
     "region": "Süd"
   },
   {
@@ -74,7 +74,7 @@
     "primaryColor": "DarkGreen",
     "secondaryColor": "White",
     "stadium": "Heidestadion",
-    "capacity": 32000,
+    "capacity": 37400,
     "region": "Nord"
   },
   {
@@ -87,7 +87,7 @@
     "primaryColor": "Red",
     "secondaryColor": "Black",
     "stadium": "Burgwall",
-    "capacity": 29000,
+    "capacity": 34800,
     "region": "Nordost"
   },
   {
@@ -100,7 +100,7 @@
     "primaryColor": "DarkBlue",
     "secondaryColor": "White",
     "stadium": "Talkessel",
-    "capacity": 35000,
+    "capacity": 40100,
     "region": "West"
   },
   {
@@ -113,7 +113,7 @@
     "primaryColor": "Blue",
     "secondaryColor": "White",
     "stadium": "Hohensteiner Berg",
-    "capacity": 30000,
+    "capacity": 35700,
     "region": "Südwest"
   },
   {
@@ -126,7 +126,7 @@
     "primaryColor": "Red",
     "secondaryColor": "White",
     "stadium": "Bergfelder Wiesen",
-    "capacity": 40000,
+    "capacity": 44600,
     "region": "Süd"
   },
   {
@@ -139,7 +139,7 @@
     "primaryColor": "Yellow",
     "secondaryColor": "Black",
     "stadium": "Steinbruch",
-    "capacity": 33000,
+    "capacity": 38300,
     "region": "Nord"
   },
   {
@@ -152,7 +152,7 @@
     "primaryColor": "Red",
     "secondaryColor": "White",
     "stadium": "Bachtal-Arena",
-    "capacity": 26000,
+    "capacity": 32100,
     "region": "Nordost"
   },
   {
@@ -165,7 +165,7 @@
     "primaryColor": "Cyan",
     "secondaryColor": "White",
     "stadium": "Mühlenkamp",
-    "capacity": 24000,
+    "capacity": 30300,
     "region": "West"
   },
   {
@@ -178,7 +178,7 @@
     "primaryColor": "DarkRed",
     "secondaryColor": "Yellow",
     "stadium": "An der Düne",
-    "capacity": 22000,
+    "capacity": 28600,
     "region": "Südwest"
   },
   {
@@ -191,7 +191,7 @@
     "primaryColor": "DarkYellow",
     "secondaryColor": "Blue",
     "stadium": "Wiesengrund",
-    "capacity": 21000,
+    "capacity": 27700,
     "region": "Süd"
   },
   {
@@ -204,7 +204,7 @@
     "primaryColor": "Blue",
     "secondaryColor": "Red",
     "stadium": "Brückenstadion",
-    "capacity": 23000,
+    "capacity": 29400,
     "region": "Nord"
   },
   {
@@ -217,7 +217,7 @@
     "primaryColor": "DarkGreen",
     "secondaryColor": "Yellow",
     "stadium": "Südkurve",
-    "capacity": 18000,
+    "capacity": 25000,
     "region": "Nordost"
   },
   {
@@ -230,7 +230,7 @@
     "primaryColor": "Green",
     "secondaryColor": "White",
     "stadium": "Moorwiese",
-    "capacity": 20000,
+    "capacity": 26800,
     "region": "West"
   },
   {
@@ -243,7 +243,7 @@
     "primaryColor": "Blue",
     "secondaryColor": "White",
     "stadium": "Lindenplatz",
-    "capacity": 17000,
+    "capacity": 49200,
     "region": "Nord"
   },
   {
@@ -256,7 +256,7 @@
     "primaryColor": "DarkRed",
     "secondaryColor": "White",
     "stadium": "Bärenzwinger",
-    "capacity": 16000,
+    "capacity": 45300,
     "region": "Nordost"
   },
   {
@@ -269,7 +269,7 @@
     "primaryColor": "Green",
     "secondaryColor": "Black",
     "stadium": "Grünauer Feld",
-    "capacity": 14000,
+    "capacity": 37400,
     "region": "West"
   },
   {
@@ -282,7 +282,7 @@
     "primaryColor": "Black",
     "secondaryColor": "White",
     "stadium": "Kirchfeld",
-    "capacity": 19000,
+    "capacity": 57000,
     "region": "Südwest"
   },
   {
@@ -295,7 +295,7 @@
     "primaryColor": "Magenta",
     "secondaryColor": "White",
     "stadium": "Holzwiese",
-    "capacity": 15000,
+    "capacity": 41300,
     "region": "Süd"
   },
   {
@@ -308,7 +308,7 @@
     "primaryColor": "Gray",
     "secondaryColor": "Black",
     "stadium": "Dorfanger",
-    "capacity": 13000,
+    "capacity": 33500,
     "region": "Nord"
   },
   {
@@ -321,7 +321,7 @@
     "primaryColor": "Blue",
     "secondaryColor": "Yellow",
     "stadium": "Mühlbach",
-    "capacity": 12000,
+    "capacity": 29600,
     "region": "Nordost"
   },
   {
@@ -334,7 +334,7 @@
     "primaryColor": "Green",
     "secondaryColor": "White",
     "stadium": "Weidenkamp",
-    "capacity": 11000,
+    "capacity": 25700,
     "region": "West"
   },
   {
@@ -347,7 +347,7 @@
     "primaryColor": "Cyan",
     "secondaryColor": "Blue",
     "stadium": "Am See",
-    "capacity": 12500,
+    "capacity": 31600,
     "region": "Südwest"
   },
   {
@@ -360,7 +360,7 @@
     "primaryColor": "DarkBlue",
     "secondaryColor": "Yellow",
     "stadium": "Uferpromenade",
-    "capacity": 14000,
+    "capacity": 37400,
     "region": "Süd"
   },
   {
@@ -373,7 +373,7 @@
     "primaryColor": "Red",
     "secondaryColor": "Blue",
     "stadium": "Hasselgrund",
-    "capacity": 10000,
+    "capacity": 21800,
     "region": "Nord"
   },
   {
@@ -386,7 +386,7 @@
     "primaryColor": "DarkGreen",
     "secondaryColor": "White",
     "stadium": "Eichenhain",
-    "capacity": 9500,
+    "capacity": 19800,
     "region": "Nordost"
   },
   {
@@ -399,7 +399,7 @@
     "primaryColor": "Black",
     "secondaryColor": "Yellow",
     "stadium": "Rabennest",
-    "capacity": 11000,
+    "capacity": 25700,
     "region": "West"
   },
   {
@@ -412,7 +412,7 @@
     "primaryColor": "Red",
     "secondaryColor": "Yellow",
     "stadium": "Saalewiesen",
-    "capacity": 10500,
+    "capacity": 23700,
     "region": "Südwest"
   },
   {
@@ -425,7 +425,7 @@
     "primaryColor": "White",
     "secondaryColor": "Blue",
     "stadium": "Bachaue",
-    "capacity": 9000,
+    "capacity": 17900,
     "region": "Süd"
   },
   {
@@ -438,7 +438,7 @@
     "primaryColor": "DarkGreen",
     "secondaryColor": "Black",
     "stadium": "Waldstadion Waldeck",
-    "capacity": 8500,
+    "capacity": 15900,
     "region": "Nord"
   },
   {
@@ -451,7 +451,7 @@
     "primaryColor": "Yellow",
     "secondaryColor": "Green",
     "stadium": "Lerchenwiese",
-    "capacity": 8000,
+    "capacity": 14000,
     "region": "Nordost"
   },
   {
@@ -464,7 +464,7 @@
     "primaryColor": "Blue",
     "secondaryColor": "White",
     "stadium": "Kirchplatz",
-    "capacity": 7500,
+    "capacity": 12000,
     "region": "West"
   },
   {
@@ -490,7 +490,7 @@
     "primaryColor": "Blue",
     "secondaryColor": "DarkRed",
     "stadium": "Sportplatz Ostermoor",
-    "capacity": 7500,
+    "capacity": 9200,
     "region": "West"
   },
   {
@@ -568,7 +568,7 @@
     "primaryColor": "White",
     "secondaryColor": "Green",
     "stadium": "Sportplatz Rosenau",
-    "capacity": 7500,
+    "capacity": 9200,
     "region": "Nordost"
   },
   {
@@ -594,7 +594,7 @@
     "primaryColor": "Cyan",
     "secondaryColor": "Black",
     "stadium": "Sportplatz Hellmühle",
-    "capacity": 7500,
+    "capacity": 9200,
     "region": "Südwest"
   },
   {
@@ -633,7 +633,7 @@
     "primaryColor": "Green",
     "secondaryColor": "White",
     "stadium": "Sportplatz Erlenbruch",
-    "capacity": 7500,
+    "capacity": 9200,
     "region": "Nordost"
   },
   {
@@ -672,7 +672,7 @@
     "primaryColor": "DarkBlue",
     "secondaryColor": "DarkGreen",
     "stadium": "Sportplatz Mühlbach-Nord",
-    "capacity": 7500,
+    "capacity": 9200,
     "region": "Nord"
   },
   {
@@ -789,7 +789,7 @@
     "primaryColor": "DarkRed",
     "secondaryColor": "Yellow",
     "stadium": "Sportplatz Moorhausen",
-    "capacity": 7500,
+    "capacity": 9200,
     "region": "Süd"
   },
   {
@@ -802,7 +802,7 @@
     "primaryColor": "DarkBlue",
     "secondaryColor": "DarkGreen",
     "stadium": "Sportplatz Heidekrug",
-    "capacity": 7500,
+    "capacity": 9200,
     "region": "West"
   },
   {
@@ -815,7 +815,7 @@
     "primaryColor": "DarkGreen",
     "secondaryColor": "Cyan",
     "stadium": "Sportplatz Ahornfeld",
-    "capacity": 7500,
+    "capacity": 9200,
     "region": "Nord"
   },
   {
@@ -841,7 +841,7 @@
     "primaryColor": "Cyan",
     "secondaryColor": "Blue",
     "stadium": "Waldstadion Tannenlohe",
-    "capacity": 8000,
+    "capacity": 11300,
     "region": "Nordost"
   },
   {
@@ -854,7 +854,7 @@
     "primaryColor": "Gray",
     "secondaryColor": "Black",
     "stadium": "Waldstadion Lehmdorf",
-    "capacity": 11500,
+    "capacity": 26400,
     "region": "West"
   },
   {
@@ -867,7 +867,7 @@
     "primaryColor": "Green",
     "secondaryColor": "Red",
     "stadium": "Waldstadion Brachfleth",
-    "capacity": 8500,
+    "capacity": 13500,
     "region": "Südwest"
   },
   {
@@ -880,7 +880,7 @@
     "primaryColor": "Magenta",
     "secondaryColor": "DarkBlue",
     "stadium": "Arena Buchenstetten",
-    "capacity": 12000,
+    "capacity": 28500,
     "region": "Süd"
   },
   {
@@ -893,7 +893,7 @@
     "primaryColor": "Cyan",
     "secondaryColor": "Black",
     "stadium": "Arena Marderkamp",
-    "capacity": 9000,
+    "capacity": 15600,
     "region": "Nord"
   },
   {
@@ -906,7 +906,7 @@
     "primaryColor": "Cyan",
     "secondaryColor": "Green",
     "stadium": "Stadion an der Kirschstraße",
-    "capacity": 13500,
+    "capacity": 35000,
     "region": "Nordost"
   },
   {
@@ -919,7 +919,7 @@
     "primaryColor": "Magenta",
     "secondaryColor": "Gray",
     "stadium": "Stadion an der Kranichstraße",
-    "capacity": 7500,
+    "capacity": 9200,
     "region": "West"
   },
   {
@@ -932,7 +932,7 @@
     "primaryColor": "DarkGreen",
     "secondaryColor": "White",
     "stadium": "Sportplatz Senfau",
-    "capacity": 8000,
+    "capacity": 11300,
     "region": "Südwest"
   },
   {
@@ -945,7 +945,7 @@
     "primaryColor": "DarkYellow",
     "secondaryColor": "DarkRed",
     "stadium": "Waldstadion Falkenbrück",
-    "capacity": 13000,
+    "capacity": 32800,
     "region": "Süd"
   },
   {

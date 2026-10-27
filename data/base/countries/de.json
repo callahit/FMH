@@ -358,6 +358,8 @@
     "referenceBudget": 900000
   },
   "finance": {
+    "cateringPerSpectator": 10,
+    "merchPerSpectator": 13,
     "divisions": {
       "DE1": {
         "tvPool": 1500000000,
@@ -371,25 +373,63 @@
         "travelPerAwayMatch": 60000,
         "wageLevel": 1.0,
         "sponsorLevel": 1.0,
+        "academyBudgetFactor": 9.0,
         "targetAnnualWage": 2900000,
         "operatingCostShare": 0.6,
-        "maxAnnualWage": 25000000
+        "maxAnnualWage": 25000000,
+        "reference": {
+          "source": "DFL-Wirtschaftsreport 24/25, Saison 2024/25, Durchschnitt je Klub",
+          "official": true,
+          "income": {
+            "matchday": 33300000,
+            "advertising": 63700000,
+            "media": 94600000,
+            "merchandising": 15900000,
+            "other": 28700000,
+            "total": 236200000
+          },
+          "expenses": {
+            "squad": 95700000,
+            "operations": 107700000,
+            "youth": 14000000,
+            "total": 217400000
+          }
+        }
       },
       "DE2": {
-        "tvPool": 360000000,
+        "tvPool": 288000000,
         "tvEqualShare": 0.6,
-        "standing": 14,
-        "seating": 28,
-        "box": 4000,
+        "standing": 22,
+        "seating": 46,
+        "box": 10000,
         "floodlightRequired": 2,
         "youthCenterRequired": 1,
         "minEquity": -8000000,
         "travelPerAwayMatch": 30000,
-        "wageLevel": 0.7,
-        "sponsorLevel": 0.8,
-        "targetAnnualWage": 420000,
-        "operatingCostShare": 0.6,
-        "maxAnnualWage": 1500000
+        "wageLevel": 0.8,
+        "sponsorLevel": 1.1,
+        "academyBudgetFactor": 8.0,
+        "targetAnnualWage": 480000,
+        "operatingCostShare": 0.75,
+        "maxAnnualWage": 1500000,
+        "reference": {
+          "source": "DFL-Wirtschaftsreport 24/25, Saison 2024/25, Durchschnitt je Klub",
+          "official": true,
+          "income": {
+            "matchday": 15200000,
+            "advertising": 12000000,
+            "media": 16000000,
+            "merchandising": 5400000,
+            "other": 9700000,
+            "total": 58300000
+          },
+          "expenses": {
+            "squad": 16500000,
+            "operations": 38700000,
+            "youth": 4100000,
+            "total": 59300000
+          }
+        }
       },
       "DE3": {
         "tvPool": 32000000,
@@ -402,10 +442,20 @@
         "minEquity": -2000000,
         "travelPerAwayMatch": 12000,
         "wageLevel": 0.4,
-        "sponsorLevel": 0.6,
+        "sponsorLevel": 0.8,
         "targetAnnualWage": 165000,
-        "operatingCostShare": 0.3,
-        "maxAnnualWage": 400000
+        "operatingCostShare": 0.55,
+        "maxAnnualWage": 400000,
+        "reference": {
+          "source": "DFB-Saisonreport 3. Liga, Saison 2023/24, Durchschnitt je Klub",
+          "official": true,
+          "income": {
+            "total": 16200000
+          },
+          "expenses": {
+            "squad": 5500000
+          }
+        }
       },
       "DE4": {
         "tvPool": 12600000,
