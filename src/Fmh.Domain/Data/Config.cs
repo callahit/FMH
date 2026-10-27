@@ -185,6 +185,8 @@ public sealed class DivisionConfig
     public List<GroupConfig> Groups { get; set; } = new();
     public GroupAssignment Assignment { get; set; } = GroupAssignment.Fixed;
     public List<MovementRule> Movements { get; set; } = new();
+    /// <summary>Weitere Saisonphasen nach dem Grunddurchgang (bisher höchstens eine).</summary>
+    public List<PhaseConfig> Phases { get; set; } = new();
 
     /// <summary>Kennungen der Ligen im Spiel: die Staffeln oder die Division selbst.</summary>
     [System.Text.Json.Serialization.JsonIgnore]
