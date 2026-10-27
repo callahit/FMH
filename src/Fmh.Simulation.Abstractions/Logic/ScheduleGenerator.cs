@@ -45,9 +45,31 @@ public static class ScheduleGenerator
         return result;
     }
 
-    /// <summary>Termine der Spieltage: wöchentlich am konfigurierten Spieltag, ohne Winterpause.</summary>
-    public static List<DateOnly> MatchdayDates(SeasonConfig cfg, int seasonYear, int count) =>
-        WeeklyDates(cfg, seasonYear, ParseDate(cfg.FirstMatchday, seasonYear, cfg.StartMonth), count);
+    /// <summary>
+    /// Termine der Spieltage: wöchentlich am konfigurierten Spieltag, ohne Winterpause. Reichen die Wochen bis zum letzten
+    /// Spieltag (<see cref="SeasonConfig.LastMatchday"/>) nicht, kommen Englische Wochen gleichmäßig verteilt hinzu.
+    /// </summary>
+    public static List<DateOnly> MatchdayDates(SeasonConfig cfg, int seasonYear, int count)
+    {
+        var weekly = WeeklyDates(cfg, seasonYear, ParseDate(cfg.FirstMatchday, seasonYear, cfg.StartMonth), count);
+        if (cfg.LastMatchday is not { Length: > 0 } last) return weekly;
+        var end = ParseDate(last, seasonYear, cfg.StartMonth);
+        var fit = weekly.Where(d => d <= end).ToList();
+        var missing = count - fit.Count;
+        if (missing <= 0 || fit.Count < 2) return weekly;
+        // Englische Wochen: vor dem Wochenendspieltag, mit gleichem Abstand zwischen den Einschüben.
+        var dates = new List<DateOnly>(fit);
+        for (var k = 1; k <= missing; k++)
+        {
+            var anchor = fit[Math.Min(fit.Count - 1, (int)Math.Round(k * fit.Count / (double)(missing + 1)))];
+            var midweek = anchor.AddDays(-(((int)anchor.DayOfWeek - (int)cfg.MidweekDay + 7) % 7));
+            if (midweek == anchor) midweek = anchor.AddDays(-7);
+            while (dates.Contains(midweek)) midweek = midweek.AddDays(-7);
+            dates.Add(midweek);
+        }
+        dates.Sort();
+        return dates;
+    }
 
     /// <summary>Wöchentliche Termine ab <paramref name="from"/> am Spieltag des Landes; Wochen der Winterpause entfallen.</summary>
     public static List<DateOnly> WeeklyDates(SeasonConfig cfg, int seasonYear, DateOnly from, int count)

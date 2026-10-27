@@ -1,0 +1,541 @@
+{
+  "code": "ENG",
+  "name": "England",
+  "currency": "GBP",
+  "validFrom": 2026,
+  "activation": "Playable",
+  "season": {
+    "startMonth": 7,
+    "firstMatchday": "08-08",
+    "winterBreakStart": "01-01",
+    "winterBreakEnd": "01-01",
+    "matchDay": "Saturday",
+    "lastMatchday": "05-02",
+    "midweekDay": "Tuesday"
+  },
+  "squad": {
+    "maxSquad": 30,
+    "benchSize": 9,
+    "substitutions": 5
+  },
+  "discipline": {
+    "yellowCardsForSuspension": 5,
+    "redCardBanMin": 1,
+    "redCardBanMax": 3,
+    "secondYellowBan": 1
+  },
+  "levels": [
+    {
+      "level": 1,
+      "divisions": [
+        {
+          "id": "ENG1",
+          "name": "Premier Division",
+          "teams": 20,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "GoalDifference",
+            "GoalsFor",
+            "HeadToHead",
+            "AwayGoals"
+          ],
+          "movements": [
+            {
+              "positions": "18-20",
+              "to": "Down"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "divisions": [
+        {
+          "id": "ENG2",
+          "name": "First Division",
+          "teams": 24,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "GoalDifference",
+            "GoalsFor",
+            "HeadToHead",
+            "AwayGoals"
+          ],
+          "movements": [
+            {
+              "positions": "1-2",
+              "to": "Up"
+            },
+            {
+              "positions": "22-24",
+              "to": "Down"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": 3,
+      "divisions": [
+        {
+          "id": "ENG3",
+          "name": "Second Division",
+          "teams": 24,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "GoalDifference",
+            "GoalsFor",
+            "HeadToHead",
+            "AwayGoals"
+          ],
+          "movements": [
+            {
+              "positions": "1-2",
+              "to": "Up"
+            },
+            {
+              "positions": "21-24",
+              "to": "Down"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": 4,
+      "divisions": [
+        {
+          "id": "ENG4",
+          "name": "Third Division",
+          "teams": 24,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "GoalDifference",
+            "GoalsFor",
+            "HeadToHead",
+            "AwayGoals"
+          ],
+          "movements": [
+            {
+              "positions": "1-3",
+              "to": "Up"
+            },
+            {
+              "positions": "23-24",
+              "to": "Down"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "pools": [
+    {
+      "id": "ENG-NL",
+      "name": "National Non-League",
+      "teams": 24,
+      "feeds": "ENG4"
+    }
+  ],
+  "cups": [
+    {
+      "id": "ENG-CUP",
+      "name": "National Cup",
+      "participants": [
+        "ENG1",
+        "ENG2",
+        "ENG3",
+        "ENG4",
+        "ENG-NL"
+      ],
+      "teams": 64,
+      "lowerTierHome": false,
+      "legs": 1,
+      "awayGoals": false,
+      "dates": [
+        "01-10",
+        "02-07",
+        "03-04",
+        "03-21",
+        "04-25",
+        "05-16"
+      ],
+      "neutralFinal": true
+    }
+  ],
+  "playoffs": [
+    {
+      "id": "ENG-PO2",
+      "name": "Play-offs First Division",
+      "upperDivision": "ENG1",
+      "lowerDivision": "ENG2",
+      "entrants": [
+        {
+          "division": "ENG2",
+          "position": 3
+        },
+        {
+          "division": "ENG2",
+          "position": 4
+        },
+        {
+          "division": "ENG2",
+          "position": 5
+        },
+        {
+          "division": "ENG2",
+          "position": 6
+        }
+      ],
+      "places": 1,
+      "legs": 2,
+      "finalLegs": 1,
+      "seeded": true,
+      "awayGoals": false,
+      "dates": [
+        "05-09,05-13",
+        "05-24"
+      ]
+    },
+    {
+      "id": "ENG-PO3",
+      "name": "Play-offs Second Division",
+      "upperDivision": "ENG2",
+      "lowerDivision": "ENG3",
+      "entrants": [
+        {
+          "division": "ENG3",
+          "position": 3
+        },
+        {
+          "division": "ENG3",
+          "position": 4
+        },
+        {
+          "division": "ENG3",
+          "position": 5
+        },
+        {
+          "division": "ENG3",
+          "position": 6
+        }
+      ],
+      "places": 1,
+      "legs": 2,
+      "finalLegs": 1,
+      "seeded": true,
+      "awayGoals": false,
+      "dates": [
+        "05-08,05-12",
+        "05-23"
+      ]
+    },
+    {
+      "id": "ENG-PO4",
+      "name": "Play-offs Third Division",
+      "upperDivision": "ENG3",
+      "lowerDivision": "ENG4",
+      "entrants": [
+        {
+          "division": "ENG4",
+          "position": 4
+        },
+        {
+          "division": "ENG4",
+          "position": 5
+        },
+        {
+          "division": "ENG4",
+          "position": 6
+        },
+        {
+          "division": "ENG4",
+          "position": 7
+        }
+      ],
+      "places": 1,
+      "legs": 2,
+      "finalLegs": 1,
+      "seeded": true,
+      "awayGoals": false,
+      "dates": [
+        "05-07,05-11",
+        "05-25"
+      ]
+    }
+  ],
+  "transferWindows": {
+    "summerStart": "06-16",
+    "summerEnd": "09-01",
+    "winterStart": "01-01",
+    "winterEnd": "02-02",
+    "preContractFrom": "01-01"
+  },
+  "youth": {
+    "intakeMonth": 3,
+    "minPlayers": 4,
+    "maxPlayers": 9,
+    "proContractAge": 17,
+    "promoteAge": 16,
+    "intakeAge": 14,
+    "groupSize": 14,
+    "referenceBudget": 1500000
+  },
+  "finance": {
+    "divisions": {
+      "ENG1": {
+        "tvPool": 3000000000,
+        "tvEqualShare": 0.6,
+        "standing": 35,
+        "seating": 50,
+        "box": 15000,
+        "floodlightRequired": 3,
+        "youthCenterRequired": 2,
+        "minEquity": -150000000,
+        "travelPerAwayMatch": 60000,
+        "wageLevel": 1.0,
+        "sponsorLevel": 0.85,
+        "operatingCostShare": 0.55,
+        "maxAnnualWage": 25000000,
+        "targetAnnualWage": 5000000
+      },
+      "ENG2": {
+        "tvPool": 200000000,
+        "tvEqualShare": 0.8,
+        "standing": 22,
+        "seating": 30,
+        "box": 5000,
+        "floodlightRequired": 2,
+        "youthCenterRequired": 1,
+        "minEquity": -40000000,
+        "travelPerAwayMatch": 30000,
+        "wageLevel": 0.9,
+        "sponsorLevel": 0.45,
+        "operatingCostShare": 0.35,
+        "maxAnnualWage": 4000000,
+        "targetAnnualWage": 1100000
+      },
+      "ENG3": {
+        "tvPool": 36000000,
+        "tvEqualShare": 0.9,
+        "standing": 18,
+        "seating": 24,
+        "box": 2000,
+        "floodlightRequired": 1,
+        "youthCenterRequired": 0,
+        "minEquity": -6000000,
+        "travelPerAwayMatch": 12000,
+        "wageLevel": 0.35,
+        "sponsorLevel": 0.35,
+        "operatingCostShare": 0.3,
+        "maxAnnualWage": 700000,
+        "targetAnnualWage": 230000
+      },
+      "ENG4": {
+        "tvPool": 24000000,
+        "tvEqualShare": 1.0,
+        "standing": 16,
+        "seating": 22,
+        "box": 1200,
+        "floodlightRequired": 1,
+        "youthCenterRequired": 0,
+        "minEquity": -3000000,
+        "travelPerAwayMatch": 8000,
+        "wageLevel": 0.25,
+        "sponsorLevel": 0.3,
+        "operatingCostShare": 0.3,
+        "maxAnnualWage": 300000,
+        "targetAnnualWage": 100000
+      },
+      "ENG-NL": {
+        "tvPool": 0,
+        "standing": 12,
+        "seating": 16,
+        "box": 500,
+        "floodlightRequired": 0,
+        "youthCenterRequired": 0,
+        "minEquity": -1000000,
+        "travelPerAwayMatch": 4000,
+        "wageLevel": 0.15,
+        "sponsorLevel": 0.15,
+        "operatingCostShare": 0.25,
+        "maxAnnualWage": 150000,
+        "targetAnnualWage": 40000
+      }
+    },
+    "cupPrizes": [
+      105000,
+      120000,
+      225000,
+      450000,
+      1000000,
+      2000000
+    ],
+    "cupWinnerPrize": 2000000,
+    "playoffPrize": 500000,
+    "creditLimitPercent": 15,
+    "boardApprovalAbove": 10000000,
+    "permitAbove": 5000000,
+    "seasonTicketDeadline": "07-31",
+    "licenseApplication": "03-15",
+    "licenseDecision": "04-30",
+    "licenseDeadline": "05-31",
+    "conditionPenalty": 3,
+    "stadiumCostPerPlace": 3000,
+    "stadiumBaseCost": 20000000,
+    "stadiumCostPerBox": 200000,
+    "stadiumBuildDays": 720
+  },
+  "europe": {
+    "league": "ENG1",
+    "places": [
+      {
+        "competition": "UCL",
+        "from": 1,
+        "to": 4
+      },
+      {
+        "competition": "UEL",
+        "from": 5,
+        "to": 5
+      },
+      {
+        "competition": "UECL",
+        "from": 6,
+        "to": 6
+      }
+    ],
+    "cupWinner": "UEL",
+    "cup": "ENG-CUP",
+    "competitions": [
+      {
+        "id": "UCL",
+        "fieldStrength": 13.6,
+        "entryPrize": 18600000,
+        "stages": [
+          {
+            "key": "europe.stage.league",
+            "date": "01-31",
+            "prize": 6300000
+          },
+          {
+            "key": "europe.stage.r16",
+            "date": "03-15",
+            "prize": 11000000
+          },
+          {
+            "key": "europe.stage.qf",
+            "date": "04-15",
+            "prize": 12500000
+          },
+          {
+            "key": "europe.stage.sf",
+            "date": "05-05",
+            "prize": 15000000
+          },
+          {
+            "key": "europe.stage.final",
+            "date": "05-31",
+            "prize": 18500000
+          }
+        ]
+      },
+      {
+        "id": "UEL",
+        "fieldStrength": 12.6,
+        "entryPrize": 4300000,
+        "stages": [
+          {
+            "key": "europe.stage.league",
+            "date": "01-31",
+            "prize": 2000000
+          },
+          {
+            "key": "europe.stage.r16",
+            "date": "03-15",
+            "prize": 4000000
+          },
+          {
+            "key": "europe.stage.qf",
+            "date": "04-15",
+            "prize": 5000000
+          },
+          {
+            "key": "europe.stage.sf",
+            "date": "05-05",
+            "prize": 6000000
+          },
+          {
+            "key": "europe.stage.final",
+            "date": "05-28",
+            "prize": 7000000
+          }
+        ]
+      },
+      {
+        "id": "UECL",
+        "fieldStrength": 11.8,
+        "entryPrize": 3200000,
+        "stages": [
+          {
+            "key": "europe.stage.league",
+            "date": "01-31",
+            "prize": 1000000
+          },
+          {
+            "key": "europe.stage.r16",
+            "date": "03-15",
+            "prize": 2000000
+          },
+          {
+            "key": "europe.stage.qf",
+            "date": "04-15",
+            "prize": 2500000
+          },
+          {
+            "key": "europe.stage.sf",
+            "date": "05-05",
+            "prize": 4000000
+          },
+          {
+            "key": "europe.stage.final",
+            "date": "05-27",
+            "prize": 7000000
+          }
+        ]
+      }
+    ],
+    "license": {
+      "minSeats": 8000,
+      "floodlight": 3,
+      "academyStars": 1
+    },
+    "ffp": {
+      "acceptableDeviation": 60000000,
+      "severeDeviation": 90000000,
+      "squadCostRatio": 0.7,
+      "finePercent": 3
+    }
+  }
+}
