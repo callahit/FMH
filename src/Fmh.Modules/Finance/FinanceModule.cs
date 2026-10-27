@@ -24,7 +24,8 @@ public sealed partial class FinanceModule : GameModule, IFinanceService
     };
 
     public DivisionFinance DivisionFinance(Club club) =>
-        World.Country(club.CountryCode).Finance.Divisions.TryGetValue(club.LeagueId, out var d) ? d : new DivisionFinance();
+        World.Country(club.CountryCode).Finance.Divisions is var all && (all.TryGetValue(club.LeagueId, out var d)
+        || (World.FindLeague(club.LeagueId) is { } l && all.TryGetValue(l.Format.Id, out d))) ? d : new DivisionFinance();
 
     public bool HasFinances(Club club) => World.FindLeague(club.LeagueId) is not null;
 

@@ -180,7 +180,7 @@ public sealed partial class MatchViewModel : ViewModelBase
             new(T["match.referee"], referee is null ? "–" : T.Format("match.refereeValue", referee.Name, referee.Strictness)),
         };
 
-        var checks = LineupSelector.Validate(own, world, Data)
+        var checks = LineupSelector.Validate(own, world, Data, AiTactics.ReserveEligibility(own, world, Data))
             .Select(p => new AdviceVm(T[p], new SolidColorBrush(P.Bad))).ToList();
         if (checks.Count > 0) checks.Add(new AdviceVm(T["match.autoFixHint"], new SolidColorBrush(P.Warn)));
         checks.AddRange(TacticAdvisor.Analyse(own, world, Data).Select(a =>

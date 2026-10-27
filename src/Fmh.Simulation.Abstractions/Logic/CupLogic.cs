@@ -19,8 +19,10 @@ public static class CupLogic
 
     public static Cup CreateCup(World world, CountryConfig country, CupConfig cfg)
     {
+        // Teilnehmer: Ligen, Staffeln (über die Division) und Pools; zweite Mannschaften nur, wenn das Land es erlaubt.
+        bool Takes(Club c) => cfg.Participants.Contains(c.LeagueId) || (world.FindLeague(c.LeagueId) is { } l && cfg.Participants.Contains(l.Format.Id));
         var participants = world.Clubs.Values
-            .Where(c => c.CountryCode == country.Code && cfg.Participants.Contains(c.LeagueId))
+            .Where(c => c.CountryCode == country.Code && Takes(c) && (c.ReserveOf is null || country.Reserves.PlayInCups))
             .Select(c => c.Id).OrderBy(id => id).ToList();
         var size = 2;
         while (size < Math.Max(cfg.Teams, participants.Count)) size *= 2;
@@ -79,6 +81,41 @@ public static class CupLogic
         });
         // Hinspiel beim Unterklassigen, Rückspiel beim Erstligisten.
         AddTie(world, cup, cup.Rounds[0], lowerClub, upperClub);
+        return cup;
+    }
+
+    /// <summary>
+    /// Aufstiegsturnier mit mehr als zwei Teilnehmern (Halbfinale und Finale bzw. größere K.-o.-Runden).
+    /// Termine je Runde wie beim Pokal; die erste Runde wird ausgelost.
+    /// </summary>
+    public static Cup CreatePlayoffTournament(World world, CountryConfig country, PlayoffConfig cfg, List<int> participants, Rng rng)
+    {
+        var size = 2;
+        while (size < participants.Count) size *= 2;
+        var cup = new Cup
+        {
+            Id = cfg.Id,
+            Name = cfg.Name,
+            CountryCode = country.Code,
+            Kind = CompetitionKind.Playoff,
+            SeasonYear = world.SeasonYear,
+            Config = new CupConfig { Id = cfg.Id, Name = cfg.Name, Legs = cfg.Legs, AwayGoals = cfg.AwayGoals, LowerTierHome = true, NeutralFinal = false },
+            ParticipantIds = participants.ToList(),
+            UpperDivision = cfg.UpperDivision,
+            LowerDivision = cfg.LowerDivision,
+        };
+        var rounds = (int)Math.Round(Math.Log2(size));
+        for (var r = 0; r < rounds; r++)
+        {
+            var dates = r < cfg.Dates.Count ? cfg.Dates[r].Split(',') : new[] { "06-15" };
+            cup.Rounds.Add(new CupRound
+            {
+                Number = r + 1,
+                NameKey = RoundKey(size >> r, r + 1),
+                Dates = dates.Select(d => ScheduleGenerator.ParseDate(d.Trim(), world.SeasonYear, country.Season.StartMonth)).ToList(),
+            });
+        }
+        Draw(world, cup, cup.Rounds[0], participants, rng);
         return cup;
     }
 

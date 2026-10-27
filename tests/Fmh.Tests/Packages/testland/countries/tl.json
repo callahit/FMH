@@ -1,0 +1,336 @@
+{
+  "code": "TL",
+  "name": "Testland",
+  "currency": "EUR",
+  "validFrom": 2026,
+  "activation": "Playable",
+  "season": {
+    "startMonth": 7,
+    "firstMatchday": "08-15",
+    "winterBreakStart": "12-21",
+    "winterBreakEnd": "01-14",
+    "matchDay": "Saturday"
+  },
+  "squad": {
+    "maxSquad": 30,
+    "benchSize": 9,
+    "substitutions": 5
+  },
+  "discipline": {
+    "yellowCardsForSuspension": 5,
+    "redCardBanMin": 1,
+    "redCardBanMax": 3,
+    "secondYellowBan": 1
+  },
+  "levels": [
+    {
+      "level": 1,
+      "divisions": [
+        {
+          "id": "TL1",
+          "name": "Testliga",
+          "teams": 10,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "GoalDifference",
+            "GoalsFor",
+            "HeadToHead",
+            "AwayGoals"
+          ],
+          "movements": [
+            {
+              "positions": "10",
+              "to": "Down"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "divisions": [
+        {
+          "id": "TL2",
+          "name": "2. Testliga",
+          "teams": 10,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "GoalDifference",
+            "GoalsFor",
+            "HeadToHead",
+            "AwayGoals"
+          ],
+          "movements": [
+            {
+              "positions": "1",
+              "to": "Up"
+            },
+            {
+              "positions": "9-10",
+              "to": "Down"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": 3,
+      "divisions": [
+        {
+          "id": "TL3",
+          "name": "3. Testliga",
+          "teams": 10,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "GoalDifference",
+            "GoalsFor",
+            "HeadToHead",
+            "AwayGoals"
+          ],
+          "movements": [
+            {
+              "positions": "1-2",
+              "to": "Up"
+            },
+            {
+              "positions": "8-10",
+              "to": "Down"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": 4,
+      "divisions": [
+        {
+          "id": "TL4",
+          "name": "Regionalliga",
+          "teams": 8,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "GoalDifference",
+            "GoalsFor",
+            "HeadToHead",
+            "AwayGoals"
+          ],
+          "movements": [
+            {
+              "positions": "1",
+              "to": "Up"
+            }
+          ],
+          "groups": [
+            {
+              "id": "TL4N",
+              "name": "Regionalliga Nord",
+              "regions": [
+                "Nord"
+              ]
+            },
+            {
+              "id": "TL4M",
+              "name": "Regionalliga Mitte",
+              "regions": [
+                "Mitte"
+              ]
+            },
+            {
+              "id": "TL4S",
+              "name": "Regionalliga Süd",
+              "regions": [
+                "Süd"
+              ]
+            }
+          ],
+          "assignment": "Fixed"
+        }
+      ]
+    }
+  ],
+  "pools": [],
+  "cups": [
+    {
+      "id": "TL-CUP",
+      "name": "Testpokal",
+      "participants": [
+        "TL1",
+        "TL2",
+        "TL3",
+        "TL4"
+      ],
+      "teams": 64,
+      "lowerTierHome": true,
+      "legs": 1,
+      "awayGoals": false,
+      "dates": [
+        "08-05",
+        "09-30",
+        "11-04",
+        "02-03",
+        "03-24",
+        "05-08"
+      ],
+      "neutralFinal": true
+    }
+  ],
+  "playoffs": [
+    {
+      "id": "TL-REL",
+      "name": "Relegation",
+      "upperDivision": "TL1",
+      "lowerDivision": "TL2",
+      "entrants": [
+        {
+          "division": "TL1",
+          "position": 9
+        },
+        {
+          "division": "TL2",
+          "position": 2
+        }
+      ],
+      "places": 1,
+      "legs": 2,
+      "awayGoals": false,
+      "dates": [
+        "05-13",
+        "05-17"
+      ]
+    },
+    {
+      "id": "TL-AUF",
+      "name": "Aufstiegsrunde",
+      "upperDivision": "TL3",
+      "lowerDivision": "TL4",
+      "entrants": [
+        {
+          "division": "TL3",
+          "position": 7
+        },
+        {
+          "division": "TL4",
+          "position": 2
+        }
+      ],
+      "places": 1,
+      "legs": 1,
+      "awayGoals": false,
+      "dates": [
+        "05-20",
+        "05-27"
+      ]
+    }
+  ],
+  "transferWindows": {
+    "summerStart": "07-01",
+    "summerEnd": "08-31",
+    "winterStart": "01-01",
+    "winterEnd": "01-31",
+    "preContractFrom": "01-01"
+  },
+  "youth": {
+    "intakeMonth": 3,
+    "minPlayers": 4,
+    "maxPlayers": 9,
+    "proContractAge": 17,
+    "promoteAge": 16,
+    "intakeAge": 14,
+    "groupSize": 14,
+    "referenceBudget": 900000
+  },
+  "finance": {
+    "divisions": {
+      "TL1": {
+        "tvPool": 85000000,
+        "tvEqualShare": 0.5,
+        "standing": 8,
+        "seating": 17,
+        "box": 2500,
+        "floodlightRequired": 3,
+        "youthCenterRequired": 2,
+        "minEquity": -6000000,
+        "travelPerAwayMatch": 35000
+      },
+      "TL2": {
+        "tvPool": 56000000,
+        "tvEqualShare": 0.6,
+        "standing": 7,
+        "seating": 14,
+        "box": 1200,
+        "floodlightRequired": 2,
+        "youthCenterRequired": 1,
+        "minEquity": -2500000,
+        "travelPerAwayMatch": 20000
+      },
+      "TL3": {
+        "tvPool": 0,
+        "standing": 5,
+        "seating": 9,
+        "box": 400,
+        "floodlightRequired": 0,
+        "youthCenterRequired": 0,
+        "minEquity": -5000000,
+        "travelPerAwayMatch": 4000
+      },
+      "TL4": {
+        "tvPool": 0,
+        "standing": 5,
+        "seating": 9,
+        "box": 400,
+        "floodlightRequired": 0,
+        "youthCenterRequired": 0,
+        "minEquity": -5000000,
+        "travelPerAwayMatch": 4000
+      }
+    },
+    "cupPrizes": [
+      100000,
+      200000,
+      400000,
+      800000,
+      1500000,
+      2500000
+    ],
+    "cupWinnerPrize": 4000000,
+    "playoffPrize": 500000,
+    "creditLimitPercent": 15,
+    "boardApprovalAbove": 2000000,
+    "permitAbove": 1000000,
+    "seasonTicketDeadline": "07-31",
+    "licenseApplication": "03-15",
+    "licenseDecision": "04-30",
+    "licenseDeadline": "05-31",
+    "conditionPenalty": 3,
+    "stadiumCostPerPlace": 900,
+    "stadiumBaseCost": 4000000,
+    "stadiumCostPerBox": 60000,
+    "stadiumBuildDays": 720
+  },
+  "reserves": {
+    "minLevelGap": 2,
+    "playInCups": false,
+    "ageLimit": 23,
+    "overAgePlayers": 3
+  }
+}

@@ -31,10 +31,14 @@ public static class PackageLoader
         throw new DirectoryNotFoundException("Kein Datenverzeichnis 'data' mit Paketen gefunden.");
     }
 
-    public static GameData Load(string dataRoot, string language = "de", IReadOnlyCollection<string>? enabledPackages = null)
+    public static GameData Load(string dataRoot, string language = "de", IReadOnlyCollection<string>? enabledPackages = null) =>
+        Load(new[] { dataRoot }, language, enabledPackages);
+
+    /// <summary>Lädt die Pakete aus mehreren Verzeichnissen (z. B. Grundwelt plus Mod- oder Testpakete).</summary>
+    public static GameData Load(IReadOnlyList<string> dataRoots, string language = "de", IReadOnlyCollection<string>? enabledPackages = null)
     {
         var manifests = new List<PackageManifest>();
-        foreach (var dir in Directory.GetDirectories(dataRoot).OrderBy(d => d, StringComparer.Ordinal))
+        foreach (var dir in dataRoots.SelectMany(r => Directory.GetDirectories(r).OrderBy(d => d, StringComparer.Ordinal)))
         {
             var manifestPath = Path.Combine(dir, ManifestFile);
             if (!File.Exists(manifestPath)) continue;
@@ -42,7 +46,7 @@ public static class PackageLoader
             m.Directory = dir;
             if (enabledPackages is null || enabledPackages.Contains(m.Id)) manifests.Add(m);
         }
-        if (manifests.Count == 0) throw new InvalidDataException($"Keine Datenpakete in '{dataRoot}'.");
+        if (manifests.Count == 0) throw new InvalidDataException($"Keine Datenpakete in '{string.Join(", ", dataRoots)}'.");
 
         var ordered = SortByDependencies(manifests);
         var files = Overlay(ordered);
@@ -53,7 +57,7 @@ public static class PackageLoader
                  .OrderBy(kv => kv.Key, StringComparer.Ordinal)
                  .Select(kv => kv.Value);
 
-        var countries = PathsUnder("countries").Select(Json.Load<CountryConfig>).ToList();
+        var countries = PathsUnder("countries").Select(p => Json.Load<CountryConfig>(p).Normalize()).ToList();
         var clubs = PathsUnder("clubs").SelectMany(Json.Load<List<ClubDefinition>>).ToList();
         var names = PathsUnder("names").Select(Json.Load<NameList>).ToDictionary(n => n.Country);
 

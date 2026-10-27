@@ -2,6 +2,7 @@ using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Fmh.Core;
+using Fmh.Core.Data;
 using Fmh.Core.Logic;
 using Fmh.Core.Model;
 using Fmh.Desktop.Controls;
@@ -93,9 +94,10 @@ public sealed partial class LeaguePageViewModel : PageViewModel, IRefreshable
         var own = Session.HumanClub.Id;
         Table = rows.Select(r =>
         {
-            var zone = r.Position <= league.Format.Promotion || (league.Level == 1 && r.Position == 1) ? P.Good
-                : r.Position > rows.Count - league.Format.Relegation ? P.Bad
-                : playoffs.Any(po => (po.UpperDivision == league.Id && po.UpperPosition == r.Position) || (po.LowerDivision == league.Id && po.LowerPosition == r.Position)) ? P.Warn
+            var direct = Pyramid.DirectZone(league.Format, r.Position, world.SeasonYear);
+            var zone = direct == MovementDirection.Up || (league.Level == 1 && r.Position == 1) ? P.Good
+                : direct == MovementDirection.Down ? P.Bad
+                : playoffs.Any(po => po.Entrants.Any(e => (e.Division == league.Id || e.Division == league.Format.Id) && e.Position == r.Position)) ? P.Warn
                 : Colors.Transparent;
             return new TableRowVm
             {
