@@ -104,6 +104,8 @@ public sealed class DivisionFinance
     /// <summary>Eigenkapital, das bei der Lizenzierung mindestens vorhanden sein muss.</summary>
     public long MinEquity { get; set; }
     public long TravelPerAwayMatch { get; set; } = 20_000;
+    /// <summary>Gehaltsniveau der Spielklasse gegenüber dem Profimarkt (1,0); Halbprofis verdienen deutlich weniger.</summary>
+    public double WageLevel { get; set; } = 1.0;
 }
 
 public sealed class BuildingRequirement

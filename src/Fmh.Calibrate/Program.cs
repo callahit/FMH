@@ -221,7 +221,12 @@ public static class Program
         {
             var result = session.Advance();
             if (result.Reason == StopReason.Decision) session.DelegateDecisions();
-            if (session.AwaitingNewJob) { Console.WriteLine($"Entlassen am {world.Date}."); break; }
+            if (session.AwaitingNewJob)
+            {
+                var reason = world.Messages.LastOrDefault(m => m.SubjectRef?.Key == "msg.sacked.subject")?.BodyText(data.Texts);
+                Console.WriteLine($"Entlassen am {world.Date:yyyy-MM-dd}: {reason}");
+                break;
+            }
             if (dayWatch is not null)
             {
                 // Spieltag gemessen vom eigenen Spiel bis alle übrigen Spiele des Tages berechnet sind.

@@ -340,6 +340,21 @@ public class PyramidTests
         Assert.Equal(new[] { new DateOnly(2026, 12, 19), new DateOnly(2027, 1, 16), new DateOnly(2027, 1, 23) }, dates);
     }
 
+    /// <summary>Ein Meister ohne Lizenz steigt zwangsweise ab statt auf; kein Verein steht in zwei Wechseln zugleich.</summary>
+    [Fact]
+    public void ForcedRelegationBlocksPromotion()
+    {
+        var s = NewTestland(81);
+        var w = s.World;
+        TestData.PlayUntil(s, r => r.Reason == StopReason.SeasonEnd, 20_000);
+        var champion = w.Clubs[LeagueTable.Compute(w.League("TL3"))[0].ClubId];
+        champion.License.ForcedRelegation = true;
+        champion.License.PromotionAllowed = true;
+        TestData.PlayUntil(s, r => r.Reason == StopReason.NewSeason, 20_000);
+        AssertConsistent(w);
+        Assert.Equal(4, w.FindLeague(champion.LeagueId)!.Level);
+    }
+
     private static GameData WithCountry(CountryConfig country)
     {
         var data = new GameData

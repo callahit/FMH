@@ -142,7 +142,9 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
   - Einnahmen: Zuschauer nach Preis, Stärke, Wetter, Derby und Fanstimmung; Dauerkarten bis Ende Juli;
     Fernsehgelder in zehn Raten plus Leistungsanteil; Sponsoren; Catering, Fanartikel und Gelände;
     Pokal- und Relegationsprämien.
-  - Ausgaben: Gehälter, Personal, Unterhalt, Reisen, Prämien, Zinsen.
+  - Ausgaben: Gehälter, Personal, Unterhalt, Reisen, Prämien, Zinsen. Das Gehaltsniveau je Spielklasse
+    (`wageLevel` in `finance.divisions`, z. B. 0,55 in der 3. Liga, 0,3 in der Regionalliga) gilt für
+    Startkader, Gehaltsforderungen und Jugendverträge.
   - Bank: Kredite (3–12 % Zins je nach Verschuldung), Festgeld, Umschichten zwischen Transfer- und
     Gehaltsbudget (52:1), Eintrittspreise mit Fanreaktion.
   - Lizenzierung mit Stichtagen, jedes Jahr für die nächste Saison:
@@ -229,7 +231,9 @@ Die Finanzsimulation über fünf Saisons ergibt folgende Werte je Verein:
 | Liga | Einnahmen | Ausgaben | Saldo pro Saison |
 |---|---|---|---|
 | 1. Liga | 26–32 Mio. | 21–26 Mio. | +4 bis +6 Mio. |
-| 2. Liga | 7–8 Mio. | 7–8 Mio. | etwa ±0 Mio. |
+| 2. Liga | 7–8 Mio. | 7–9 Mio. | etwa ±0 Mio., in späteren Saisons leicht negativ |
+| 3. Liga | 3–4 Mio. | 3,5–4 Mio. | ±0 bis −0,9 Mio. |
+| Regionalliga | 1,4–1,6 Mio. | 1,5–1,9 Mio. | −0,1 bis −0,4 Mio. |
 
 Darin sind die Budgets der Nachwuchsleistungszentren und die Europapokalprämien bereits enthalten.
 Absteiger geraten mit ihren Gehältern ins Minus. Es gibt keine Kettenpleiten. In der 2. Liga bekommen
@@ -463,6 +467,9 @@ Mannschaften liegt unter `tests/Fmh.Tests/Packages/testland` (nur für Tests).
   real wechselt der Aufstiegsmodus jährlich zwischen den Staffeln. Pokalplätze für Amateure gehen nach Ruf statt
   über Landespokale. Die fiktiven Ortsnamen sind zusammengesetzt; Übereinstimmungen mit kleinen realen Orten sind
   möglich, bekannte Vereinsorte sind ausgeschlossen.
+- **Finanzen in Ebene 3–4:** Die Kosten steigen über fünf Saisons leicht stärker als die Einnahmen; in der
+  fünften Saison bekommen einzelne Vereine der 3. Liga und Regionalliga Punktabzüge. Feinabstimmung mit
+  weiteren Ländern (AP 4b).
 - **Karten in unteren Ligen:** Über alle vier Ebenen zeigt die Engine 3,2 Gelbe und 0,13 Rote Karten je Spiel
   (Ziel 3,8 bzw. 0,2), weil schwächere Spieler seltener in Zweikämpfe kommen. Die Kalibrierung prüft deshalb
   Ebene 1–2 (`--max-level`); ob untere Ligen eigene Zielwerte bekommen, ist offen.
