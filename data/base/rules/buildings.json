@@ -1,0 +1,1222 @@
+[
+ {
+  "id": "trainingPitch",
+  "category": "training",
+  "width": 2,
+  "height": 1,
+  "maxLevel": 5,
+  "cost": 250000,
+  "upkeep": 4000,
+  "buildDays": 45,
+  "effects": {
+   "training.quality": 0.03,
+   "training.injury": 0.04
+  },
+  "multiple": true,
+  "location": "dressing"
+ },
+ {
+  "id": "artificialPitch",
+  "category": "training",
+  "width": 2,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 400000,
+  "upkeep": 5000,
+  "buildDays": 45,
+  "effects": {
+   "training.winter": 0.3,
+   "training.quality": 0.01
+  }
+ },
+ {
+  "id": "trainingFloodlight",
+  "category": "training",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 150000,
+  "upkeep": 2000,
+  "buildDays": 30,
+  "effects": {
+   "training.winter": 0.2,
+   "training.quality": 0.01
+  },
+  "requires": [
+   {
+    "type": "trainingPitch",
+    "level": 1
+   }
+  ]
+ },
+ {
+  "id": "trainingHeating",
+  "category": "training",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 1,
+  "cost": 300000,
+  "upkeep": 6000,
+  "buildDays": 30,
+  "effects": {
+   "training.winter": 0.4
+  },
+  "requires": [
+   {
+    "type": "trainingPitch",
+    "level": 2
+   }
+  ]
+ },
+ {
+  "id": "soccerCourt",
+  "category": "training",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 80000,
+  "upkeep": 1000,
+  "buildDays": 20,
+  "effects": {
+   "training.technical": 0.04
+  }
+ },
+ {
+  "id": "goalkeeperArea",
+  "category": "training",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 120000,
+  "upkeep": 1500,
+  "buildDays": 30,
+  "effects": {
+   "training.goalkeeping": 0.06
+  }
+ },
+ {
+  "id": "setPieceArea",
+  "category": "training",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 90000,
+  "upkeep": 1000,
+  "buildDays": 20,
+  "effects": {
+   "training.setPieces": 0.08
+  }
+ },
+ {
+  "id": "sprintTrack",
+  "category": "training",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 150000,
+  "upkeep": 1500,
+  "buildDays": 30,
+  "effects": {
+   "training.physical": 0.04
+  }
+ },
+ {
+  "id": "trainingHall",
+  "category": "training",
+  "width": 2,
+  "height": 2,
+  "maxLevel": 3,
+  "cost": 1500000,
+  "upkeep": 12000,
+  "buildDays": 120,
+  "effects": {
+   "training.winter": 0.3,
+   "training.quality": 0.02,
+   "income.events": 1500
+  }
+ },
+ {
+  "id": "gym",
+  "category": "training",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 5,
+  "cost": 300000,
+  "upkeep": 4000,
+  "buildDays": 45,
+  "effects": {
+   "training.physical": 0.04,
+   "training.injury": 0.05
+  },
+  "location": "dressing"
+ },
+ {
+  "id": "dressingRooms",
+  "category": "training",
+  "width": 2,
+  "height": 1,
+  "maxLevel": 5,
+  "cost": 500000,
+  "upkeep": 5000,
+  "buildDays": 60,
+  "effects": {
+   "morale": 0.4,
+   "medical.condition": 0.15,
+   "signing": 0.02
+  }
+ },
+ {
+  "id": "videoRoom",
+  "category": "training",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 200000,
+  "upkeep": 2000,
+  "buildDays": 30,
+  "effects": {
+   "training.familiarity": 0.15
+  },
+  "location": "dressing"
+ },
+ {
+  "id": "analysisCentre",
+  "category": "training",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 400000,
+  "upkeep": 6000,
+  "buildDays": 45,
+  "effects": {
+   "scout.accuracy": 1.0,
+   "analysis": 10
+  }
+ },
+ {
+  "id": "altitudeChamber",
+  "category": "training",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 1,
+  "cost": 1200000,
+  "upkeep": 15000,
+  "buildDays": 60,
+  "effects": {
+   "training.physical": 0.08,
+   "medical.condition": 0.3
+  }
+ },
+ {
+  "id": "greenkeeper",
+  "category": "training",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 150000,
+  "upkeep": 3000,
+  "buildDays": 30,
+  "effects": {
+   "pitch": 3.0,
+   "training.quality": 0.01
+  }
+ },
+ {
+  "id": "physio",
+  "category": "medical",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 5,
+  "cost": 250000,
+  "upkeep": 4000,
+  "buildDays": 45,
+  "effects": {
+   "medical.recovery": 0.05,
+   "medical.condition": 0.15
+  }
+ },
+ {
+  "id": "clinic",
+  "category": "medical",
+  "width": 2,
+  "height": 1,
+  "maxLevel": 5,
+  "cost": 1500000,
+  "upkeep": 15000,
+  "buildDays": 120,
+  "effects": {
+   "medical.recovery": 0.05,
+   "medical.longInjury": 0.1,
+   "income.patients": 2000
+  }
+ },
+ {
+  "id": "rehab",
+  "category": "medical",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 800000,
+  "upkeep": 8000,
+  "buildDays": 90,
+  "effects": {
+   "medical.recovery": 0.06,
+   "medical.longInjury": 0.2
+  },
+  "requires": [
+   {
+    "type": "physio",
+    "level": 2
+   }
+  ],
+  "synergies": [
+   {
+    "with": "pool",
+    "effect": "medical.recovery",
+    "value": 0.05
+   }
+  ]
+ },
+ {
+  "id": "pool",
+  "category": "medical",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 600000,
+  "upkeep": 8000,
+  "buildDays": 90,
+  "effects": {
+   "medical.recovery": 0.03,
+   "medical.condition": 0.2
+  }
+ },
+ {
+  "id": "sauna",
+  "category": "medical",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 150000,
+  "upkeep": 2000,
+  "buildDays": 30,
+  "effects": {
+   "medical.condition": 0.2,
+   "morale": 0.2
+  }
+ },
+ {
+  "id": "icePool",
+  "category": "medical",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 100000,
+  "upkeep": 1500,
+  "buildDays": 20,
+  "effects": {
+   "medical.condition": 0.35
+  }
+ },
+ {
+  "id": "restRooms",
+  "category": "medical",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 120000,
+  "upkeep": 1500,
+  "buildDays": 30,
+  "effects": {
+   "medical.condition": 0.25
+  }
+ },
+ {
+  "id": "nutrition",
+  "category": "medical",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 250000,
+  "upkeep": 4000,
+  "buildDays": 45,
+  "effects": {
+   "training.physical": 0.02,
+   "training.injury": 0.04
+  }
+ },
+ {
+  "id": "psychologyRoom",
+  "category": "medical",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 100000,
+  "upkeep": 1500,
+  "buildDays": 20,
+  "effects": {
+   "psychology": 0.5,
+   "morale": 0.2
+  }
+ },
+ {
+  "id": "diagnostics",
+  "category": "medical",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 350000,
+  "upkeep": 4000,
+  "buildDays": 45,
+  "effects": {
+   "training.injury": 0.05,
+   "medical.recovery": 0.02
+  }
+ },
+ {
+  "id": "youthCentre",
+  "category": "youth",
+  "width": 2,
+  "height": 2,
+  "maxLevel": 5,
+  "cost": 1500000,
+  "upkeep": 15000,
+  "buildDays": 120,
+  "effects": {
+   "youth.quality": 1.5,
+   "youth.development": 0.08
+  }
+ },
+ {
+  "id": "youthPitches",
+  "category": "youth",
+  "width": 2,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 300000,
+  "upkeep": 4000,
+  "buildDays": 45,
+  "effects": {
+   "youth.development": 0.08
+  },
+  "multiple": true
+ },
+ {
+  "id": "boardingSchool",
+  "category": "youth",
+  "width": 2,
+  "height": 1,
+  "maxLevel": 5,
+  "cost": 1200000,
+  "upkeep": 12000,
+  "buildDays": 120,
+  "effects": {
+   "youth.count": 1.0,
+   "youth.quality": 0.5
+  },
+  "requires": [
+   {
+    "type": "youthCentre",
+    "level": 1
+   }
+  ],
+  "synergies": [
+   {
+    "with": "partnerSchool",
+    "effect": "youth.count",
+    "value": 1.0
+   }
+  ]
+ },
+ {
+  "id": "partnerSchool",
+  "category": "youth",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 300000,
+  "upkeep": 3000,
+  "buildDays": 60,
+  "effects": {
+   "youth.professionalism": 1.0
+  }
+ },
+ {
+  "id": "youthDressing",
+  "category": "youth",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 150000,
+  "upkeep": 1500,
+  "buildDays": 30,
+  "effects": {
+   "youth.morale": 0.4
+  }
+ },
+ {
+  "id": "youthCanteen",
+  "category": "youth",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 120000,
+  "upkeep": 2000,
+  "buildDays": 30,
+  "effects": {
+   "youth.development": 0.04
+  }
+ },
+ {
+  "id": "footballSchool",
+  "category": "youth",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 200000,
+  "upkeep": 2000,
+  "buildDays": 45,
+  "effects": {
+   "income.weekly": 2000,
+   "fans.mood": 0.1,
+   "youth.quality": 0.3
+  }
+ },
+ {
+  "id": "womensCentre",
+  "category": "youth",
+  "width": 2,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 600000,
+  "upkeep": 6000,
+  "buildDays": 90,
+  "effects": {
+   "reputation": 0.2,
+   "sponsor": 0.02,
+   "fans.mood": 0.1
+  }
+ },
+ {
+  "id": "office",
+  "category": "admin",
+  "width": 2,
+  "height": 1,
+  "maxLevel": 5,
+  "cost": 600000,
+  "upkeep": 6000,
+  "buildDays": 90,
+  "effects": {
+   "staff.slots": 1.0,
+   "sponsor": 0.03
+  }
+ },
+ {
+  "id": "coachOffices",
+  "category": "admin",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 200000,
+  "upkeep": 2000,
+  "buildDays": 30,
+  "effects": {
+   "staff.slots": 0.5,
+   "training.quality": 0.01
+  }
+ },
+ {
+  "id": "scoutingDept",
+  "category": "admin",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 5,
+  "cost": 250000,
+  "upkeep": 3000,
+  "buildDays": 30,
+  "effects": {
+   "scout.slots": 1.0,
+   "scout.accuracy": 0.5
+  }
+ },
+ {
+  "id": "legalDept",
+  "category": "admin",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 200000,
+  "upkeep": 4000,
+  "buildDays": 30,
+  "effects": {
+   "negotiation": 0.03,
+   "fines": 0.25
+  }
+ },
+ {
+  "id": "marketing",
+  "category": "admin",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 250000,
+  "upkeep": 4000,
+  "buildDays": 45,
+  "effects": {
+   "income.merch": 0.6,
+   "sponsor": 0.04
+  }
+ },
+ {
+  "id": "pressRoom",
+  "category": "admin",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 300000,
+  "upkeep": 3000,
+  "buildDays": 45,
+  "effects": {
+   "media": 0.3
+  }
+ },
+ {
+  "id": "tvStudio",
+  "category": "admin",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 500000,
+  "upkeep": 6000,
+  "buildDays": 60,
+  "effects": {
+   "income.weekly": 4000,
+   "fans.mood": 0.1,
+   "media": 0.1
+  },
+  "requires": [
+   {
+    "type": "pressRoom",
+    "level": 1
+   }
+  ]
+ },
+ {
+  "id": "staffCanteen",
+  "category": "admin",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 120000,
+  "upkeep": 2000,
+  "buildDays": 30,
+  "effects": {
+   "staffMorale": 0.5
+  }
+ },
+ {
+  "id": "daycare",
+  "category": "admin",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 150000,
+  "upkeep": 2500,
+  "buildDays": 45,
+  "effects": {
+   "signing": 0.02,
+   "morale": 0.1
+  }
+ },
+ {
+  "id": "fanshop",
+  "category": "fans",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 5,
+  "cost": 200000,
+  "upkeep": 2000,
+  "buildDays": 30,
+  "effects": {
+   "income.merch": 1.2
+  },
+  "location": "entrance"
+ },
+ {
+  "id": "cityShop",
+  "category": "fans",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 300000,
+  "upkeep": 4000,
+  "buildDays": 45,
+  "effects": {
+   "income.weekly": 3000
+  }
+ },
+ {
+  "id": "onlineShop",
+  "category": "fans",
+  "width": 2,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 800000,
+  "upkeep": 8000,
+  "buildDays": 90,
+  "effects": {
+   "income.weekly": 6000
+  },
+  "requires": [
+   {
+    "type": "fanshop",
+    "level": 2
+   }
+  ]
+ },
+ {
+  "id": "ticketCentre",
+  "category": "fans",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 150000,
+  "upkeep": 2000,
+  "buildDays": 30,
+  "effects": {
+   "seasonTickets": 0.05,
+   "attendance": 0.01
+  },
+  "location": "entrance"
+ },
+ {
+  "id": "snackBar",
+  "category": "fans",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 40000,
+  "upkeep": 500,
+  "buildDays": 10,
+  "effects": {
+   "income.catering": 0.6
+  },
+  "multiple": true,
+  "location": "entrance"
+ },
+ {
+  "id": "beerGarden",
+  "category": "fans",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 80000,
+  "upkeep": 1000,
+  "buildDays": 20,
+  "effects": {
+   "income.catering": 0.8,
+   "fans.mood": 0.1
+  },
+  "location": "entrance"
+ },
+ {
+  "id": "fanPub",
+  "category": "fans",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 250000,
+  "upkeep": 2500,
+  "buildDays": 45,
+  "effects": {
+   "fans.mood": 0.2,
+   "income.weekly": 1500
+  }
+ },
+ {
+  "id": "clubhouse",
+  "category": "fans",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 300000,
+  "upkeep": 3000,
+  "buildDays": 60,
+  "effects": {
+   "members": 0.03,
+   "income.weekly": 1000
+  }
+ },
+ {
+  "id": "restaurant",
+  "category": "fans",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 500000,
+  "upkeep": 5000,
+  "buildDays": 60,
+  "effects": {
+   "income.catering": 0.5,
+   "income.box": 0.1
+  },
+  "location": "entrance"
+ },
+ {
+  "id": "fanProject",
+  "category": "fans",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 150000,
+  "upkeep": 2000,
+  "buildDays": 30,
+  "effects": {
+   "fines": 0.4,
+   "fans.mood": 0.1
+  }
+ },
+ {
+  "id": "museum",
+  "category": "fans",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 700000,
+  "upkeep": 4000,
+  "buildDays": 90,
+  "effects": {
+   "income.matchday": 8000,
+   "reputation": 0.1,
+   "fans.mood": 0.05
+  }
+ },
+ {
+  "id": "stadiumTours",
+  "category": "fans",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 100000,
+  "upkeep": 1000,
+  "buildDays": 20,
+  "effects": {
+   "income.weekly": 1500
+  },
+  "requires": [
+   {
+    "type": "museum",
+    "level": 1
+   }
+  ]
+ },
+ {
+  "id": "kidsClub",
+  "category": "fans",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 100000,
+  "upkeep": 1000,
+  "buildDays": 20,
+  "effects": {
+   "attendance": 0.01,
+   "members": 0.02
+  }
+ },
+ {
+  "id": "walkOfFame",
+  "category": "fans",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 1,
+  "cost": 150000,
+  "upkeep": 500,
+  "buildDays": 30,
+  "effects": {
+   "fans.mood": 0.2,
+   "reputation": 0.1
+  }
+ },
+ {
+  "id": "statue",
+  "category": "fans",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 1,
+  "cost": 200000,
+  "upkeep": 300,
+  "buildDays": 45,
+  "effects": {
+   "fans.mood": 0.3
+  }
+ },
+ {
+  "id": "chapel",
+  "category": "fans",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 1,
+  "cost": 350000,
+  "upkeep": 1000,
+  "buildDays": 60,
+  "effects": {
+   "income.weekly": 800,
+   "fans.mood": 0.1
+  }
+ },
+ {
+  "id": "hotel",
+  "category": "commerce",
+  "width": 2,
+  "height": 2,
+  "maxLevel": 5,
+  "cost": 5000000,
+  "upkeep": 40000,
+  "buildDays": 240,
+  "effects": {
+   "income.weekly": 15000,
+   "signing": 0.02
+  },
+  "synergies": [
+   {
+    "with": "conferenceCentre",
+    "effect": "income.events",
+    "value": 5000
+   }
+  ]
+ },
+ {
+  "id": "conferenceCentre",
+  "category": "commerce",
+  "width": 2,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 2000000,
+  "upkeep": 15000,
+  "buildDays": 150,
+  "effects": {
+   "income.events": 6000,
+   "sponsor": 0.02
+  }
+ },
+ {
+  "id": "businessClub",
+  "category": "commerce",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 1000000,
+  "upkeep": 8000,
+  "buildDays": 90,
+  "effects": {
+   "income.box": 0.15,
+   "sponsor": 0.03
+  },
+  "location": "entrance"
+ },
+ {
+  "id": "offices",
+  "category": "commerce",
+  "width": 2,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 2500000,
+  "upkeep": 10000,
+  "buildDays": 150,
+  "effects": {
+   "income.weekly": 12000
+  }
+ },
+ {
+  "id": "membersGym",
+  "category": "commerce",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 600000,
+  "upkeep": 6000,
+  "buildDays": 60,
+  "effects": {
+   "income.weekly": 4000,
+   "members": 0.02
+  }
+ },
+ {
+  "id": "sportsComplex",
+  "category": "commerce",
+  "width": 2,
+  "height": 2,
+  "maxLevel": 3,
+  "cost": 1500000,
+  "upkeep": 12000,
+  "buildDays": 120,
+  "effects": {
+   "members": 0.06,
+   "income.weekly": 3000
+  }
+ },
+ {
+  "id": "esports",
+  "category": "commerce",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 400000,
+  "upkeep": 5000,
+  "buildDays": 45,
+  "effects": {
+   "income.weekly": 3000,
+   "media": 0.1
+  }
+ },
+ {
+  "id": "ledTower",
+  "category": "commerce",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 250000,
+  "upkeep": 1500,
+  "buildDays": 30,
+  "effects": {
+   "income.weekly": 3500
+  }
+ },
+ {
+  "id": "parking",
+  "category": "infrastructure",
+  "width": 2,
+  "height": 1,
+  "maxLevel": 5,
+  "cost": 300000,
+  "upkeep": 1500,
+  "buildDays": 30,
+  "effects": {
+   "attendance": 0.015,
+   "income.matchday": 4000
+  }
+ },
+ {
+  "id": "parkingGarage",
+  "category": "infrastructure",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 3000000,
+  "upkeep": 12000,
+  "buildDays": 180,
+  "effects": {
+   "attendance": 0.03,
+   "income.matchday": 15000
+  },
+  "requires": [
+   {
+    "type": "parking",
+    "level": 3
+   }
+  ]
+ },
+ {
+  "id": "busParking",
+  "category": "infrastructure",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 100000,
+  "upkeep": 500,
+  "buildDays": 20,
+  "effects": {
+   "attendance": 0.01
+  }
+ },
+ {
+  "id": "shuttle",
+  "category": "infrastructure",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 500000,
+  "upkeep": 3000,
+  "buildDays": 90,
+  "effects": {
+   "attendance": 0.025
+  }
+ },
+ {
+  "id": "bikeRacks",
+  "category": "infrastructure",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 20000,
+  "upkeep": 100,
+  "buildDays": 10,
+  "effects": {
+   "attendance": 0.005,
+   "reputation": 0.02
+  }
+ },
+ {
+  "id": "accessRoad",
+  "category": "infrastructure",
+  "width": 2,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 600000,
+  "upkeep": 2000,
+  "buildDays": 90,
+  "effects": {
+   "attendance": 0.01
+  }
+ },
+ {
+  "id": "workshop",
+  "category": "infrastructure",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 250000,
+  "upkeep": 2000,
+  "buildDays": 45,
+  "effects": {
+   "upkeep.reduction": 0.06
+  }
+ },
+ {
+  "id": "security",
+  "category": "infrastructure",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 300000,
+  "upkeep": 4000,
+  "buildDays": 45,
+  "effects": {
+   "fines": 0.3
+  }
+ },
+ {
+  "id": "solar",
+  "category": "energy",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 300000,
+  "upkeep": 500,
+  "buildDays": 30,
+  "effects": {
+   "upkeep.reduction": 0.03,
+   "reputation": 0.03
+  }
+ },
+ {
+  "id": "chp",
+  "category": "energy",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 500000,
+  "upkeep": 2000,
+  "buildDays": 60,
+  "effects": {
+   "upkeep.reduction": 0.04
+  }
+ },
+ {
+  "id": "cistern",
+  "category": "energy",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 1,
+  "cost": 60000,
+  "upkeep": 200,
+  "buildDays": 15,
+  "effects": {
+   "upkeep.reduction": 0.015
+  }
+ },
+ {
+  "id": "evCharging",
+  "category": "energy",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 100000,
+  "upkeep": 500,
+  "buildDays": 15,
+  "effects": {
+   "income.weekly": 800,
+   "reputation": 0.02
+  }
+ },
+ {
+  "id": "park",
+  "category": "energy",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 2,
+  "cost": 80000,
+  "upkeep": 800,
+  "buildDays": 30,
+  "effects": {
+   "fans.mood": 0.1,
+   "reputation": 0.03
+  }
+ },
+ {
+  "id": "reservePitch",
+  "category": "teams",
+  "width": 2,
+  "height": 1,
+  "maxLevel": 3,
+  "cost": 350000,
+  "upkeep": 3000,
+  "buildDays": 60,
+  "effects": {
+   "youth.development": 0.04,
+   "training.quality": 0.01
+  }
+ },
+ {
+  "id": "smallStadium",
+  "category": "teams",
+  "width": 2,
+  "height": 2,
+  "maxLevel": 3,
+  "cost": 2000000,
+  "upkeep": 10000,
+  "buildDays": 180,
+  "effects": {
+   "income.weekly": 2500,
+   "youth.development": 0.04,
+   "reputation": 0.05
+  }
+ },
+ {
+  "id": "busGarage",
+  "category": "teams",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 1,
+  "cost": 400000,
+  "upkeep": 2000,
+  "buildDays": 45,
+  "effects": {
+   "travel.reduction": 0.35
+  }
+ },
+ {
+  "id": "land",
+  "category": "teams",
+  "width": 1,
+  "height": 1,
+  "maxLevel": 1,
+  "cost": 0,
+  "upkeep": 0,
+  "buildDays": 0,
+  "effects": {},
+  "land": true,
+  "multiple": true
+ }
+]

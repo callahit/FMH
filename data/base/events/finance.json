@@ -1,0 +1,291 @@
+[
+ {
+  "id": "sponsorScandal",
+  "category": "finance",
+  "options": [
+   {
+    "id": "end",
+    "effects": {
+     "money": -50000,
+     "fans": 3,
+     "media": 2
+    }
+   },
+   {
+    "id": "keep",
+    "effects": {
+     "fans": -4,
+     "media": -2
+    }
+   }
+  ]
+ },
+ {
+  "id": "sponsorParty",
+  "category": "finance",
+  "weight": 1.5,
+  "options": [
+   {
+    "id": "attend",
+    "effects": {
+     "money": 15000,
+     "playerCondition": -3
+    }
+   },
+   {
+    "id": "decline",
+    "effects": {
+     "money": -5000
+    }
+   }
+  ]
+ },
+ {
+  "id": "sponsorBonusCampaign",
+  "category": "finance",
+  "when": {
+   "afterWin": true
+  },
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "money": 25000
+    }
+   }
+  ]
+ },
+ {
+  "id": "merchRecord",
+  "category": "finance",
+  "when": {
+   "minFanMood": 60
+  },
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "money": 40000
+    }
+   }
+  ]
+ },
+ {
+  "id": "merchFlop",
+  "category": "finance",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "options": [
+   {
+    "id": "sale",
+    "effects": {
+     "money": -15000,
+     "fans": 1
+    }
+   },
+   {
+    "id": "shred",
+    "effects": {
+     "money": -25000
+    }
+   }
+  ]
+ },
+ {
+  "id": "printingError",
+  "category": "finance",
+  "styles": [
+   "Satirical",
+   "Balanced"
+  ],
+  "options": [
+   {
+    "id": "reprint",
+    "effects": {
+     "money": -12000
+    }
+   },
+   {
+    "id": "collector",
+    "effects": {
+     "money": 5000,
+     "media": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "energyBill",
+  "category": "finance",
+  "styles": [
+   "Balanced",
+   "Serious"
+  ],
+  "options": [
+   {
+    "id": "pay",
+    "effects": {
+     "money": -35000
+    }
+   },
+   {
+    "id": "solar",
+    "effects": {
+     "money": -120000,
+     "media": 2
+    }
+   }
+  ]
+ },
+ {
+  "id": "lawsuit",
+  "category": "finance",
+  "styles": [
+   "Balanced",
+   "Serious"
+  ],
+  "options": [
+   {
+    "id": "settle",
+    "effects": {
+     "money": -40000
+    }
+   },
+   {
+    "id": "court",
+    "effects": {
+     "money": -10000
+    },
+    "chance": 0.5,
+    "failEffects": {
+     "money": -80000
+    }
+   }
+  ]
+ },
+ {
+  "id": "donation",
+  "category": "finance",
+  "styles": [
+   "Satirical"
+  ],
+  "options": [
+   {
+    "id": "accept",
+    "effects": {
+     "money": 50000,
+     "fans": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "bankFees",
+  "category": "finance",
+  "when": {
+   "lowBalance": true
+  },
+  "options": [
+   {
+    "id": "pay",
+    "effects": {
+     "money": -15000
+    }
+   }
+  ]
+ },
+ {
+  "id": "cateringContract",
+  "category": "finance",
+  "options": [
+   {
+    "id": "new",
+    "effects": {
+     "money": 30000,
+     "fans": -2
+    }
+   },
+   {
+    "id": "local",
+    "effects": {
+     "fans": 3
+    }
+   }
+  ]
+ },
+ {
+  "id": "ticketSystem",
+  "category": "finance",
+  "options": [
+   {
+    "id": "buy",
+    "effects": {
+     "money": -50000,
+     "fans": 2
+    }
+   },
+   {
+    "id": "patch",
+    "effects": {
+     "fans": -2
+    }
+   }
+  ]
+ },
+ {
+  "id": "crowdfunding",
+  "category": "finance",
+  "when": {
+   "maxReputation": 10
+  },
+  "options": [
+   {
+    "id": "start",
+    "effects": {
+     "money": 30000,
+     "fans": 2
+    }
+   }
+  ]
+ },
+ {
+  "id": "betSponsor",
+  "category": "finance",
+  "styles": [
+   "Balanced",
+   "Serious"
+  ],
+  "options": [
+   {
+    "id": "accept",
+    "effects": {
+     "money": 120000,
+     "fans": -3,
+     "media": -1
+    }
+   },
+   {
+    "id": "decline",
+    "effects": {
+     "fans": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "auctionShirt",
+  "category": "finance",
+  "options": [
+   {
+    "id": "auction",
+    "effects": {
+     "money": 15000,
+     "fans": 2,
+     "media": 1
+    }
+   }
+  ]
+ }
+]

@@ -1,0 +1,99 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Fmh.Desktop.ViewModels"
+             xmlns:s="using:Fmh.Desktop.Services"
+             x:Class="Fmh.Desktop.Views.NegotiationView"
+             x:DataType="vm:NegotiationViewModel">
+  <Border Classes="card" Width="900" Padding="22">
+    <DockPanel>
+      <StackPanel DockPanel.Dock="Top" Spacing="2" Margin="0,0,0,12">
+        <TextBlock Classes="h2" Text="{Binding Title}" />
+        <TextBlock Classes="muted" Text="{Binding PlayerLine}" />
+      </StackPanel>
+
+      <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto" Margin="0,16,0,0">
+        <TextBlock Text="{Binding Error}" Foreground="{DynamicResource BadBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+          <Button Content="{s:L neg.withdraw}" Command="{Binding WithdrawCommand}" IsVisible="{Binding !Finished}" />
+          <Button Content="{s:L ui.close}" Command="{Binding CloseCommand}" />
+          <Button Classes="primary" Content="{s:L neg.submit}" Command="{Binding SubmitCommand}" IsVisible="{Binding !Finished}" />
+        </StackPanel>
+      </Grid>
+
+      <Grid ColumnDefinitions="3*,2*" ColumnSpacing="18">
+        <StackPanel Spacing="10">
+          <Border Classes="inset">
+            <TextBlock Text="{Binding StageText}" FontWeight="SemiBold" />
+          </Border>
+
+          <!-- Stufe 1: Verein -->
+          <StackPanel Spacing="8" IsVisible="{Binding ClubStage}">
+            <StackPanel Spacing="8" IsVisible="{Binding IsTransfer}">
+              <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.fee}" VerticalAlignment="Center" />
+                <NumericUpDown Grid.Column="1" Value="{Binding Fee}" Minimum="0" Increment="50000" FormatString="N0" /></Grid>
+              <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.installments}" VerticalAlignment="Center" />
+                <NumericUpDown Grid.Column="1" Value="{Binding InstallmentYears}" Minimum="0" Maximum="3" Increment="1" /></Grid>
+              <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.sellOn}" VerticalAlignment="Center" />
+                <NumericUpDown Grid.Column="1" Value="{Binding SellOnPercent}" Minimum="0" Maximum="50" Increment="5" /></Grid>
+              <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.swap}" VerticalAlignment="Center" />
+                <ComboBox Grid.Column="1" ItemsSource="{Binding SwapOptions}" SelectedItem="{Binding Swap}" HorizontalAlignment="Stretch">
+                  <ComboBox.ItemTemplate><DataTemplate x:DataType="vm:SwapOption"><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate>
+                </ComboBox></Grid>
+            </StackPanel>
+            <StackPanel Spacing="8" IsVisible="{Binding IsLoan}">
+              <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.loanMonths}" VerticalAlignment="Center" />
+                <NumericUpDown Grid.Column="1" Value="{Binding LoanMonths}" Minimum="6" Maximum="12" Increment="6" /></Grid>
+              <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.wageShare}" VerticalAlignment="Center" />
+                <NumericUpDown Grid.Column="1" Value="{Binding WageShare}" Minimum="0" Maximum="100" Increment="10" /></Grid>
+              <CheckBox Content="{s:L neg.purchaseOption}" IsChecked="{Binding HasPurchaseOption}" />
+              <Grid ColumnDefinitions="170,*" IsVisible="{Binding HasPurchaseOption}"><TextBlock Text="{s:L neg.purchaseFee}" VerticalAlignment="Center" />
+                <NumericUpDown Grid.Column="1" Value="{Binding PurchaseFee}" Minimum="0" Increment="50000" FormatString="N0" /></Grid>
+              <CheckBox Content="{s:L neg.purchaseObligation}" IsChecked="{Binding PurchaseObligation}" IsVisible="{Binding HasPurchaseOption}" />
+              <CheckBox Content="{s:L neg.recall}" IsChecked="{Binding RecallInWinter}" />
+            </StackPanel>
+          </StackPanel>
+
+          <!-- Stufe 2: Spieler -->
+          <StackPanel Spacing="8" IsVisible="{Binding PlayerStage}">
+            <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.years}" VerticalAlignment="Center" />
+              <NumericUpDown Grid.Column="1" Value="{Binding Years}" Minimum="1" Maximum="5" Increment="1" /></Grid>
+            <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.weeklyWage}" VerticalAlignment="Center" />
+              <NumericUpDown Grid.Column="1" Value="{Binding WeeklyWage}" Minimum="0" Increment="500" FormatString="N0" /></Grid>
+            <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.status}" VerticalAlignment="Center" />
+              <ComboBox Grid.Column="1" ItemsSource="{Binding StatusOptions}" SelectedIndex="{Binding StatusIndex}" HorizontalAlignment="Stretch" /></Grid>
+            <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.signingFee}" VerticalAlignment="Center" />
+              <NumericUpDown Grid.Column="1" Value="{Binding SigningFee}" Minimum="0" Increment="10000" FormatString="N0" /></Grid>
+            <Grid ColumnDefinitions="170,*,*" ColumnSpacing="8"><TextBlock Text="{s:L neg.bonuses}" VerticalAlignment="Center" />
+              <NumericUpDown Grid.Column="1" Value="{Binding AppearanceBonus}" Minimum="0" Increment="500" FormatString="N0" ToolTip.Tip="{s:L neg.appearanceBonus}" />
+              <NumericUpDown Grid.Column="2" Value="{Binding GoalBonus}" Minimum="0" Increment="500" FormatString="N0" ToolTip.Tip="{s:L neg.goalBonus}" /></Grid>
+            <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.yearlyRaise}" VerticalAlignment="Center" />
+              <NumericUpDown Grid.Column="1" Value="{Binding YearlyRaise}" Minimum="0" Maximum="20" Increment="5" /></Grid>
+            <Grid ColumnDefinitions="170,*">
+              <CheckBox Content="{s:L neg.releaseClause}" IsChecked="{Binding HasReleaseClause}" />
+              <NumericUpDown Grid.Column="1" Value="{Binding ReleaseClause}" Minimum="0" Increment="100000" FormatString="N0" IsEnabled="{Binding HasReleaseClause}" /></Grid>
+            <CheckBox Content="{s:L neg.relegationClause}" IsChecked="{Binding RelegationClause}" />
+          </StackPanel>
+        </StackPanel>
+
+        <StackPanel Grid.Column="1" Spacing="10">
+          <Border Classes="inset" IsVisible="{Binding Response, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+            <StackPanel Spacing="4">
+              <TextBlock Classes="h3" Text="{s:L neg.response}" />
+              <TextBlock Text="{Binding Response}" Foreground="{Binding ResponseBrush}" TextWrapping="Wrap" FontWeight="SemiBold" />
+            </StackPanel>
+          </Border>
+          <ItemsControl ItemsSource="{Binding Facts}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:InfoLine">
+                <Grid ColumnDefinitions="175,*" Margin="0,3">
+                  <TextBlock Text="{Binding Label}" Classes="muted" />
+                  <TextBlock Grid.Column="1" Text="{Binding Value}" Foreground="{Binding Fore}" TextWrapping="Wrap" />
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Grid>
+    </DockPanel>
+  </Border>
+</UserControl>

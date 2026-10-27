@@ -1,0 +1,16 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Fmh.Desktop.ViewModels"
+        xmlns:s="using:Fmh.Desktop.Services"
+        x:Class="Fmh.Desktop.Views.MainWindow"
+        x:DataType="vm:MainWindowViewModel"
+        Title="{s:L app.windowTitle}"
+        Width="1440" Height="900" MinWidth="1180" MinHeight="720"
+        WindowStartupLocation="CenterScreen">
+  <Grid>
+    <ContentControl Content="{Binding Screen}" />
+    <Border IsVisible="{Binding HasDialog}" Background="#99000000">
+      <ContentControl Content="{Binding Dialog}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+    </Border>
+  </Grid>
+</Window>

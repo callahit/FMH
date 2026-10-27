@@ -1,0 +1,328 @@
+{
+  "code": "DE",
+  "name": "Deutschland",
+  "currency": "EUR",
+  "validFrom": 2026,
+  "activation": "Playable",
+  "season": {
+    "startMonth": 7,
+    "firstMatchday": "08-15",
+    "winterBreakStart": "12-21",
+    "winterBreakEnd": "01-14",
+    "matchDay": "Saturday"
+  },
+  "squad": {
+    "maxSquad": 30,
+    "benchSize": 9,
+    "substitutions": 5
+  },
+  "discipline": {
+    "yellowCardsForSuspension": 5,
+    "redCardBanMin": 1,
+    "redCardBanMax": 3,
+    "secondYellowBan": 1
+  },
+  "levels": [
+    {
+      "level": 1,
+      "divisions": [
+        {
+          "id": "DE1",
+          "name": "1. Liga",
+          "teams": 18,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "GoalDifference",
+            "GoalsFor",
+            "HeadToHead",
+            "AwayGoals"
+          ],
+          "promotion": 0,
+          "relegation": 2
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "divisions": [
+        {
+          "id": "DE2",
+          "name": "2. Liga",
+          "teams": 18,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "GoalDifference",
+            "GoalsFor",
+            "HeadToHead",
+            "AwayGoals"
+          ],
+          "promotion": 2,
+          "relegation": 0
+        }
+      ]
+    }
+  ],
+  "pools": [
+    {
+      "id": "DE-AMA",
+      "name": "Amateure",
+      "teams": 28
+    }
+  ],
+  "cups": [
+    {
+      "id": "DE-CUP",
+      "name": "Pokal",
+      "participants": [
+        "DE1",
+        "DE2",
+        "DE-AMA"
+      ],
+      "teams": 64,
+      "lowerTierHome": true,
+      "legs": 1,
+      "awayGoals": false,
+      "dates": [
+        "08-05",
+        "09-30",
+        "11-04",
+        "02-03",
+        "03-24",
+        "05-08"
+      ],
+      "neutralFinal": true
+    }
+  ],
+  "playoffs": [
+    {
+      "id": "DE-REL",
+      "name": "Relegation",
+      "upperDivision": "DE1",
+      "upperPosition": 16,
+      "lowerDivision": "DE2",
+      "lowerPosition": 3,
+      "legs": 2,
+      "awayGoals": false,
+      "dates": [
+        "05-13",
+        "05-17"
+      ]
+    }
+  ],
+  "transferWindows": {
+    "summerStart": "07-01",
+    "summerEnd": "08-31",
+    "winterStart": "01-01",
+    "winterEnd": "01-31",
+    "preContractFrom": "01-01"
+  },
+  "youth": {
+    "intakeMonth": 3,
+    "minPlayers": 4,
+    "maxPlayers": 9,
+    "proContractAge": 17,
+    "promoteAge": 16,
+    "intakeAge": 14,
+    "groupSize": 14,
+    "referenceBudget": 900000
+  },
+  "finance": {
+    "divisions": {
+      "DE1": {
+        "tvPool": 85000000,
+        "tvEqualShare": 0.5,
+        "standing": 8,
+        "seating": 17,
+        "box": 2500,
+        "floodlightRequired": 3,
+        "youthCenterRequired": 2,
+        "minEquity": -6000000,
+        "travelPerAwayMatch": 35000
+      },
+      "DE2": {
+        "tvPool": 56000000,
+        "tvEqualShare": 0.6,
+        "standing": 7,
+        "seating": 14,
+        "box": 1200,
+        "floodlightRequired": 2,
+        "youthCenterRequired": 1,
+        "minEquity": -2500000,
+        "travelPerAwayMatch": 20000
+      },
+      "DE-AMA": {
+        "tvPool": 0,
+        "standing": 5,
+        "seating": 9,
+        "box": 400,
+        "floodlightRequired": 0,
+        "youthCenterRequired": 0,
+        "minEquity": -300000,
+        "travelPerAwayMatch": 4000
+      }
+    },
+    "cupPrizes": [
+      100000,
+      200000,
+      400000,
+      800000,
+      1500000,
+      2500000
+    ],
+    "cupWinnerPrize": 4000000,
+    "playoffPrize": 500000,
+    "creditLimitPercent": 15,
+    "boardApprovalAbove": 2000000,
+    "permitAbove": 1000000,
+    "seasonTicketDeadline": "07-31",
+    "licenseApplication": "03-15",
+    "licenseDecision": "04-30",
+    "licenseDeadline": "05-31",
+    "conditionPenalty": 3,
+    "stadiumCostPerPlace": 900,
+    "stadiumBaseCost": 4000000,
+    "stadiumCostPerBox": 60000,
+    "stadiumBuildDays": 720
+  },
+  "europe": {
+    "league": "DE1",
+    "places": [
+      {
+        "competition": "UCL",
+        "from": 1,
+        "to": 4
+      },
+      {
+        "competition": "UEL",
+        "from": 5,
+        "to": 5
+      },
+      {
+        "competition": "UECL",
+        "from": 6,
+        "to": 6
+      }
+    ],
+    "cupWinner": "UEL",
+    "cup": "DE-CUP",
+    "competitions": [
+      {
+        "id": "UCL",
+        "fieldStrength": 13.6,
+        "entryPrize": 4000000,
+        "stages": [
+          {
+            "key": "europe.stage.league",
+            "date": "01-31",
+            "prize": 1500000
+          },
+          {
+            "key": "europe.stage.r16",
+            "date": "03-15",
+            "prize": 2000000
+          },
+          {
+            "key": "europe.stage.qf",
+            "date": "04-15",
+            "prize": 2500000
+          },
+          {
+            "key": "europe.stage.sf",
+            "date": "05-05",
+            "prize": 3500000
+          },
+          {
+            "key": "europe.stage.final",
+            "date": "05-31",
+            "prize": 5000000
+          }
+        ]
+      },
+      {
+        "id": "UEL",
+        "fieldStrength": 12.6,
+        "entryPrize": 1200000,
+        "stages": [
+          {
+            "key": "europe.stage.league",
+            "date": "01-31",
+            "prize": 500000
+          },
+          {
+            "key": "europe.stage.r16",
+            "date": "03-15",
+            "prize": 700000
+          },
+          {
+            "key": "europe.stage.qf",
+            "date": "04-15",
+            "prize": 900000
+          },
+          {
+            "key": "europe.stage.sf",
+            "date": "05-05",
+            "prize": 1300000
+          },
+          {
+            "key": "europe.stage.final",
+            "date": "05-28",
+            "prize": 2000000
+          }
+        ]
+      },
+      {
+        "id": "UECL",
+        "fieldStrength": 11.8,
+        "entryPrize": 600000,
+        "stages": [
+          {
+            "key": "europe.stage.league",
+            "date": "01-31",
+            "prize": 250000
+          },
+          {
+            "key": "europe.stage.r16",
+            "date": "03-15",
+            "prize": 350000
+          },
+          {
+            "key": "europe.stage.qf",
+            "date": "04-15",
+            "prize": 450000
+          },
+          {
+            "key": "europe.stage.sf",
+            "date": "05-05",
+            "prize": 650000
+          },
+          {
+            "key": "europe.stage.final",
+            "date": "05-27",
+            "prize": 1000000
+          }
+        ]
+      }
+    ],
+    "license": {
+      "minSeats": 8000,
+      "floodlight": 3,
+      "academyStars": 1
+    },
+    "ffp": {
+      "acceptableDeviation": 5000000,
+      "severeDeviation": 30000000,
+      "squadCostRatio": 0.7,
+      "finePercent": 3
+    }
+  }
+}

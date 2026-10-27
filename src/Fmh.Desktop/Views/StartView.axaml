@@ -1,0 +1,62 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Fmh.Desktop.ViewModels"
+             xmlns:c="using:Fmh.Desktop.Controls"
+             xmlns:s="using:Fmh.Desktop.Services"
+             x:Class="Fmh.Desktop.Views.StartView"
+             x:DataType="vm:StartViewModel">
+  <Grid ColumnDefinitions="*,*">
+    <!-- Linke Seite: Spielfeld als Bildmotiv mit Titel -->
+    <Grid>
+      <c:Pitch Grass="{DynamicResource PitchBrush}" Lines="{DynamicResource PitchLineBrush}" Margin="48" Opacity="0.85" />
+      <Border Background="#66000000" />
+      <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" Spacing="10">
+        <c:Crest Primary="DarkGreen" Secondary="White" Initials="FMH" Width="150" Height="172" HorizontalAlignment="Center" />
+        <TextBlock Text="FMH" FontSize="64" FontWeight="Black" HorizontalAlignment="Center" Foreground="White" />
+        <TextBlock Text="{s:L app.subtitle}" FontSize="20" HorizontalAlignment="Center" Foreground="White" />
+        <TextBlock Text="{s:L app.tagline}" FontSize="15" FontStyle="Italic" HorizontalAlignment="Center" Foreground="{DynamicResource GoldBrush}" />
+      </StackPanel>
+    </Grid>
+
+    <!-- Rechte Seite: Menü und Spielstände -->
+    <DockPanel Grid.Column="1" Margin="56,64">
+      <StackPanel DockPanel.Dock="Top" Spacing="14">
+        <TextBlock Classes="h1" Text="{s:L menu.welcome}" />
+        <Button Classes="primary" Command="{Binding NewGameCommand}" HorizontalAlignment="Stretch" Padding="18,14" FontSize="16">
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <Path Classes="icon" Data="{StaticResource IconBall}" Stroke="#0B1A12" />
+            <TextBlock Text="{s:L menu.newGame}" Foreground="#0B1A12" />
+          </StackPanel>
+        </Button>
+        <TextBlock Classes="h3" Text="{s:L menu.load}" Margin="0,18,0,0" />
+        <TextBlock Classes="muted" Text="{s:L load.none}" IsVisible="{Binding !HasSaves}" />
+      </StackPanel>
+      <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto,Auto">
+        <Button Classes="ghost" Content="{s:L menu.quit}" Command="{Binding QuitCommand}" HorizontalAlignment="Left" />
+        <TextBlock Grid.Column="1" Text="{s:L options.language}" Classes="muted" VerticalAlignment="Center" Margin="0,0,10,0" />
+        <ComboBox Grid.Column="2" x:Name="LanguageBox" ItemsSource="{Binding Languages}" SelectedIndex="{Binding LanguageIndex}" MinWidth="150" />
+      </Grid>
+      <ScrollViewer Margin="0,8">
+        <ItemsControl ItemsSource="{Binding Saves}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:SaveItem">
+              <Button Classes="ghost" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Margin="0,3" Padding="0"
+                      Command="{Binding $parent[ItemsControl].((vm:StartViewModel)DataContext).LoadCommand}" CommandParameter="{Binding}">
+                <Border Classes="card" Padding="12">
+                  <Grid ColumnDefinitions="Auto,*,Auto">
+                    <c:Crest Width="38" Height="44" Primary="{Binding Primary}" Secondary="{Binding Secondary}" Initials="{Binding Initials}" />
+                    <StackPanel Grid.Column="1" Margin="14,0" VerticalAlignment="Center">
+                      <TextBlock Text="{Binding Title}" FontWeight="SemiBold" FontSize="15" />
+                      <TextBlock Text="{Binding Subtitle}" Classes="muted small" />
+                    </StackPanel>
+                    <TextBlock Grid.Column="2" Text="{Binding Saved}" Classes="muted small" VerticalAlignment="Center" />
+                  </Grid>
+                </Border>
+              </Button>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </ScrollViewer>
+    </DockPanel>
+  </Grid>
+</UserControl>

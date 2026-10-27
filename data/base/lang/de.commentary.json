@@ -1,0 +1,263 @@
+{
+ "kickoff": [
+  "Anpfiff! {home} gegen {away} – der Ball rollt.",
+  "Los geht's! {home} empfängt {away}.",
+  "Der Schiedsrichter pfeift an: {home} gegen {away}."
+ ],
+ "secondHalf": [
+  "Weiter geht's mit der zweiten Halbzeit.",
+  "Die zweite Hälfte läuft, {t} hat Anstoß.",
+  "Wiederanpfiff! Noch 45 Minuten."
+ ],
+ "halfTime": [
+  "Halbzeit! Es steht {score}.",
+  "Pause beim Stand von {score}.",
+  "Der Schiedsrichter bittet zum Pausentee – {score}."
+ ],
+ "fullTime": [
+  "Abpfiff! Endstand {score}.",
+  "Aus, aus, das Spiel ist aus! {score}.",
+  "Schluss! Das Spiel endet {score}."
+ ],
+ "stoppage": [
+  "Nachspielzeit: {n} Min.",
+  "Der vierte Offizielle zeigt {n} Minuten an.",
+  "Die Tafel geht hoch: +{n}."
+ ],
+ "attack": [
+  "{p} treibt den Ball {side} nach vorn.",
+  "{t} kombiniert sich {side} nach vorn, {p} am Ball.",
+  "{p} sucht {side} den Weg in die Spitze.",
+  "Ballbesitz {t}, {p} schaltet sich {side} ein."
+ ],
+ "counter": [
+  "KONTER! {p} ist {side} auf und davon ...",
+  "Blitzschnelles Umschalten bei {t}, {p} startet durch!",
+  "{t} kontert, {p} hat freie Bahn!"
+ ],
+ "dribble": [
+  "{p} lässt {o} stehen!",
+  "Schöner Haken von {p}, {o} geht ins Leere.",
+  "{p} tanzt {o} aus!"
+ ],
+ "cross": [
+  "Flanke von {p} in den Strafraum ...",
+  "{p} bringt den Ball von außen herein ...",
+  "Hohe Hereingabe von {p} ..."
+ ],
+ "aerialWon": [
+  "{p} steigt hoch!",
+  "{p} setzt sich im Luftduell gegen {o} durch!",
+  "{p} ist mit dem Kopf zur Stelle!"
+ ],
+ "shot.normal.wide": [
+  "{p} zieht ab ... knapp vorbei!",
+  "Schuss von {p} ... am Tor vorbei.",
+  "{p} versucht es ... drüber!"
+ ],
+ "shot.normal.saved": [
+  "{p} schießt ... {g} pariert!",
+  "Abschluss {p} ... starke Parade von {g}!",
+  "{p} aus kurzer Distanz ... {g} ist da!"
+ ],
+ "shot.normal.blocked": [
+  "Schuss von {p} ... geblockt!",
+  "{p} zieht ab, doch ein Verteidiger wirft sich dazwischen.",
+  "{p} bleibt am Abwehrbein hängen."
+ ],
+ "shot.normal.post": [
+  "{p} ... PFOSTEN! Was für ein Pech!",
+  "{p} trifft nur das Aluminium!",
+  "Latte! {p} hatte schon den Torschrei auf den Lippen."
+ ],
+ "shot.header.wide": [
+  "KOPFBALL ... knapp über die Latte!",
+  "Kopfball {p} ... vorbei!",
+  "{p} köpft ... daneben!"
+ ],
+ "shot.header.saved": [
+  "Kopfball {p} ... {g} fischt ihn raus!",
+  "{p} köpft aufs Tor ... {g} hält!"
+ ],
+ "shot.header.blocked": [
+  "Kopfball {p} ... abgefälscht!"
+ ],
+ "shot.header.post": [
+  "Kopfball {p} ... an die Latte!",
+  "{p} köpft an den Pfosten!"
+ ],
+ "shot.longShot.wide": [
+  "{p} aus der Distanz ... weit drüber.",
+  "Fernschuss {p} ... deutlich vorbei.",
+  "{p} hält einfach mal drauf ... vorbei."
+ ],
+ "shot.longShot.saved": [
+  "Fernschuss {p} ... {g} packt sicher zu.",
+  "{p} aus 25 Metern ... {g} lenkt ihn über die Latte!"
+ ],
+ "shot.longShot.blocked": [
+  "{p} versucht es aus der Distanz ... geblockt."
+ ],
+ "shot.longShot.post": [
+  "{p} aus der Distanz ... ans Lattenkreuz!"
+ ],
+ "shot.freeKick.wide": [
+  "... über die Mauer ... und knapp vorbei!",
+  "... der Freistoß geht drüber."
+ ],
+ "shot.freeKick.saved": [
+  "... über die Mauer ... {g} ist zur Stelle!",
+  "... aufs Torwarteck ... {g} pariert!"
+ ],
+ "shot.freeKick.blocked": [
+  "... in die Mauer."
+ ],
+ "shot.freeKick.post": [
+  "... über die Mauer ... an den Pfosten!"
+ ],
+ "shot.penalty.wide": [
+  "{p} läuft an ... verschossen! Daneben!",
+  "{p} schießt ... über das Tor!"
+ ],
+ "shot.penalty.saved": [
+  "{p} läuft an ... {g} HÄLT! Elfmeter pariert!",
+  "{p} tritt an ... {g} ahnt die Ecke!"
+ ],
+ "shot.penalty.blocked": [
+  "{p} läuft an ... {g} hält!"
+ ],
+ "shot.penalty.post": [
+  "{p} läuft an ... an den Pfosten!"
+ ],
+ "shot.oneOnOne.wide": [
+  "{p} allein vor {g} ... schiebt vorbei!",
+  "{p} frei vor dem Tor ... und vergibt!"
+ ],
+ "shot.oneOnOne.saved": [
+  "{p} allein vor {g} ... pariert!",
+  "{g} gewinnt das Duell gegen {p}!"
+ ],
+ "shot.oneOnOne.blocked": [
+  "{p} allein vor {g} ... in letzter Sekunde geklärt!"
+ ],
+ "shot.oneOnOne.post": [
+  "{p} allein vor {g} ... Pfosten!"
+ ],
+ "goal": [
+  "TOR!!! {score} für {t}! {p} trifft!",
+  "TOR!!! {p} schiebt ein – {score}!",
+  "TOOOR! {p} macht das {score} für {t}!"
+ ],
+ "goal.header": [
+  "TOR!!! {score} für {t}! {p} köpft ein!",
+  "TOR!!! Kopfballtor durch {p}, {score}!"
+ ],
+ "goal.longShot": [
+  "TOR!!! {score}! {p} aus der Distanz – unhaltbar!",
+  "TOR!!! Was für ein Hammer von {p}! {score}."
+ ],
+ "goal.freeKick": [
+  "TOR!!! {score} für {t}! {p} zirkelt ihn in den Winkel!",
+  "TOR!!! Freistoßtor von {p}, {score}!"
+ ],
+ "goal.penalty": [
+  "TOR!!! {p} verwandelt sicher, {score}.",
+  "TOR!!! {p} bleibt cool vom Punkt – {score}."
+ ],
+ "goal.oneOnOne": [
+  "TOR!!! {p} lässt {g} keine Chance, {score}!",
+  "TOR!!! {p} lupft über {g} – {score}!"
+ ],
+ "foul": [
+  "Foul von {p} an {o}.",
+  "{p} holt {o} von den Beinen.",
+  "Freistoß: {p} hat {o} gelegt."
+ ],
+ "foul.dangerous": [
+  "Foul von {p} an {o}, {m} Meter vor dem Tor.",
+  "{p} bringt {o} zu Fall – Freistoß aus {m} Metern!"
+ ],
+ "yellow": [
+  "GELBE KARTE für {p} ({t}).",
+  "Gelb für {p} ({t}).",
+  "Der Schiedsrichter zückt Gelb: {p} ({t})."
+ ],
+ "secondYellow": [
+  "GELB-ROT für {p} ({t})! {t} nur noch zu zehnt.",
+  "Zweite Gelbe für {p} – Platzverweis!"
+ ],
+ "red": [
+  "ROTE KARTE! {p} ({t}) muss vom Platz!",
+  "Glatt Rot für {p} ({t})!"
+ ],
+ "freeKick": [
+  "Freistoß für {t}, {p} führt aus.",
+  "{p} legt sich den Ball zurecht ..."
+ ],
+ "freeKick.direct": [
+  "Freistoß {p} aus {n} Metern ...",
+  "{p} tritt den Freistoß aus {n} Metern ..."
+ ],
+ "penalty": [
+  "ELFMETER für {t}! {o} hat {p} im Strafraum gelegt!",
+  "Der Schiedsrichter zeigt auf den Punkt! {o} foult {p}."
+ ],
+ "corner": [
+  "Ecke für {t}. {p} tritt an.",
+  "Eckstoß {t}, {p} bringt den Ball."
+ ],
+ "offside": [
+  "Abseits! {p} stand zu weit vorn.",
+  "Die Fahne geht hoch – {p} im Abseits."
+ ],
+ "goalKick": [
+  "Abstoß für {t}.",
+  "Abstoß, {t} baut neu auf."
+ ],
+ "injury": [
+  "{p} bleibt liegen ... das sieht nicht gut aus.",
+  "{p} ({t}) muss behandelt werden.",
+  "Verletzungsunterbrechung: {p} hält sich das Bein."
+ ],
+ "substitution": [
+  "Wechsel bei {t}: {p} kommt für {o}.",
+  "{t} wechselt: {o} geht, {p} kommt."
+ ],
+ "endOfRegularTime": [
+  "Nach 90 Minuten steht es {score} – es geht in die Verlängerung!",
+  "Abpfiff der regulären Spielzeit beim Stand von {score}. Jetzt kommen 30 Extra-Minuten.",
+  "Keine Entscheidung nach 90 Minuten: {score}. Verlängerung!"
+ ],
+ "extraTime": [
+  "Die Verlängerung läuft.",
+  "Weiter geht's mit der ersten Hälfte der Verlängerung.",
+  "Die Kräfte schwinden, jetzt beginnt die Verlängerung."
+ ],
+ "extraTimeSecondHalf": [
+  "Seitenwechsel in der Verlängerung, noch 15 Minuten.",
+  "Die letzte Viertelstunde der Verlängerung beginnt."
+ ],
+ "shootoutStart": [
+  "Elfmeterschießen! Die Nerven liegen blank.",
+  "Es geht ins Elfmeterschießen – jetzt entscheidet der Punkt.",
+  "Keine Entscheidung nach 120 Minuten: Elfmeterschießen!"
+ ],
+ "shootoutKick.goal": [
+  "{p} tritt an … und trifft! ({pens})",
+  "{p} verwandelt sicher. ({pens})",
+  "{p} schickt {g} in die falsche Ecke. ({pens})"
+ ],
+ "shootoutKick.saved": [
+  "{p} scheitert an {g}! ({pens})",
+  "{g} ahnt die Ecke und pariert gegen {p}! ({pens})"
+ ],
+ "shootoutKick.miss": [
+  "{p} setzt den Ball neben das Tor! ({pens})",
+  "Drüber! {p} vergibt. ({pens})"
+ ],
+ "shootoutEnd": [
+  "{t} gewinnt das Elfmeterschießen mit {pens}!",
+  "Entschieden! {t} setzt sich im Elfmeterschießen durch ({pens}).",
+  "Der Jubel bei {t} kennt keine Grenzen – {pens} im Elfmeterschießen!"
+ ]
+}
