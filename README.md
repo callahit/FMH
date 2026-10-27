@@ -142,9 +142,11 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
   - Einnahmen: Zuschauer nach Preis, Stärke, Wetter, Derby und Fanstimmung; Dauerkarten bis Ende Juli;
     Fernsehgelder in zehn Raten plus Leistungsanteil; Sponsoren; Catering, Fanartikel und Gelände;
     Pokal- und Relegationsprämien.
-  - Ausgaben: Gehälter, Personal, Unterhalt, Reisen, Prämien, Zinsen. Das Gehaltsniveau je Spielklasse
-    (`wageLevel` in `finance.divisions`, z. B. 0,55 in der 3. Liga, 0,3 in der Regionalliga) gilt für
-    Startkader, Gehaltsforderungen und Jugendverträge.
+  - Ausgaben: Gehälter, Personal, Unterhalt, Reisen, Prämien, Zinsen und Betriebskosten (Verwaltung,
+    Spielbetrieb, Personal außerhalb des Kaders) als Anteil der laufenden Einnahmen (`operatingCostShare`).
+  - Gehälter (siehe „Wirtschaft“ unten): Marktgehalt nach Stärke, angepasst an das Gehaltsniveau der
+    Spielklasse (`wageLevel`) und begrenzt durch ihr Spitzengehalt (`maxAnnualWage`). Verträge sind
+    ligaabhängig: Nach Auf- oder Abstieg ändern sich die Gehälter im Verhältnis der Gehaltsniveaus.
   - Bank: Kredite (3–12 % Zins je nach Verschuldung), Festgeld, Umschichten zwischen Transfer- und
     Gehaltsbudget (52:1), Eintrittspreise mit Fanreaktion.
   - Lizenzierung mit Stichtagen, jedes Jahr für die nächste Saison:
@@ -226,14 +228,35 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
   Tonfall, Ereignishäufigkeit und Pressedelegation jederzeit in den Optionen.
 - **Statuszeile:** Kontostand, Vorstand, Fans, Moral und nächstes Spiel.
 
+### Wirtschaft
+
+Gehälter und Einnahmen haben reale Größenordnungen. Referenz für Deutschland sind der
+[DFL-Wirtschaftsreport 24/25](https://report.bundesliga.de/2425/de/_assets/downloads/key-economic-figures-dfl-er25.pdf)
+(Bundesliga je Klub rund 284 Mio. Umsatz, 96 Mio. Personalaufwand Spielbetrieb; 2. Bundesliga 67 bzw.
+16,5 Mio.), der [DFB-Saisonreport 3. Liga](https://www.dfb.de/news/wirtschaftlich-stabil-und-talentschmiede-3-liga-schreibt-rekordzahlen)
+(rund 16 Mio. Erträge, 5,5 Mio. Personal) und MDR-Recherchen zur Regionalliga (Spieler im Schnitt rund 1.000 €
+im Monat, Spitze bis 6.500 €).
+
+- **Marktgehalt:** 9.000 € pro Woche bei Stärke 9,4, Faktor 1,85 je Stärkepunkt; Marktwert 9 Mio. bei Stärke 12
+  mit demselben Faktor. Gehaltsforderungen gehen vom Marktgehalt aus, das bisherige Gehalt hebt sie höchstens
+  auf 120 % (Verlängerung) bzw. 140 % (Wechsel).
+- **Marktniveau je Spielklasse:** Zum Spielstart und jedem Saisonstart wird die Ø-Stärke der besten elf je
+  Verein gemessen. Gehälter und Marktwerte richten sich nach dem Abstand dazu, damit stärker werdende Kader
+  das Gehaltsgefüge nicht aufblähen (Spielstand: `market_levels`/`market_bases` in `meta`).
+- **Daten je Spielklasse** (`finance.divisions`): TV-Topf, Eintrittspreise, `wageLevel`, `maxAnnualWage`,
+  `sponsorLevel`, `operatingCostShare` und `targetAnnualWage` als Kalibrierungsziel.
+- **Kalibrierung:** `fmh-calibrate --season --seasons 5 --strict` prüft je Spielklasse, dass das Ø-Jahresgehalt
+  im Korridor ±30 % um das Ziel liegt; erlaubt ist eine Lohnentwicklung von 4 % je Saison (real etwa 4 % im
+  Jahr laut DFL 2019/20–2024/25).
+
 Die Finanzsimulation über fünf Saisons ergibt folgende Werte je Verein:
 
-| Liga | Einnahmen | Ausgaben | Saldo pro Saison |
-|---|---|---|---|
-| 1. Liga | 26–32 Mio. | 21–26 Mio. | +4 bis +6 Mio. |
-| 2. Liga | 7–8 Mio. | 7–9 Mio. | etwa ±0 Mio., in späteren Saisons leicht negativ |
-| 3. Liga | 3–4 Mio. | 3,5–4 Mio. | ±0 bis −0,9 Mio. |
-| Regionalliga | 1,4–1,6 Mio. | 1,5–1,9 Mio. | −0,1 bis −0,4 Mio. |
+| Liga | Ø Jahresgehalt (Ziel) | Kadergehälter | Einnahmen | Saldo pro Saison |
+|---|---|---|---|---|
+| 1. Liga | 2,9–3,6 Mio. (2,9 Mio.) | 69–81 Mio. | 200–250 Mio. | +28 bis +38 Mio. |
+| 2. Liga | 420–550 Tsd. (420 Tsd.) | 10–12 Mio. | 37–45 Mio. | +4 bis +8 Mio. |
+| 3. Liga | 150–180 Tsd. (165 Tsd.) | 3,8–4 Mio. | 9–10 Mio. | ±0 bis +1,8 Mio. |
+| Regionalliga | 26–34 Tsd. (25 Tsd.) | 0,6–0,8 Mio. | 2,5–3,9 Mio. | ±0 bis +0,4 Mio. |
 
 Darin sind die Budgets der Nachwuchsleistungszentren und die Europapokalprämien bereits enthalten.
 Absteiger geraten mit ihren Gehältern ins Minus. Es gibt keine Kettenpleiten. In der 2. Liga bekommen
@@ -469,9 +492,10 @@ Mannschaften liegt unter `tests/Fmh.Tests/Packages/testland` (nur für Tests).
   der Meisterrunde) folgen, wenn ein Land sie braucht.
 - **Deutschland:** Pokalplätze für Amateure gehen nach Ruf statt über Landespokale. Die fiktiven Ortsnamen sind
   zusammengesetzt; Übereinstimmungen mit kleinen realen Orten sind möglich, bekannte Vereinsorte sind ausgeschlossen.
-- **Finanzen in Ebene 3–4:** Die Kosten steigen über fünf Saisons leicht stärker als die Einnahmen; in der
-  fünften Saison bekommen einzelne Vereine der 3. Liga und Regionalliga Punktabzüge. Feinabstimmung mit
-  weiteren Ländern (AP 4b).
+- **Wirtschaft:** Die 1. Liga erwirtschaftet im Schnitt rund +30 Mio. je Saison (real etwa +15 Mio.), weil die
+  KI Überschüsse nur teilweise ausgibt. Bauprojekte, Prämien des Vorstands und Strafen sind noch nicht an die
+  neuen Größenordnungen angepasst. Ältere Spielstände behalten ihre Gehälter und bekommen ab dem nächsten
+  Monat die neuen Einnahmen und Betriebskosten.
 - **Karten in unteren Ligen:** Über alle vier Ebenen zeigt die Engine 3,2 Gelbe und 0,13 Rote Karten je Spiel
   (Ziel 3,8 bzw. 0,2), weil schwächere Spieler seltener in Zweikämpfe kommen. Die Kalibrierung prüft deshalb
   Ebene 1–2 (`--max-level`); ob untere Ligen eigene Zielwerte bekommen, ist offen.

@@ -117,7 +117,7 @@ public sealed partial class FinanceModule
         // Nach Auf- oder Abstieg passt die Vorjahreszahl nicht mehr: zur Hälfte mit der Schätzung für die aktuelle Liga mischen.
         var last = ExpectedIncome(club);
         var income = club.Finance.LastSeason.Count == 0 ? last : (last + EstimateIncome(club)) / 2;
-        var fixedCosts = -club.Finance.LastSeason.Where(kv => kv.Key is TransactionType.StaffWages or TransactionType.Upkeep or TransactionType.Travel or TransactionType.Interest or TransactionType.Youth)
+        var fixedCosts = -club.Finance.LastSeason.Where(kv => kv.Key is TransactionType.StaffWages or TransactionType.Upkeep or TransactionType.Travel or TransactionType.Interest or TransactionType.Youth or TransactionType.Operations)
             .Sum(kv => Math.Min(0, kv.Value));
         if (fixedCosts == 0) fixedCosts = (long)(income * 0.22);
         var bill = Budgets.WageBill(club, World);

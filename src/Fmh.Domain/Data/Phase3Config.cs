@@ -106,6 +106,21 @@ public sealed class DivisionFinance
     public long TravelPerAwayMatch { get; set; } = 20_000;
     /// <summary>Gehaltsniveau der Spielklasse gegenüber dem Profimarkt (1,0); Halbprofis verdienen deutlich weniger.</summary>
     public double WageLevel { get; set; } = 1.0;
+    /// <summary>Sponsorenniveau der Spielklasse gegenüber der höchsten Liga (1,0).</summary>
+    public double SponsorLevel { get; set; } = 1.0;
+    /// <summary>
+    /// Betriebskosten (Verwaltung, Spielbetrieb, Personal außerhalb des Kaders) als Anteil der laufenden Einnahmen;
+    /// in der Bundesliga real rund 45 % (DFL-Wirtschaftsreport). 0 = keine.
+    /// </summary>
+    public double OperatingCostShare { get; set; }
+    /// <summary>Höchstes Jahresgehalt, das ein Verein dieser Spielklasse zahlen kann (0 = ohne Grenze).</summary>
+    public long MaxAnnualWage { get; set; }
+
+    /// <summary>Höchstes Wochengehalt der Spielklasse (<see cref="int.MaxValue"/> ohne Grenze).</summary>
+    public int MaxWeeklyWage => MaxAnnualWage > 0 ? (int)(MaxAnnualWage / 52) : int.MaxValue;
+
+    /// <summary>Kalibrierungsziel: durchschnittliches Jahresgehalt eines Kaderspielers (0 = ohne Ziel).</summary>
+    public long TargetAnnualWage { get; set; }
 }
 
 public sealed class BuildingRequirement

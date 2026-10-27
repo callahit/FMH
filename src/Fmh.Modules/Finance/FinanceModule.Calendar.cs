@@ -32,7 +32,7 @@ public sealed partial class FinanceModule
         if (wages > 0) Book(club, TransactionType.Wages, -wages, TR("tx.wages"));
         var staff = World.Staff.Where(s => s.ClubId == club.Id).Sum(s => (long)s.WeeklyWage)
                     + World.Scouts.Where(s => s.ClubId == club.Id).Sum(s => (long)ClubRules.ScoutWage(s))
-                    + (IsHuman(club) ? club.Board.ManagerWeeklyWage : (long)(club.Board.ManagerWeeklyWage > 0 ? club.Board.ManagerWeeklyWage : 2_000 * ClubRules.Scale(club)));
+                    + (IsHuman(club) ? club.Board.ManagerWeeklyWage : (long)(club.Board.ManagerWeeklyWage > 0 ? club.Board.ManagerWeeklyWage : ClubRules.ManagerWage(club)));
         if (staff > 0) Book(club, TransactionType.StaffWages, -staff, TR("tx.staffWages"));
         var weekly = (Facilities.Effect(club, "income.weekly") + Facilities.Effect(club, "income.events") + Facilities.Effect(club, "income.patients")) * 0.5
                      + club.Grounds.Buildings.Where(b => b.Leased).Sum(b => Facilities.MonthlyUpkeep(club, b) * 0.4);
@@ -64,6 +64,8 @@ public sealed partial class FinanceModule
         var members = (long)(club.Fans.Members * 4);
         if (members > 0) Book(club, TransactionType.BuildingIncome, members, TR("tx.members"));
 
+        Operations(club, div);
+
         // Kredite: Annuität, Zinsanteil getrennt.
         foreach (var loan in f.Loans.ToList())
         {
@@ -94,6 +96,25 @@ public sealed partial class FinanceModule
         f.MonthExpenses = 0;
         while (f.History.Count > 36) f.History.RemoveAt(0);
         if (!IsHuman(club)) AiFinance(club);
+    }
+
+    /// <summary>Laufende Einnahmen, an denen sich die Betriebskosten bemessen (ohne Transfers, Kredite und Festgeld).</summary>
+    private static readonly TransactionType[] OperatingIncome =
+    {
+        TransactionType.Tickets, TransactionType.SeasonTickets, TransactionType.Tv, TransactionType.Sponsorship, TransactionType.Merchandise,
+        TransactionType.Catering, TransactionType.BuildingIncome, TransactionType.PrizeMoney, TransactionType.European,
+    };
+
+    /// <summary>
+    /// Betriebskosten monatlich nachbuchen: Anteil der bisherigen Saisoneinnahmen abzüglich des schon Gebuchten. Ergibt sich
+    /// vollständig aus den Saisonsummen, braucht also keinen eigenen Zustand im Spielstand.
+    /// </summary>
+    private void Operations(Club club, DivisionFinance div)
+    {
+        if (div.OperatingCostShare <= 0) return;
+        var income = OperatingIncome.Sum(t => Math.Max(0, club.Finance.Season.GetValueOrDefault(t)));
+        var due = (long)(income * div.OperatingCostShare) + club.Finance.Season.GetValueOrDefault(TransactionType.Operations);
+        if (due > 0) Book(club, TransactionType.Operations, -due, TR("tx.operations"));
     }
 
     /// <summary>Dauerkarten werden zum Stichtag verkauft (Kapitel 8).</summary>

@@ -76,7 +76,7 @@ public sealed partial class BoardModule
             offers = World.Clubs.Values.Where(c => c.Id != current.Id && World.FindLeague(c.LeagueId) is not null).OrderBy(c => c.Reputation).Take(2).ToList();
         foreach (var club in offers)
         {
-            var offer = new JobOffer { ClubId = club.Id, Expires = World.Date.AddDays(afterSacking ? 60 : 14), WeeklyWage = (int)(Math.Round(2_500 * ClubRules.Scale(club) / 100) * 100), Years = 2 };
+            var offer = new JobOffer { ClubId = club.Id, Expires = World.Date.AddDays(afterSacking ? 60 : 14), WeeklyWage = ClubRules.ManagerWage(club), Years = 2 };
             m.Career.Offers.Add(offer);
             Notify(MessageType.Career, "msg.sender.agent", TR("msg.jobOffer.subject", club.Name),
                 TR("msg.jobOffer.body", club.Name, Comp(club.LeagueId), TR("goal." + ExpectedGoal(club)), TextArg.Money(offer.WeeklyWage, Currency)),

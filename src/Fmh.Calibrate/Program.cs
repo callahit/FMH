@@ -168,11 +168,41 @@ public static class Program
         Console.WriteLine();
     }
 
+    /// <summary>Gehälter der letzten ausgewerteten Saison im Zielkorridor (±30 % um <c>targetAnnualWage</c> je Division)?</summary>
+    private static bool _wagesOk = true;
+
+    /// <summary>Erlaubte Lohnentwicklung je Saison (real rund 4 % im Jahr, DFL-Personalaufwand 2019/20–2024/25).</summary>
+    private const double WageGrowth = 1.04;
+
+    private static int _startYear;
+
+    /// <summary>Durchschnittliches Jahresgehalt der Kaderspieler je Division gegen das Kalibrierungsziel aus den Daten.</summary>
+    private static void PrintWageStats(World w)
+    {
+        _wagesOk = true;
+        if (_startYear == 0) _startYear = w.SeasonYear;
+        var growth = Math.Pow(WageGrowth, w.SeasonYear - _startYear);
+        foreach (var div in w.Leagues.GroupBy(l => (l.CountryCode, l.Format.Id)))
+        {
+            var clubs = div.SelectMany(l => l.ClubIds).Select(id => w.Clubs[id]).ToList();
+            var target = (long)(ClubRules.DivisionFinance(w, clubs[0]).TargetAnnualWage * growth);
+            // Leihspieler mit dem Anteil, den der aufnehmende Verein zahlt.
+            var wages = clubs.SelectMany(c => w.SquadOf(c)).Select(p => (p.Contract?.WeeklyWage ?? 0) * 52.0 * (p.Loan?.WageSharePercent ?? 100) / 100).ToList();
+            var avg = wages.Average();
+            var median = wages.Order().ElementAt(wages.Count / 2);
+            var ok = target == 0 || Math.Abs(avg / target - 1) <= 0.3;
+            _wagesOk &= ok;
+            Console.WriteLine($"Gehälter {div.First().Format.Name}: Ø {avg / 1000:F0} Tsd. im Jahr, Median {median / 1000:F0} Tsd., Kader Ø {clubs.Average(c => Budgets.WageBill(c, w) * 52.0) / 1_000_000:F1} Mio." +
+                              (target > 0 ? $", Ziel {target / 1000} Tsd. ±30 % {(ok ? "ok" : "ABWEICHUNG")}" : ""));
+        }
+    }
+
     /// <summary>Finanzkennzahlen je Liga: Einnahmen, Ausgaben, Saldo und Kontostände (Kalibrierung Phase 3).</summary>
     private static void PrintFinanceStats(GameSession session)
     {
         var w = session.World;
         static string M(double v) => (v / 1_000_000).ToString("F1", CultureInfo.InvariantCulture);
+        PrintWageStats(w);
         foreach (var league in w.Leagues)
         {
             var clubs = league.ClubIds.Select(id => w.Clubs[id]).ToList();
@@ -215,6 +245,9 @@ public static class Program
         var targetSeason = world.SeasonYear + seasons;
         var topLeague = world.Leagues.OrderBy(l => l.Level).First();
         var strengthStart = TopEleven(session, topLeague);
+        Console.WriteLine("Start:");
+        PrintWageStats(world);
+        if (seasons == 0) return 0;
 
         Stopwatch? dayWatch = null;
         while (world.SeasonYear < targetSeason)
@@ -225,6 +258,7 @@ public static class Program
             {
                 var reason = world.Messages.LastOrDefault(m => m.SubjectRef?.Key == "msg.sacked.subject")?.BodyText(data.Texts);
                 Console.WriteLine($"Entlassen am {world.Date:yyyy-MM-dd}: {reason}");
+                PrintFinanceStats(session);
                 break;
             }
             if (dayWatch is not null)
@@ -258,7 +292,7 @@ public static class Program
         Console.WriteLine($"{seasons} Saison(s) in {sw.Elapsed.TotalSeconds:F1} s, {matchdays} Spieltage des eigenen Vereins, langsamster Spieltag {slowest.TotalMilliseconds:F0} ms (Ziel < 5000 ms).");
         var drift = (TopEleven(session, topLeague) - strengthStart) / Math.Max(1, seasons);
         Console.WriteLine($"Ligastärke-Drift {topLeague.Name}: {drift:+0.000;-0.000} je Saison" + (maxDrift is { } md ? $" (Grenze {md:0.000})" : " (Ziel ≤ 0,05, offener Punkt)"));
-        var ok = slowest.TotalMilliseconds < 5000 && world.SeasonYear >= targetSeason && (maxDrift is not { } m || drift <= m);
+        var ok = slowest.TotalMilliseconds < 5000 && world.SeasonYear >= targetSeason && (maxDrift is not { } m || drift <= m) && _wagesOk;
         if (!ok) Console.WriteLine("ACHTUNG: Saisonlauf außerhalb der Vorgaben.");
         return strict && !ok ? 1 : 0;
     }

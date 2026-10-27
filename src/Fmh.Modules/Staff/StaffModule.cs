@@ -25,7 +25,7 @@ public sealed partial class StaffModule : GameModule, IStaffService
     public int StaffAbility(Club club, StaffRole role) =>
         World.Staff.Where(s => s.ClubId == club.Id && s.Role == role).Select(s => s.Ability).DefaultIfEmpty(0).Max();
 
-    public static int StaffWage(int ability) => (int)(Math.Round(320 * Math.Pow(1.22, ability) / 100) * 100);
+    public static int StaffWage(int ability) => (int)(Math.Round(350 * Math.Pow(1.27, ability) / 100) * 100);
 
     private StaffMember NewStaff(StaffRole role, int ability, string country)
     {
