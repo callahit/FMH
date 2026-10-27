@@ -41,6 +41,14 @@ public static class DataValidator
 
         foreach (var country in data.Countries)
         {
+            foreach (var (div, fin) in country.Finance.Divisions.Where(kv => kv.Value.Reference is not null))
+            {
+                var r = fin.Reference!;
+                foreach (var key in r.Income.Keys.Except(FinanceReference.IncomeCategories).Concat(r.Expenses.Keys.Except(FinanceReference.ExpenseCategories)))
+                    errors.Add($"Ligazahlen '{div}': unbekannte Kategorie '{key}'.");
+                if (string.IsNullOrWhiteSpace(r.Source) || r.Income.Values.Concat(r.Expenses.Values).Any(v => v <= 0))
+                    errors.Add($"Ligazahlen '{div}': Quelle fehlt oder Betrag nicht positiv.");
+            }
             foreach (var pool in country.Pools)
             {
                 var count = data.Clubs.Count(c => c.Division == pool.Id);

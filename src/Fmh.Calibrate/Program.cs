@@ -176,6 +176,9 @@ public static class Program
 
     private static int _startYear;
 
+    /// <summary>Erträge und Aufwand der zuletzt ausgewerteten Saison nahe an den Ligazahlen (<see cref="ReferenceReport"/>)?</summary>
+    private static bool _financeOk = true;
+
     /// <summary>Durchschnittliches Jahresgehalt der Kaderspieler je Division gegen das Kalibrierungsziel aus den Daten.</summary>
     private static void PrintWageStats(World w)
     {
@@ -203,6 +206,7 @@ public static class Program
         var w = session.World;
         static string M(double v) => (v / 1_000_000).ToString("F1", CultureInfo.InvariantCulture);
         PrintWageStats(w);
+        _financeOk = ReferenceReport.Print(w);
         foreach (var league in w.Leagues)
         {
             var clubs = league.ClubIds.Select(id => w.Clubs[id]).ToList();
@@ -292,7 +296,7 @@ public static class Program
         Console.WriteLine($"{seasons} Saison(s) in {sw.Elapsed.TotalSeconds:F1} s, {matchdays} Spieltage des eigenen Vereins, langsamster Spieltag {slowest.TotalMilliseconds:F0} ms (Ziel < 5000 ms).");
         var drift = (TopEleven(session, topLeague) - strengthStart) / Math.Max(1, seasons);
         Console.WriteLine($"Ligastärke-Drift {topLeague.Name}: {drift:+0.000;-0.000} je Saison" + (maxDrift is { } md ? $" (Grenze {md:0.000})" : " (Ziel ≤ 0,05, offener Punkt)"));
-        var ok = slowest.TotalMilliseconds < 5000 && world.SeasonYear >= targetSeason && (maxDrift is not { } m || drift <= m) && _wagesOk;
+        var ok = slowest.TotalMilliseconds < 5000 && world.SeasonYear >= targetSeason && (maxDrift is not { } m || drift <= m) && _wagesOk && _financeOk;
         if (!ok) Console.WriteLine("ACHTUNG: Saisonlauf außerhalb der Vorgaben.");
         return strict && !ok ? 1 : 0;
     }
