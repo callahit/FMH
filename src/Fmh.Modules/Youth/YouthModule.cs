@@ -48,7 +48,7 @@ public sealed partial class YouthModule : GameModule, IYouthService
     {
         var level = World.FindLeague(club.LeagueId)?.Level ?? 3;
         var factor = level switch { 1 => 1.2, 2 => 0.8, _ => 0.25 };
-        return MarketValue.Round(World.Country(club.CountryCode).Youth.ReferenceBudget * FacilitiesModule.Scale(club) * factor);
+        return MarketValue.Round(World.Country(club.CountryCode).Youth.ReferenceBudget * ClubRules.Scale(club) * factor);
     }
 
     // ================================================================== Ablauf
@@ -78,7 +78,7 @@ public sealed partial class YouthModule : GameModule, IYouthService
         a.Facilities += (t.facilities - a.Facilities) * drift;
         a.Recruitment += (t.recruitment - a.Recruitment) * drift;
         a.Education += (t.education - a.Education) * drift;
-        SyncYouthValues(club);
+        ClubRules.SyncYouthValues(club);
     }
 
     /// <summary>Zielwerte der vier Kriterien (1–20) bei aktuellem Budget, Personal und Gebäuden.</summary>
@@ -100,13 +100,6 @@ public sealed partial class YouthModule : GameModule, IYouthService
         return (Math.Clamp(coaching, 1, 20), Math.Clamp(facilities, 1, 20), Math.Clamp(recruitment, 1, 20), Math.Clamp(education, 1, 20));
     }
 
-    /// <summary>Die alten Kennzahlen (Anzeige, Training) folgen den Kriterien des Leistungszentrums.</summary>
-    public static void SyncYouthValues(Club club)
-    {
-        club.YouthFacilities = (int)Math.Round(Math.Clamp((club.Academy.Facilities + club.Academy.Coaching) / 2, 1, 20));
-        club.YouthRecruitment = (int)Math.Round(Math.Clamp(club.Academy.Recruitment, 1, 20));
-    }
-
     /// <summary>Startwerte nach Vereinsgröße (neue Welt oder älterer Spielstand).</summary>
     public void InitAcademy(Club club)
     {
@@ -121,7 +114,7 @@ public sealed partial class YouthModule : GameModule, IYouthService
         a.Recruitment = Start(t.recruitment);
         a.Education = Start(t.education);
         a.Reputation = Math.Clamp(15 + club.Reputation * 2.5 + Rng.Next(-8, 9), 5, 90);
-        SyncYouthValues(club);
+        ClubRules.SyncYouthValues(club);
         AssignYouthCoaches(club);
     }
 

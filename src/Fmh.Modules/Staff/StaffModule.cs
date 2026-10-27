@@ -113,7 +113,7 @@ public sealed partial class StaffModule : GameModule, IStaffService
         club.CoachQuality = (int)Math.Clamp(Math.Round(assistant * 0.55 + fitness * 0.25 + gk * 0.1 + license + Facilities.Effect(club, "training.quality") * 20), 1, 20);
         // Jugend: Kennzahlen kommen aus dem Nachwuchsleistungszentrum (Altersstufen, Budget, Gebäude).
         Youth.AssignYouthCoaches(club);
-        if (club.Academy.Initialized) YouthModule.SyncYouthValues(club);
+        if (club.Academy.Initialized) ClubRules.SyncYouthValues(club);
     }
 
     /// <summary>Saisonwechsel: auslaufende Personalverträge. KI verlängert gute Leute, ersetzt schwache.</summary>

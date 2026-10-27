@@ -47,7 +47,7 @@ public sealed partial class ScoutingModule : GameModule, IScoutingService
     public void FireScout(Scout scout)
     {
         if (scout.ClubId != HumanClub.Id) return;
-        Finance.Book(HumanClub, TransactionType.StaffWages, -(long)FinanceModule.ScoutWage(scout) * 8, TR("tx.severance", scout.Name));
+        Finance.Book(HumanClub, TransactionType.StaffWages, -(long)ClubRules.ScoutWage(scout) * 8, TR("tx.severance", scout.Name));
         World.ScoutAssignments.RemoveAll(a => a.ScoutId == scout.Id);
         World.Scouts.Remove(scout);
     }

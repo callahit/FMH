@@ -18,9 +18,6 @@ public sealed partial class FacilitiesModule : GameModule, IFacilitiesService
 
     private readonly Dictionary<int, Dictionary<string, double>> _effects = new();
 
-    /// <summary>Größe des Vereins für Geldbeträge: 1,0 bei Reputation 10, ca. ×1,19 je Punkt.</summary>
-    public static double Scale(Club club) => Math.Max(0.15, Math.Pow(1.19, club.Reputation - 10));
-
     public void InvalidateEffects(Club club) => _effects.Remove(club.Id);
 
     /// <summary>Summe einer Gebäudewirkung (Stufe × Wert, Zustand, Lagebonus, Synergien). Verpachtete Gebäude wirken nicht.</summary>
@@ -114,10 +111,6 @@ public sealed partial class FacilitiesModule : GameModule, IFacilitiesService
             : spots[0];
     }
 
-    public static long LevelCost(BuildingDef def, int level) => (long)(def.Cost * Math.Pow(def.CostGrowth, level - 1));
-
     public long MonthlyUpkeep(Club club, Building b) =>
         Data.Building(b.Type) is { } def ? (long)(def.Upkeep * (1 + 0.5 * (b.Level - 1))) : 0;
-
-    public static long LandPrice(Club club) => MarketValue.Round(120_000 * Scale(club));
 }

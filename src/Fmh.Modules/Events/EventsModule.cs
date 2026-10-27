@@ -53,7 +53,7 @@ public sealed partial class EventsModule : GameModule, IEventsService
             Expires = World.Date.AddDays(EventDecisionDays),
             Args = new List<TextArg>
             {
-                TextArg.Literal(club.Name), TextArg.Literal(player?.Name ?? ""), TextArg.Money(MarketValue.Round(amount * FacilitiesModule.Scale(club)), Currency),
+                TextArg.Literal(club.Name), TextArg.Literal(player?.Name ?? ""), TextArg.Money(MarketValue.Round(amount * ClubRules.Scale(club)), Currency),
                 TextArg.Literal(other.Name), TextArg.Literal(HumanManager.Name), TextArg.Literal(club.City), TextArg.Literal(Sponsors.StadiumDisplayName(club)),
             },
         };
@@ -84,8 +84,8 @@ public sealed partial class EventsModule : GameModule, IEventsService
         if (w.NoStadiumSite == true && (StadiumPlans.AvailableSite(club) is not null || club.Grounds.Projects.Any(p => p.Kind == ProjectKind.NewStadium && p.State != ProjectState.Done))) return false;
         if (w.LowBalance == true && club.Budget.Balance > Finance.ExpectedIncome(club) * 0.1) return false;
         var last1 = AllFixtures.Where(x => x.Involves(club.Id) && x.Result is not null).OrderByDescending(x => x.Date).FirstOrDefault();
-        if (w.AfterWin == true && (last1 is null || PressModule.Outcome(club, last1) <= 0 || last1.Date < World.Date.AddDays(-4))) return false;
-        if (w.AfterLoss == true && (last1 is null || PressModule.Outcome(club, last1) >= 0 || last1.Date < World.Date.AddDays(-4))) return false;
+        if (w.AfterWin == true && (last1 is null || ClubRules.Outcome(club, last1) <= 0 || last1.Date < World.Date.AddDays(-4))) return false;
+        if (w.AfterLoss == true && (last1 is null || ClubRules.Outcome(club, last1) >= 0 || last1.Date < World.Date.AddDays(-4))) return false;
         return true;
     }
 
@@ -143,7 +143,7 @@ public sealed partial class EventsModule : GameModule, IEventsService
             switch (key)
             {
                 case "money":
-                    var money = MarketValue.Round(value * FacilitiesModule.Scale(club));
+                    var money = MarketValue.Round(value * ClubRules.Scale(club));
                     Finance.Book(club, TransactionType.Event, money, TR("tx.event"));
                     lines.Add(TR("effect.money", TextArg.Money(money, Currency)));
                     continue;

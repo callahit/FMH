@@ -61,7 +61,7 @@ public sealed partial class StadiumPlansModule : GameModule, IStadiumPlansServic
     {
         var (before, incomeBefore) = SeasonGate(club, club.Stadium);
         var (after, incomeAfter) = SeasonGate(club, planned);
-        var upkeep = (FinanceModule.StadiumUpkeep(planned) - FinanceModule.StadiumUpkeep(club.Stadium)) * 12;
+        var upkeep = (ClubRules.StadiumUpkeep(planned) - ClubRules.StadiumUpkeep(club.Stadium)) * 12;
         return new StadiumImpact((int)Math.Round(after - before), incomeAfter - incomeBefore, upkeep, cost);
     }
 
@@ -81,7 +81,7 @@ public sealed partial class StadiumPlansModule : GameModule, IStadiumPlansServic
             case ProjectKind.Heating: planned.UndersoilHeating = true; break;
             case ProjectKind.Scoreboard: planned.Scoreboard++; break;
         }
-        var impact = ForecastStadium(club, planned, MarketValue.Round(quote.cost * FacilitiesModule.ContractorFactors(contractor).cost));
+        var impact = ForecastStadium(club, planned, MarketValue.Round(quote.cost * ClubRules.ContractorFactors(contractor).cost));
         // Anzeigetafel: Werbeeinnahmen je Heimspiel (siehe Spieltagseinnahmen).
         if (kind == ProjectKind.Scoreboard)
             impact = impact with { ExtraIncome = impact.ExtraIncome + 6_000L * (World.FindLeague(club.LeagueId)?.Fixtures.Count(f => f.HomeId == club.Id) ?? 17) };
@@ -98,7 +98,7 @@ public sealed partial class StadiumPlansModule : GameModule, IStadiumPlansServic
             Offered = World.Date,
             Expires = World.Date.AddYears(2),
             MaxCapacity = Math.Clamp(20_000 + club.Reputation * 2_800, 20_000, 80_000) / 1000 * 1000,
-            LandPrice = MarketValue.Round(1_500_000 * FacilitiesModule.Scale(club)),
+            LandPrice = MarketValue.Round(1_500_000 * ClubRules.Scale(club)),
         };
     }
 
@@ -119,32 +119,9 @@ public sealed partial class StadiumPlansModule : GameModule, IStadiumPlansServic
     public long StadiumLoanCapacity(Club club) =>
         Math.Max(0, MarketValue.Round(Finance.ExpectedIncome(club) * 3.0) - club.Finance.Loans.Sum(l => l.Remaining));
 
-    public static Stadium BuildNewStadium(Club club, StadiumDesign d)
-    {
-        var standing = d.Capacity * Math.Clamp(d.StandingPercent, 0, 60) / 100;
-        var seating = d.Capacity - standing;
-        Stand Make(StandSide side, double standShare, double seatShare, double boxShare) => new()
-        {
-            Side = side, Standing = (int)(standing * standShare), Seating = (int)(seating * seatShare), Roof = d.Roof,
-            Boxes = (int)Math.Min(40, Math.Round(d.Boxes * boxShare)),
-        };
-        // Kurven mit den Stehplätzen, Haupt- und Gegentribüne mit Sitzplätzen und Logen.
-        return new Stadium
-        {
-            Stands = new List<Stand>
-            {
-                Make(StandSide.North, 0.5, 0.1, 0),
-                Make(StandSide.South, 0.5, 0.1, 0),
-                Make(StandSide.East, 0, 0.35, 0.4),
-                Make(StandSide.West, 0, 0.45, 0.6),
-            },
-            Floodlight = 4, UndersoilHeating = true, Scoreboard = 3, Pitch = 100,
-        };
-    }
-
     /// <summary>Prognose für den Neubau gegenüber dem heutigen Stadion.</summary>
     public StadiumImpact ForecastNewStadium(Club club, StadiumDesign d, Contractor contractor = Contractor.Standard) =>
-        ForecastStadium(club, BuildNewStadium(club, d), MarketValue.Round(NewStadiumCost(club, d) * FacilitiesModule.ContractorFactors(contractor).cost));
+        ForecastStadium(club, StadiumBuilder.BuildNewStadium(club, d), MarketValue.Round(NewStadiumCost(club, d) * ClubRules.ContractorFactors(contractor).cost));
 
     /// <summary>Neubau beauftragen. Fehlertext-Schlüssel oder null.</summary>
     public string? OrderNewStadium(StadiumDesign d, Contractor contractor, bool financed)

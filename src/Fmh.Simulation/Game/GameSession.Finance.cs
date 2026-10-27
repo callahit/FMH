@@ -18,7 +18,6 @@ public sealed partial class GameSession
     public long LoanCapacity(Club club) => _finance.LoanCapacity(club);
     public (int standing, int seating, int boxes) Attendance(Club home, Club away, Fixture f, Weather weather) => _finance.Attendance(home, away, f, weather);
     public bool IsTopMatch(Club home, Club away, Fixture f) => _finance.IsTopMatch(home, away, f);
-    public static long StadiumUpkeep(Stadium st) => FinanceModule.StadiumUpkeep(st);
     public string? TakeLoan(long amount, int years) => _finance.TakeLoan(amount, years);
     public string? RepayLoan(BankLoan loan) => _finance.RepayLoan(loan);
     public static double DepositRate(int months) => FinanceModule.DepositRate(months);
@@ -26,5 +25,4 @@ public sealed partial class GameSession
     public string? ShiftBudget(long transferDelta) => _finance.ShiftBudget(transferDelta);
     public string? SetTicketPrices(TicketPrices prices) => _finance.SetTicketPrices(prices);
     public void SetSeasonBudget(Club club) => _finance.SetSeasonBudget(club);
-    public static int ScoutWage(Scout s) => FinanceModule.ScoutWage(s);
 }

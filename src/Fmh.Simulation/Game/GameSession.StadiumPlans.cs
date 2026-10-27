@@ -14,7 +14,6 @@ public sealed partial class GameSession
     public StadiumSite? AvailableSite(Club club) => _stadiumPlans.AvailableSite(club);
     public long NewStadiumCost(Club club, StadiumDesign d) => _stadiumPlans.NewStadiumCost(club, d);
     public long StadiumLoanCapacity(Club club) => _stadiumPlans.StadiumLoanCapacity(club);
-    public static Stadium BuildNewStadium(Club club, StadiumDesign d) => StadiumPlansModule.BuildNewStadium(club, d);
     public StadiumImpact ForecastNewStadium(Club club, StadiumDesign d, Contractor contractor = Contractor.Standard) => _stadiumPlans.ForecastNewStadium(club, d, contractor);
     public string? OrderNewStadium(StadiumDesign d, Contractor contractor, bool financed) => _stadiumPlans.OrderNewStadium(d, contractor, financed);
 }

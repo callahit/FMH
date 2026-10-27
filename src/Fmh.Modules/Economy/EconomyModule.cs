@@ -24,7 +24,7 @@ public sealed partial class EconomyModule : GameModule, IEconomyService
         {
             if (club.Stadium.Stands.Count > 0) continue;
             fresh.Add(club);
-            club.Stadium = FacilitiesModule.CreateStadium(club, Rng);
+            club.Stadium = StadiumBuilder.CreateStadium(club, Rng);
             Facilities.CreateGrounds(club);
             Staff.CreateStaff(club);
             Board.CreateBoard(club);
