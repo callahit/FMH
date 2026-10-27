@@ -157,8 +157,11 @@ public sealed partial class BoardModule
         if (World.SeasonYear - HumanManager.Career.Stations.First().From.Year >= 10) Achieve("decade");
         var home = World.FindLeague(club.LeagueId)?.Fixtures.Where(f => f.HomeId == club.Id && f.Result is not null).ToList() ?? new();
         if (home.Count > 5 && home.All(f => f.Result!.HomeGoals >= f.Result.AwayGoals)) Achieve("unbeatenHome");
-        var cupWon = World.Cups.Any(c => c.Kind == CompetitionKind.Cup && c.WinnerId == club.Id);
-        if (cupWon) { st?.Titles.Add($"{World.Cups.First(c => c.Kind == CompetitionKind.Cup && c.WinnerId == club.Id).Id}|{World.SeasonYear}"); Achieve("cupWin"); }
+        // Jeder gewonnene Pokal (Pokal, Supercup, Ligapokal …) zählt als eigener Titel, der Erfolg nur einmal.
+        var cupsWon = World.Cups.Where(c => c.Kind == CompetitionKind.Cup && c.WinnerId == club.Id).ToList();
+        var cupWon = cupsWon.Count > 0;
+        foreach (var cup in cupsWon) st?.Titles.Add($"{cup.Id}|{World.SeasonYear}");
+        if (cupWon) Achieve("cupWin");
         if (cupWon && champion) Achieve("doubleWin");
         if (club.Finance.Season.Values.Sum() > 0) Achieve("profitSeason");
         if (World.SquadOf(club).Any(p => p.History.Any(h => h.SeasonYear == World.SeasonYear && h.ClubId == club.Id && h.Appearances >= 20) && p.Age(World.Date) <= 21 && p.Contract is { Status: SquadStatus.Prospect })) Achieve("youthStar");
