@@ -256,4 +256,37 @@ public class PyramidTests
         AssertConsistent(world);
         Assert.All(groups, g => Assert.NotEmpty(g.Fixtures));
     }
+
+    [Fact]
+    public void PlayoffWithSeveralPlacesIsRejected()
+    {
+        var tl = System.Text.Json.JsonSerializer.Deserialize<CountryConfig>(
+            System.Text.Json.JsonSerializer.Serialize(Data.Countries.Single(c => c.Code == "TL"), Json.Compact), Json.Compact)!;
+        tl.Playoffs.Single(p => p.Id == "TL-AUF").Places = 2;
+        Assert.Contains(PyramidValidator.Validate(WithCountries(tl)), e => e.Contains("unterstützt wird genau einer"));
+    }
+
+    /// <summary>Spielrecht gilt auch, wenn der Mensch eine zweite Mannschaft führt: Validierung meldet es, die Reparatur hält es ein.</summary>
+    [Fact]
+    public void ReserveEligibilityAppliesToHumanLineups()
+    {
+        var s = NewTestland();
+        var w = s.World;
+        var reserve = w.Clubs.Values.First(c => c.ReserveOf is not null);
+        var start = new DateOnly(w.SeasonYear, w.Country("TL").Season.StartMonth, 1);
+        var eligible = AiTactics.ReserveEligibility(reserve, w, Data)!;
+        // Vier Ältere in die Startelf: einer zu viel.
+        var older = w.SquadOf(reserve).Where(p => p.Age(start) > 23).Take(3).ToList();
+        var extra = PlayerGenerator.Create(w, Data, new Fmh.Core.Rng(9), Position.MC, 8, 30, "TL");
+        extra.ClubId = reserve.Id;
+        w.Players[extra.Id] = extra;
+        reserve.PlayerIds.Add(extra.Id);
+        eligible = AiTactics.ReserveEligibility(reserve, w, Data)!;
+        var outsider = older.Append(extra).First(p => !eligible(p));
+        reserve.Tactic.Lineup[5] = outsider.Id;
+        Assert.Contains("lineup.reserveAge", LineupSelector.Validate(reserve, w, Data, eligible));
+        LineupSelector.Repair(reserve, w, Data, 7, eligible);
+        Assert.DoesNotContain("lineup.reserveAge", LineupSelector.Validate(reserve, w, Data, eligible));
+        Assert.True(reserve.Tactic.Lineup.Concat(reserve.Tactic.Bench.Select(b => (int?)b)).Count(id => id is { } v && w.Players[v].Age(start) > 23) <= 3);
+    }
 }

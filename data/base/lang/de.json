@@ -334,6 +334,7 @@
  "lineup.foreign": "Ein Spieler gehört nicht (mehr) zum Kader.",
  "lineup.injured": "Ein verletzter Spieler steht in der Startelf.",
  "lineup.suspended": "Ein gesperrter Spieler steht in der Startelf.",
+ "lineup.reserveAge": "Zweite Mannschaft: zu viele Spieler über der Altersgrenze im Spieltagskader.",
  "lineup.benchUnavailable": "Auf der Bank sitzt ein nicht einsatzfähiger Spieler.",
  "sub.noneLeft": "Keine Wechsel mehr übrig.",
  "sub.notOnPitch": "Der Spieler steht nicht auf dem Platz.",
