@@ -78,15 +78,19 @@ public class GoldenMasterTests
             File.WriteAllText(GoldenFile, sorted.ToJsonString(new JsonSerializerOptions { WriteIndented = true }) + "\n");
             return;
         }
-        // Für eine neue Laufzeitumgebung gibt es noch keinen Referenzwert: Hash ausgeben, nicht scheitern.
-        if (file[key] is not JsonObject expected)
+        // Für eine neue Laufzeitumgebung gibt es noch keinen eigenen Referenzwert: mit einer anderen vergleichen.
+        // Weicht sie ab, nennt die Meldung die Hashes, damit sie als eigener Eintrag nachgetragen werden können.
+        var reference = file[key] is JsonObject own ? (key, own)
+            : file.Where(kv => kv.Key.StartsWith(name + ".") && kv.Value is JsonObject).Select(kv => (kv.Key, (JsonObject)kv.Value!)).FirstOrDefault();
+        if (reference.Item2 is not { } expected)
         {
             _out.WriteLine($"Kein Golden Master für {key} hinterlegt.");
             return;
         }
         var diff = actual.Where(kv => expected[kv.Key]?.GetValue<string>() != kv.Value).Select(kv => kv.Key)
             .Concat(expected.Select(kv => kv.Key).Where(k => !actual.ContainsKey(k))).ToList();
-        Assert.True(diff.Count == 0, $"Golden Master {key} weicht ab in: {string.Join(", ", diff)}");
+        Assert.True(diff.Count == 0,
+            $"Golden Master {key} (Referenz {reference.Item1}) weicht ab in: {string.Join(", ", diff)}; Ist: {JsonSerializer.Serialize(actual)}");
     }
 
     internal static string Hash(string text) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(text)))[..32];
