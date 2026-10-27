@@ -7,9 +7,15 @@ namespace Fmh.Tests;
 
 internal static class TestData
 {
-    private static readonly Lazy<GameData> Lazy = new(() => PackageLoader.Load(PackageLoader.FindDataRoot()));
+    /// <summary>Grundwelt (Deutschland); die meisten Tests brauchen keine weiteren Länder und bleiben so schnell.</summary>
+    private static readonly Lazy<GameData> Lazy = new(() => PackageLoader.Load(new[] { PackageLoader.FindDataRoot() }, enabledPackages: new[] { "base" }));
+
+    /// <summary>Alle ausgelieferten Pakete (Deutschland, England, …).</summary>
+    private static readonly Lazy<GameData> AllLazy = new(() => PackageLoader.Load(PackageLoader.FindDataRoot()));
 
     public static GameData Data => Lazy.Value;
+
+    public static GameData AllData => AllLazy.Value;
 
     public static GameSession NewSession(ulong seed = 42, string club = "nordheide")
     {
