@@ -331,6 +331,15 @@ public class PyramidTests
         Assert.All(world.Leagues, l => Assert.Equal(l.RegularMatchdays, l.MatchdayCount));
     }
 
+    /// <summary>Termine der zweiten Phase folgen dem Wochenrhythmus des Landes und lassen die Winterpause aus.</summary>
+    [Fact]
+    public void PhaseDatesSkipTheWinterBreak()
+    {
+        var season = new SeasonConfig { StartMonth = 7, WinterBreakStart = "12-21", WinterBreakEnd = "01-14", MatchDay = DayOfWeek.Saturday };
+        var dates = ScheduleGenerator.WeeklyDates(season, 2026, new DateOnly(2026, 12, 15), 3);
+        Assert.Equal(new[] { new DateOnly(2026, 12, 19), new DateOnly(2027, 1, 16), new DateOnly(2027, 1, 23) }, dates);
+    }
+
     private static GameData WithCountry(CountryConfig country)
     {
         var data = new GameData
