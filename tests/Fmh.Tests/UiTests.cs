@@ -647,5 +647,28 @@ public class UiTests
         Pump();
         Shot(w, "42_terminal_league");
         Palette.Apply("Klassik");
+
+        // Anzeigewährung Pfund mit eigenem Kurs: Beträge erscheinen in GBP, gerechnet wird weiter in Euro.
+        try
+        {
+            shell.OptionsCommand.Execute(null);
+            var opts = Assert.IsType<OptionsViewModel>(vm.Dialog);
+            var currency = opts.Settings[1];
+            currency.SelectedIndex = currency.Options.ToList().FindIndex(o => o.Contains("GBP"));
+            Assert.True(opts.RateEditable);
+            opts.Rate = 0.5m;
+            Assert.Equal(0.5, AppState.Current.Session!.HumanManager.Profile.ExchangeRates["GBP"]);
+            Assert.Equal(("GBP", 0.5), (Fmh.Core.Fmt.DisplayCurrency, Fmh.Core.Fmt.DisplayRate));
+            opts.CloseCommand.Execute(null);
+            shell.OpenPage<FinancesPageViewModel>();
+            Pump();
+            Assert.Contains(VisibleTexts(w), t => t.Contains("GBP"));
+            Assert.DoesNotContain(VisibleTexts(w), t => t.Contains("EUR"));
+        }
+        finally
+        {
+            AppState.Current.Session!.HumanManager.Profile.DisplayCurrency = "EUR";
+            AppState.Current.ApplyCurrency();
+        }
     }
 }
