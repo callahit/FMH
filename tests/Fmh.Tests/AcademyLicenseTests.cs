@@ -7,7 +7,16 @@ namespace Fmh.Tests;
 /// <summary>Nachwuchsleistungszentrum, Lizenzverfahren mit Stichtagen, FFP, Europa-Zulassung, Stadionprognose und Neubau.</summary>
 public class AcademyLicenseTests
 {
-    private static void AdvanceTo(GameSession s, DateOnly date) => TestData.PlayUntil(s, _ => s.World.Date >= date, 20_000);
+    /// <summary>Tagesgenau bis zum Datum (ein "Weiter" könnte sonst über einen Stichtag hinweg rechnen).</summary>
+    private static void AdvanceTo(GameSession s, DateOnly date)
+    {
+        for (var i = 0; i < 20_000 && s.World.Date < date; i++)
+        {
+            var r = s.Advance(1);
+            if (r.Reason == StopReason.HumanMatch && r.Fixture is { } f) s.PlayInstant(f);
+            if (r.Reason == StopReason.Decision) s.DelegateDecisions();
+        }
+    }
 
     private static DateOnly Spring(GameSession s, int month, int day) => new(s.World.SeasonYear + 1, month, day);
 
