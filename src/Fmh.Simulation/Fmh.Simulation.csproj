@@ -5,5 +5,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Fmh.Domain\Fmh.Domain.csproj" />
     <ProjectReference Include="..\Fmh.Data\Fmh.Data.csproj" />
+    <ProjectReference Include="..\Fmh.Simulation.Abstractions\Fmh.Simulation.Abstractions.csproj" />
+    <ProjectReference Include="..\Fmh.Modules\Fmh.Modules.csproj" />
   </ItemGroup>
 </Project>
