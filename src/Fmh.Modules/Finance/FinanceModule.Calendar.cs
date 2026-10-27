@@ -144,15 +144,31 @@ public sealed partial class FinanceModule
     public void SeasonEndFinances()
     {
         foreach (var league in World.Leagues)
-        {
-            if (!World.Country(league.CountryCode).Finance.Divisions.TryGetValue(league.Id, out var div) || div.TvPool == 0) continue;
-            var table = LeagueTable.Compute(league);
-            var pool = div.TvPool * (1 - div.TvEqualShare);
-            var weights = table.Select(r => (double)(table.Count - r.Position + 1)).ToList();
-            var total = weights.Sum();
-            for (var i = 0; i < table.Count; i++)
-                Book(World.Clubs[table[i].ClubId], TransactionType.Tv, (long)(pool * weights[i] / total), TR("tx.tvPerformance", table[i].Position));
-        }
+            foreach (var (club, position, amount) in TvPerformanceShares(league))
+                Book(club, TransactionType.Tv, amount, TR("tx.tvPerformance", position));
+    }
+
+    /// <summary>TV-Leistungsanteile nach aktuellem Tabellenplatz (zum Saisonende ausgezahlt).</summary>
+    private IEnumerable<(Club club, int position, long amount)> TvPerformanceShares(League league)
+    {
+        if (!World.Country(league.CountryCode).Finance.Divisions.TryGetValue(league.Id, out var div) || div.TvPool == 0) yield break;
+        var table = LeagueTable.Compute(league);
+        var pool = div.TvPool * (1 - div.TvEqualShare);
+        var weights = table.Select(r => (double)(table.Count - r.Position + 1)).ToList();
+        var total = weights.Sum();
+        for (var i = 0; i < table.Count; i++)
+            yield return (World.Clubs[table[i].ClubId], table[i].Position, (long)(pool * weights[i] / total));
+    }
+
+    /// <summary>
+    /// Eigenkapital für die Lizenzprüfung: Der TV-Leistungsanteil fließt erst zum Saisonende, steht dem Verein aber nach
+    /// aktuellem Tabellenplatz schon zu und zählt bis zur Auszahlung als Forderung mit.
+    /// </summary>
+    public long LicenseEquity(Club club)
+    {
+        var receivable = !World.SeasonFinished && World.FindLeague(club.LeagueId) is { } league
+            ? TvPerformanceShares(league).Where(s => s.club == club).Sum(s => s.amount) : 0;
+        return Equity(club) + receivable;
     }
 
     public void RollSeasonFinances()
