@@ -5,6 +5,9 @@
   "competition.ENG4": "Third Division",
   "competition.ENG-NL": "National Non-League",
   "competition.ENG-CUP": "National Cup",
+  "competition.ENG-SC": "Supercup",
+  "competition.ENG-LC": "Ligapokal",
+  "competition.ENG-TR": "Liga-Trophy",
   "competition.ENG-PO2": "Play-offs First Division",
   "competition.ENG-PO3": "Play-offs Second Division",
   "competition.ENG-PO4": "Play-offs Third Division"

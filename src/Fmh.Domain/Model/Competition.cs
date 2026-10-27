@@ -33,6 +33,10 @@ public sealed class CupRound
     /// <summary>Textschlüssel des Rundennamens, Platzhalter {0} = Rundennummer.</summary>
     public string NameKey { get; set; } = "";
     public List<DateOnly> Dates { get; set; } = new();
+    /// <summary>Geplante Teilnehmerzahl der Runde inklusive Freilosen (0 = Zweierpotenz aus der Rundenzahl, ältere Spielstände).</summary>
+    public int Teams { get; set; }
+    /// <summary>Vereine, die erst in dieser Runde einsteigen (z. B. Erstligisten in der dritten Runde).</summary>
+    public List<int> Entrants { get; set; } = new();
     public List<CupTie> Ties { get; set; } = new();
     public bool Drawn => Ties.Count > 0;
     public bool Complete => Drawn && Ties.All(t => t.WinnerId is not null);

@@ -36,7 +36,8 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
             World.History.Add(new SeasonRecord
             {
                 SeasonYear = World.SeasonYear, LeagueId = cup.Id, LeagueName = cup.Name,
-                ChampionId = winner.Id, ChampionName = winner.Name, FinalOrder = new List<int> { winner.Id },
+                // Rangfolge (Sieger, Finalist, Halbfinalisten …) für Startplätze in der nächsten Saison.
+                ChampionId = winner.Id, ChampionName = winner.Name, FinalOrder = CupEntries.Ranking(World, cup),
             });
         }
 
