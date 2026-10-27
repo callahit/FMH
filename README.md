@@ -242,7 +242,7 @@ Amateurfußball, und Vereine mit dünnem Kader verpflichten unter der Saison nac
 | Kapitel | Umgesetzt | Folgt laut Roadmap |
 |---|---|---|
 | 2 Spielmodi und Spielstart | Karriere mit neuem Spiel (Name, Werdegang, Verein, Seed, Weltregeln), Managerprofil, Speichern, Autosave vor jedem Spieltag in 3 rotierenden Slots, optional Ironman | Schnellsaison, Hot-Seat, Herausforderungen (Phase 4) |
-| 3 Spielwelt, Wettbewerbe | Tagesgenauer Kalender, Ligen als Daten, Deutschland mit 1. und 2. Liga und Amateurbereich, **Pokal**, **Relegation**, Transferfenster, Pflicht-Entscheidungen | Europapokal, weitere Länder (Phase 3) |
+| 3 Spielwelt, Wettbewerbe | Tagesgenauer Kalender, Ligen als Daten, Deutschland mit 1. und 2. Liga und Amateurbereich, **Pokal**, **Relegation**, Transferfenster, Pflicht-Entscheidungen, **Ligapyramiden mit Staffeln, Bewegungsregeln, Aufstiegsrunden, zweiten Mannschaften und Formatversionen** | Europapokal, weitere Länder (Phase 3) |
 | 4 Spielerdatenmodell | 44 Attribute, versteckte Werte, Kondition, Form, Moral, Spielpraxis, Positionseignung, Entwicklung durch **Training** und Saisonwechsel, Karriereende, Dauerschäden | Zufriedenheit, Tutor-System |
 | 5 Kader, Training, Taktik | Kader, Profil, **Training**, **Trainingslager**, 25 Formationen, **Rollen und Aufgaben**, **Spieleranweisungen**, **freie Positionierung**, **Taktikvertrautheit**, **3 Taktikvarianten**, Standardvarianten, Co-Trainer | – |
 | 6 Spieltag und Matchengine | Vorbericht, Kabinenansprache, Kommentar/Ticker/Sofort/**Konferenz**, Wechsel, Taktik und Zurufe live, Nachbericht mit Noten und Statistik, **Verlängerung und Elfmeterschießen**, Hin- und Rückspiel, **Pressekonferenzen** | – |
@@ -309,6 +309,7 @@ danach je Abschnitt angehoben:
 - Version 4 bekommt das Nachwuchsleistungszentrum, die Lizenzakte (Auflagen, Europa-Lizenz, FFP)
   und die Tabelle `european_entries`.
 - Abschnitt `world` Version 6 bekommt die Tabelle `teams`: jeder Verein erhält seine erste Mannschaft.
+- Abschnitt `world` Version 7 bekommt die Vereinsspalten `reserve_of`, `region`, `latitude` und `longitude`.
 
 Ein Spielstand mit einem neueren oder unbekannten Abschnitt wird abgelehnt.
 
@@ -411,6 +412,30 @@ frühere, Sprachdateien werden schlüsselweise zusammengeführt.
 Beim Start prüft `DataValidator` die Pakete und bricht mit einer Fehlerliste ab. Geprüft werden unter
 anderem Teamzahlen, Pools, Pokaltermine und Relegationsplätze.
 
+### Ligapyramiden (AP 3)
+
+Ein Land beschreibt seine Pyramide als Ebenen mit Divisionen. Formate ändern sich als reines Daten-Update:
+
+- **Staffeln:** `groups` teilt eine Division in Staffeln (je Staffel `teams` Vereine), `assignment` bestimmt die
+  Zuteilung: `Fixed` (Vereine behalten ihre Staffel, Neulinge kommen in die Staffel ihrer `region` bzw. die
+  nächstgelegene), `Geographic` (jede Saison neu nach `longitude`/`latitude`) oder `Rotating` (ausgelost).
+  Vereine stehen in `clubs/*.json` mit der Staffel oder nur der Division als `division`.
+- **Bewegungsregeln:** `movements: [{ "positions": "1-2", "to": "Up" }, { "positions": "17-18", "to": "Down" }]`,
+  optional `onlySeason` für Übergangsregeln. Die älteren Felder `promotion`/`relegation` werden beim Laden
+  darauf abgebildet. Wer keine Lizenz hat oder als zweite Mannschaft nicht aufsteigen darf, gibt seinen Platz an
+  den Nächsten ab; Zwangsabsteiger ersetzt der bestplatzierte sportliche Absteiger bzw. ein Nachrücker. Zu- und
+  Abgänge je Ebene gleichen sich immer aus.
+- **Relegation und Aufstiegsrunden:** `playoffs` mit `entrants` (Liga oder Division und Tabellenplatz; bei einer
+  Division aus jeder Staffel) und `places`. Zwei Teilnehmer spielen ein Duell, mehr ein K.-o.-Turnier.
+- **Zweite Mannschaften:** Vereine mit `reserveOf` (Schlüssel der ersten Mannschaft). `reserves` im Land regelt den
+  Mindestabstand in Ebenen (`minLevelGap`), die Pokalteilnahme und das Spielrecht (`ageLimit`, `overAgePlayers`).
+- **Gültigkeit:** `validFrom`/`validTo` je Formatversion; beim Saisonwechsel gilt die passende Version, Ligen und
+  Staffeln werden umgebaut. Der Validator prüft für jede Version, dass Zu- und Abgänge je Ebene aufgehen, und
+  beim Wechsel, dass die Teamzahlen nach den Übergangsregeln zur neuen Version passen.
+
+Ein Testland mit vier Ebenen, geteilter 4. Liga (drei Staffeln), Relegation, Aufstiegsrunde und zweiten
+Mannschaften liegt unter `tests/Fmh.Tests/Packages/testland` (nur für Tests).
+
 ## Offene Entscheidungen
 
 - **Lizenz:** Open Source ist gesetzt, die konkrete Lizenz klärt der Projektinhaber später (Vorschlag
@@ -419,3 +444,8 @@ anderem Teamzahlen, Pools, Pokaltermine und Relegationsplätze.
   5-Saison-Lauf um etwa 0,14 je Saison; Ziel ist ≤ 0,05. Die CI prüft das noch nicht.
 - **Europapokal:** Die europäischen Wettbewerbe laufen vereinfacht ohne eigene Spiele und ohne
   ausländische Vereine. Echte Partien brauchen weitere Länder als Datenpakete.
+- **Saisonphasen:** Grunddurchgang mit Meister- und Abstiegsrunde (`phases`, `pointsCarry`, Konzept 6.1) ist noch
+  nicht umgesetzt; die Pyramide kennt bisher nur eine Phase je Saison.
+- **Zweite Mannschaften als eigene Vereine:** Eine zweite Mannschaft ist bisher ein eigener Verein mit Verweis
+  `reserveOf` (eigener Kader, eigene Finanzen). Die Mannschaft eines Vereins (`Team`) übernimmt das, sobald
+  Spiele Mannschaften statt Vereine referenzieren.

@@ -1,0 +1,8 @@
+{
+  "id": "testland",
+  "name": "Testland für Ligapyramiden (nur Tests)",
+  "version": "0.1.0",
+  "dependsOn": [
+    "base"
+  ]
+}
