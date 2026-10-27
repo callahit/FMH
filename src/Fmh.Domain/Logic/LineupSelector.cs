@@ -19,50 +19,67 @@ public static class LineupSelector
     /// Ordnet Spieler den Slots zu. Torwart zuerst, danach die Slots mit den wenigsten passenden Kandidaten,
     /// damit seltene Positionen nicht leer ausgehen.
     /// </summary>
-    public static List<int?> Assign(Formation formation, IReadOnlyCollection<Player> candidates, PositionProfiles profiles)
+    public static List<int?> Assign(Formation formation, IReadOnlyCollection<Player> candidates, PositionProfiles profiles) =>
+        Assign(formation, candidates, profiles, new SlotScores(profiles));
+
+    /// <summary>Wie oben, mit gemeinsamem Zwischenspeicher der Slot-Bewertungen (z. B. beim Vergleich aller Formationen).</summary>
+    public static List<int?> Assign(Formation formation, IReadOnlyCollection<Player> candidates, PositionProfiles profiles, SlotScores scores)
     {
         var result = new List<int?>(new int?[formation.Slots.Count]);
         var free = candidates.ToList();
+        var rows = free.Select(scores.Row).ToList();
 
         var order = Enumerable.Range(0, formation.Slots.Count)
             .OrderBy(i => formation.Slots[i].Position == Position.GK ? 0 : 1)
-            .ThenBy(i => candidates.Count(p => p.SuitabilityFor(formation.Slots[i].Position) >= Suitability.Good))
+            .ThenBy(i => scores.GoodCount(candidates, formation.Slots[i].Position))
             .ToList();
 
         foreach (var slot in order)
         {
             if (free.Count == 0) break;
             var pos = formation.Slots[slot].Position;
-            var best = free.MaxBy(p => SlotScore(p, pos, profiles) - (pos != Position.GK && p.MainPosition == Position.GK ? 100 : 0))!;
-            result[slot] = best.Id;
-            free.Remove(best);
+            // Wie MaxBy: bei Gleichstand gewinnt der erste Kandidat.
+            var bestIndex = 0;
+            var bestScore = double.MinValue;
+            for (var k = 0; k < free.Count; k++)
+            {
+                var p = free[k];
+                var score = scores.Get(rows[k], p, pos) - (pos != Position.GK && p.MainPosition == Position.GK ? 100 : 0);
+                if (k == 0 || score > bestScore) { bestScore = score; bestIndex = k; }
+            }
+            result[slot] = free[bestIndex].Id;
+            free.RemoveAt(bestIndex);
+            rows.RemoveAt(bestIndex);
         }
         return result;
     }
 
     /// <summary>Komplette Aufstellung für einen Verein: Startelf, Bank (mit Ersatztorwart) und Standardschützen.</summary>
-    public static void PickBest(Club club, World world, GameData data, int benchSize)
+    public static void PickBest(Club club, World world, GameData data, int benchSize, SlotScores? scores = null)
     {
+        scores ??= new SlotScores(data.PositionProfiles);
         var formation = TacticResolver.Resolve(club.Tactic, data);
         var available = world.SquadOf(club).Where(p => p.IsAvailable).ToList();
-        club.Tactic.Lineup = Assign(formation, available, data.PositionProfiles);
-        club.Tactic.Bench = PickBench(club.Tactic.Lineup, available, benchSize, data.PositionProfiles);
+        club.Tactic.Lineup = Assign(formation, available, data.PositionProfiles, scores);
+        club.Tactic.Bench = PickBench(club.Tactic.Lineup, available, benchSize, data.PositionProfiles, scores);
         PickSetPieceTakers(club, world);
     }
 
-    public static List<int> PickBench(IEnumerable<int?> lineup, IEnumerable<Player> available, int benchSize, PositionProfiles profiles)
+    public static List<int> PickBench(IEnumerable<int?> lineup, IEnumerable<Player> available, int benchSize, PositionProfiles profiles,
+                                      SlotScores? scores = null)
     {
+        scores ??= new SlotScores(profiles);
         var used = lineup.Where(id => id.HasValue).Select(id => id!.Value).ToHashSet();
         var rest = available.Where(p => !used.Contains(p.Id)).ToList();
         var bench = new List<int>();
-        var gk = rest.Where(p => p.MainPosition == Position.GK).MaxBy(p => SlotScore(p, Position.GK, profiles));
+        var gk = rest.Where(p => p.MainPosition == Position.GK).MaxBy(p => scores.Get(p, Position.GK));
         if (gk is not null && benchSize > 0)
         {
             bench.Add(gk.Id);
             rest.Remove(gk);
         }
         bench.AddRange(rest.Where(p => p.MainPosition != Position.GK)
-            .OrderByDescending(p => SlotScore(p, p.MainPosition, profiles))
+            .OrderByDescending(p => scores.Get(p, p.MainPosition))
             .Take(benchSize - bench.Count)
             .Select(p => p.Id));
         return bench;
@@ -154,5 +171,55 @@ public static class LineupSelector
         if (club.Tactic.Bench.Any(id => world.Players.TryGetValue(id, out var p) && !p.IsAvailable)) problems.Add("lineup.benchUnavailable");
         if (club.Tactic.Bench.Any(ids.Contains)) problems.Add("lineup.duplicate");
         return problems.Distinct().ToList();
+    }
+}
+
+/// <summary>
+/// Zwischenspeicher für <see cref="LineupSelector.SlotScore"/> je Spieler und Position. Gilt nur, solange sich
+/// Attribute, Kondition und Form nicht ändern (also innerhalb einer Aufstellungsentscheidung).
+/// </summary>
+public sealed class SlotScores
+{
+    private static readonly int PositionCount = Enum.GetValues<Position>().Length;
+
+    private readonly PositionProfiles _profiles;
+    private readonly Dictionary<Player, double[]> _scores = new(ReferenceEqualityComparer.Instance);
+    private readonly Dictionary<Position, int> _goodCounts = new();
+    private object? _countsFor;
+
+    public SlotScores(PositionProfiles profiles) => _profiles = profiles;
+
+    public double Get(Player p, Position pos) => Get(Row(p), p, pos);
+
+    /// <summary>Zeile der Bewertungen eines Spielers (für schnelle Zugriffe in Schleifen).</summary>
+    public double[] Row(Player p)
+    {
+        if (!_scores.TryGetValue(p, out var row))
+        {
+            row = new double[PositionCount];
+            Array.Fill(row, double.NaN);
+            _scores[p] = row;
+        }
+        return row;
+    }
+
+    public double Get(double[] row, Player p, Position pos)
+    {
+        var s = row[(int)pos];
+        if (double.IsNaN(s)) row[(int)pos] = s = LineupSelector.SlotScore(p, pos, _profiles);
+        return s;
+    }
+
+    /// <summary>Wie viele Kandidaten eine Position mindestens gut spielen (für die Reihenfolge der Slots).</summary>
+    public int GoodCount(IReadOnlyCollection<Player> candidates, Position pos)
+    {
+        if (!ReferenceEquals(_countsFor, candidates))
+        {
+            _goodCounts.Clear();
+            _countsFor = candidates;
+        }
+        if (!_goodCounts.TryGetValue(pos, out var n))
+            _goodCounts[pos] = n = candidates.Count(p => p.SuitabilityFor(pos) >= Suitability.Good);
+        return n;
     }
 }
