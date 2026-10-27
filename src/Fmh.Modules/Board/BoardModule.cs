@@ -52,7 +52,7 @@ public sealed partial class BoardModule : GameModule, IBoardService
         var league = World.FindLeague(club.LeagueId);
         var n = league?.ClubIds.Count ?? 18;
         var relegation = league?.Format.Relegation ?? 2;
-        var playoff = World.Country(club.CountryCode).Playoffs.Any(p => p.UpperDivision == club.LeagueId) ? 1 : 0;
+        var playoff = World.Country(club.CountryCode).Playoffs.Any(p => p.UpperDivision == club.LeagueId && p.AppliesTo(World.SeasonYear)) ? 1 : 0;
         return goal switch
         {
             SeasonGoal.Title => 1,
