@@ -29,7 +29,7 @@ public static class Negotiations
     public static long AskingPrice(Player p, Club seller, World world, GameData data)
     {
         if (p.Transfer.AskingPrice is { } ask && p.Transfer.Listed) return ask;
-        var value = MarketValue.Of(p, world.Date, data.PositionProfiles);
+        var value = MarketValue.Of(p, world, data.PositionProfiles);
         var factor = 1.15;
         if (p.Transfer.Listed) factor = 0.85;
         var squad = world.SquadOf(seller).OrderByDescending(x => Ratings.Strength(x, data.PositionProfiles)).ToList();
@@ -43,12 +43,12 @@ public static class Negotiations
     /// <summary>Wert eines Angebots aus Sicht des Verkäufers.</summary>
     public static double EffectiveValue(ClubOffer o, Player p, World world, GameData data)
     {
-        var value = MarketValue.Of(p, world.Date, data.PositionProfiles);
+        var value = MarketValue.Of(p, world, data.PositionProfiles);
         var fee = o.Fee * (1 - 0.04 * Math.Clamp(o.InstallmentYears, 0, 3));
         var bonus = (o.AppearanceBonus + o.GoalBonus) * 0.3;
         var sellOn = Math.Clamp(o.SellOnPercent, 0, 50) / 100.0 * value * 0.5;
         var swap = o.SwapPlayerId is { } sid && world.Players.TryGetValue(sid, out var sp)
-            ? MarketValue.Of(sp, world.Date, data.PositionProfiles) * 0.8 : 0;
+            ? MarketValue.Of(sp, world, data.PositionProfiles) * 0.8 : 0;
         return fee + bonus + sellOn + swap;
     }
 
@@ -75,8 +75,8 @@ public static class Negotiations
         var key = squad.IndexOf(p) is >= 0 and < 11;
         if (key && !p.Transfer.LoanListed) return new NegotiationResponse(ResponseKind.Reject, "neg.loan.keyPlayer");
         var minShare = p.Transfer.LoanListed ? 50 : p.Age(world.Date) <= 21 ? 60 : 80;
-        if (o.PurchaseFee is { } fee && fee < MarketValue.Of(p, world.Date, data.PositionProfiles) * 0.9)
-            return new NegotiationResponse(ResponseKind.Counter, "neg.loan.optionLow", MarketValue.Of(p, world.Date, data.PositionProfiles));
+        if (o.PurchaseFee is { } fee && fee < MarketValue.Of(p, world, data.PositionProfiles) * 0.9)
+            return new NegotiationResponse(ResponseKind.Counter, "neg.loan.optionLow", MarketValue.Of(p, world, data.PositionProfiles));
         if (o.WageSharePercent >= minShare) return new NegotiationResponse(ResponseKind.Accept, "neg.loan.accept");
         if (n.ClubRounds >= MaxRounds) return new NegotiationResponse(ResponseKind.Reject, "neg.club.final");
         return new NegotiationResponse(ResponseKind.Counter, "neg.loan.wageShare", minShare, minShare);
@@ -84,16 +84,19 @@ public static class Negotiations
 
     // ------------------------------------------------------------------ Spieler
 
-    /// <summary>Gehaltsforderung pro Woche, abhängig von Marktniveau, Reputation, Status und Ehrgeiz.</summary>
+    /// <summary>
+    /// Gehaltsforderung pro Woche: Marktniveau der Stärke, angepasst an Reputation, Status, Ehrgeiz und das Gehaltsniveau der
+    /// Spielklasse des Käufers. Das bisherige Gehalt hebt die Forderung höchstens auf 120 % (Verlängerung) bzw. 140 %
+    /// (Wechsel) dieses Niveaus, damit sich Gehälter nicht mit jeder Verlängerung hochschaukeln.
+    /// </summary>
     public static int WageDemand(Player p, Club buyer, SquadStatus status, World world, GameData data)
     {
-        var fair = MarketValue.FairWage(p, data.PositionProfiles);
-        var current = p.Contract?.WeeklyWage ?? (int)(fair * 0.7);
+        var fair = MarketValue.FairWage(p, world, data.PositionProfiles, buyer);
         var moving = p.ClubId != buyer.Id;
-        double demand = Math.Max(moving ? current * 1.1 : current * 1.05, fair);
+        double target = fair;
         var gap = p.Reputation - buyer.Reputation;
-        demand *= gap > 0 ? 1 + gap * 0.06 : 0.97;
-        demand *= status switch
+        target *= gap > 0 ? 1 + gap * 0.06 : 0.97;
+        target *= status switch
         {
             SquadStatus.Star => 1.25,
             SquadStatus.Regular => 1.1,
@@ -101,8 +104,12 @@ public static class Negotiations
             SquadStatus.Prospect => 0.8,
             _ => 1.0,
         };
-        if (p.Hidden.Ambition >= 15) demand *= 1.05;
-        demand *= ClubRules.DivisionFinance(world, buyer).WageLevel;
+        if (p.Hidden.Ambition >= 15) target *= 1.05;
+        var div = ClubRules.DivisionFinance(world, buyer);
+        target *= div.WageLevel;
+        var current = p.Contract?.WeeklyWage ?? 0;
+        // Mehr als die Spitzengehälter der Spielklasse kann der Verein nicht zahlen.
+        var demand = Math.Min(Math.Max(target, Math.Min(current * (moving ? 1.1 : 1.0), target * (moving ? 1.4 : 1.2))), div.MaxWeeklyWage);
         if (p.IsYouth || p.Age(world.Date) < 18) demand = Math.Min(demand, fair * 0.6);
         return (int)(Math.Round(demand / 100) * 100);
     }
@@ -145,6 +152,9 @@ public static class Negotiations
         var age = p.Age(world.Date);
         if (age < 18 && o.Years > 3) return new NegotiationResponse(ResponseKind.Counter, "neg.player.minorYears", 3);
         if (o.Years is < 1 or > 5) return new NegotiationResponse(ResponseKind.Counter, "neg.player.years", 0);
+        // Mehr als das Spitzengehalt der Spielklasse lässt das Gehaltsgefüge nicht zu.
+        var max = ClubRules.DivisionFinance(world, buyer).MaxWeeklyWage;
+        if (o.WeeklyWage > max) return new NegotiationResponse(ResponseKind.Counter, "neg.player.wageCap", max, max);
 
         var demand = (double)WageDemand(p, buyer, o.Status, world, data);
         var (minY, maxY) = PreferredYears(p, world.Date);

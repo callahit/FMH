@@ -181,7 +181,7 @@ public sealed partial class TransfersModule
                 buyer.PlayerIds.Remove(p.Id);
                 parent.PlayerIds.Add(p.Id);
                 p.ClubId = parent.Id;
-                ExecuteTransfer(p, buyer, parent, new ClubOffer { Fee = fee }, new ContractOffer { Years = 3, WeeklyWage = p.Contract?.WeeklyWage ?? MarketValue.FairWage(p, Data.PositionProfiles) });
+                ExecuteTransfer(p, buyer, parent, new ClubOffer { Fee = fee }, new ContractOffer { Years = 3, WeeklyWage = p.Contract?.WeeklyWage ?? MarketValue.FairWage(p, World, Data.PositionProfiles) });
             }
             else ReturnLoan(p);
         }

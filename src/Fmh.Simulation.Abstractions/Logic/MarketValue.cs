@@ -6,10 +6,12 @@ namespace Fmh.Core.Logic;
 /// <summary>Marktwert und Gehaltsniveau aus Stärke, Alter, Potenzial, Vertragslaufzeit und Reputation.</summary>
 public static class MarketValue
 {
-    public static long Of(Player p, DateOnly today, PositionProfiles profiles)
+    public static long Of(Player p, World world, PositionProfiles profiles)
     {
-        var rating = Ratings.PositionRating(p, p.MainPosition, profiles);
-        var value = 60_000 * Math.Pow(1.55, rating - 4);
+        var today = world.Date;
+        var rating = Ratings.PositionRating(p, p.MainPosition, profiles) - Shift(world, p.ClubId is { } cid ? world.Clubs[cid] : null);
+        // Profimarkt: rund 9 Mio. bei Stärke 12 (Stammspieler der 1. Liga), etwa Faktor 1,85 je Stärkepunkt.
+        var value = 9_000_000 * Math.Pow(1.85, rating - 12);
         var age = p.Age(today);
         var headroom = Math.Max(0, p.Hidden.PotentialAbility - p.Hidden.CurrentAbility);
         value *= age switch
@@ -33,18 +35,41 @@ public static class MarketValue
     public static long Round(double v) =>
         v >= 1_000_000 ? (long)(Math.Round(v / 50_000) * 50_000) : v >= 100_000 ? (long)(Math.Round(v / 10_000) * 10_000) : (long)(Math.Round(v / 1_000) * 1_000);
 
-    /// <summary>Marktübliches Wochengehalt für einen Spieler dieser Stärke.</summary>
-    public static int FairWage(Player p, PositionProfiles profiles)
+    /// <summary>
+    /// Wochengehalt des Profimarkts je Stärke: 9.000 bei Stärke 9,4 (Durchschnitt der 2. Liga, rund 470.000 im Jahr),
+    /// etwa Faktor 1,85 je Stärkepunkt. Untere Spielklassen zahlen anteilig (<c>wageLevel</c> der Division).
+    /// </summary>
+    public static double Wage(double level, World world, Club? club) => 9_000 * Math.Pow(1.85, level - Shift(world, club) - 9.4);
+
+    /// <summary>Marktübliches Wochengehalt für einen Spieler dieser Stärke im Umfeld eines Vereins (ohne Verein: sein eigener).</summary>
+    public static int FairWage(Player p, World world, PositionProfiles profiles, Club? club = null) =>
+        (int)(Math.Round(Wage(Ratings.PositionRating(p, p.MainPosition, profiles), world, club ?? (p.ClubId is { } c ? world.Clubs[c] : null)) / 100) * 100);
+
+    /// <summary>Spielklasse eines Vereins für das Marktniveau: Division der Liga bzw. der Pool.</summary>
+    public static string MarketKey(World world, Club club) => world.FindLeague(club.LeagueId)?.Format.Id ?? club.LeagueId;
+
+    /// <summary>Wie weit das Marktniveau der Spielklasse seit Spielstart gestiegen ist (0 ohne Messung, z. B. in älteren Spielständen).</summary>
+    public static double Shift(World world, Club? club) =>
+        club is not null && MarketKey(world, club) is var key && world.MarketLevels.TryGetValue(key, out var level)
+        && world.MarketBases.TryGetValue(key, out var b) ? level - b : 0;
+
+    /// <summary>Misst das Marktniveau aller Spielklassen (Ø Top-11 der Vereine); beim ersten Mal auch die Basis.</summary>
+    public static void UpdateMarketLevel(World world, PositionProfiles profiles)
     {
-        var rating = Ratings.PositionRating(p, p.MainPosition, profiles);
-        return (int)(Math.Round(60 * Math.Pow(1.55, rating) / 100) * 100);
+        foreach (var group in world.Clubs.Values.Where(c => c.ReserveOf is null).GroupBy(c => MarketKey(world, c)))
+        {
+            var level = group.Average(c => world.SquadOf(c).Select(p => Ratings.PositionRating(p, p.MainPosition, profiles))
+                .OrderDescending().Take(11).DefaultIfEmpty(0).Average());
+            world.MarketLevels[group.Key] = Math.Round(level, 4);
+            world.MarketBases.TryAdd(group.Key, world.MarketLevels[group.Key]);
+        }
     }
 }
 
 /// <summary>Vorstand: Budgets zum Saisonstart (bis zum Finanzmodul in Phase 3 aus der Reputation abgeleitet).</summary>
 public static class Budgets
 {
-    public static long StartingBalance(Club club) => MarketValue.Round(2_000_000 * Math.Pow(1.25, club.Reputation - 5));
+    public static long StartingBalance(Club club) => MarketValue.Round(1_500_000 * Math.Pow(1.35, club.Reputation - 5));
 
     /// <summary>
     /// Wöchentliche Gehaltssumme: eigener Kader (Leihspieler mit dem übernommenen Anteil) plus der Restanteil für
