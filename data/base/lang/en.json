@@ -720,6 +720,7 @@
  "neg.player.accept": "The player agrees and signs.",
  "neg.player.counter": "The player demands {0}.",
  "neg.player.final": "The player breaks off talks.",
+ "neg.player.wageCap": "The wage structure of this division allows at most {0}.",
  "neg.player.minorYears": "Players under 18 may sign for three years at most.",
  "neg.player.years": "The contract length must be between one and five years.",
  "refuse.competition": "The player sees too much competition for his position here.",

@@ -93,6 +93,7 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
                 p = PlayerGenerator.Create(World, Data, Rng, Season.NeededPosition(club), Math.Max(3, level), Rng.Next(19, 30), club.CountryCode);
                 p.ClubId = club.Id;
                 p.Contract!.Until = new DateOnly(World.SeasonYear + 1, 6, 30);
+                p.Contract.WeeklyWage = ClubRules.LeagueWage(World, club, p.Contract.WeeklyWage);
                 p.SeasonStats = new PlayerSeasonStats { SeasonYear = World.SeasonYear, ClubId = club.Id };
                 World.Players[p.Id] = p;
                 club.PlayerIds.Add(p.Id);

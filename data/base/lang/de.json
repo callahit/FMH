@@ -720,6 +720,7 @@
  "neg.player.accept": "Der Spieler ist einverstanden und unterschreibt.",
  "neg.player.counter": "Der Spieler verlangt {0}.",
  "neg.player.final": "Der Spieler bricht die Gespräche ab.",
+ "neg.player.wageCap": "Mehr als {0} lässt das Gehaltsgefüge dieser Spielklasse nicht zu.",
  "neg.player.minorYears": "Minderjährige Spieler dürfen höchstens drei Jahre unterschreiben.",
  "neg.player.years": "Die Laufzeit muss zwischen einem und fünf Jahren liegen.",
  "refuse.competition": "Der Spieler sieht bei uns zu viel Konkurrenz auf seiner Position.",

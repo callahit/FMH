@@ -204,8 +204,6 @@ public static class WorldGenerator
     public static void CreateSquad(World world, GameData data, Rng rng, Club club, string country, ReserveRules? reserve = null)
     {
         var level = PlayerGenerator.ClubLevel(club.Reputation);
-        var div = ClubRules.DivisionFinance(world, club);
-        var wageLevel = div.WageLevel;
         var older = 0;
         foreach (var (pos, count) in PlayerGenerator.SquadTemplate)
         {
@@ -217,8 +215,7 @@ public static class WorldGenerator
                 var playerLevel = level + (i == 0 ? 0.8 : -0.6) + rng.Normal(0, 1.1) + AgeLevelOffset(age);
                 var p = PlayerGenerator.Create(world, data, rng, pos, Math.Clamp(playerLevel, 3, 19), age, country);
                 p.ClubId = club.Id;
-                if (wageLevel != 1.0) p.Contract!.WeeklyWage = (int)(Math.Round(p.Contract.WeeklyWage * wageLevel / 100) * 100);
-                p.Contract!.WeeklyWage = Math.Min(p.Contract.WeeklyWage, div.MaxWeeklyWage);
+                p.Contract!.WeeklyWage = ClubRules.LeagueWage(world, club, p.Contract.WeeklyWage);
                 p.SeasonStats = new PlayerSeasonStats { SeasonYear = world.SeasonYear, ClubId = club.Id };
                 world.Players[p.Id] = p;
                 club.PlayerIds.Add(p.Id);

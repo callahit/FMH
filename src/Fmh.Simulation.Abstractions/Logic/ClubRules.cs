@@ -12,6 +12,13 @@ public static class ClubRules
     /// <summary>Wochengehalt des Cheftrainers: rund 1,9 Mio. im Jahr bei Reputation 15, 85.000 bei Reputation 3.</summary>
     public static int ManagerWage(Club club) => (int)(Math.Round(10_000 * Math.Pow(Scale(club), 1.5) / 100) * 100);
 
+    /// <summary>Gehalt des Profimarkts auf das Niveau der Spielklasse eines Vereins umgerechnet und auf ihr Spitzengehalt begrenzt.</summary>
+    public static int LeagueWage(World world, Club club, int marketWage)
+    {
+        var div = DivisionFinance(world, club);
+        return Math.Min(div.MaxWeeklyWage, (int)(Math.Round(marketWage * div.WageLevel / 100) * 100));
+    }
+
     /// <summary>Finanzrahmen der Spielklasse eines Vereins: Liga bzw. Staffel, sonst ihre Division, sonst Standardwerte.</summary>
     public static DivisionFinance DivisionFinance(World world, Club club) =>
         world.Country(club.CountryCode).Finance.Divisions is var all && (all.TryGetValue(club.LeagueId, out var d)

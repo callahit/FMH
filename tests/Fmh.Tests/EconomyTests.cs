@@ -48,6 +48,20 @@ public class EconomyTests
         Assert.True(high <= ClubRules.DivisionFinance(w, top).MaxWeeklyWage);
     }
 
+    /// <summary>Ein Vertragsangebot über dem Spitzengehalt der Spielklasse wird nicht angenommen, sondern auf die Grenze gekontert.</summary>
+    [Fact]
+    public void OffersAboveTheWageCapAreCountered()
+    {
+        var s = TestData.NewSession();
+        var w = s.World;
+        var club = w.Clubs[w.League("DE4N").ClubIds.First(id => w.Clubs[id].ReserveOf is null)];
+        var p = w.SquadOf(club).First();
+        var max = ClubRules.DivisionFinance(w, club).MaxWeeklyWage;
+        var n = new Negotiation { Contract = new ContractOffer { Years = 2, WeeklyWage = max * 3, Status = SquadStatus.Regular } };
+        var r = Negotiations.EvaluateContract(n, p, club, w, TestData.Data);
+        Assert.Equal((ResponseKind.Counter, "neg.player.wageCap", (long)max), (r.Kind, r.TextKey, r.Amount));
+    }
+
     /// <summary>Betriebskosten werden monatlich als Anteil der laufenden Einnahmen der Saison gebucht.</summary>
     [Fact]
     public void OperatingCostsFollowIncome()
