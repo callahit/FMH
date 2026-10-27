@@ -24,6 +24,8 @@
  "competition.DE4S": "Regionalliga Süd",
  "competition.DE-REL2": "Relegation 2./3. Liga",
  "competition.DE-AUF": "Aufstiegsspiele Regionalliga",
+ "competition.DE-AUF2": "Aufstiegsspiele Regionalliga",
+ "competition.DE-AUF3": "Aufstiegsspiele Regionalliga",
  "cup.scorePenalties": "{0} ({1} i. E.)",
  "cup.scoreExtraTime": "{0} n. V.",
  "msg.scoutSearch.line": "{0} · {1} ({2}, {3}) – {4}",

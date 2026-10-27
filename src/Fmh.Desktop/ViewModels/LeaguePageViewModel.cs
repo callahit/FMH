@@ -89,7 +89,7 @@ public sealed partial class LeaguePageViewModel : PageViewModel, IRefreshable
         if (IsCup) { RefreshCup(); return; }
         var world = Session.World;
         var league = world.League(League.Id);
-        var playoffs = world.Countries.SelectMany(c => c.Playoffs).ToList();
+        var playoffs = world.Countries.SelectMany(c => c.Playoffs).Where(p => p.AppliesTo(world.SeasonYear)).ToList();
         var rows = LeagueTable.Compute(league);
         var own = Session.HumanClub.Id;
         Table = rows.Select(r =>

@@ -86,7 +86,12 @@ public sealed class PlayoffConfig
     public int Places { get; set; } = 1;
     /// <summary>Übergangsregel, die nur in dieser Saison gilt.</summary>
     public int? OnlySeason { get; set; }
+    /// <summary>Rotation: Die Relegation findet nur alle <see cref="Cycle"/> Saisons statt, erstmals in <see cref="CycleStart"/>.</summary>
+    public int? Cycle { get; set; }
+    public int CycleStart { get; set; }
     public int Legs { get; set; } = 2;
+
+    public bool AppliesTo(int seasonYear) => (OnlySeason is null || OnlySeason == seasonYear) && SeasonCycle.InCycle(Cycle, CycleStart, seasonYear);
     public bool AwayGoals { get; set; }
     public List<string> Dates { get; set; } = new();
 }
