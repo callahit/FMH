@@ -101,7 +101,8 @@ public class AcademyLicenseTests
         // Ein KI-Verein ist überschuldet (kurz vor der Entscheidung, damit die Insolvenzregel nicht vorher greift).
         AdvanceTo(s, Spring(s, 4, 29));
         var broke = s.World.Clubs[league.ClubIds.First(id => id != club.Id)];
-        broke.Budget.Balance = -100_000_000;
+        // Lizenz-Eigenkapital (inklusive ausstehendem TV-Leistungsanteil) auf -100 Mio. setzen.
+        broke.Budget.Balance -= s.LicenseEquity(broke) + 100_000_000;
         AdvanceTo(s, Spring(s, 5, 1));
         Assert.Equal(LicenseStage.Decided, club.License.Stage);
         Assert.Equal(LicenseOutcome.Refused, broke.License.Outcome);

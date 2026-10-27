@@ -318,7 +318,15 @@
         "sponsorLevel": 0.98,
         "operatingCostShare": 0.55,
         "maxAnnualWage": 28700000,
-        "targetAnnualWage": 5700000
+        "targetAnnualWage": 5700000,
+        "reference": {
+          "source": "Deloitte Annual Review of Football Finance 2026, Saison 2024/25 (keine amtliche Ligazahl), £ zu 0,87 je Euro",
+          "official": false,
+          "income": {
+            "media": 195400000,
+            "total": 390800000
+          }
+        }
       },
       "ENG2": {
         "tvPool": 229900000,

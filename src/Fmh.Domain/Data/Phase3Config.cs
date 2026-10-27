@@ -11,6 +11,10 @@ public sealed class FinanceConfig
     public List<long> CupPrizes { get; set; } = new();
     public long CupWinnerPrize { get; set; }
     public long PlayoffPrize { get; set; }
+    /// <summary>Catering-Umsatz je Zuschauer und Heimspiel (DFL: Teil der sonstigen Erlöse).</summary>
+    public long CateringPerSpectator { get; set; } = 5;
+    /// <summary>Fanartikel-Umsatz je Zuschauer und Heimspiel, bevor Stimmung und Fanshop wirken.</summary>
+    public long MerchPerSpectator { get; set; } = 10;
     /// <summary>Kreditrahmen der Hausbank in Prozent der Saisoneinnahmen.</summary>
     public int CreditLimitPercent { get; set; } = 15;
     /// <summary>Bausumme, ab der der Vorstand zustimmen muss.</summary>
@@ -121,6 +125,51 @@ public sealed class DivisionFinance
 
     /// <summary>Kalibrierungsziel: durchschnittliches Jahresgehalt eines Kaderspielers (0 = ohne Ziel).</summary>
     public long TargetAnnualWage { get; set; }
+
+    /// <summary>
+    /// Jahresbudget des Nachwuchsleistungszentrums als Vielfaches des Länder-Referenzbudgets (skaliert nach Vereinsgröße);
+    /// 0 = bisherige Staffel nach Ligaebene.
+    /// </summary>
+    public double AcademyBudgetFactor { get; set; }
+
+    /// <summary>Veröffentlichte Ligazahlen je Verein als Kalibrierungsziel (null = keine).</summary>
+    public FinanceReference? Reference { get; set; }
+}
+
+/// <summary>
+/// Durchschnittliche Erträge und Aufwendungen eines Vereins der Spielklasse aus einem Ligabericht, ohne Transfers.
+/// Kategorien wie im DFL-Wirtschaftsreport; fehlende Kategorien werden nicht geprüft.
+/// </summary>
+public sealed class FinanceReference
+{
+    /// <summary>Quelle mit Saison, z. B. „DFL-Wirtschaftsreport 2025 (Saison 2023/24)“.</summary>
+    public string Source { get; set; } = "";
+    /// <summary>Amtliche Zahlen des Ligaverbands (true) oder Schätzung Dritter (false).</summary>
+    public bool Official { get; set; }
+    /// <summary>Erträge je Kategorie: matchday, advertising, media, merchandising, other und total.</summary>
+    public Dictionary<string, long> Income { get; set; } = new();
+    /// <summary>Aufwand je Kategorie: squad (Personal Spielbetrieb), operations (Verwaltung, Spielbetrieb, Sonstiges), youth und total.</summary>
+    public Dictionary<string, long> Expenses { get; set; } = new();
+
+    public static readonly string[] IncomeCategories = { "matchday", "advertising", "media", "merchandising", "other", "total" };
+    public static readonly string[] ExpenseCategories = { "squad", "operations", "youth", "total" };
+
+    /// <summary>
+    /// DFL-Kategorie einer Buchungsart (Catering zählt wie im Wirtschaftsreport zu den sonstigen Erlösen);
+    /// null für Transfers, Kredite, Bau, Zinsen, Strafen und Ereignisse, die der Vergleich auslässt.
+    /// </summary>
+    public static string? Category(TransactionType type) => type switch
+    {
+        TransactionType.Tickets or TransactionType.SeasonTickets => "matchday",
+        TransactionType.Sponsorship => "advertising",
+        TransactionType.Tv or TransactionType.European => "media",
+        TransactionType.Merchandise => "merchandising",
+        TransactionType.Catering or TransactionType.BuildingIncome or TransactionType.PrizeMoney => "other",
+        TransactionType.Wages or TransactionType.StaffWages or TransactionType.Bonuses => "squad",
+        TransactionType.Operations or TransactionType.Upkeep or TransactionType.Travel or TransactionType.TrainingCamp => "operations",
+        TransactionType.Youth => "youth",
+        _ => null,
+    };
 }
 
 public sealed class BuildingRequirement

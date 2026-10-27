@@ -114,6 +114,12 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
             club.Board.Goal = Board.ExpectedGoal(club);
             Finance.SetSeasonBudget(club);
             Board.UpdateFavourites(club);
+            // KI-Vereine übernehmen nach Auf- oder Abstieg die üblichen Eintrittspreise ihrer Spielklasse.
+            if (!IsHuman(club) && Finance.HasFinances(club))
+            {
+                var div = Finance.DivisionFinance(club);
+                (club.Finance.Prices.Standing, club.Finance.Prices.Seating, club.Finance.Prices.Box) = (div.Standing, div.Seating, div.Box);
+            }
             if (!IsHuman(club)) club.Tactic.FormationId = AiTactics.BestFormation(club, World, Data).Id;
             LineupSelector.Repair(club, World, Data, BenchSize(club));
         }

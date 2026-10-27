@@ -80,6 +80,9 @@ public class GermanyTests
         var risen = pool.Where(id => w.Clubs[id].LeagueId != "DE-AMA").ToList();
         Assert.Equal(bottom.Count, risen.Count);
         Assert.All(risen, id => Assert.StartsWith("DE4", w.Clubs[id].LeagueId));
+        // KI-Vereine übernehmen nach Auf- und Abstieg die Eintrittspreise ihrer neuen Spielklasse.
+        foreach (var c in w.Clubs.Values.Where(c => c.Id != s.HumanClub.Id && s.DivisionFinance(c).TvPool > 0))
+            Assert.Equal(s.DivisionFinance(c).Seating, c.Finance.Prices.Seating);
     }
 
     /// <summary>

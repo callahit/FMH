@@ -13,6 +13,8 @@ public interface IFinanceService
     bool HasFinances(Club club);
     /// <summary>Eigenkapital: Kontostand plus Festgeld minus Restschuld der Kredite.</summary>
     long Equity(Club club);
+    /// <summary>Eigenkapital plus noch ausstehender TV-Leistungsanteil nach aktuellem Tabellenplatz (Lizenzprüfung vor Saisonende).</summary>
+    long LicenseEquity(Club club);
     /// <summary>Saisoneinnahmen (letzte Saison, sonst geschätzt) als Basis für Kreditrahmen und Budgets.</summary>
     long ExpectedIncome(Club club);
     /// <summary>Kreditrahmen der Hausbank: so weit darf das Konto ins Minus.</summary>

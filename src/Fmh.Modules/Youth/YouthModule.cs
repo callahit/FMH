@@ -47,7 +47,8 @@ public sealed partial class YouthModule : GameModule, IYouthService
     public long ReferenceAcademyBudget(Club club)
     {
         var level = World.FindLeague(club.LeagueId)?.Level ?? 3;
-        var factor = level switch { 1 => 1.2, 2 => 0.8, _ => 0.25 };
+        var configured = Finance.HasFinances(club) ? Finance.DivisionFinance(club).AcademyBudgetFactor : 0;
+        var factor = configured > 0 ? configured : level switch { 1 => 1.2, 2 => 0.8, _ => 0.25 };
         return MarketValue.Round(World.Country(club.CountryCode).Youth.ReferenceBudget * ClubRules.Scale(club) * factor);
     }
 

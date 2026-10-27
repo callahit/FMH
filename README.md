@@ -249,19 +249,51 @@ im Monat, Spitze bis 6.500 €).
   Verein gemessen. Gehälter und Marktwerte richten sich nach dem Abstand dazu, damit stärker werdende Kader
   das Gehaltsgefüge nicht aufblähen (Spielstand: `market_levels`/`market_bases` in `meta`).
 - **Daten je Spielklasse** (`finance.divisions`): TV-Topf, Eintrittspreise, `wageLevel`, `maxAnnualWage`,
-  `sponsorLevel`, `operatingCostShare` und `targetAnnualWage` als Kalibrierungsziel.
+  `sponsorLevel`, `operatingCostShare`, `academyBudgetFactor` und `targetAnnualWage` als Kalibrierungsziel. Je Land
+  gelten `cateringPerSpectator` und `merchPerSpectator`. KI-Vereine übernehmen nach Auf- und Abstieg die
+  Eintrittspreise ihrer neuen Spielklasse.
+- **Ligazahlen** (`finance.divisions.*.reference`): Erträge und Aufwand je Verein ohne Transfers, in den Kategorien
+  des DFL-Wirtschaftsreports, jeweils mit Quelle und Kennzeichen „amtlich“. Für 1. und 2. Liga stammen die Werte
+  aus dem DFL-Wirtschaftsreport 24/25, für die 3. Liga aus dem DFB-Saisonreport 2023/24 (nur Summe Erträge und
+  Personal). Für die Premier Division gibt es keinen amtlichen Ligabericht. Hier dienen die Zahlen aus Deloittes
+  [Annual Review of Football Finance 2026](https://www.deloitte.com/uk/en/services/consulting/research/annual-review-of-football-finance-premier-league-clubs.html)
+  als Ziel (2024/25: 6,8 Mrd. £ Umsatz, davon 3,4 Mrd. £ TV; umgerechnet zu 0,87 £ je Euro), ausdrücklich als nicht
+  amtlich gekennzeichnet. Für Championship und tiefere englische Ligen fehlen aktuelle Zahlen, dort gibt es kein Ziel.
+  Zuordnung der Buchungen: Spielertrag = Tickets und Dauerkarten; Werbung = Sponsoren; mediale Verwertung = TV und
+  Europapokal; Merchandising = Fanartikel; Sonstiges = Catering, Mitglieder, Gelände und Prämien; Personal
+  Spielbetrieb = Gehälter, Prämien und Trainerstab; Verwaltung, Spielbetrieb und Sonstiges = Betriebskosten,
+  Instandhaltung und Reisen; Nachwuchs = Budget des Leistungszentrums (bei der DFL inklusive Amateure und Frauen).
+- **Lizenz und TV-Geld:** Der Leistungsanteil der TV-Gelder fließt erst zum Saisonende. Bei der Lizenzprüfung im
+  Frühjahr zählt er nach dem aktuellen Tabellenplatz als Forderung zum Eigenkapital. Vorher bekam ein Spitzenclub
+  mitten in der Saison wegen dieser Lücke Punktabzug oder keine Lizenz.
 - **Kalibrierung:** `fmh-calibrate --season --seasons 5 --strict` prüft je Spielklasse, dass das Ø-Jahresgehalt
   im Korridor ±30 % um das Ziel liegt; erlaubt ist eine Lohnentwicklung von 4 % je Saison (real etwa 4 % im
-  Jahr laut DFL 2019/20–2024/25).
+  Jahr laut DFL 2019/20–2024/25). Außerdem müssen die Ligazahlen der letzten Saison passen: Summen ±25 %,
+  einzelne Kategorien ±40 %.
 
 Die Finanzsimulation über fünf Saisons ergibt folgende Werte je Verein:
 
 | Liga | Ø Jahresgehalt (Ziel) | Kadergehälter | Einnahmen | Saldo pro Saison |
 |---|---|---|---|---|
-| 1. Liga | 2,9–3,6 Mio. (2,9 Mio.) | 69–81 Mio. | 200–250 Mio. | +28 bis +38 Mio. |
-| 2. Liga | 420–550 Tsd. (420 Tsd.) | 10–12 Mio. | 37–45 Mio. | +4 bis +8 Mio. |
-| 3. Liga | 150–180 Tsd. (165 Tsd.) | 3,8–4 Mio. | 9–10 Mio. | ±0 bis +1,8 Mio. |
-| Regionalliga | 26–34 Tsd. (25 Tsd.) | 0,6–0,8 Mio. | 2,5–3,9 Mio. | ±0 bis +0,4 Mio. |
+| 1. Liga | 2,9–3,5 Mio. (2,9 Mio.) | 73–80 Mio. | 220–251 Mio. | +20 bis +43 Mio. |
+| 2. Liga | 480–610 Tsd. (480 Tsd.) | 11–14 Mio. | 54–59 Mio. | −2 bis +3 Mio. |
+| 3. Liga | 150–192 Tsd. (165 Tsd.) | 3,8–4,4 Mio. | 13–15 Mio. | ±0 bis +2 Mio. |
+| Regionalliga | 25–35 Tsd. (25 Tsd.) | 0,6–0,8 Mio. | 2,8–3,2 Mio. | ±0 bis +0,6 Mio. |
+
+Im Vergleich mit dem DFL-Bericht (letzte Saison des Laufs, Spiel/Bericht in Mio. € je Klub):
+
+| Kategorie | 1. Liga | 2. Liga |
+|---|---|---|
+| Spielertrag | 28/33 | 13/15 |
+| Werbung | 68/64 | 13/12 |
+| Mediale Verwertung | 97/95 | 16/16 |
+| Merchandising | 19/16 | 7/5 |
+| Sonstiges | 22/29 | 8/10 |
+| Erträge gesamt | 234/236 | 56/58 |
+| Personal Spielbetrieb | 82/96 | 15/17 |
+| Verwaltung, Spielbetrieb, Sonstiges | 115/108 | 38/39 |
+| Nachwuchs | 17/14 | 4/4 |
+| Aufwand gesamt | 213/217 | 57/59 |
 
 Darin sind die Budgets der Nachwuchsleistungszentren und die Europapokalprämien bereits enthalten.
 Absteiger geraten mit ihren Gehältern ins Minus. Es gibt keine Kettenpleiten. In der 2. Liga bekommen
@@ -518,8 +550,10 @@ Klub rund 315 Mio. £ Umsatz, rund 4 Mrd. £ Lohnkosten insgesamt), umgerechnet 
   der Meisterrunde) folgen, wenn ein Land sie braucht.
 - **Deutschland:** Pokalplätze für Amateure gehen nach Ruf statt über Landespokale. Die fiktiven Ortsnamen sind
   zusammengesetzt; Übereinstimmungen mit kleinen realen Orten sind möglich, bekannte Vereinsorte sind ausgeschlossen.
-- **Wirtschaft:** Die 1. Liga erwirtschaftet im Schnitt rund +30 Mio. je Saison (real etwa +15 Mio.), weil die
-  KI Überschüsse nur teilweise ausgibt. Bauprojekte, Prämien des Vorstands und Strafen sind noch nicht an die
+- **Wirtschaft:** Die 1. Liga erwirtschaftet im Schnitt +20 bis +43 Mio. je Saison (laut DFL ohne Transfers etwa
+  +19 Mio.), weil die KI Überschüsse nur teilweise ausgibt. Der Personalaufwand liegt rund 15 % unter dem
+  DFL-Wert, weil Kader im Spiel kleiner sind als real. Die Stadien der fiktiven Vereine wurden auf reale
+  Größenordnungen gebracht (2. Liga Ø rund 30.000 Plätze). Bauprojekte, Prämien des Vorstands und Strafen sind noch nicht an die
   neuen Größenordnungen angepasst. Ältere Spielstände behalten ihre gespeicherte Länderkonfiguration (ohne
   Betriebskosten, Sponsorenniveau 1,0) und ihre Gehälter, rechnen aber Sponsoren, Marktwerte und neue Verträge
   nach den neuen Formeln und werden dadurch reicher; eine Migration der Länderdaten im Spielstand ist offen.
