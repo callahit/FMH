@@ -67,33 +67,49 @@ public sealed partial class CupsModule : GameModule, ICupsService
         DrawRound(cup, cup.Rounds[round.Number], winners);
     }
 
+    private IEnumerable<PlayoffConfig> ActivePlayoffs(CountryConfig country) =>
+        country.Playoffs.Where(p => p.OnlySeason is null || p.OnlySeason == World.SeasonYear);
+
+    /// <summary>Teilnehmer einer Relegation, sobald alle beteiligten Ligen fertig sind; bei geteilten Ligen aus jeder Staffel.</summary>
+    private List<int>? Entrants(PlayoffConfig cfg)
+    {
+        var result = new List<int>();
+        foreach (var e in cfg.Entrants)
+        {
+            var leagues = Pyramid.Matching(World, e.Division).ToList();
+            if (leagues.Count == 0 || leagues.Any(l => !l.IsComplete)) return null;
+            foreach (var l in leagues)
+                if (LeagueTable.Compute(l).FirstOrDefault(r => r.Position == e.Position) is { } row) result.Add(row.ClubId);
+        }
+        return result.Count >= 2 ? result : null;
+    }
+
     /// <summary>Tägliche Prüfung: Relegation ansetzen, Saisonende erkennen. true = alle Wettbewerbe beendet.</summary>
     public bool CompetitionsDaily()
     {
         foreach (var country in World.Countries)
         {
-            foreach (var cfg in country.Playoffs)
+            foreach (var cfg in ActivePlayoffs(country))
             {
                 if (World.Cups.Any(c => c.Id == cfg.Id)) continue;
-                var upper = World.FindLeague(cfg.UpperDivision);
-                var lower = World.FindLeague(cfg.LowerDivision);
-                if (upper is null || lower is null || !upper.IsComplete || !lower.IsComplete) continue;
-                var u = LeagueTable.Compute(upper).First(r => r.Position == cfg.UpperPosition).ClubId;
-                var l = LeagueTable.Compute(lower).First(r => r.Position == cfg.LowerPosition).ClubId;
-                var cup = CupLogic.CreatePlayoff(World, country, cfg, u, l);
+                if (Entrants(cfg) is not { } entrants) continue;
+                var cup = entrants.Count == 2
+                    ? CupLogic.CreatePlayoff(World, country, cfg, entrants[0], entrants[1])
+                    : CupLogic.CreatePlayoffTournament(World, country, cfg, entrants, Rng);
                 // Termine liegen nach dem letzten Spieltag; falls nötig nach hinten schieben.
                 var earliest = World.Date.AddDays(3);
                 foreach (var fx in cup.Fixtures.Where(fx => fx.Date < earliest)) fx.Date = earliest.AddDays(4 * (fx.Leg - 1));
                 World.Cups.Add(cup);
-                Finance.CupPrize(cup, 1, new[] { u, l });
-                if (u == HumanClub.Id || l == HumanClub.Id)
+                Finance.CupPrize(cup, 1, entrants);
+                if (cup.Rounds[0].Ties.FirstOrDefault(t => t.HomeId == HumanClub.Id || t.AwayId == HumanClub.Id) is { } own && own.HomeId != own.AwayId)
                 {
-                    var opp = World.Clubs[u == HumanClub.Id ? l : u];
-                    Notify(MessageType.Cup, "msg.sender.league", TR("msg.playoff.subject", Comp(cfg.Id)), TR("msg.playoff.body", opp.Name, TextArg.OfDate(cup.Fixtures[0].Date)));
+                    var opp = World.Clubs[own.HomeId == HumanClub.Id ? own.AwayId : own.HomeId];
+                    var first = cup.Fixtures.First(fx => fx.TieId == own.Id);
+                    Notify(MessageType.Cup, "msg.sender.league", TR("msg.playoff.subject", Comp(cfg.Id)), TR("msg.playoff.body", opp.Name, TextArg.OfDate(first.Date)));
                 }
             }
         }
-        var playoffsPending = World.Countries.SelectMany(c => c.Playoffs).Any(p => World.Cups.FirstOrDefault(c => c.Id == p.Id) is not { IsFinished: true });
+        var playoffsPending = World.Countries.SelectMany(ActivePlayoffs).Any(p => World.Cups.FirstOrDefault(c => c.Id == p.Id) is not { IsFinished: true });
         return World.Leagues.All(l => l.IsComplete) && !playoffsPending && World.Cups.All(c => c.IsFinished);
     }
 }

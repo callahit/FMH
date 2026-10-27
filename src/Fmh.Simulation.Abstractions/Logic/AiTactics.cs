@@ -7,11 +7,11 @@ namespace Fmh.Core.Logic;
 public static class AiTactics
 {
     public static Formation BestFormation(Club club, World world, GameData data) =>
-        BestFormation(club, world, data, new SlotScores(data.PositionProfiles));
+        BestFormation(club, world, data, new SlotScores(data.PositionProfiles), null);
 
-    private static Formation BestFormation(Club club, World world, GameData data, SlotScores scores)
+    private static Formation BestFormation(Club club, World world, GameData data, SlotScores scores, Func<Player, bool>? eligible)
     {
-        var available = world.SquadOf(club).Where(p => p.IsAvailable).ToList();
+        var available = world.SquadOf(club).Where(p => p.IsAvailable && (eligible is null || eligible(p))).ToList();
         Formation? best = null;
         var bestScore = double.MinValue;
         foreach (var f in data.Formations)
@@ -32,9 +32,10 @@ public static class AiTactics
     public static void Prepare(Club club, Club opponent, bool home, World world, GameData data, int benchSize)
     {
         var scores = new SlotScores(data.PositionProfiles);
-        var formation = BestFormation(club, world, data, scores);
+        var eligible = ReserveEligibility(club, world, data);
+        var formation = BestFormation(club, world, data, scores, eligible);
         club.Tactic.FormationId = formation.Id;
-        LineupSelector.PickBest(club, world, data, benchSize, scores);
+        LineupSelector.PickBest(club, world, data, benchSize, scores, eligible);
 
         var own = TeamStrength(club, world, data);
         var opp = TeamStrength(opponent, world, data);
@@ -50,6 +51,22 @@ public static class AiTactics
         ins.Pressing = Avg(Attr.WorkRate) + Avg(Attr.Stamina) >= 25 ? PressingHeight.High : diff < -1 ? PressingHeight.Low : PressingHeight.Mid;
         ins.Line = ins.Pressing == PressingHeight.High ? DefensiveLine.High : ins.Pressing == PressingHeight.Low ? DefensiveLine.Deep : DefensiveLine.Normal;
         ins.Tempo = diff > 1 ? Tempo.High : Tempo.Normal;
+    }
+
+    /// <summary>
+    /// Spielrecht zweiter Mannschaften: Spieler bis zur Altersgrenze (Alter am Saisonstart) und die besten
+    /// Älteren bis zur erlaubten Zahl. Null für erste Mannschaften.
+    /// </summary>
+    public static Func<Player, bool>? ReserveEligibility(Club club, World world, GameData data)
+    {
+        if (club.ReserveOf is null) return null;
+        var country = world.Country(club.CountryCode);
+        var rules = country.Reserves;
+        var start = new DateOnly(world.SeasonYear, country.Season.StartMonth, 1);
+        var older = world.SquadOf(club).Where(p => p.IsAvailable && p.Age(start) > rules.AgeLimit)
+            .OrderByDescending(p => Ratings.PositionRating(p, p.MainPosition, data.PositionProfiles)).ThenBy(p => p.Id)
+            .Take(rules.OverAgePlayers).Select(p => p.Id).ToHashSet();
+        return p => p.Age(start) <= rules.AgeLimit || older.Contains(p.Id);
     }
 
     public static double TeamStrength(Club club, World world, GameData data)
