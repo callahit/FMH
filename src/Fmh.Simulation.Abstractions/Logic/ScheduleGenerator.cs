@@ -46,15 +46,18 @@ public static class ScheduleGenerator
     }
 
     /// <summary>Termine der Spieltage: wöchentlich am konfigurierten Spieltag, ohne Winterpause.</summary>
-    public static List<DateOnly> MatchdayDates(SeasonConfig cfg, int seasonYear, int count)
+    public static List<DateOnly> MatchdayDates(SeasonConfig cfg, int seasonYear, int count) =>
+        WeeklyDates(cfg, seasonYear, ParseDate(cfg.FirstMatchday, seasonYear, cfg.StartMonth), count);
+
+    /// <summary>Wöchentliche Termine ab <paramref name="from"/> am Spieltag des Landes; Wochen der Winterpause entfallen.</summary>
+    public static List<DateOnly> WeeklyDates(SeasonConfig cfg, int seasonYear, DateOnly from, int count)
     {
-        var first = ParseDate(cfg.FirstMatchday, seasonYear, cfg.StartMonth);
-        while (first.DayOfWeek != cfg.MatchDay) first = first.AddDays(1);
+        var d = from;
+        while (d.DayOfWeek != cfg.MatchDay) d = d.AddDays(1);
         var breakStart = ParseDate(cfg.WinterBreakStart, seasonYear, cfg.StartMonth);
         var breakEnd = ParseDate(cfg.WinterBreakEnd, seasonYear, cfg.StartMonth);
 
         var dates = new List<DateOnly>();
-        var d = first;
         while (dates.Count < count)
         {
             if (breakStart < breakEnd && d >= breakStart && d <= breakEnd)
