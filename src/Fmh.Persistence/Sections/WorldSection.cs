@@ -11,19 +11,33 @@ public sealed class WorldSection : SaveSection
 {
     public override string ModuleId => "world";
 
-    /// <summary>Version 6: Mannschaften (Tabelle teams), Verein und Mannschaft getrennt.</summary>
-    public override int Version => 6;
+    /// <summary>Version 6: Mannschaften (Tabelle teams). Version 7: zweite Mannschaften und Regionen (Ligapyramiden, AP 3).</summary>
+    public override int Version => 7;
 
     private const string TeamsTable = """
         CREATE TABLE teams (id INTEGER PRIMARY KEY, club_id INTEGER NOT NULL, world_id TEXT NOT NULL, ord INTEGER NOT NULL, data TEXT);
         """;
 
-    /// <summary>5 → 6: jeder Verein bekommt seine erste Mannschaft (Männer) mit der Kennung des Vereins.</summary>
+    private const string ClubColumnsV7 = """
+        ALTER TABLE clubs ADD COLUMN reserve_of INTEGER;
+        ALTER TABLE clubs ADD COLUMN region TEXT;
+        ALTER TABLE clubs ADD COLUMN latitude REAL;
+        ALTER TABLE clubs ADD COLUMN longitude REAL;
+        """;
+
+    /// <summary>
+    /// 5 → 6: jeder Verein bekommt seine erste Mannschaft (Männer) mit der Kennung des Vereins.
+    /// 6 → 7: Spalten für zweite Mannschaften, Region und Koordinaten.
+    /// </summary>
     public override void Migrate(SqliteConnection c, SqliteTransaction tx, int fromVersion)
     {
-        if (fromVersion != BaseVersion) base.Migrate(c, tx, fromVersion);
-        Exec(c, tx, TeamsTable);
-        Exec(c, tx, "INSERT INTO teams (id, club_id, world_id, ord, data) SELECT id, id, 'men', 0, NULL FROM clubs");
+        if (fromVersion < BaseVersion || fromVersion > Version) base.Migrate(c, tx, fromVersion);
+        if (fromVersion <= 5)
+        {
+            Exec(c, tx, TeamsTable);
+            Exec(c, tx, "INSERT INTO teams (id, club_id, world_id, ord, data) SELECT id, id, 'men', 0, NULL FROM clubs");
+        }
+        if (fromVersion <= 6) Exec(c, tx, ClubColumnsV7);
     }
 
     protected override string Schema => """
@@ -39,7 +53,8 @@ public sealed class WorldSection : SaveSection
             youth_recruitment INTEGER NOT NULL DEFAULT 10, saved_tactics TEXT NOT NULL DEFAULT '[]', familiarity TEXT NOT NULL DEFAULT '{}',
             training TEXT, camp TEXT, youth_ids TEXT NOT NULL DEFAULT '[]', shortlist TEXT NOT NULL DEFAULT '[]',
             player_ids TEXT NOT NULL DEFAULT '[]', finance TEXT, stadium_data TEXT, grounds TEXT, sponsors TEXT NOT NULL DEFAULT '[]',
-            sponsor_offers TEXT NOT NULL DEFAULT '[]', board TEXT, fans TEXT, rivals TEXT NOT NULL DEFAULT '[]', academy TEXT, license TEXT);
+            sponsor_offers TEXT NOT NULL DEFAULT '[]', board TEXT, fans TEXT, rivals TEXT NOT NULL DEFAULT '[]', academy TEXT, license TEXT,
+            reserve_of INTEGER, region TEXT, latitude REAL, longitude REAL);
         CREATE TABLE leagues (id TEXT PRIMARY KEY, ord INTEGER NOT NULL, name TEXT NOT NULL, country TEXT NOT NULL,
             level INTEGER NOT NULL, format TEXT NOT NULL, deductions TEXT NOT NULL DEFAULT '{}');
         CREATE TABLE league_clubs (league_id TEXT NOT NULL, club_id INTEGER NOT NULL, ord INTEGER NOT NULL);
@@ -62,14 +77,14 @@ public sealed class WorldSection : SaveSection
         using (var cmd = Insert(con, tx, "managers", 7))
             foreach (var m in w.Managers) Run(cmd, m.Id, m.Name, m.Human, m.ClubId, m.Reputation, JsonSerializer.Serialize(m.Profile, Json.Compact), J(m.Career));
 
-        using (var cmd = Insert(con, tx, "clubs", 37))
+        using (var cmd = Insert(con, tx, "clubs", 41))
             foreach (var c in w.Clubs.Values)
                 Run(cmd, c.Id, c.Key, c.Name, c.ShortName, c.City, c.CountryCode, c.Reputation, c.PrimaryColor, c.SecondaryColor,
                     c.StadiumName, c.StadiumCapacity, c.LeagueId, c.ManagerId, J(c.Tactic),
                     c.Budget.Balance, c.Budget.TransferBudget, c.Budget.WageBudget, c.CoachQuality, c.YouthFacilities, c.YouthRecruitment,
                     J(c.SavedTactics), J(c.Familiarity), J(c.Training), c.Camp is null ? null : J(c.Camp), J(c.YouthIds), J(c.Shortlist), J(c.PlayerIds),
                     J(c.Finance), J(c.Stadium), J(c.Grounds), J(c.Sponsors), J(c.SponsorOffers), J(c.Board), J(c.Fans), J(c.Rivals),
-                    J(c.Academy), J(c.License));
+                    J(c.Academy), J(c.License), c.ReserveOf, c.Region, c.Latitude, c.Longitude);
 
         // Die erste Mannschaft steht in den Vereinsspalten, weitere Mannschaften vollständig als JSON.
         using (var cmd = Insert(con, tx, "teams", 5))
@@ -104,7 +119,7 @@ public sealed class WorldSection : SaveSection
     public override void Load(SqliteConnection con, World w)
     {
         foreach (var r in Rows(con, "SELECT config FROM countries ORDER BY code"))
-            w.Countries.Add(JsonSerializer.Deserialize<CountryConfig>(r.GetString(0), Json.Compact)!);
+            w.Countries.Add(JsonSerializer.Deserialize<CountryConfig>(r.GetString(0), Json.Compact)!.Normalize());
 
         foreach (var r in Rows(con, "SELECT id, name, strictness FROM referees ORDER BY id"))
             w.Referees.Add(new Referee { Id = r.GetInt32(0), Name = r.GetString(1), Strictness = r.GetInt32(2) });
@@ -137,7 +152,7 @@ public sealed class WorldSection : SaveSection
             w.Leagues.Add(new League
             {
                 Id = r.GetString(0), Name = r.GetString(1), CountryCode = r.GetString(2), Level = r.GetInt32(3),
-                Format = JsonSerializer.Deserialize<DivisionConfig>(r.GetString(4), Json.Compact)!,
+                Format = JsonSerializer.Deserialize<DivisionConfig>(r.GetString(4), Json.Compact)!.Normalize(),
                 Deductions = PJ<Dictionary<int, int>>(r.GetString(5)) ?? new(),
             });
         var leagues = w.Leagues.ToDictionary(l => l.Id);
@@ -187,5 +202,7 @@ public sealed class WorldSection : SaveSection
         Rivals = Opt<List<int>>(r, 34) ?? new(),
         Academy = Opt<YouthAcademy>(r, 35) ?? new(),
         License = Opt<LicenseFile>(r, 36) ?? new(),
+        ReserveOf = NInt(r, 37), Region = NStr(r, 38),
+        Latitude = r.IsDBNull(39) ? null : r.GetDouble(39), Longitude = r.IsDBNull(40) ? null : r.GetDouble(40),
     };
 }
