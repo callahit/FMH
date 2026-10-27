@@ -494,8 +494,9 @@ Mannschaften liegt unter `tests/Fmh.Tests/Packages/testland` (nur für Tests).
   zusammengesetzt; Übereinstimmungen mit kleinen realen Orten sind möglich, bekannte Vereinsorte sind ausgeschlossen.
 - **Wirtschaft:** Die 1. Liga erwirtschaftet im Schnitt rund +30 Mio. je Saison (real etwa +15 Mio.), weil die
   KI Überschüsse nur teilweise ausgibt. Bauprojekte, Prämien des Vorstands und Strafen sind noch nicht an die
-  neuen Größenordnungen angepasst. Ältere Spielstände behalten ihre Gehälter und bekommen ab dem nächsten
-  Monat die neuen Einnahmen und Betriebskosten.
+  neuen Größenordnungen angepasst. Ältere Spielstände behalten ihre gespeicherte Länderkonfiguration (ohne
+  Betriebskosten, Sponsorenniveau 1,0) und ihre Gehälter, rechnen aber Sponsoren, Marktwerte und neue Verträge
+  nach den neuen Formeln und werden dadurch reicher; eine Migration der Länderdaten im Spielstand ist offen.
 - **Karten in unteren Ligen:** Über alle vier Ebenen zeigt die Engine 3,2 Gelbe und 0,13 Rote Karten je Spiel
   (Ziel 3,8 bzw. 0,2), weil schwächere Spieler seltener in Zweikämpfe kommen. Die Kalibrierung prüft deshalb
   Ebene 1–2 (`--max-level`); ob untere Ligen eigene Zielwerte bekommen, ist offen.
