@@ -94,7 +94,7 @@ public sealed partial class LeaguePageViewModel : PageViewModel, IRefreshable
         var own = Session.HumanClub.Id;
         Table = rows.Select(r =>
         {
-            var direct = Pyramid.DirectZone(league.Format, r.Position, world.SeasonYear);
+            var direct = Pyramid.DirectZone(league, r.Position, world.SeasonYear);
             var zone = direct == MovementDirection.Up || (league.Level == 1 && r.Position == 1) ? P.Good
                 : direct == MovementDirection.Down ? P.Bad
                 : playoffs.Any(po => po.Entrants.Any(e => (e.Division == league.Id || e.Division == league.Format.Id) && e.Position == r.Position)) ? P.Warn

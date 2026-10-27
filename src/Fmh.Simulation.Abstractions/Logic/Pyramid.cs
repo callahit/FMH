@@ -29,8 +29,8 @@ public static partial class Pyramid
         world.Leagues.Where(l => l.Id == divisionOrLeague || l.Format.Id == divisionOrLeague);
 
     /// <summary>Direkte Auf- oder Abstiegszone eines Tabellenplatzes (für Anzeige und Saisonbilanz).</summary>
-    public static MovementDirection? DirectZone(DivisionConfig div, int position, int seasonYear) =>
-        div.Movements.Where(m => m.Kind == MovementKind.Direct && m.AppliesTo(seasonYear))
+    public static MovementDirection? DirectZone(League league, int position, int seasonYear) =>
+        league.Format.MovementsOf(league.Id).Where(m => m.Kind == MovementKind.Direct && m.AppliesTo(seasonYear))
             .FirstOrDefault(m => m.PositionList().Contains(position))?.To;
 
     /// <summary>Plant und vollzieht Auf- und Abstieg eines Landes zum Saisonwechsel.</summary>
@@ -41,8 +41,10 @@ public static partial class Pyramid
         var tables = levels.SelectMany(l => l).ToDictionary(l => l.Id, l => LeagueTable.Compute(l).Select(r => r.ClubId).ToList());
         // Zwei Durchgänge: Erst stehen die Ebenen der ersten Mannschaften fest, dann gelten die Regeln für zweite Mannschaften.
         var plan = Plan(world, country, levels, tables, null);
-        plan = Plan(world, country, levels, tables, NewLevels(world, levels, plan));
-        Apply(world, country, levels, plan, rng, onRelegated);
+        var newLevels = NewLevels(world, levels, plan);
+        plan = Plan(world, country, levels, tables, newLevels);
+        var pool = PoolExchange(world, country, levels[^1], tables, rng, newLevels);
+        Apply(world, country, levels, plan, pool, rng, onRelegated);
     }
 
     private static Dictionary<int, int> NewLevels(World world, List<List<League>> levels, List<Exchange> plan)
@@ -114,7 +116,7 @@ public static partial class Pyramid
     }
 
     private static List<int> Rules(League league, MovementDirection to, int year) =>
-        league.Format.Movements.Where(m => m.Kind == MovementKind.Direct && m.To == to && m.AppliesTo(year))
+        league.Format.MovementsOf(league.Id).Where(m => m.Kind == MovementKind.Direct && m.To == to && m.AppliesTo(year))
             .SelectMany(m => m.PositionList()).Distinct().Order().ToList();
 
     /// <summary>Relegation: Sieger aus der unteren Ebene steigen auf, unterlegene Teilnehmer der oberen ab.</summary>

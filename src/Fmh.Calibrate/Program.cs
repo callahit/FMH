@@ -55,7 +55,9 @@ public static class Program
                 opts.Get("max-drift") is { } d ? double.Parse(d, CultureInfo.InvariantCulture) : null);
 
         var matches = int.Parse(opts.Get("matches") ?? "10000", CultureInfo.InvariantCulture);
-        return RunMatches(data, seed, matches, opts.Has("strict"), opts.Get("max-ms") is { } ms ? double.Parse(ms, CultureInfo.InvariantCulture) : null);
+        // Toleranzen gelten für den Profibereich; untere Ebenen lassen sich mit --max-level einbeziehen.
+        var maxLevel = int.Parse(opts.Get("max-level") ?? "2", CultureInfo.InvariantCulture);
+        return RunMatches(data, seed, matches, maxLevel, opts.Has("strict"), opts.Get("max-ms") is { } ms ? double.Parse(ms, CultureInfo.InvariantCulture) : null);
     }
 
     private static GameSession NewSession(GameData data, ulong seed)
@@ -64,17 +66,18 @@ public static class Program
         return new GameSession(world, data, new TextMatchEngine());
     }
 
-    private static int RunMatches(GameData data, ulong seed, int count, bool strict, double? maxMs)
+    private static int RunMatches(GameData data, ulong seed, int count, int maxLevel, bool strict, double? maxMs)
     {
         var session = NewSession(data, seed);
         var world = session.World;
         var rng = new Rng(seed ^ 0xC0FFEE);
         var m = new Metrics();
+        var leagues = world.Leagues.Where(l => l.Level <= maxLevel).ToList();
         var sw = Stopwatch.StartNew();
 
         for (var i = 0; i < count; i++)
         {
-            var league = world.Leagues[i % world.Leagues.Count];
+            var league = leagues[i % leagues.Count];
             var home = league.ClubIds[rng.Next(league.ClubIds.Count)];
             int away;
             do away = league.ClubIds[rng.Next(league.ClubIds.Count)]; while (away == home);
@@ -85,7 +88,7 @@ public static class Program
         }
         sw.Stop();
 
-        Console.WriteLine($"FMH Matchengine-Kalibrierung: {Fmt.Int(count)} Spiele, Seed {seed}, {sw.Elapsed.TotalSeconds:F1} s ({sw.Elapsed.TotalMilliseconds / count:F2} ms/Spiel)");
+        Console.WriteLine($"FMH Matchengine-Kalibrierung: {Fmt.Int(count)} Spiele (Ebene 1–{maxLevel}), Seed {seed}, {sw.Elapsed.TotalSeconds:F1} s ({sw.Elapsed.TotalMilliseconds / count:F2} ms/Spiel)");
         Console.WriteLine();
         Console.WriteLine($"{"Kennzahl",-34} {"Ist",10} {"Ziel",10} {"Toleranz",10}  ");
         Console.WriteLine(new string('-', 72));

@@ -23,6 +23,9 @@ public static class CupLogic
         bool Takes(Club c) => cfg.Participants.Contains(c.LeagueId) || (world.FindLeague(c.LeagueId) is { } l && cfg.Participants.Contains(l.Format.Id));
         var participants = world.Clubs.Values
             .Where(c => c.CountryCode == country.Code && Takes(c) && (c.ReserveOf is null || country.Reserves.PlayInCups))
+            .OrderBy(c => c.Id).ToList()
+            // Mehr Bewerber als Plätze: die höheren Ebenen zuerst, innerhalb einer Ebene nach Ruf.
+            .OrderBy(c => Level(world, c.Id)).ThenByDescending(c => c.Reputation).ThenBy(c => c.Id).Take(Math.Max(cfg.Teams, 2))
             .Select(c => c.Id).OrderBy(id => id).ToList();
         var size = 2;
         while (size < Math.Max(cfg.Teams, participants.Count)) size *= 2;
