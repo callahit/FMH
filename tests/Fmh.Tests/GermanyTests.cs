@@ -49,7 +49,7 @@ public class GermanyTests
     }
 
     /// <summary>
-    /// Eine Saison: Die Meister von West, Südwest und Süd steigen direkt auf, die Meister von Nord und Nordost spielen den
+    /// Eine Saison (2026/27): Die Meister von West, Südwest und Nordost steigen direkt auf, die Meister von Nord und Süd spielen den
     /// vierten Aufsteiger aus. Die beiden Letzten jeder Staffel fallen in die Oberliga, ebenso viele Oberligisten rücken nach.
     /// </summary>
     [Fact]
@@ -60,7 +60,8 @@ public class GermanyTests
         TestData.PlayUntil(s, r => r.Reason == StopReason.SeasonEnd, 20_000);
         var tables = w.Leagues.ToDictionary(l => l.Id, l => LeagueTable.Compute(l).Select(r => r.ClubId).ToList());
         var playoff = w.Cups.Single(c => c.Id == "DE-AUF");
-        Assert.Equal(new[] { tables["DE4N"][0], tables["DE4NO"][0] }.Order(), playoff.ParticipantIds.Order());
+        Assert.Equal(new[] { tables["DE4N"][0], tables["DE4S"][0] }.Order(), playoff.ParticipantIds.Order());
+        Assert.DoesNotContain(w.Cups, c => c.Id is "DE-AUF2" or "DE-AUF3");
         var winner = playoff.WinnerId!.Value;
         var bottom = Groups.SelectMany(g => tables[g].Skip(16)).ToList();
         var pool = w.Clubs.Values.Where(c => c.LeagueId == "DE-AMA").Select(c => c.Id).ToList();
@@ -68,7 +69,7 @@ public class GermanyTests
 
         foreach (var l in w.Leagues) Assert.Equal(l.Format.Teams, l.ClubIds.Count);
         Assert.Equal(40, w.Clubs.Values.Count(c => c.LeagueId == "DE-AMA"));
-        foreach (var g in new[] { "DE4W", "DE4SW", "DE4S" })
+        foreach (var g in new[] { "DE4W", "DE4SW", "DE4NO" })
         {
             var champion = w.Clubs[tables[g][0]];
             Assert.True(champion.LeagueId == "DE3" || !champion.License.PromotionAllowed, $"{champion.Name} ist nicht aufgestiegen.");
@@ -79,6 +80,25 @@ public class GermanyTests
         var risen = pool.Where(id => w.Clubs[id].LeagueId != "DE-AMA").ToList();
         Assert.Equal(bottom.Count, risen.Count);
         Assert.All(risen, id => Assert.StartsWith("DE4", w.Clubs[id].LeagueId));
+    }
+
+    /// <summary>
+    /// Wie in der Realität: West und Südwest steigen immer direkt auf, der dritte Direktplatz wechselt jährlich zwischen
+    /// Nordost (2026), Süd (2027) und Nord (2028); die beiden anderen Meister spielen den vierten Aufsteiger aus.
+    /// </summary>
+    [Theory]
+    [InlineData(2026, "DE4NO", "DE4N", "DE4S")]
+    [InlineData(2027, "DE4S", "DE4NO", "DE4N")]
+    [InlineData(2028, "DE4N", "DE4NO", "DE4S")]
+    [InlineData(2029, "DE4NO", "DE4N", "DE4S")]
+    public void RegionalLeaguePromotionRotates(int season, string direct, string playoffA, string playoffB)
+    {
+        var de = TestData.Data.Countries.Single(c => c.Code == "DE");
+        var div = de.Divisions.Single(d => d.Id == "DE4");
+        var directGroups = div.LeagueIds.Where(id => div.MovementsOf(id).Any(m => m.To == MovementDirection.Up && m.AppliesTo(season))).Order();
+        Assert.Equal(new[] { "DE4SW", "DE4W", direct }.Order(), directGroups);
+        var playoff = Assert.Single(de.Playoffs, p => p.UpperDivision == "DE3" && p.AppliesTo(season));
+        Assert.Equal(new[] { playoffA, playoffB }.Order(), playoff.Entrants.Select(e => e.Division).Order());
     }
 
     [Fact]
@@ -98,6 +118,10 @@ public class GermanyTests
         de.Pools[0].Feeds = "DE4";
         // Eigene Regel einer Staffel: Direktaufstieg auch für den Nordmeister, dann geht die Bilanz nicht mehr auf.
         de.Divisions.Single(d => d.Id == "DE4").Groups.Single(g => g.Id == "DE4N").Movements.Clear();
-        Assert.Contains(PyramidValidator.Validate(With(de)), e => e.Contains("4 Absteiger aus Ebene 3, aber 5 Aufsteiger"));
+        Assert.Contains(PyramidValidator.Validate(With(de)), e => e.Contains("4 Absteiger aus Ebene 3, aber 5 Aufsteiger aus Ebene 4 (Saison 2026)"));
+        // Rotation ohne passende Relegation: In der Saison 2027 fehlt dann der vierte Aufsteiger.
+        de = Copy(TestData.Data.Countries.Single(c => c.Code == "DE"));
+        de.Playoffs.RemoveAll(p => p.Id == "DE-AUF2");
+        Assert.Equal(new[] { "Land 'DE' ab 2026: 4 Absteiger aus Ebene 3, aber 3 Aufsteiger aus Ebene 4 (Saison 2027)." }, PyramidValidator.Validate(With(de)));
     }
 }

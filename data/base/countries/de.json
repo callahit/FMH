@@ -133,6 +133,12 @@
               ],
               "movements": [
                 {
+                  "positions": "1",
+                  "to": "Up",
+                  "cycle": 3,
+                  "cycleStart": 2028
+                },
+                {
                   "positions": "17-18",
                   "to": "Down"
                 }
@@ -145,6 +151,12 @@
                 "Nordost"
               ],
               "movements": [
+                {
+                  "positions": "1",
+                  "to": "Up",
+                  "cycle": 3,
+                  "cycleStart": 2026
+                },
                 {
                   "positions": "17-18",
                   "to": "Down"
@@ -170,6 +182,18 @@
               "name": "Regionalliga Süd",
               "regions": [
                 "Süd"
+              ],
+              "movements": [
+                {
+                  "positions": "1",
+                  "to": "Up",
+                  "cycle": 3,
+                  "cycleStart": 2027
+                },
+                {
+                  "positions": "17-18",
+                  "to": "Down"
+                }
               ]
             }
           ],
@@ -243,25 +267,77 @@
     {
       "id": "DE-AUF",
       "name": "Aufstiegsspiele Regionalliga",
-      "upperDivision": "DE3",
-      "lowerDivision": "DE4",
       "entrants": [
         {
           "division": "DE4N",
           "position": 1
         },
         {
-          "division": "DE4NO",
+          "division": "DE4S",
           "position": 1
         }
       ],
+      "cycleStart": 2026,
+      "upperDivision": "DE3",
+      "lowerDivision": "DE4",
       "places": 1,
       "legs": 2,
       "awayGoals": false,
       "dates": [
         "05-06",
         "05-10"
-      ]
+      ],
+      "cycle": 3
+    },
+    {
+      "id": "DE-AUF2",
+      "name": "Aufstiegsspiele Regionalliga",
+      "entrants": [
+        {
+          "division": "DE4NO",
+          "position": 1
+        },
+        {
+          "division": "DE4N",
+          "position": 1
+        }
+      ],
+      "cycleStart": 2027,
+      "upperDivision": "DE3",
+      "lowerDivision": "DE4",
+      "places": 1,
+      "legs": 2,
+      "awayGoals": false,
+      "dates": [
+        "05-06",
+        "05-10"
+      ],
+      "cycle": 3
+    },
+    {
+      "id": "DE-AUF3",
+      "name": "Aufstiegsspiele Regionalliga",
+      "entrants": [
+        {
+          "division": "DE4NO",
+          "position": 1
+        },
+        {
+          "division": "DE4S",
+          "position": 1
+        }
+      ],
+      "cycleStart": 2028,
+      "upperDivision": "DE3",
+      "lowerDivision": "DE4",
+      "places": 1,
+      "legs": 2,
+      "awayGoals": false,
+      "dates": [
+        "05-06",
+        "05-10"
+      ],
+      "cycle": 3
     }
   ],
   "transferWindows": {

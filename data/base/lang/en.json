@@ -24,6 +24,8 @@
  "competition.DE4S": "Regional League South",
  "competition.DE-REL2": "Relegation Play-off 2nd/3rd Division",
  "competition.DE-AUF": "Regional League Promotion Play-off",
+ "competition.DE-AUF2": "Regional League Promotion Play-off",
+ "competition.DE-AUF3": "Regional League Promotion Play-off",
  "cup.scorePenalties": "{0} ({1} on pens)",
  "cup.scoreExtraTime": "{0} aet",
  "msg.scoutSearch.line": "{0} · {1} ({2}, {3}) – {4}",
