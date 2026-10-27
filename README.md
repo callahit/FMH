@@ -251,7 +251,7 @@ Amateurfußball, und Vereine mit dünnem Kader verpflichten unter der Saison nac
 | 9 Vereinsgelände | **83 Gebäude** mit Stufen, Lage und Synergien, Baufirmen, Genehmigungen | – |
 | 10 Umfeld, Karriere | **Vorstand, Fans, Presse, 166 Zufallsereignisse, Managerkarriere** mit Lizenzen und Erfolgen | Nationalmannschaft, Medienhaus |
 | 11 Oberfläche | Desktop-Oberfläche (Avalonia) mit Maus, Drag & Drop, sortierbaren Tabellen, Diagrammen (Radar, Formkurve, xG, Heatmap), Wappen, Farbthemen | Tastenbelegung |
-| 12 Nicht-funktional | Determinismus, **SQLite-Spielstände** mit Schemamigration, **Mehrsprachigkeit (Deutsch, Englisch, erweiterbar)**, Datenpakete mit Überlagerung, Datenvalidierung, Kalibrierungs-CLI mit Toleranzprüfung, **CI auf Linux und Windows**, Warnungen als Fehler | Editor (AP 6), Modularisierung (AP 1), Mod-Verwaltung (AP 14) |
+| 12 Nicht-funktional | Determinismus, **SQLite-Spielstände** mit Schemamigration, **Mehrsprachigkeit (Deutsch, Englisch, erweiterbar)**, Datenpakete mit Überlagerung, Datenvalidierung, Kalibrierungs-CLI mit Toleranzprüfung, **CI auf Linux und Windows**, Warnungen als Fehler, **Modulaufbau mit Golden Master und Architekturtest** | Editor (AP 6), Mod-Verwaltung (AP 14) |
 
 ## Sprachen
 
@@ -296,8 +296,10 @@ SELECT date, player_id, fee FROM transfers WHERE to_club = 6;
 ```
 
 Verschachtelte Konfigurationen (Ligaformat, Taktik, Pokalrunden, Verhandlungen) liegen als JSON-Spalten
-daneben. Die Tabelle `meta` enthält die Schemaversion (aktuell 5). Ältere Spielstände werden beim Laden
-schrittweise angehoben:
+daneben. Die Tabellen gehören Speicherabschnitten je Modul; jeder führt seine eigene Version in der
+Tabelle `meta` (`schema.world`, `schema.finance` …). Die frühere globale Schemaversion 5 ist die
+Ausgangsversion aller Abschnitte. Ältere Spielstände werden beim Laden zuerst global bis Version 5 und
+danach je Abschnitt angehoben:
 
 - Version 1 (Phase 1) bekommt die Karrieredaten: Budgets, Scouts, Pokal und Amateurvereine.
 - Version 2 bekommt die Spalten für sprachneutrale Texte.
@@ -306,6 +308,9 @@ schrittweise angehoben:
   Fehlende Daten werden beim Laden erzeugt.
 - Version 4 bekommt das Nachwuchsleistungszentrum, die Lizenzakte (Auflagen, Europa-Lizenz, FFP)
   und die Tabelle `european_entries`.
+- Abschnitt `world` Version 6 bekommt die Tabelle `teams`: jeder Verein erhält seine erste Mannschaft.
+
+Ein Spielstand mit einem neueren oder unbekannten Abschnitt wird abgelehnt.
 
 ## Kalibrierung der Matchengine
 
@@ -341,20 +346,42 @@ Die Gewichte stehen in `data/base/rules/engine.json`.
 
 ## Aufbau
 
+Aufbau nach Umsetzungskonzept, Abschnitt 4: `GameSession` ist eine dünne Fassade über Spielmodulen,
+die nur über Ereignisse und Dienst-Schnittstellen miteinander sprechen.
+
 ```
 src/
-  Fmh.Core/          Kern: Datenmodell, Kalender und Tagesablauf (GameSession, aufgeteilt in Saison,
-                     Pokal, Transfers, Training, Scouting, Jugend, Finanzen, Gelände, Personal,
-                     Sponsoren, Vorstand, Presse, Ereignisse), Ligen und Tabellen, Weltgenerator,
-                     Aufstellung/KI-Taktik, Verhandlungslogik, Marktwerte, SQLite-Speicher, Datenpakete,
-                     Schnittstelle IMatchEngine
+  Fmh.Domain/        Reine Datentypen (Model, Match-Modelle), Rng, Formatierung, Texte, Konfigurationstypen,
+                     Aufstellungs- und Bewertungsregeln, die die Engine braucht; referenziert nichts
+  Fmh.Data/          Datenpakete laden, überlagern und validieren
+  Fmh.Simulation.Abstractions/
+                     Modulvertrag (IGameModule, ModuleContext, DayContext), Ereignisbus mit Ereignissen
+                     (DayStarted, MatchPlayed), Dienst-Schnittstellen der Module, gemeinsamer Kern
+                     (Spielstand, Zufall, Posteingang) und Regelbibliothek (Tabellen, Weltgenerator, Marktwerte …)
+  Fmh.Modules/       Je Fachgebiet ein Modul: Spielbetrieb, Saison, Pokale, Transfers, Training, Scouting,
+                     Jugend, Finanzen, Wirtschaft, Gelände, Stadionpläne, Personal, Sponsoren, Vorstand,
+                     Presse, Ereignisse, Lizenz
+  Fmh.Simulation/    Fassade GameSession: Tagesschleife, Modul-Registry (Reihenfolge aus DependsOn)
+  Fmh.Persistence/   SQLite-Spielstand: Speicherabschnitte je Modul mit eigener Version, Altmigrationen bis Version 5
   Fmh.MatchEngine/   Text-Matchengine (Phasen, 5x7-Zonen, Duelle, Rollen, Verlängerung, Elfmeterschießen)
                      und Kommentargenerator
   Fmh.Desktop/       Desktop-Oberfläche (Avalonia, MVVM), Programm "fmh"
   Fmh.Calibrate/     Kommandozeilen-Simulator "fmh-calibrate"
-tests/Fmh.Tests/     xUnit-Tests für Kern, Engine, Karriere, Spielstände, Daten und Oberfläche
+tests/Fmh.Tests/     xUnit-Tests für Kern, Engine, Karriere, Spielstände, Daten, Oberfläche, Architektur
+                     und Golden Master
 data/base/           Datenpaket "base": Länder, Vereine, Namen, Formationen, Rollen, Regeln, Sprachdateien
 ```
+
+Regeln, die ein Architekturtest prüft: erlaubte Projektverweise (Konzept 4.1), keine Datei in
+`Fmh.Simulation` oder `Fmh.Modules` über 400 Zeilen, kein Modul verwendet die Klasse eines anderen.
+Ein Verein (`Club`) besitzt Mannschaften (`Team`, je eine Welt `men`/`women`); vereinsweite Daten liegen
+am Verein, Kader, Taktik, Training und Liga an der Mannschaft. Bis alle Module direkt mit Mannschaften
+arbeiten, leiten die gleichnamigen Vereinseigenschaften an die erste Mannschaft weiter.
+
+**Golden Master** (Konzept 4.5): `GoldenMasterTests` simuliert eine Welt mit Seed 4242 über drei Saisons
+und 10.000 Engine-Spiele und vergleicht Hashes je Bereich mit `tests/Fmh.Tests/GoldenMaster/golden.json`
+(ein Eintrag je Laufzeitumgebung). Neu gesetzt wird er nur in PRs, die eine Regeländerung ankündigen:
+`FMH_GOLDEN_UPDATE=1 dotnet test --filter GoldenMaster`.
 
 Oberflächentests laufen ohne Bildschirm (Avalonia Headless). Mit `FMH_SHOTS=<ordner> dotnet test`
 speichern sie Bildschirmfotos aller Seiten.

@@ -54,6 +54,8 @@ public class SaveCompatibilityTests
             var meta = SqliteStore.ReadMetaTable(path);
             foreach (var section in SqliteStore.Sections)
                 Assert.Equal(section.Version.ToString(), meta["schema." + section.ModuleId]);
+            // Migration 5 → 6 des Abschnitts "world": jeder Verein hat seine erste Mannschaft.
+            Assert.All(world.Clubs.Values, c => Assert.Equal((c.Id, c.Id, Fmh.Core.Model.Team.MenWorld), (c.FirstTeam.Id, c.FirstTeam.ClubId, c.FirstTeam.WorldId)));
         }
         finally
         {
@@ -61,9 +63,12 @@ public class SaveCompatibilityTests
         }
     }
 
-    /// <summary>Die Abschnitte legen genau das Schema an, das ein migrierter Spielstand der Version 5 hat (Spalten, Reihenfolge, Indizes).</summary>
+    /// <summary>
+    /// Ein neuer Spielstand hat genau das Schema eines migrierten: Version 5 (Altschema) plus die Migrationen jedes Abschnitts
+    /// (Spalten, Reihenfolge, Vorgaben, Indizes).
+    /// </summary>
     [Fact]
-    public void SectionSchemaMatchesMigratedVersionFive()
+    public void NewSchemaMatchesMigratedVersionFive()
     {
         string Describe(SqliteConnection con)
         {
@@ -97,6 +102,12 @@ public class SaveCompatibilityTests
             cmd.CommandText = LegacySchema.Schema(SqliteStore.SchemaVersion);
             cmd.ExecuteNonQuery();
         }
+        using (var tx = legacy.BeginTransaction())
+        {
+            foreach (var s in SqliteStore.Sections.Where(s => s.Version > SqliteStore.SchemaVersion))
+                s.Migrate(legacy, tx, SqliteStore.SchemaVersion);
+            tx.Commit();
+        }
         using var sections = new SqliteConnection("Data Source=:memory:");
         sections.Open();
         using (var tx = sections.BeginTransaction())
@@ -125,6 +136,31 @@ public class SaveCompatibilityTests
             Exec(path, "UPDATE meta SET value = '5' WHERE key = 'schema.finance'");
             Exec(path, "INSERT INTO meta (key, value) VALUES ('schema.future', '6')");
             Assert.Throws<InvalidDataException>(() => SqliteStore.Load(path));
+        }
+        finally
+        {
+            Cleanup(path);
+        }
+    }
+
+    /// <summary>Weitere Mannschaften (z. B. Frauen, AP 15) werden vollständig gespeichert; die erste bleibt in den Vereinsspalten.</summary>
+    [Fact]
+    public void AdditionalTeamsRoundTrip()
+    {
+        var s = TestData.NewSession();
+        var club = s.HumanClub;
+        club.Teams.Add(new Fmh.Core.Model.Team { Id = 9001, ClubId = club.Id, WorldId = "women", LeagueId = "test", PlayerIds = { 1, 2 } });
+        var path = Path.Combine(Path.GetTempPath(), $"fmh-teams-{Guid.NewGuid():N}.fmh");
+        try
+        {
+            SqliteStore.Save(s.World, path);
+            var loaded = SqliteStore.Load(path).Clubs[club.Id];
+            Assert.Equal(2, loaded.Teams.Count);
+            Assert.Equal(club.LeagueId, loaded.FirstTeam.LeagueId);
+            Assert.Equal(Fmh.Core.Model.Team.MenWorld, loaded.FirstTeam.WorldId);
+            var women = loaded.Teams[1];
+            Assert.Equal((9001, "women", "test"), (women.Id, women.WorldId, women.LeagueId));
+            Assert.Equal(new[] { 1, 2 }, women.PlayerIds);
         }
         finally
         {
