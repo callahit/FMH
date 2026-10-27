@@ -84,8 +84,8 @@ Farbthemen: Klassik, Hell, Terminal.
     Unterklassige; Verlängerung und Elfmeterschießen; neutrales Finale.
   - Relegation 16. gegen 3. in Hin- und Rückspiel.
   - Ansicht mit allen Runden und Duellen.
-- **Jugend:** Jahrgang im März, ein Anfangsjahrgang bei Spielstart und 2 % Chance auf eine
-  „goldene Generation". Profiverträge ab 16, Freigabe mit 19; die KI übernimmt Talente selbst.
+- **Jugend:** Nachwuchsleistungszentrum mit drei Altersstufen, siehe
+  [Nachwuchsleistungszentrum](#nachwuchsleistungszentrum).
 - **Budgets:** Kontostand, Transfer- und Gehaltsbudget je Saison; seit Phase 3 aus den Einnahmen
   des Vereins berechnet (siehe unten).
 
@@ -96,6 +96,39 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
 - Pro Saison gibt es rund 60 Transfers mit Ablöse und 25–70 Leihen.
 - Die Spielstärke der Ligen steigt nur leicht, um etwa 0,07 Punkte pro Saison.
 
+## Nachwuchsleistungszentrum
+
+- **Altersstufen:**
+  - U15 (14–15 Jahre), U17 (16–17) und U19 (18).
+  - Jede Stufe hat eine begrenzte Zahl an Plätzen, die mit der Infrastruktur wächst.
+  - Jugendtrainer aus dem Personal betreuen je eine Altersstufe.
+- **Jährlicher Jahrgang:**
+  - Am 15. März kommen 14-Jährige in die U15.
+  - Ihre Anzahl und ihr Talent hängen von Sichtung, Ruf der Akademie und Vereinsgröße ab; mit 2 %
+    Chance gibt es eine „goldene Generation".
+  - Bei guter Sichtung kommen Quereinsteiger mit 15 oder 16 Jahren dazu.
+- **Vier Qualitätskriterien (1–20):** Sie folgen ihrem Zielwert über mehrere Monate.
+  - Trainerarbeit: Budgetanteil und Jugendtrainer.
+  - Infrastruktur: Leistungszentrum, Jugendplätze, Internat, Kabinen, Kantine.
+  - Sichtung: Budgetanteil, Fußballschule, Internat, Vereins- und Akademieruf.
+  - Schule und Betreuung: Budgetanteil, Partnerschule, Internat.
+- **Jahresbudget:**
+  - Das Budget wird monatlich gebucht und auf Trainer, Sichtung und Schule verteilt.
+  - Zum Saisonstart kommt ein Vorschlag in den Posteingang.
+  - Ohne Geld sinkt die Qualität; die KI richtet ihr Budget nach Finanzlage und Lizenzvorgabe.
+- **Zertifizierung:** 0–3 Sterne aus dem Gesamtwert. Sie ist Lizenzvoraussetzung (1. Liga 2 Sterne,
+  2. Liga 1 Stern, Europa 1 Stern).
+- **Wirkung:** Die Talente entwickeln sich je nach Trainern, Infrastruktur und Alter, ältere lernen
+  schneller.
+- **Saisonstart:**
+  - Volle Altersstufen werden ausgedünnt.
+  - Schwache Schule führt zu mehr Abbrechern.
+  - Mit 19 endet die Jugendzeit. Wer nicht übernommen wird, geht meist in den Amateurfußball.
+- **Absolventen:** Profiverträge ab 16. Absolventen, die sich durchsetzen, steigern den Ruf der
+  Akademie.
+- **Seite:** Verein → Nachwuchs mit Kriterien und Trend, Budget und Aufteilung, Altersstufen mit
+  Trainerwahl und Spielerlisten.
+
 ## Umfeld (Phase 3)
 
 - **Finanzen** (Kapitel 8):
@@ -105,14 +138,52 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
   - Ausgaben: Gehälter, Personal, Unterhalt, Reisen, Prämien, Zinsen.
   - Bank: Kredite (3–12 % Zins je nach Verschuldung), Festgeld, Umschichten zwischen Transfer- und
     Gehaltsbudget (52:1), Eintrittspreise mit Fanreaktion.
-  - Lizenzierung zum Saisonende: Eigenkapital und Infrastruktur, Auflagen oder Punktabzug.
-    Insolvenz nach 30 Tagen unter dem Kreditrahmen: KI-Vereine bekommen neun Punkte Abzug, der
+  - Lizenzierung mit Stichtagen, jedes Jahr für die nächste Saison:
+    - Antrag am 15. März mit Checkliste.
+    - Entscheidung am 30. April: erteilt, mit Auflagen, mit Punktabzug oder verweigert.
+      Verweigert bedeutet Zwangsabstieg; in der untersten Liga gibt es stattdessen neun Punkte Abzug.
+    - Nachweis der Auflagen bis 31. Mai, sonst drei Punkte Abzug und eine Geldstrafe.
+    - Geprüft werden Eigenkapital, Flutlicht und die Zertifizierung des Nachwuchsleistungszentrums.
+    - Aufstiegskandidaten werden zusätzlich nach den Kriterien der höheren Liga geprüft.
+      Fehlt das Geld, ist kein Aufstieg möglich; fehlende Infrastruktur kostet eine Geldstrafe.
+  - Insolvenz nach 30 Tagen unter dem Kreditrahmen: KI-Vereine bekommen neun Punkte Abzug, der
     Mensch wird entlassen.
+  - **Financial Fair Play:**
+    - Prüfung zum Saisonstart für die Vereine der 1. Liga und alle Europapokalteilnehmer.
+    - Regel 1: Das Break-even-Ergebnis über drei Spielzeiten darf höchstens 5 Mio. im Minus liegen.
+      Ausgaben für Stadion, Gelände und Nachwuchs zählen dabei nicht.
+    - Regel 2: Die Kaderkostenquote darf höchstens 70 % betragen.
+    - Sanktionen: Verwarnung, im Wiederholungsfall Geldstrafe, ab 30 Mio. Defizit Ausschluss
+      aus Europa.
+  - **Europa-Lizenz** (zum 30. April):
+    - Voraussetzungen sind eine einwandfreie nationale Lizenz, kein FFP-Ausschluss, mindestens
+      8.000 Sitzplätze, Flutlicht Stufe 3, ein zertifiziertes Leistungszentrum und keine
+      überfälligen Verbindlichkeiten.
+  - **Europapokalplätze** zum Saisonende:
+    - Platz 1–4 der 1. Liga spielen im Champions-Pokal, Platz 5 und der Pokalsieger im
+      Europa-Pokal, Platz 6 im Conference-Pokal.
+    - Ohne Zulassung rückt der nächste Verein nach. Ist der Pokalsieger schon qualifiziert oder ohne
+      Lizenz, geht sein Platz an den nächsten Ligaplatz.
+    - Die Wettbewerbe laufen vereinfacht ohne eigene Spiele: An fünf Terminen entscheidet die
+      Mannschaftsstärke gegen das Teilnehmerfeld über das Weiterkommen. Es gibt Start- und
+      Rundenprämien, Fanstimmung und Vereinsruf steigen.
+  - Ansicht unter Finanzen → Lizenz und Europa.
   - Saisonbilanz, Monatsverlauf als Diagramm.
 - **Stadion:** vier Tribünen mit Steh- und Sitzplätzen, Dach und Logen; Flutlicht, Rasenheizung,
   Anzeigetafel, Rasenzustand. Bauprojekte brauchen ab 2 Mio. die Freigabe des Vorstands und ab
   1 Mio. eine Baugenehmigung. Drei Baufirmen (billig und riskant, normal, teuer und schnell),
   Verzögerungen und Pleiten, Finanzierung über Kredit.
+  - **Prognose je Ausbau:** zusätzliche Zuschauer pro Heimspiel, Mehreinnahmen und Unterhalt pro
+    Saison und Amortisationsdauer. Berechnet wird mit dem Zuschauermodell, dem aktuellen Spielplan,
+    den Preisen und der Fanstimmung. Mehr Plätze bringen nur etwas, wenn die Nachfrage das Stadion
+    füllt.
+  - **Stadionneubau an anderer Stelle** (Sonderthema):
+    - Nur möglich, wenn die Stadt per Zufallsereignis ein Grundstück anbietet. Das Angebot gilt zwei
+      Jahre, die Größe des Grundstücks begrenzt die Kapazität.
+    - Planung von Kapazität, Stehplatzanteil, Logen, Dach und Name mit Kosten- und
+      Einnahmenprognose.
+    - Bauzeit etwa zwei Jahre, Stadionkredit über bis zu 20 Jahre. Während des Baus wird im alten
+      Stadion gespielt.
 - **Vereinsgelände** (Kapitel 9): 83 Gebäude in neun Bereichen (Training, Medizin, Jugend, Fans,
   Kommerz, Verwaltung, Infrastruktur, Energie, Mannschaften).
   - Bis zu fünf Ausbaustufen, Zustand, Unterhalt, Voraussetzungen, Lagebonus und Synergien.
@@ -153,7 +224,11 @@ Die Finanzsimulation über fünf Saisons ergibt folgende Werte je Verein:
 | 1. Liga | 26–32 Mio. | 21–26 Mio. | +4 bis +6 Mio. |
 | 2. Liga | 7–8 Mio. | 7–8 Mio. | etwa ±0 Mio. |
 
-Absteiger geraten mit ihren Gehältern ins Minus. Es gibt keine Kettenpleiten. Die Kennzahlen zeigt
+Darin sind die Budgets der Nachwuchsleistungszentren und die Europapokalprämien bereits enthalten.
+Absteiger geraten mit ihren Gehältern ins Minus. Es gibt keine Kettenpleiten. In der 2. Liga bekommen
+einige Vereine im Frühjahr Lizenzauflagen, Punktabzüge sind selten. Die Zahl der vereinslosen
+Spieler bleibt bei 100–130: Wer nach der Jugend nicht übernommen wird, geht meist in den
+Amateurfußball, und Vereine mit dünnem Kader verpflichten unter der Saison nach. Die Kennzahlen zeigt
 `fmh-calibrate --season --seasons 5` je Liga und Buchungsart an.
 
 ## Umfang nach Kapiteln des Fachkonzepts
@@ -215,7 +290,7 @@ SELECT date, player_id, fee FROM transfers WHERE to_club = 6;
 ```
 
 Verschachtelte Konfigurationen (Ligaformat, Taktik, Pokalrunden, Verhandlungen) liegen als JSON-Spalten
-daneben. Die Tabelle `meta` enthält die Schemaversion (aktuell 4). Ältere Spielstände werden beim Laden
+daneben. Die Tabelle `meta` enthält die Schemaversion (aktuell 5). Ältere Spielstände werden beim Laden
 schrittweise angehoben:
 
 - Version 1 (Phase 1) bekommt die Karrieredaten: Budgets, Scouts, Pokal und Amateurvereine.
@@ -223,6 +298,8 @@ schrittweise angehoben:
 - Version 3 bekommt das Umfeld: Spalten für Finanzen, Stadion, Gelände, Sponsoren, Vorstand, Fans
   und Rivalen; Karriere des Managers; Punktabzüge; Tabellen `staff`, `events` und `event_history`.
   Fehlende Daten werden beim Laden erzeugt.
+- Version 4 bekommt das Nachwuchsleistungszentrum, die Lizenzakte (Auflagen, Europa-Lizenz, FFP)
+  und die Tabelle `european_entries`.
 
 ## Kalibrierung der Matchengine
 
@@ -288,8 +365,5 @@ anderem Teamzahlen, Pools, Pokaltermine und Relegationsplätze.
 - **Lizenz:** Das Fachkonzept schlägt GPL-3.0 für den Code und CC BY-SA 4.0 für Daten und Texte vor.
   Eine Lizenzdatei ist noch nicht enthalten.
 - **Spielstärke-Drift:** Über viele Saisons steigt die Ligastärke leicht, um etwa 0,07 pro Saison.
-- **Vereinslose Spieler:** Die Zahl der vereinslosen Spieler wächst über die Saisons (rund 300 nach
-  fünf Jahren), die Kader schrumpfen leicht auf durchschnittlich 22 Spieler. Das gab es schon vor
-  Phase 3. Vereinslose sollten früher ihr Karriereende erreichen oder günstiger unterschreiben.
-- **Stadionneubau:** Ein Neubau an anderer Stelle (Kapitel 8) ist noch nicht umgesetzt; das Stadion
-  wächst über Tribünenausbau.
+- **Europapokal:** Die europäischen Wettbewerbe laufen vereinfacht ohne eigene Spiele und ohne
+  ausländische Vereine. Echte Partien brauchen weitere Länder als Datenpakete.

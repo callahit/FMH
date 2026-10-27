@@ -182,9 +182,27 @@ public class UiTests
         AssertNoMissingTexts(w);
         Shot(w, "53_building");
 
+        // Stadionneubau erst nach dem Angebot der Stadt.
+        Assert.False(stadium.HasSite);
+        var site = session.TriggerRandomEvent("citySite")!;
+        session.ResolveEvent(site, "accept");
+        stadium.Refresh();
+        Assert.True(stadium.HasSite);
+        Assert.False(string.IsNullOrEmpty(stadium.DesignImpact));
+        Assert.Contains(stadium.Stands[0].Actions, a => a.Impact.Length > 0);
+        w.GetVisualDescendants().OfType<TabControl>().First().SelectedIndex = 0;
+        Pump();
+        AssertNoMissingTexts(w);
+        Shot(w, "59_new_stadium");
+
         shell.OpenPage<ClubPageViewModel>();
         var club = Assert.IsType<ClubPageViewModel>(shell.Page);
         ShowTabs(w, "54_club");
+        Assert.Equal(3, club.YouthGroups.Count);
+        Assert.Equal(4, club.AcademyCriteria.Count);
+        club.AcademyBudget = 2_000_000;
+        club.SaveAcademyBudgetCommand.Execute(null);
+        Assert.Equal(2_000_000, session.HumanClub.Academy.Budget);
         var staff = club.OwnStaff.Count;
         club.OwnStaff[0].Action.Execute(null);
         Assert.Equal(staff - 1, club.OwnStaff.Count);

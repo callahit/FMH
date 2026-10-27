@@ -17,4 +17,6 @@ public sealed class StaffMember
     public int Motivation { get; set; } = 10;
     public int WeeklyWage { get; set; }
     public DateOnly ContractUntil { get; set; }
+    /// <summary>Jugendtrainer: betreute Altersstufe.</summary>
+    public YouthAgeGroup? AgeGroup { get; set; }
 }

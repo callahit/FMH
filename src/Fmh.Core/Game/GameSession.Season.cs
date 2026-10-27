@@ -64,7 +64,7 @@ public sealed partial class GameSession
             if (!AwaitingNewJob)
                 CareerSeasonEnd(own, row.Position, reached, verdictKey is "msg.seasonEnd.promoted", row.Position == 1 && ownLeague.Level == 1);
         }
-        Licensing();
+        AllocateEuropeanPlaces();
     }
 
     /// <summary>Zum Saisonstart: Auf- und Abstieg, Vertragsende, Entwicklung, Karriereenden, neue Wettbewerbe.</summary>
@@ -95,6 +95,8 @@ public sealed partial class GameSession
             club.Finance.PendingDeduction = 0;
         }
         RollSeasonFinances();
+        FfpAssessment();
+        EuropeSeasonStart();
         StaffSeasonStart();
         foreach (var club in World.Clubs.Values)
         {
@@ -128,13 +130,22 @@ public sealed partial class GameSession
                 var lower = leagues[i + 1];
                 var count = Math.Min(upper.Format.Relegation, lower.Format.Promotion);
                 var down = count <= 0 ? new List<int>() : LeagueTable.Compute(upper).TakeLast(count).Select(r => r.ClubId).ToList();
-                var up = count <= 0 ? new List<int>() : LeagueTable.Compute(lower).Take(count).Select(r => r.ClubId).ToList();
+                // Lizenz verweigert: Zwangsabstieg; dafür bleibt der bestplatzierte sportliche Absteiger oben.
+                foreach (var forced in LeagueTable.Compute(upper).Select(r => r.ClubId).Where(id => World.Clubs[id].License.ForcedRelegation && !down.Contains(id)).ToList())
+                {
+                    down.Add(forced);
+                    if (down.Count > count && down.Count > 1) down.RemoveAt(0);
+                }
+                // Aufsteigen kann nur, wer die Lizenz für die höhere Liga hat.
+                var up = count <= 0 ? new List<int>() : LeagueTable.Compute(lower).Select(r => r.ClubId)
+                    .Where(id => World.Clubs[id].License.PromotionAllowed).Take(count).ToList();
+                foreach (var forced in lower.ClubIds.Where(id => World.Clubs[id].License.ForcedRelegation)) World.Clubs[forced].License.ForcedRelegation = false;
                 // Relegation: Verlierer des Erstligisten steigt ab, Sieger des Zweitligisten auf.
                 foreach (var po in World.Cups.Where(c => c.Kind == CompetitionKind.Playoff && c.UpperDivision == upper.Id && c.LowerDivision == lower.Id && c.WinnerId is not null))
                 {
                     var upperClub = po.ParticipantIds.First(id => upper.ClubIds.Contains(id));
                     var lowerClub = po.ParticipantIds.First(id => lower.ClubIds.Contains(id));
-                    if (po.WinnerId == lowerClub) { down.Add(upperClub); up.Add(lowerClub); }
+                    if (po.WinnerId == lowerClub && World.Clubs[lowerClub].License.PromotionAllowed) { down.Add(upperClub); up.Add(lowerClub); }
                 }
                 foreach (var id in down) { upper.ClubIds.Remove(id); lower.ClubIds.Add(id); World.Clubs[id].LeagueId = lower.Id; ApplyRelegationClauses(id); }
                 foreach (var id in up) { lower.ClubIds.Remove(id); upper.ClubIds.Add(id); World.Clubs[id].LeagueId = upper.Id; }
@@ -209,19 +220,27 @@ public sealed partial class GameSession
         while (club.PlayerIds.Count < minimum && guard++ < 20)
         {
             if (IsHuman(club) && club.PlayerIds.Count >= 16) break;
-            var need = NeededPosition(club);
-            var youth = club.YouthIds.Select(id => World.Players[id]).Where(p => p.Age(World.Date) >= 17)
-                .OrderByDescending(p => Ratings.PositionRating(p, p.MainPosition, Data.PositionProfiles)).FirstOrDefault();
-            if (youth is not null && !IsHuman(club)) { PromoteYouthInternal(club, youth); continue; }
-            if (!IsHuman(club) && SignBestFreeAgent(club, need)) continue;
-            // Letzter Ausweg: Spieler aus dem Umfeld des Vereins (Amateurbereich) verpflichten.
-            var level = PlayerGenerator.ClubLevel(club.Reputation) - 1.5;
-            var p = PlayerGenerator.Create(World, Data, _rng, need, Math.Clamp(level + _rng.Normal(0, 1), 3, 18), _rng.Next(19, 28), club.CountryCode);
-            p.ClubId = club.Id;
-            p.SeasonStats = new PlayerSeasonStats { SeasonYear = World.SeasonYear, ClubId = club.Id };
-            World.Players[p.Id] = p;
-            club.PlayerIds.Add(p.Id);
+            if (!IsHuman(club) && SignBestFreeAgent(club, NeededPosition(club))) continue;
+            AddEmergencyPlayer(club);
         }
+    }
+
+    /// <summary>Kader auffüllen: bestes Talent ab 17 aus der eigenen Jugend, sonst ein Spieler aus dem Amateurbereich.</summary>
+    private void AddEmergencyPlayer(Club club)
+    {
+        var need = NeededPosition(club);
+        var youth = club.YouthIds.Select(id => World.Players[id]).Where(p => p.Age(World.Date) >= 17)
+            .OrderByDescending(p => Ratings.PositionRating(p, p.MainPosition, Data.PositionProfiles)).FirstOrDefault();
+        if (youth is not null && !IsHuman(club)) { PromoteYouthInternal(club, youth); return; }
+        var level = PlayerGenerator.ClubLevel(club.Reputation) - 1.5;
+        var p = PlayerGenerator.Create(World, Data, _rng, need, Math.Clamp(level + _rng.Normal(0, 1), 3, 18), _rng.Next(19, 28), club.CountryCode);
+        p.ClubId = club.Id;
+        p.SeasonStats = new PlayerSeasonStats { SeasonYear = World.SeasonYear, ClubId = club.Id };
+        // Vertrag wie ein ablösefreier Neuzugang, damit der Spieler nicht sofort wieder geht.
+        var contract = Negotiations.SuggestContract(p, club, World, Data);
+        p.Contract = MakeContract(contract, World.Date);
+        World.Players[p.Id] = p;
+        club.PlayerIds.Add(p.Id);
     }
 
     /// <summary>Position mit dem größten Bedarf nach der Kaderschablone.</summary>

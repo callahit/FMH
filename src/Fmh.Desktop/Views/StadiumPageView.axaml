@@ -49,7 +49,10 @@
                         <ItemsControl.ItemTemplate>
                           <DataTemplate x:DataType="vm:BuildAction">
                             <Grid ColumnDefinitions="*,Auto" Margin="0,2">
-                              <TextBlock Text="{Binding Cost}" Classes="small" VerticalAlignment="Center" />
+                              <StackPanel VerticalAlignment="Center">
+                                <TextBlock Text="{Binding Cost}" Classes="small" />
+                                <TextBlock Text="{Binding Impact}" Foreground="{Binding ImpactBrush}" FontSize="11" TextWrapping="Wrap" />
+                              </StackPanel>
                               <Button Grid.Column="1" Content="{Binding Label}" Command="{Binding Command}" MinWidth="170" />
                             </Grid>
                           </DataTemplate>
@@ -67,12 +70,39 @@
                   <ItemsControl.ItemTemplate>
                     <DataTemplate x:DataType="vm:BuildAction">
                       <Grid ColumnDefinitions="*,Auto" Margin="0,2">
-                        <TextBlock Text="{Binding Cost}" Classes="small" VerticalAlignment="Center" />
+                        <StackPanel VerticalAlignment="Center">
+                          <TextBlock Text="{Binding Cost}" Classes="small" />
+                          <TextBlock Text="{Binding Impact}" Foreground="{Binding ImpactBrush}" FontSize="11" TextWrapping="Wrap" />
+                        </StackPanel>
                         <Button Grid.Column="1" Content="{Binding Label}" Command="{Binding Command}" MinWidth="200" />
                       </Grid>
                     </DataTemplate>
                   </ItemsControl.ItemTemplate>
                 </ItemsControl>
+                <TextBlock Classes="muted small" Text="{s:L forecast.help}" TextWrapping="Wrap" Margin="0,6,0,0" />
+              </StackPanel>
+            </Border>
+            <Border Classes="card">
+              <StackPanel Spacing="8">
+                <TextBlock Classes="h3" Text="{s:L newStadium.title}" />
+                <TextBlock Text="{Binding SiteText}" TextWrapping="Wrap" />
+                <StackPanel Spacing="8" IsVisible="{Binding HasSite}">
+                  <Grid ColumnDefinitions="200,220,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="6" ColumnSpacing="10">
+                    <TextBlock Text="{s:L newStadium.capacity}" VerticalAlignment="Center" />
+                    <NumericUpDown Grid.Column="1" Value="{Binding DesignCapacity}" Minimum="10000" Maximum="{Binding DesignMax}" Increment="1000" FormatString="N0" />
+                    <TextBlock Grid.Row="1" Text="{s:L newStadium.standing}" VerticalAlignment="Center" />
+                    <NumericUpDown Grid.Row="1" Grid.Column="1" Value="{Binding DesignStanding}" Minimum="0" Maximum="60" Increment="5" FormatString="N0" />
+                    <TextBlock Grid.Row="2" Text="{s:L newStadium.boxes}" VerticalAlignment="Center" />
+                    <NumericUpDown Grid.Row="2" Grid.Column="1" Value="{Binding DesignBoxes}" Minimum="0" Maximum="80" Increment="5" FormatString="N0" />
+                    <TextBlock Grid.Row="3" Text="{s:L newStadium.name}" VerticalAlignment="Center" />
+                    <TextBox Grid.Row="3" Grid.Column="1" Text="{Binding DesignName}" MaxLength="40" />
+                    <CheckBox Grid.Row="4" Grid.Column="1" Content="{s:L newStadium.roof}" IsChecked="{Binding DesignRoof}" />
+                  </Grid>
+                  <TextBlock Text="{Binding DesignCost}" FontWeight="SemiBold" />
+                  <TextBlock Text="{Binding DesignImpact}" Foreground="{Binding DesignImpactBrush}" TextWrapping="Wrap" />
+                  <Button Classes="primary" Content="{s:L newStadium.order}" Command="{Binding OrderNewStadiumCommand}" HorizontalAlignment="Left" />
+                </StackPanel>
+                <TextBlock Classes="muted small" Text="{s:L newStadium.help}" TextWrapping="Wrap" />
               </StackPanel>
             </Border>
           </StackPanel>

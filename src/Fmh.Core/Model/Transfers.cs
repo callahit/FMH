@@ -42,6 +42,7 @@ public enum TransactionType
     // Phase 3
     Tickets, SeasonTickets, Tv, Sponsorship, Merchandise, Catering, PrizeMoney, BuildingIncome,
     Wages, StaffWages, Bonuses, Upkeep, Construction, Interest, LoanPayout, LoanRepayment, Deposit, Travel, Fines, Event,
+    Youth, European,
 }
 
 /// <summary>Finanzbuchung (Datenmodell Kapitel 12).</summary>

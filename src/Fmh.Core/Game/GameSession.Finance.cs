@@ -317,6 +317,7 @@ public sealed partial class GameSession
     {
         foreach (var club in World.Clubs.Values)
         {
+            if (HasFinances(club)) RecordSeasonFinance(club);
             club.Finance.LastSeason = club.Finance.Season;
             club.Finance.Season = new Dictionary<TransactionType, long>();
         }
@@ -340,11 +341,12 @@ public sealed partial class GameSession
 
     public string? TakeLoan(long amount, int years) => TakeLoan(HumanClub, amount, years, silent: false);
 
-    private string? TakeLoan(Club club, long amount, int years, bool silent)
+    private string? TakeLoan(Club club, long amount, int years, bool silent, long? capacity = null)
     {
-        years = Math.Clamp(years, 1, 10);
+        // Stadionkredite (eigener Rahmen) laufen bis zu 20 Jahre.
+        years = Math.Clamp(years, 1, capacity is null ? 10 : 20);
         if (amount <= 0) return "fin.error.amount";
-        if (amount > LoanCapacity(club)) return "fin.error.loanLimit";
+        if (amount > (capacity ?? LoanCapacity(club))) return "fin.error.loanLimit";
         var rate = InterestRate(club);
         var r = rate / 100 / 12;
         var n = years * 12;
@@ -443,7 +445,7 @@ public sealed partial class GameSession
         // Nach Auf- oder Abstieg passt die Vorjahreszahl nicht mehr: zur Hälfte mit der Schätzung für die aktuelle Liga mischen.
         var last = ExpectedIncome(club);
         var income = club.Finance.LastSeason.Count == 0 ? last : (last + EstimateIncome(club)) / 2;
-        var fixedCosts = -club.Finance.LastSeason.Where(kv => kv.Key is TransactionType.StaffWages or TransactionType.Upkeep or TransactionType.Travel or TransactionType.Interest)
+        var fixedCosts = -club.Finance.LastSeason.Where(kv => kv.Key is TransactionType.StaffWages or TransactionType.Upkeep or TransactionType.Travel or TransactionType.Interest or TransactionType.Youth)
             .Sum(kv => Math.Min(0, kv.Value));
         if (fixedCosts == 0) fixedCosts = (long)(income * 0.22);
         var bill = Budgets.WageBill(club, World);
@@ -481,31 +483,6 @@ public sealed partial class GameSession
     }
 
     /// <summary>Lizenzierung am Saisonende: Eigenkapital und Infrastruktur für die Liga der neuen Saison.</summary>
-    private void Licensing()
-    {
-        foreach (var club in World.Clubs.Values.Where(HasFinances))
-        {
-            var div = DivisionFinance(club);
-            var equity = Equity(club);
-            var outcome = LicenseOutcome.Granted;
-            var deduction = 0;
-            if (club.Finance.Insolvent) { outcome = LicenseOutcome.PointDeduction; deduction = 9; }
-            else if (equity < div.MinEquity * 3) { outcome = LicenseOutcome.PointDeduction; deduction = 6; }
-            else if (equity < div.MinEquity * 1.5) { outcome = LicenseOutcome.PointDeduction; deduction = 3; }
-            else if (equity < div.MinEquity) outcome = LicenseOutcome.Conditions;
-            var infraMissing = club.Stadium.Floodlight < div.FloodlightRequired || BuildingLevel(club, "youthCentre") < div.YouthCenterRequired;
-            if (infraMissing && outcome == LicenseOutcome.Granted) outcome = LicenseOutcome.Conditions;
-            if (infraMissing) Book(club, TransactionType.Fines, -MarketValue.Round(50_000 * Scale(club)), TR("tx.licenseFine"));
-            club.Finance.LastLicense = outcome;
-            club.Finance.Insolvent = false;
-            if (deduction > 0) club.Finance.PendingDeduction = deduction;
-            if (IsHuman(club))
-                Notify(MessageType.Finance, "msg.sender.league", TR("msg.license.subject"),
-                    TR("msg.license." + outcome, TextArg.Money(equity, Currency), TextArg.Money(div.MinEquity, Currency), deduction,
-                        infraMissing ? TR("msg.license.infra", div.FloodlightRequired, div.YouthCenterRequired) : TextRef.Literal("")));
-        }
-    }
-
     /// <summary>KI: Schulden abbauen, bei Überschuss Stadion und Anlagen ausbauen.</summary>
     private void AiFinance(Club club)
     {
@@ -514,6 +491,7 @@ public sealed partial class GameSession
         if (b.Balance < -CreditLimit(club) / 2 && club.Finance.Loans.Count == 0 && LoanCapacity(club) > 0)
             TakeLoan(club, Math.Min(LoanCapacity(club), -b.Balance), 5, silent: true);
         var income = Math.Max(1, ExpectedIncome(club));
+        AiLicenseInvestments(club);
         if (b.Balance > income * 0.6)
         {
             // Wachsender Verein: Anlagen ausbauen, wo es am meisten bringt.
@@ -528,6 +506,29 @@ public sealed partial class GameSession
             if (club.Stadium.Capacity < 10_000 + club.Reputation * 3_500 && b.Balance > income)
                 Order(club, new ConstructionProject { Kind = ProjectKind.Seating, Side = _rng.Pick(new[] { StandSide.East, StandSide.West }), Amount = 1000 }, 1_300_000, 75, Contractor.Standard, false);
         }
+    }
+
+    /// <summary>KI: zuerst die Lizenzkriterien (Flutlicht, Leistungszentrum), ambitionierte Vereine auch für die höhere Liga und Europa.</summary>
+    private void AiLicenseInvestments(Club club)
+    {
+        var div = DivisionFinance(club);
+        var league = World.FindLeague(club.LeagueId);
+        var floodlight = div.FloodlightRequired;
+        var stars = div.YouthCenterRequired;
+        if (league is not null && World.Leagues.FirstOrDefault(l => l.CountryCode == league.CountryCode && l.Level == league.Level - 1) is { } higher
+            && World.Country(club.CountryCode).Finance.Divisions.TryGetValue(higher.Id, out var up) && club.Reputation >= 8)
+        {
+            floodlight = Math.Max(floodlight, up.FloodlightRequired);
+            stars = Math.Max(stars, up.YouthCenterRequired);
+        }
+        if (World.Country(club.CountryCode).Europe is { } europe && club.LeagueId == europe.League) floodlight = Math.Max(floodlight, europe.License.Floodlight);
+        var running = club.Grounds.Projects.Any(p => p.State is ProjectState.Building or ProjectState.AwaitingPermit);
+        if (!running && club.Stadium.Floodlight < floodlight && StadiumProjectQuote(club, ProjectKind.Floodlight, null) is { } q && q.cost < club.Budget.Balance + CreditLimit(club) / 2)
+            Order(club, new ConstructionProject { Kind = ProjectKind.Floodlight, Amount = 1 }, q.cost, q.days, Contractor.Premium, false);
+        if (club.Academy.Stars < stars && club.Grounds.Buildings.FirstOrDefault(x => x.Type == "youthCentre") is { UnderConstruction: false } centre
+            && Data.Building("youthCentre") is { } def && centre.Level < def.MaxLevel && LevelCost(def, centre.Level + 1) < club.Budget.Balance + CreditLimit(club) / 2)
+            Order(club, new ConstructionProject { Kind = ProjectKind.UpgradeBuilding, BuildingId = centre.Id, BuildingType = centre.Type, X = centre.X, Y = centre.Y, Amount = centre.Level + 1 },
+                LevelCost(def, centre.Level + 1), def.BuildDays / 2, Contractor.Premium, false);
     }
 
     /// <summary>Wochengehalt eines Scouts aus seiner Urteilskraft.</summary>

@@ -479,7 +479,7 @@ public sealed partial class GameSession
         foreach (var p in FreeAgents.ToList())
         {
             var age = p.Age(World.Date);
-            var chance = age >= 33 ? 1.0 : age >= 30 ? 0.6 : Rating(p) < floor ? 0.8 : 0.45;
+            var chance = age >= 33 ? 1.0 : age >= 30 ? 0.75 : Rating(p) < floor ? 0.9 : 0.6;
             if (_rng.Chance(chance)) p.Retired = true;
         }
     }
@@ -506,7 +506,8 @@ public sealed partial class GameSession
         foreach (var club in aiClubs)
         {
             ManageAiSquadSize(club);
-            if (club.PlayerIds.Count < 22) SignBestFreeAgent(club, NeededPosition(club));
+            // Dünne Kader: zuerst Vereinslose, sonst Talente aus der eigenen Jugend oder dem Umfeld.
+            if (club.PlayerIds.Count < 22 && !SignBestFreeAgent(club, NeededPosition(club)) && club.PlayerIds.Count < 21) AddEmergencyPlayer(club);
             if (window && _rng.Chance(0.3)) TryAiSigning(club);
         }
         if (window && _rng.Chance(0.3)) MakeIncomingOffer();

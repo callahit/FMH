@@ -77,6 +77,7 @@ public sealed partial class GameSession
         if (w.MaxFanMood is { } fmax && club.Fans.Mood > fmax) return false;
         if (w.MaxBoardTrust is { } bt && club.Board.Trust > bt) return false;
         if (w.RequiresBuilding is { } b && BuildingLevel(club, b) == 0) return false;
+        if (w.NoStadiumSite == true && (AvailableSite(club) is not null || club.Grounds.Projects.Any(p => p.Kind == ProjectKind.NewStadium && p.State != ProjectState.Done))) return false;
         if (w.LowBalance == true && club.Budget.Balance > ExpectedIncome(club) * 0.1) return false;
         var last1 = AllFixtures.Where(x => x.Involves(club.Id) && x.Result is not null).OrderByDescending(x => x.Date).FirstOrDefault();
         if (w.AfterWin == true && (last1 is null || Outcome(club, last1) <= 0 || last1.Date < World.Date.AddDays(-4))) return false;
@@ -149,6 +150,10 @@ public sealed partial class GameSession
                 case "reputation":
                     if (_rng.Chance(Math.Abs(value))) club.Reputation = Math.Clamp(club.Reputation + Math.Sign(value), 1, 20);
                     break;
+                case "stadiumSite":
+                    OfferStadiumSite(club);
+                    lines.Add(TR("effect.stadiumSite", club.Grounds.Site!.MaxCapacity, TextArg.OfDate(club.Grounds.Site.Expires)));
+                    continue;
                 case "pitch": club.Stadium.Pitch = Math.Clamp(club.Stadium.Pitch + value, 0, 100); break;
                 case "playerMorale" when player is not null:
                     player.State.Morale = (Morale)Math.Clamp((int)player.State.Morale + (int)Math.Round(value), 0, 6); break;

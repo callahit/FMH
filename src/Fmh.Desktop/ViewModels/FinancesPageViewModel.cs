@@ -14,6 +14,8 @@ public sealed record FinanceRow(string Label, string Current, string Last, IBrus
 
 public sealed record LoanLine(BankLoan Loan, string Text, string Detail, IRelayCommand Repay);
 
+public sealed record SeasonFinanceLine(string Season, string Revenue, string Expenses, string BreakEven, string Ratio, IBrush Brush);
+
 public sealed record SponsorLine(string Slot, string Company, string Value, string Until, IBrush Brush);
 
 /// <summary>Finanzen (Kapitel 8): Überblick, Saisonbilanz, Verlauf, Kredite, Festgeld, Budgets, Eintrittspreise, Sponsoren.</summary>
@@ -55,6 +57,10 @@ public sealed partial class FinancesPageViewModel : PageViewModel, IRefreshable
     [ObservableProperty] private string _priceText = "";
     [ObservableProperty] private string _sponsorText = "";
     [ObservableProperty] private string? _result;
+    [ObservableProperty] private IReadOnlyList<InfoLine> _licenseLines = Array.Empty<InfoLine>();
+    [ObservableProperty] private IReadOnlyList<InfoLine> _ffpLines = Array.Empty<InfoLine>();
+    [ObservableProperty] private IReadOnlyList<SeasonFinanceLine> _seasonLines = Array.Empty<SeasonFinanceLine>();
+    [ObservableProperty] private IReadOnlyList<InfoLine> _europeLines = Array.Empty<InfoLine>();
 
     [ObservableProperty] private decimal _loanAmount = 1_000_000;
     [ObservableProperty] private int _loanYearIndex = 2;
@@ -135,8 +141,65 @@ public sealed partial class FinancesPageViewModel : PageViewModel, IRefreshable
             var offers = club.SponsorOffers.Count(o => o.Slot == x.slot && o.Index == x.index);
             return new SponsorLine(slot, offers > 0 ? T.Format("fin.offers", offers) : T["fin.free"], "", "", new SolidColorBrush(offers > 0 ? P.Gold : P.Muted));
         }).ToList();
+        RefreshLicense();
         SponsorText = T.Format("fin.sponsorTotal", M(club.Sponsors.Where(x => x.UntilSeason >= s.World.SeasonYear).Sum(x => x.PerSeason)));
     }
+
+    private void RefreshLicense()
+    {
+        var s = Session;
+        var club = Club;
+        var lic = club.License;
+        var country = s.World.Country(club.CountryCode);
+        var fin = country.Finance;
+        string M(long v) => Fmt.Money(v, Currency);
+        string D(string md)
+        {
+            var parts = md.Split('-');
+            var month = int.Parse(parts[0]);
+            var year = month < country.Season.StartMonth ? s.World.SeasonYear + 1 : s.World.SeasonYear;
+            return Fmt.Date(new DateOnly(year, month, int.Parse(parts[1])));
+        }
+        IBrush B(bool ok) => new SolidColorBrush(ok ? P.Good : P.Bad);
+        var div = s.DivisionFinance(club);
+        var lines = new List<InfoLine>
+        {
+            new(T["license.stage"], T["licenseStage." + lic.Stage]),
+            new(T["license.outcome"], T["fin.license." + lic.Outcome], B(lic.Outcome is LicenseOutcome.Granted or LicenseOutcome.Conditions)),
+            new(T["license.dates"], T.Format("license.datesValue", D(fin.LicenseApplication), D(fin.LicenseDecision), D(fin.LicenseDeadline))),
+            new(T["license.equity"], $"{M(s.Equity(club))} / {M(div.MinEquity)}", B(s.Equity(club) >= div.MinEquity)),
+            new(T["license.floodlight"], $"{club.Stadium.Floodlight} / {div.FloodlightRequired}", B(club.Stadium.Floodlight >= div.FloodlightRequired)),
+            new(T["license.academy"], $"{club.Academy.Stars} / {div.YouthCenterRequired}", B(club.Academy.Stars >= div.YouthCenterRequired)),
+            new(T["license.conditions"], lic.Conditions.Count == 0 ? T["ui.none"] : string.Join(", ", lic.Conditions.Select(c => T["condition." + c]))),
+            new(T["license.promotion"], lic.PromotionAllowed ? T["ui.yes"] : T["ui.no"], B(lic.PromotionAllowed)),
+            new(T["license.uefa"], lic.UefaLicense ? T["ui.yes"] : lic.UefaReasons.Count == 0 ? T["license.notDecided"] : string.Join(", ", lic.UefaReasons.Select(r => T[r])), B(lic.UefaLicense)),
+        };
+        LicenseLines = lines;
+        var rules = country.Europe?.Ffp;
+        FfpLines = new List<InfoLine>
+        {
+            new(T["ffp.status"], T["ffp." + lic.Ffp], B(lic.Ffp is FfpStatus.Compliant)),
+            new(T["ffp.breakEven"], M(lic.FfpBreakEven) + (rules is null ? "" : " / " + M(-rules.AcceptableDeviation)), B(rules is null || lic.FfpBreakEven >= -rules.AcceptableDeviation)),
+            new(T["ffp.squadCost"], Fmt.Num(lic.FfpSquadCost * 100, "0") + " %" + (rules is null ? "" : " / " + Fmt.Num(rules.SquadCostRatio * 100, "0") + " %"), B(rules is null || lic.FfpSquadCost <= rules.SquadCostRatio)),
+            new(T["ffp.excluded"], lic.ExcludedUntilSeason >= s.World.SeasonYear ? GameSession.SeasonLabel(lic.ExcludedUntilSeason) : T["ui.no"]),
+        };
+        SeasonLines = club.Finance.Seasons.AsEnumerable().Reverse().Select(x => new SeasonFinanceLine(GameSession.SeasonLabel(x.SeasonYear), M(x.Revenue), M(x.Expenses),
+            M(x.BreakEven), Fmt.Num(x.SquadCostRatio * 100, "0") + " %", new SolidColorBrush(x.BreakEven < 0 ? P.Bad : P.Good))).ToList();
+        var europe = new List<InfoLine>();
+        foreach (var year in new[] { s.World.SeasonYear, s.World.SeasonYear + 1 })
+            foreach (var e in s.EuropeanEntriesOf(year))
+            {
+                var stage = e.Stage < 0 ? T["europe.notStarted"]
+                    : GameSession.EuropeCompetitionOf(s.World.Country(s.World.Clubs[e.ClubId].CountryCode), e.CompetitionId) is { } comp ? T[comp.Stages[e.Stage].Key] : "";
+                if (e.Eliminated && e.Stage < 4) stage += " · " + T["europe.out"];
+                europe.Add(new InfoLine($"{GameSession.SeasonLabel(year)} · {T["europe." + e.CompetitionId]}", $"{s.World.Clubs[e.ClubId].Name} – {stage}",
+                    e.ClubId == club.Id ? new SolidColorBrush(P.Gold) : null));
+            }
+        EuropeLines = europe;
+    }
+
+    public bool NoEurope => EuropeLines.Count == 0;
+    partial void OnEuropeLinesChanged(IReadOnlyList<InfoLine> value) => OnPropertyChanged(nameof(NoEurope));
 
     private void Show(string? error, string okKey, params object[] args)
     {

@@ -32,6 +32,8 @@ public sealed class Grounds
     /// <summary>Zusätzlich gekaufte Spalten am rechten Rand.</summary>
     public int ExtraColumns { get; set; }
     public bool Maintenance { get; set; } = true;
+    /// <summary>Von der Stadt angebotenes Grundstück für einen Stadionneubau.</summary>
+    public StadiumSite? Site { get; set; }
 
     public int EntranceX => StadiumX + StadiumWidth / 2;
     public int EntranceY => StadiumY + StadiumHeight;

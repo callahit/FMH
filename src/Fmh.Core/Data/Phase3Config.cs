@@ -19,6 +19,74 @@ public sealed class FinanceConfig
     public long PermitAbove { get; set; } = 1_000_000;
     /// <summary>Dauerkarten-Verkauf bis (MM-dd).</summary>
     public string SeasonTicketDeadline { get; set; } = "07-31";
+    /// <summary>Stichtage des Lizenzverfahrens (MM-dd): Antrag, Erstentscheidung, Nachweis der Auflagen.</summary>
+    public string LicenseApplication { get; set; } = "03-15";
+    public string LicenseDecision { get; set; } = "04-30";
+    public string LicenseDeadline { get; set; } = "05-31";
+    /// <summary>Punktabzug, wenn Auflagen bis zum Nachweisstichtag nicht erfüllt sind.</summary>
+    public int ConditionPenalty { get; set; } = 3;
+    /// <summary>Mindest-Zertifizierung des Nachwuchsleistungszentrums (Sterne) je Liga steht in DivisionFinance.YouthCenterRequired.</summary>
+    public long StadiumCostPerPlace { get; set; } = 900;
+    public long StadiumBaseCost { get; set; } = 4_000_000;
+    public long StadiumCostPerBox { get; set; } = 60_000;
+    public int StadiumBuildDays { get; set; } = 720;
+}
+
+/// <summary>Europäische Wettbewerbe (UEFA): Plätze, Lizenzkriterien, Financial Fair Play, Prämien.</summary>
+public sealed class EuropeConfig
+{
+    /// <summary>Liga, deren Abschlusstabelle die Plätze vergibt.</summary>
+    public string League { get; set; } = "";
+    public List<EuropePlace> Places { get; set; } = new();
+    /// <summary>Wettbewerb des Pokalsiegers (fällt an den nächsten Ligaplatz, wenn er schon qualifiziert ist).</summary>
+    public string CupWinner { get; set; } = "";
+    public string Cup { get; set; } = "";
+    public List<EuropeCompetition> Competitions { get; set; } = new();
+    public UefaLicenseRules License { get; set; } = new();
+    public FfpRules Ffp { get; set; } = new();
+}
+
+public sealed class EuropePlace
+{
+    public string Competition { get; set; } = "";
+    public int From { get; set; }
+    public int To { get; set; }
+}
+
+public sealed class EuropeCompetition
+{
+    public string Id { get; set; } = "";
+    /// <summary>Stärke des Teilnehmerfelds (Durchschnitt Top-11, Skala der Spielerbewertung).</summary>
+    public double FieldStrength { get; set; } = 13;
+    public long EntryPrize { get; set; }
+    /// <summary>Runden ab der Ligaphase: Name (Textschlüssel), Datum (MM-dd), Prämie fürs Erreichen.</summary>
+    public List<EuropeStage> Stages { get; set; } = new();
+}
+
+public sealed class EuropeStage
+{
+    public string Key { get; set; } = "";
+    public string Date { get; set; } = "";
+    public long Prize { get; set; }
+}
+
+public sealed class UefaLicenseRules
+{
+    public int MinSeats { get; set; } = 8000;
+    public int Floodlight { get; set; } = 3;
+    public int AcademyStars { get; set; } = 1;
+}
+
+public sealed class FfpRules
+{
+    /// <summary>Zulässiges Break-even-Defizit über drei Spielzeiten.</summary>
+    public long AcceptableDeviation { get; set; } = 5_000_000;
+    /// <summary>Ab diesem Defizit Ausschluss aus europäischen Wettbewerben.</summary>
+    public long SevereDeviation { get; set; } = 30_000_000;
+    /// <summary>Höchstquote Kaderkosten zu Umsatz.</summary>
+    public double SquadCostRatio { get; set; } = 0.7;
+    /// <summary>Geldstrafe in Prozent des Umsatzes.</summary>
+    public double FinePercent { get; set; } = 3;
 }
 
 public sealed class DivisionFinance
@@ -91,6 +159,8 @@ public sealed class EventCondition
     public double? MaxFanMood { get; set; }
     public double? MaxBoardTrust { get; set; }
     public string? RequiresBuilding { get; set; }
+    /// <summary>Nur ohne laufendes Grundstücksangebot und ohne laufenden Stadionneubau.</summary>
+    public bool? NoStadiumSite { get; set; }
     public bool? LowBalance { get; set; }
 }
 

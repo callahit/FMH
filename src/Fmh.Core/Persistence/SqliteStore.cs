@@ -14,7 +14,7 @@ namespace Fmh.Core.Persistence;
 public static class SqliteStore
 {
     /// <summary>Aktuelle Schemaversion. Ältere Spielstände werden beim Laden mit <see cref="Migrations"/> angehoben.</summary>
-    public const int SchemaVersion = 4;
+    public const int SchemaVersion = 5;
 
     /// <summary>Migrationsschritte: Schlüssel = Ausgangsversion; das SQL hebt die Datenbank um eine Version an.</summary>
     private static readonly Dictionary<int, string> Migrations = new()
@@ -100,6 +100,13 @@ public static class SqliteStore
                 data TEXT NOT NULL);
             CREATE TABLE events (id INTEGER PRIMARY KEY, event_id TEXT NOT NULL, date TEXT NOT NULL, chosen TEXT, data TEXT NOT NULL);
             CREATE TABLE event_history (event_id TEXT PRIMARY KEY, date TEXT NOT NULL);
+            """,
+        // Nachwuchsleistungszentrum, Lizenzakte mit FFP, Europapokalteilnehmer.
+        [4] = """
+            ALTER TABLE clubs ADD COLUMN academy TEXT;
+            ALTER TABLE clubs ADD COLUMN license TEXT;
+            CREATE TABLE european_entries (club_id INTEGER NOT NULL, competition TEXT NOT NULL, season_year INTEGER NOT NULL,
+                stage INTEGER NOT NULL, eliminated INTEGER NOT NULL, replacement INTEGER NOT NULL);
             """,
     };
 
@@ -251,14 +258,15 @@ public static class SqliteStore
         using (var cmd = Cmd(con, tx, "INSERT INTO managers VALUES ($a, $b, $c, $d, $e, $f, $g)", "$a", "$b", "$c", "$d", "$e", "$f", "$g"))
             foreach (var m in w.Managers) Run(cmd, m.Id, m.Name, m.Human, m.ClubId, m.Reputation, JsonSerializer.Serialize(m.Profile, Json.Compact), J(m.Career));
 
-        var clubParams = Enumerable.Range(0, 35).Select(i => "$c" + i).ToArray();
+        var clubParams = Enumerable.Range(0, 37).Select(i => "$c" + i).ToArray();
         using (var cmd = Cmd(con, tx, $"INSERT INTO clubs VALUES ({string.Join(",", clubParams)})", clubParams))
             foreach (var c in w.Clubs.Values)
                 Run(cmd, c.Id, c.Key, c.Name, c.ShortName, c.City, c.CountryCode, c.Reputation, c.PrimaryColor, c.SecondaryColor,
                     c.StadiumName, c.StadiumCapacity, c.LeagueId, c.ManagerId, J(c.Tactic),
                     c.Budget.Balance, c.Budget.TransferBudget, c.Budget.WageBudget, c.CoachQuality, c.YouthFacilities, c.YouthRecruitment,
                     J(c.SavedTactics), J(c.Familiarity), J(c.Training), c.Camp is null ? null : J(c.Camp), J(c.YouthIds), J(c.Shortlist), J(c.PlayerIds),
-                    J(c.Finance), J(c.Stadium), J(c.Grounds), J(c.Sponsors), J(c.SponsorOffers), J(c.Board), J(c.Fans), J(c.Rivals));
+                    J(c.Finance), J(c.Stadium), J(c.Grounds), J(c.Sponsors), J(c.SponsorOffers), J(c.Board), J(c.Fans), J(c.Rivals),
+                    J(c.Academy), J(c.License));
 
         WritePlayers(con, tx, w);
 
@@ -502,6 +510,8 @@ public static class SqliteStore
                 Board = Opt<BoardState>(r, 32) ?? new(),
                 Fans = Opt<FanState>(r, 33) ?? new(),
                 Rivals = Opt<List<int>>(r, 34) ?? new(),
+                Academy = Opt<YouthAcademy>(r, 35) ?? new(),
+                License = Opt<LicenseFile>(r, 36) ?? new(),
             };
             w.Clubs[c.Id] = c;
         }
@@ -702,6 +712,8 @@ public static class SqliteStore
             foreach (var e in w.Events) Run(cmd, e.Id, e.EventId, D(e.Date), e.Chosen, J(e));
         using (var cmd = Cmd(con, tx, "INSERT INTO event_history VALUES ($a,$b)", "$a", "$b"))
             foreach (var (id, d) in w.EventHistory) Run(cmd, id, D(d));
+        using (var cmd = Cmd(con, tx, "INSERT INTO european_entries VALUES ($a,$b,$c,$d,$e,$f)", "$a", "$b", "$c", "$d", "$e", "$f"))
+            foreach (var e in w.EuropeanEntries) Run(cmd, e.ClubId, e.CompetitionId, e.SeasonYear, e.Stage, e.Eliminated, e.Replacement);
     }
 
     private static void ReadCareer(SqliteConnection con, World w)
@@ -754,6 +766,12 @@ public static class SqliteStore
             w.Events.Add(PJ<PendingEvent>(r.GetString(0))!);
         foreach (var r in Rows(con, "SELECT event_id, date FROM event_history"))
             w.EventHistory[r.GetString(0)] = PD(r.GetString(1));
+        foreach (var r in Rows(con, "SELECT club_id, competition, season_year, stage, eliminated, replacement FROM european_entries"))
+            w.EuropeanEntries.Add(new EuropeanEntry
+            {
+                ClubId = r.GetInt32(0), CompetitionId = r.GetString(1), SeasonYear = r.GetInt32(2), Stage = r.GetInt32(3),
+                Eliminated = r.GetInt32(4) == 1, Replacement = r.GetInt32(5) == 1,
+            });
     }
 
     // ------------------------------------------------------------------ Hilfen
