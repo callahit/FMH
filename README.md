@@ -330,7 +330,8 @@ Mit `--strict` endet das Programm mit Exitcode 1, wenn eine Kennzahl außerhalb 
 Weitere Prüfungen:
 
 - `--max-ms 3` prüft zusätzlich die Rechenzeit je Spiel. Sie hängt von der Hardware ab und läuft
-  deshalb nicht in der CI (gemessen: 2,5–4,2 ms je nach Maschine).
+  deshalb nicht in der CI (gemessen: 2,4 ms in der Cloud-Umgebung, davon etwa 0,4 ms Aufstellung und
+  KI-Taktik, der Rest Engine).
 - `--season --seasons 5 --strict` prüft den Karrierelauf: Der langsamste Spieltag muss unter 5 s
   liegen und alle Saisons müssen durchlaufen.
 - `--max-drift 0.05` prüft zusätzlich die Ligastärke-Drift.
@@ -364,7 +365,8 @@ src/
   Fmh.Simulation/    Fassade GameSession: Tagesschleife, Modul-Registry (Reihenfolge aus DependsOn)
   Fmh.Persistence/   SQLite-Spielstand: Speicherabschnitte je Modul mit eigener Version, Altmigrationen bis Version 5
   Fmh.MatchEngine/   Text-Matchengine (Phasen, 5x7-Zonen, Duelle, Rollen, Verlängerung, Elfmeterschießen)
-                     und Kommentargenerator
+                     und Kommentargenerator; MatchSimulation ist nach Konzept 4.4 aufgeteilt in Zustandsmodell,
+                     Phasensteuerung (Flow), Aktionen, Standards, Disziplin, Spielerwahl, Werte und Wechsel-KI
   Fmh.Desktop/       Desktop-Oberfläche (Avalonia, MVVM), Programm "fmh"
   Fmh.Calibrate/     Kommandozeilen-Simulator "fmh-calibrate"
 tests/Fmh.Tests/     xUnit-Tests für Kern, Engine, Karriere, Spielstände, Daten, Oberfläche, Architektur
@@ -373,7 +375,7 @@ data/base/           Datenpaket "base": Länder, Vereine, Namen, Formationen, Ro
 ```
 
 Regeln, die ein Architekturtest prüft: erlaubte Projektverweise (Konzept 4.1), keine Datei in
-`Fmh.Simulation` oder `Fmh.Modules` über 400 Zeilen, kein Modul verwendet die Klasse eines anderen.
+`Fmh.Simulation`, `Fmh.Modules` oder `Fmh.MatchEngine` über 400 Zeilen, kein Modul verwendet die Klasse eines anderen.
 Ein Verein (`Club`) besitzt Mannschaften (`Team`, je eine Welt `men`/`women`); vereinsweite Daten liegen
 am Verein, Kader, Taktik, Training und Liga an der Mannschaft. Bis alle Module direkt mit Mannschaften
 arbeiten, leiten die gleichnamigen Vereinseigenschaften an die erste Mannschaft weiter.
