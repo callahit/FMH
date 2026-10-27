@@ -56,11 +56,15 @@ public static class DataValidator
             }
             foreach (var cup in country.Cups)
             {
-                foreach (var id in cup.Participants.Where(id => !KnownDivision(id)))
+                foreach (var id in cup.Participants.Concat(cup.Entries.SelectMany(e => e.Participants)).Where(id => !KnownDivision(id)))
                     errors.Add($"Pokal '{cup.Name}': unbekannte Teilnehmerliga '{id}'.");
-                // Mehr Bewerber als Plätze sind erlaubt: Der Pokal nimmt die höheren Ebenen zuerst (CupLogic.CreateCup).
-                var rounds = (int)Math.Ceiling(Math.Log2(Math.Max(2, cup.Teams)));
+                foreach (var q in cup.Entries.Select(e => e.QualifiersOf).Where(q => q.Length > 0 && country.Cups.All(c => c.Id != q)))
+                    errors.Add($"Pokal '{cup.Name}': Startplätze aus unbekanntem Pokal '{q}'.");
+                // Mehr Bewerber als Plätze sind erlaubt: Der Pokal nimmt die höheren Ebenen zuerst (CupEntries.Resolve).
+                // Mit späterem Einstieg ergibt sich die Rundenzahl erst aus den Teilnehmern; dann muss es je Einstiegsrunde Termine geben.
+                var rounds = cup.Entries.Any(e => e.Round > 1) ? cup.Entries.Max(e => e.Round) + 1 : (int)Math.Ceiling(Math.Log2(Math.Max(2, cup.Teams)));
                 if (cup.Dates.Count < rounds) errors.Add($"Pokal '{cup.Name}': {rounds} Runden, aber nur {cup.Dates.Count} Termine.");
+                if (cup.FixedPairing && cup.HomeEntry is < 0 or > 1) errors.Add($"Pokal '{cup.Name}': Heimrecht nur für Eintrag 0 oder 1.");
             }
         }
 

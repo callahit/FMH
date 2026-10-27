@@ -160,20 +160,64 @@
   ],
   "cups": [
     {
+      "id": "ENG-SC",
+      "name": "Super Cup",
+      "participants": [
+        "ENG1"
+      ],
+      "teams": 2,
+      "entries": [
+        {
+          "qualifiersOf": "ENG-CUP",
+          "count": 1
+        },
+        {
+          "participants": [
+            "ENG1"
+          ],
+          "previousSeason": true,
+          "count": 1
+        }
+      ],
+      "fixedPairing": true,
+      "lowerTierHome": false,
+      "legs": 1,
+      "dates": [
+        "08-08"
+      ],
+      "neutralFinal": true,
+      "prizes": [
+        0
+      ],
+      "winnerPrize": 0
+    },
+    {
       "id": "ENG-CUP",
       "name": "National Cup",
-      "participants": [
-        "ENG1",
-        "ENG2",
-        "ENG3",
-        "ENG4",
-        "ENG-NL"
+      "participants": [],
+      "teams": 116,
+      "entries": [
+        {
+          "participants": [
+            "ENG3",
+            "ENG4",
+            "ENG-NL"
+          ]
+        },
+        {
+          "participants": [
+            "ENG1",
+            "ENG2"
+          ],
+          "round": 3
+        }
       ],
-      "teams": 64,
       "lowerTierHome": false,
       "legs": 1,
       "awayGoals": false,
       "dates": [
+        "11-01",
+        "11-29",
         "01-10",
         "02-07",
         "03-04",
@@ -182,6 +226,96 @@
         "05-16"
       ],
       "neutralFinal": true
+    },
+    {
+      "id": "ENG-LC",
+      "name": "League Cup",
+      "participants": [],
+      "teams": 92,
+      "entries": [
+        {
+          "participants": [
+            "ENG2",
+            "ENG3",
+            "ENG4"
+          ]
+        },
+        {
+          "participants": [
+            "ENG1"
+          ],
+          "europe": false,
+          "round": 2
+        },
+        {
+          "participants": [
+            "ENG1"
+          ],
+          "europe": true,
+          "round": 3
+        }
+      ],
+      "lowerTierHome": false,
+      "legs": 1,
+      "roundLegs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        2,
+        1
+      ],
+      "awayGoals": false,
+      "dates": [
+        "08-13",
+        "08-27",
+        "09-17",
+        "10-29",
+        "12-17",
+        "01-07,02-04",
+        "03-15"
+      ],
+      "neutralFinal": true,
+      "prizes": [
+        0,
+        0,
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "winnerPrize": 120000
+    },
+    {
+      "id": "ENG-TR",
+      "name": "League Trophy",
+      "participants": [
+        "ENG3",
+        "ENG4"
+      ],
+      "teams": 48,
+      "lowerTierHome": false,
+      "legs": 1,
+      "dates": [
+        "09-02",
+        "10-07",
+        "11-11",
+        "01-13",
+        "02-17",
+        "04-12"
+      ],
+      "neutralFinal": true,
+      "prizes": [
+        10000,
+        10000,
+        20000,
+        40000,
+        60000,
+        80000
+      ],
+      "winnerPrize": 150000
     }
   ],
   "playoffs": [
@@ -427,15 +561,16 @@
         "competition": "UEL",
         "from": 5,
         "to": 5
-      },
-      {
-        "competition": "UECL",
-        "from": 6,
-        "to": 6
       }
     ],
     "cupWinner": "UEL",
     "cup": "ENG-CUP",
+    "cupPlaces": [
+      {
+        "cup": "ENG-LC",
+        "competition": "UECL"
+      }
+    ],
     "competitions": [
       {
         "id": "UCL",

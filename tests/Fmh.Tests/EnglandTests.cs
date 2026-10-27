@@ -66,6 +66,10 @@ public class EnglandTests
         Assert.All(semis, t => Assert.Equal(2, t.Legs));
         Assert.Equal(1, Assert.Single(po.Rounds[1].Ties).Legs);
         var winner = po.WinnerId!.Value;
+        // Der Sieger des League Cup spielt europäisch (Conference League, sofern nicht schon über Liga oder Pokal dabei).
+        var leagueCup = w.Clubs[w.Cups.Single(c => c.Id == "ENG-LC").WinnerId!.Value];
+        if (leagueCup.License.UefaLicense && !leagueCup.License.ForcedRelegation)
+            Assert.Contains(w.EuropeanEntries, e => e.ClubId == leagueCup.Id && e.SeasonYear == w.SeasonYear + 1);
         var bottom = LeagueTable.Compute(w.League("ENG4")).Skip(22).Select(r => r.ClubId).ToList();
         TestData.PlayUntil(s, r => r.Reason == StopReason.NewSeason, 20_000);
         foreach (var l in w.Leagues.Where(l => l.CountryCode == "ENG")) Assert.Equal(l.Format.Teams, l.ClubIds.Count);

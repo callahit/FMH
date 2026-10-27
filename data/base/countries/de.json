@@ -212,15 +212,82 @@
   ],
   "cups": [
     {
+      "id": "DE-SC",
+      "name": "Supercup",
+      "participants": [
+        "DE1"
+      ],
+      "teams": 2,
+      "entries": [
+        {
+          "qualifiersOf": "DE-CUP",
+          "count": 1
+        },
+        {
+          "participants": [
+            "DE1"
+          ],
+          "previousSeason": true,
+          "count": 1
+        }
+      ],
+      "fixedPairing": true,
+      "homeEntry": 1,
+      "lowerTierHome": false,
+      "legs": 1,
+      "dates": [
+        "08-09"
+      ],
+      "neutralFinal": false,
+      "prizes": [
+        0
+      ],
+      "winnerPrize": 0
+    },
+    {
       "id": "DE-CUP",
       "name": "Pokal",
       "participants": [
-        "DE1",
-        "DE2",
-        "DE3",
-        "DE4"
+        "DE4",
+        "DE-AMA"
       ],
       "teams": 64,
+      "entries": [
+        {
+          "participants": [
+            "DE1",
+            "DE2"
+          ],
+          "previousSeason": true
+        },
+        {
+          "participants": [
+            "DE3"
+          ],
+          "previousSeason": true,
+          "count": 4
+        },
+        {
+          "qualifiersOf": "DE-LP-N",
+          "count": 5
+        },
+        {
+          "qualifiersOf": "DE-LP-NO",
+          "count": 6
+        },
+        {
+          "qualifiersOf": "DE-LP-W",
+          "count": 4
+        },
+        {
+          "qualifiersOf": "DE-LP-SW",
+          "count": 7
+        },
+        {
+          "qualifiersOf": "DE-LP-S",
+          "count": 2
+        }
+      ],
       "lowerTierHome": true,
       "legs": 1,
       "awayGoals": false,
@@ -233,6 +300,121 @@
         "05-08"
       ],
       "neutralFinal": true
+    },
+    {
+      "id": "DE-LP-N",
+      "name": "Verbandspokal Nord",
+      "participants": [
+        "DE3",
+        "DE4",
+        "DE-AMA"
+      ],
+      "region": "Nord",
+      "teams": 32,
+      "lowerTierHome": true,
+      "legs": 1,
+      "dates": [
+        "08-19",
+        "09-16",
+        "10-21",
+        "04-07",
+        "05-21"
+      ],
+      "neutralFinal": false,
+      "prizes": [],
+      "winnerPrize": 0
+    },
+    {
+      "id": "DE-LP-NO",
+      "name": "Verbandspokal Nordost",
+      "participants": [
+        "DE3",
+        "DE4",
+        "DE-AMA"
+      ],
+      "region": "Nordost",
+      "teams": 32,
+      "lowerTierHome": true,
+      "legs": 1,
+      "dates": [
+        "08-19",
+        "09-16",
+        "10-21",
+        "04-07",
+        "05-21"
+      ],
+      "neutralFinal": false,
+      "prizes": [],
+      "winnerPrize": 0
+    },
+    {
+      "id": "DE-LP-W",
+      "name": "Verbandspokal West",
+      "participants": [
+        "DE3",
+        "DE4",
+        "DE-AMA"
+      ],
+      "region": "West",
+      "teams": 32,
+      "lowerTierHome": true,
+      "legs": 1,
+      "dates": [
+        "08-19",
+        "09-16",
+        "10-21",
+        "04-07",
+        "05-21"
+      ],
+      "neutralFinal": false,
+      "prizes": [],
+      "winnerPrize": 0
+    },
+    {
+      "id": "DE-LP-SW",
+      "name": "Verbandspokal Südwest",
+      "participants": [
+        "DE3",
+        "DE4",
+        "DE-AMA"
+      ],
+      "region": "Südwest",
+      "teams": 32,
+      "lowerTierHome": true,
+      "legs": 1,
+      "dates": [
+        "08-19",
+        "09-16",
+        "10-21",
+        "04-07",
+        "05-21"
+      ],
+      "neutralFinal": false,
+      "prizes": [],
+      "winnerPrize": 0
+    },
+    {
+      "id": "DE-LP-S",
+      "name": "Verbandspokal Süd",
+      "participants": [
+        "DE3",
+        "DE4",
+        "DE-AMA"
+      ],
+      "region": "Süd",
+      "teams": 32,
+      "lowerTierHome": true,
+      "legs": 1,
+      "dates": [
+        "08-19",
+        "09-16",
+        "10-21",
+        "04-07",
+        "05-21"
+      ],
+      "neutralFinal": false,
+      "prizes": [],
+      "winnerPrize": 0
     }
   ],
   "playoffs": [

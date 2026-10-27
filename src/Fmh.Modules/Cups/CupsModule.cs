@@ -19,8 +19,9 @@ public sealed partial class CupsModule : GameModule, ICupsService
             foreach (var cfg in country.Cups)
             {
                 var cup = CupLogic.CreateCup(World, country, cfg);
+                if (cup.ParticipantIds.Count < 2) continue;
                 World.Cups.Add(cup);
-                DrawRound(cup, cup.Rounds[0], cup.ParticipantIds);
+                DrawRound(cup, cup.Rounds[0], cup.Rounds[0].Entrants);
             }
         }
     }
@@ -64,7 +65,9 @@ public sealed partial class CupsModule : GameModule, ICupsService
                 Notify(MessageType.Cup, "msg.sender.association", TR("msg.cupWinner.subject", Comp(cup.Id)), TR("msg.cupWinner.body", Comp(cup.Id), World.Clubs[winners[0]].Name));
             return;
         }
-        DrawRound(cup, cup.Rounds[round.Number], winners);
+        // Neueinsteiger der nächsten Runde (z. B. Erstligisten in Runde 3) kommen zu den Siegern hinzu.
+        var next = cup.Rounds[round.Number];
+        DrawRound(cup, next, winners.Concat(next.Entrants).ToList());
     }
 
     private IEnumerable<PlayoffConfig> ActivePlayoffs(CountryConfig country) =>

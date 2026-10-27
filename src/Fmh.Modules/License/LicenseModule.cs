@@ -278,15 +278,17 @@ public sealed partial class LicenseModule : GameModule, ILicenseService
             if (country.Europe is not { } europe || World.FindLeague(europe.League) is not { } league) continue;
             bool Eligible(Club c) => c.License.UefaLicense && c.License.ExcludedUntilSeason < next && !c.License.ForcedRelegation;
             var table = LeagueTable.Compute(league);
-            var cupWinner = World.Cups.FirstOrDefault(c => c.Id == europe.Cup && c.SeasonYear == World.SeasonYear)?.WinnerId is { } wid ? World.Clubs[wid] : null;
             var slots = europe.Places.OrderBy(p => p.From).SelectMany(p => Enumerable.Repeat(p.Competition, p.To - p.From + 1)).ToList();
-            var cupOk = cupWinner is not null && Eligible(cupWinner) && europe.CupWinner.Length > 0;
-            var cupViaLeague = cupOk && table.Select(r => World.Clubs[r.ClubId]).Where(Eligible).Take(slots.Count).Contains(cupWinner!);
-            // Pokalsieger schon über die Liga dabei oder ohne Zulassung: der Platz geht an den nächsten Ligaplatz.
-            if (europe.CupWinner.Length > 0 && (!cupOk || cupViaLeague))
+            var leagueSlots = slots.Count;
+            // Pokalsieger: schon über die Liga dabei, doppelt oder ohne Zulassung, dann geht der Platz an den nächsten Ligaplatz.
+            var cupEntries = new List<(Club club, string competition)>();
+            foreach (var place in europe.AllCupPlaces)
             {
-                var idx = slots.FindLastIndex(s => s == europe.CupWinner);
-                slots.Insert(idx < 0 ? slots.Count : idx + 1, europe.CupWinner);
+                var winner = World.Cups.FirstOrDefault(c => c.Id == place.Cup && c.SeasonYear == World.SeasonYear)?.WinnerId is { } wid ? World.Clubs[wid] : null;
+                var viaLeague = winner is not null && table.Select(r => World.Clubs[r.ClubId]).Where(Eligible).Take(leagueSlots).Contains(winner);
+                if (winner is not null && Eligible(winner) && !viaLeague && cupEntries.All(e => e.club != winner)) { cupEntries.Add((winner, place.Competition)); continue; }
+                var idx = slots.FindLastIndex(s => s == place.Competition);
+                slots.Insert(idx < 0 ? slots.Count : idx + 1, place.Competition);
             }
             var skipped = new List<Club>();
             var allocated = new List<EuropeanEntry>();
@@ -294,11 +296,11 @@ public sealed partial class LicenseModule : GameModule, ILicenseService
             {
                 if (allocated.Count >= slots.Count) break;
                 var club = World.Clubs[row.ClubId];
-                if (cupOk && !cupViaLeague && club == cupWinner) continue;
+                if (cupEntries.Any(e => e.club == club)) continue;
                 if (!Eligible(club)) { skipped.Add(club); continue; }
                 allocated.Add(new EuropeanEntry { ClubId = club.Id, CompetitionId = slots[allocated.Count], SeasonYear = next, Replacement = skipped.Count > 0 });
             }
-            if (cupOk && !cupViaLeague) allocated.Add(new EuropeanEntry { ClubId = cupWinner!.Id, CompetitionId = europe.CupWinner, SeasonYear = next });
+            allocated.AddRange(cupEntries.Select(e => new EuropeanEntry { ClubId = e.club.Id, CompetitionId = e.competition, SeasonYear = next }));
             World.EuropeanEntries.AddRange(allocated);
 
             var human = HumanClub;

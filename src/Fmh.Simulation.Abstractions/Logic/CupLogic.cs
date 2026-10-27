@@ -19,16 +19,9 @@ public static class CupLogic
 
     public static Cup CreateCup(World world, CountryConfig country, CupConfig cfg)
     {
-        // Teilnehmer: Ligen, Staffeln (über die Division) und Pools; zweite Mannschaften nur, wenn das Land es erlaubt.
-        bool Takes(Club c) => cfg.Participants.Contains(c.LeagueId) || (world.FindLeague(c.LeagueId) is { } l && cfg.Participants.Contains(l.Format.Id));
-        var participants = world.Clubs.Values
-            .Where(c => c.CountryCode == country.Code && Takes(c) && (c.ReserveOf is null || country.Reserves.PlayInCups))
-            .OrderBy(c => c.Id).ToList()
-            // Mehr Bewerber als Plätze: die höheren Ebenen zuerst, innerhalb einer Ebene nach Ruf.
-            .OrderBy(c => Level(world, c.Id)).ThenByDescending(c => c.Reputation).ThenBy(c => c.Id).Take(Math.Max(cfg.Teams, 2))
-            .Select(c => c.Id).OrderBy(id => id).ToList();
-        var size = 2;
-        while (size < Math.Max(cfg.Teams, participants.Count)) size *= 2;
+        // Teilnehmer: Startplätze und Auffüllen aus Ligen, Staffeln und Pools; zweite Mannschaften nur, wenn das Land es erlaubt.
+        var entrants = CupEntries.Resolve(world, country, cfg);
+        var sizes = CupEntries.PlanRounds(entrants[1].Count, entrants, cfg.Teams);
         var cup = new Cup
         {
             Id = cfg.Id,
@@ -37,17 +30,17 @@ public static class CupLogic
             Kind = CompetitionKind.Cup,
             SeasonYear = world.SeasonYear,
             Config = cfg,
-            ParticipantIds = participants,
+            ParticipantIds = entrants.Values.SelectMany(ids => ids).OrderBy(id => id).ToList(),
         };
-        var rounds = (int)Math.Round(Math.Log2(size));
-        for (var r = 0; r < rounds; r++)
+        for (var r = 0; r < sizes.Count; r++)
         {
-            var teamsLeft = size >> r;
             var dates = r < cfg.Dates.Count ? cfg.Dates[r].Split(',') : new[] { "06-01" };
             cup.Rounds.Add(new CupRound
             {
                 Number = r + 1,
-                NameKey = RoundKey(teamsLeft, r + 1),
+                NameKey = RoundKey(sizes[r], r + 1),
+                Teams = sizes[r],
+                Entrants = entrants.TryGetValue(r + 1, out var ids) ? ids : new List<int>(),
                 Dates = dates.Select(d => ToWeekday(ScheduleGenerator.ParseDate(d.Trim(), world.SeasonYear, country.Season.StartMonth), DayOfWeek.Wednesday)).ToList(),
             });
         }
@@ -129,8 +122,15 @@ public static class CupLogic
     public static void Draw(World world, Cup cup, CupRound round, List<int> teams, Rng rng)
     {
         var pool = teams.ToList();
+        if (cup.Config.FixedPairing)
+        {
+            // Feste Paarungen (Supercup): Reihenfolge der Startplätze, Heimrecht nach HomeEntry.
+            for (var i = 0; i + 1 < pool.Count; i += 2)
+                AddTie(world, cup, round, pool[i + (cup.Config.HomeEntry ?? 0)], pool[i + 1 - (cup.Config.HomeEntry ?? 0)]);
+            return;
+        }
         rng.Shuffle(pool);
-        var size = 1 << (cup.Rounds.Count - round.Number + 1);
+        var size = round.Teams > 0 ? round.Teams : 1 << (cup.Rounds.Count - round.Number + 1);
         var byes = Math.Max(0, size - pool.Count);
         // Freilose bekommen die stärksten Vereine (höchste Liga, höchste Reputation).
         var byeTeams = pool.OrderBy(id => Level(world, id)).ThenByDescending(id => world.Clubs[id].Reputation).Take(byes).ToList();
@@ -149,7 +149,8 @@ public static class CupLogic
 
     private static void AddTie(World world, Cup cup, CupRound round, int home, int away)
     {
-        var legs = Math.Max(1, round.Number == cup.Rounds.Count && cup.Config.FinalLegs is { } fl ? fl : cup.Config.Legs);
+        var legs = Math.Max(1, round.Number <= cup.Config.RoundLegs.Count ? cup.Config.RoundLegs[round.Number - 1]
+            : round.Number == cup.Rounds.Count && cup.Config.FinalLegs is { } fl ? fl : cup.Config.Legs);
         var tie = new CupTie { Id = world.NextTieId++, HomeId = home, AwayId = away, Legs = legs };
         for (var leg = 1; leg <= legs; leg++)
         {

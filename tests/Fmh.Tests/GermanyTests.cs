@@ -30,17 +30,22 @@ public class GermanyTests
         Assert.All(reserves, r => Assert.Equal(4, w.FindLeague(r.LeagueId)!.Level));
     }
 
-    /// <summary>Pokal mit 64 Plätzen: alle Vereine der Ebenen 1–3, die übrigen Plätze an die Regionalligisten mit dem höchsten Ruf.</summary>
+    /// <summary>
+    /// Pokal mit 64 Plätzen in der ersten Saison (ohne Vorjahr): alle Vereine der Ebenen 1 und 2, die vier Drittligisten mit
+    /// dem höchsten Ruf und statt der Verbandspokalsieger die Regionalligisten mit dem höchsten Ruf, ohne zweite Mannschaften.
+    /// </summary>
     [Fact]
     public void CupTakesHigherLevelsFirst()
     {
         var w = TestData.NewSession().World;
         var cup = w.Cups.Single(c => c.Id == "DE-CUP");
         Assert.Equal(64, cup.ParticipantIds.Count);
-        var upper = w.Leagues.Where(l => l.Level <= 3).SelectMany(l => l.ClubIds).ToList();
+        var upper = w.Leagues.Where(l => l.Level <= 2).SelectMany(l => l.ClubIds).ToList();
         Assert.All(upper, id => Assert.Contains(id, cup.ParticipantIds));
-        var regional = cup.ParticipantIds.Except(upper).Select(id => w.Clubs[id]).ToList();
-        Assert.Equal(8, regional.Count);
+        var third = w.League("DE3").ClubIds.Select(id => w.Clubs[id]).OrderByDescending(c => c.Reputation).ThenBy(c => c.Id).ToList();
+        Assert.Equal(third.Take(4).Select(c => c.Id).Order(), cup.ParticipantIds.Intersect(third.Select(c => c.Id)).Order());
+        var regional = cup.ParticipantIds.Except(upper).Except(third.Select(c => c.Id)).Select(id => w.Clubs[id]).ToList();
+        Assert.Equal(24, regional.Count);
         Assert.All(regional, c => Assert.Equal(4, w.FindLeague(c.LeagueId)!.Level));
         Assert.DoesNotContain(regional, c => c.ReserveOf is not null);
         var left = w.Leagues.Where(l => l.Level == 4).SelectMany(l => l.ClubIds).Select(id => w.Clubs[id])

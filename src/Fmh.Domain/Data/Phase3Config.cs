@@ -45,9 +45,21 @@ public sealed class EuropeConfig
     /// <summary>Wettbewerb des Pokalsiegers (fällt an den nächsten Ligaplatz, wenn er schon qualifiziert ist).</summary>
     public string CupWinner { get; set; } = "";
     public string Cup { get; set; } = "";
+    /// <summary>Weitere Pokalsieger mit Europaplatz (z. B. Ligapokal), in dieser Reihenfolge nach <see cref="Cup"/>.</summary>
+    public List<EuropeCupPlace> CupPlaces { get; set; } = new();
     public List<EuropeCompetition> Competitions { get; set; } = new();
+
+    /// <summary>Alle Pokalplätze: zuerst <see cref="Cup"/>, dann <see cref="CupPlaces"/>.</summary>
+    public IEnumerable<EuropeCupPlace> AllCupPlaces =>
+        (Cup.Length > 0 && CupWinner.Length > 0 ? new[] { new EuropeCupPlace { Cup = Cup, Competition = CupWinner } } : Array.Empty<EuropeCupPlace>()).Concat(CupPlaces);
     public UefaLicenseRules License { get; set; } = new();
     public FfpRules Ffp { get; set; } = new();
+}
+
+public sealed class EuropeCupPlace
+{
+    public string Cup { get; set; } = "";
+    public string Competition { get; set; } = "";
 }
 
 public sealed class EuropePlace
