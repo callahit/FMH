@@ -19,9 +19,18 @@ public sealed partial class OptionsViewModel : ViewModelBase
         var yesNo = new[] { T["ui.no"], T["ui.yes"] };
         var themes = Palette.All.Select(t => t.Name).ToList();
         var languages = State.Languages;
+        var currencies = Data.Currencies.Rates.Select(r => r.Code).ToList();
         Settings = new List<ChoiceSetting>
         {
             new(T["options.wage"], Names<WageDisplay>("wage."), Idx(p.WageDisplay), i => p.WageDisplay = At<WageDisplay>(i)),
+            new(T["options.currency"], currencies.Select(c => T.TryGet("currency." + c) ?? c).ToList(), Math.Max(0, currencies.IndexOf(p.DisplayCurrency)), i =>
+            {
+                p.DisplayCurrency = currencies[i];
+                State.ApplyCurrency();
+                OnPropertyChanged(nameof(Rate));
+                OnPropertyChanged(nameof(RateEditable));
+                OnPropertyChanged(nameof(RateLabel));
+            }),
             new(T["options.attributes"], Names<AttributeDisplay>("attrDisplay."), Idx(p.AttributeDisplay), i => p.AttributeDisplay = At<AttributeDisplay>(i)),
             new(T["options.matchDisplay"], Names<MatchDisplayMode>("matchDisplay."), Idx(p.MatchDisplay), i => p.MatchDisplay = At<MatchDisplayMode>(i)),
             new(T["options.matchSpeed"], Enumerable.Range(1, 5).Select(i => T["speed." + i]).ToList(), p.MatchSpeed - 1, i => p.MatchSpeed = i + 1),
@@ -54,6 +63,33 @@ public sealed partial class OptionsViewModel : ViewModelBase
     }
 
     public string Title => T.Format("options.title", Session.HumanManager.Name);
+
+    /// <summary>Kurs der Anzeigewährung (Einheiten je Euro); der Euro selbst ist die Leitwährung und nicht änderbar.</summary>
+    public decimal Rate
+    {
+        get => (decimal)State.RateOf(Session.HumanManager.Profile.DisplayCurrency);
+        set
+        {
+            var p = Session.HumanManager.Profile;
+            if (p.DisplayCurrency == Fmh.Core.Data.CurrencyConfig.Base || value <= 0) return;
+            p.ExchangeRates[p.DisplayCurrency] = (double)value;
+            State.ApplyCurrency();
+            OnPropertyChanged();
+        }
+    }
+
+    public bool RateEditable => Session.HumanManager.Profile.DisplayCurrency != Fmh.Core.Data.CurrencyConfig.Base;
+
+    public string RateLabel => T.Format("options.rate", Session.HumanManager.Profile.DisplayCurrency, Data.Currencies.AsOf);
+
+    /// <summary>Eigenen Kurs verwerfen und den Standardkurs aus den Daten nutzen.</summary>
+    [RelayCommand]
+    private void ResetRate()
+    {
+        Session.HumanManager.Profile.ExchangeRates.Remove(Session.HumanManager.Profile.DisplayCurrency);
+        State.ApplyCurrency();
+        OnPropertyChanged(nameof(Rate));
+    }
     public IReadOnlyList<ChoiceSetting> Settings { get; }
     public IReadOnlyList<InfoLine> World { get; }
 

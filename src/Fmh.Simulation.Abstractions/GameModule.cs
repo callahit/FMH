@@ -69,8 +69,8 @@ public abstract class GameModule : IGameModule
 
     protected bool IsHuman(Club club) => club.ManagerId is { } mid && World.Managers.First(m => m.Id == mid).Human;
 
-    /// <summary>Währung des menschlichen Vereins.</summary>
-    protected string Currency => World.Country(HumanClub.CountryCode).Currency;
+    /// <summary>Spielwährung (immer Euro; die Anzeige rechnet in die gewählte Währung um).</summary>
+    protected static string Currency => CurrencyConfig.Base;
 
     public static string SeasonLabel(int year) => $"{year}/{(year + 1) % 100:00}";
 
