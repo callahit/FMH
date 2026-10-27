@@ -46,7 +46,7 @@ public class EnglandTests
         Assert.All(dates, d => Assert.Contains(d.DayOfWeek, new[] { DayOfWeek.Saturday, DayOfWeek.Tuesday }));
         // Die Premier Division kommt mit 38 Spieltagen ohne Englische Wochen aus.
         Assert.All(w.League("ENG1").Fixtures, f => Assert.Equal(DayOfWeek.Saturday, f.Date.DayOfWeek));
-        Assert.Equal("GBP", w.Country("ENG").Currency);
+        Assert.Equal("EUR", w.Country("ENG").Currency);
     }
 
     /// <summary>
