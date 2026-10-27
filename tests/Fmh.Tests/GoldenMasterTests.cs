@@ -110,7 +110,7 @@ internal static class WorldFingerprint
             ["calendar"] = J(new { w.Date, w.SeasonYear, w.SeasonFinished, w.RngState }),
             ["ids"] = J(new { w.NextPlayerId, w.NextFixtureId, w.NextMessageId, w.NextTieId, w.NextNegotiationId, w.NextScoutId, w.NextAssignmentId,
                 w.NextStaffId, w.NextBuildingId, w.NextProjectId, w.NextSponsorId, w.NextLoanId, w.NextEventId }),
-            ["managers"] = J(w.Managers),
+            ["managers"] = Legacy(w.Managers, null, "profile", ProfileFieldsSinceCurrency),
             ["clubs"] = Legacy(w.Clubs.Values.OrderBy(c => c.Id), ClubFieldsSinceAp3, "format", null),
             ["players"] = J(w.Players.Values.OrderBy(p => p.Id)),
             ["leagues"] = Legacy(w.Leagues, null, "format", FormatFieldsSinceAp3),
@@ -130,6 +130,9 @@ internal static class WorldFingerprint
 
     /// <summary>Felder, die AP 4 an Pokalformaten ergänzt hat (eigene Spielzahl im Finale).</summary>
     private static readonly string[] CupFieldsSinceAp4 = { "finalLegs" };
+
+    /// <summary>Anzeigewährung und eigene Kurse im Managerprofil (reine Anzeige, ohne Wirkung auf die Simulation).</summary>
+    private static readonly string[] ProfileFieldsSinceCurrency = { "displayCurrency", "exchangeRates" };
 
     private static string Legacy<T>(IEnumerable<T> items, string[]? remove, string nested, string[]? removeFromNested)
     {
