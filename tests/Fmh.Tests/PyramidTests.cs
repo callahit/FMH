@@ -289,4 +289,73 @@ public class PyramidTests
         Assert.DoesNotContain("lineup.reserveAge", LineupSelector.Validate(reserve, w, Data, eligible));
         Assert.True(reserve.Tactic.Lineup.Concat(reserve.Tactic.Bench.Select(b => (int?)b)).Count(id => id is { } v && w.Players[v].Age(start) > 23) <= 3);
     }
+
+    /// <summary>Saisonphasen: 2. Testliga mit Meister- und Abstiegsrunde (je 5 Teams, einfache Runde, halbe Punkte abgerundet).</summary>
+    [Fact]
+    public void ChampionshipAndRelegationRoundCarryHalfThePoints()
+    {
+        static CountryConfig Copy(CountryConfig c) =>
+            System.Text.Json.JsonSerializer.Deserialize<CountryConfig>(System.Text.Json.JsonSerializer.Serialize(c, Json.Compact), Json.Compact)!;
+        var tl = Copy(Data.Countries.Single(c => c.Code == "TL"));
+        tl.Divisions.Single(d => d.Id == "TL2").Phases.Add(new PhaseConfig
+        {
+            Id = "split", Name = "Meister- und Abstiegsrunde", Rounds = 1, PointsCarry = 0.5, Rounding = PointsRounding.Down,
+            Groups = { new PhaseGroup { Id = "top", Name = "Meisterrunde", Positions = "1-5" }, new PhaseGroup { Id = "bottom", Name = "Abstiegsrunde", Positions = "6-10" } },
+        });
+        var data = WithCountry(tl);
+        Assert.Empty(PyramidValidator.Validate(data));
+        var world = WorldGenerator.Create(data, new NewGameOptions
+        {
+            Seed = 79, ClubKey = "tl1-5", ManagerName = "Test", Activation = new() { ["DE"] = CountryActivation.Inactive },
+        });
+        var s = new GameSession(world, data, new TextMatchEngine());
+        var tl2 = world.League("TL2");
+        TestData.PlayUntil(s, _ => tl2.PhaseScheduled, 20_000);
+        var regular = LeagueTable.Compute(tl2, tl2.RegularMatchdays);
+        Assert.Equal(90, tl2.Fixtures.Count(f => f.Matchday <= tl2.RegularMatchdays));
+        Assert.Equal(20, tl2.Fixtures.Count(f => f.Matchday > tl2.RegularMatchdays));
+        Assert.False(tl2.IsComplete);
+
+        TestData.PlayUntil(s, r => r.Reason == StopReason.SeasonEnd, 20_000);
+        var final = LeagueTable.Compute(tl2);
+        // Die Meisterrunde belegt die Plätze 1–5, unabhängig von den Punkten der Abstiegsrunde.
+        Assert.Equal(regular.Take(5).Select(r => r.ClubId).ToHashSet(), final.Take(5).Select(r => r.ClubId).ToHashSet());
+        foreach (var row in final)
+        {
+            var before = regular.First(r => r.ClubId == row.ClubId);
+            Assert.True(row.Points >= before.Points / 2 && row.Points <= before.Points / 2 + 12, $"{row.ClubId}: {row.Points} aus {before.Points}");
+            Assert.Equal(before.Played + 4, row.Played);
+        }
+        TestData.PlayUntil(s, r => r.Reason == StopReason.NewSeason, 20_000);
+        AssertConsistent(world);
+        Assert.All(world.Leagues, l => Assert.Equal(l.RegularMatchdays, l.MatchdayCount));
+    }
+
+    private static GameData WithCountry(CountryConfig country)
+    {
+        var data = new GameData
+        {
+            Packages = Data.Packages, Countries = Data.Countries.Where(c => c.Code != country.Code).Append(country).ToList(),
+            Clubs = Data.Clubs, Names = Data.Names, Formations = Data.Formations, PositionProfiles = Data.PositionProfiles,
+            Injuries = Data.Injuries, Roles = Data.Roles, Engine = Data.Engine, Buildings = Data.Buildings, Events = Data.Events,
+            PressQuestions = Data.PressQuestions, Sponsors = Data.Sponsors, Languages = Data.Languages, DefaultLanguage = Data.DefaultLanguage,
+        };
+        data.UseLanguage("de");
+        return data;
+    }
+
+    [Fact]
+    public void ValidatorChecksPhaseGroups()
+    {
+        var tl = System.Text.Json.JsonSerializer.Deserialize<CountryConfig>(
+            System.Text.Json.JsonSerializer.Serialize(Data.Countries.Single(c => c.Code == "TL"), Json.Compact), Json.Compact)!;
+        tl.Divisions.Single(d => d.Id == "TL2").Phases.Add(new PhaseConfig
+        {
+            Name = "Lücke", PointsCarry = 1.5,
+            Groups = { new PhaseGroup { Positions = "1-5" }, new PhaseGroup { Positions = "7-10" } },
+        });
+        var errors = PyramidValidator.Validate(WithCountries(tl));
+        Assert.Contains(errors, e => e.Contains("nicht alle Plätze genau einmal"));
+        Assert.Contains(errors, e => e.Contains("Punkteübernahme"));
+    }
 }

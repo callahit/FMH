@@ -16,7 +16,16 @@ public sealed class League
 
     public int MatchdayCount => Fixtures.Count == 0 ? 0 : Fixtures.Max(f => f.Matchday);
 
-    public bool IsComplete => Fixtures.Count > 0 && Fixtures.All(f => f.Result is not null);
+    /// <summary>Spieltage des Grunddurchgangs (Kreisverfahren; bei ungerader Teamzahl ein Spieltag mehr je Runde).</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public int RegularMatchdays => (ClubIds.Count % 2 == 0 ? ClubIds.Count - 1 : ClubIds.Count) * Format.Rounds;
+
+    /// <summary>Spiele der zweiten Saisonphase sind angesetzt.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public bool PhaseScheduled => Fixtures.Any(f => f.Matchday > RegularMatchdays);
+
+    /// <summary>Alle Spiele gespielt; mit Saisonphasen erst, wenn auch die zweite Phase angesetzt und beendet ist.</summary>
+    public bool IsComplete => Fixtures.Count > 0 && Fixtures.All(f => f.Result is not null) && (Format.Phases.Count == 0 || PhaseScheduled);
 
     /// <summary>Letzter vollständig gespielter Spieltag (0 = noch keiner).</summary>
     public int CurrentMatchday =>

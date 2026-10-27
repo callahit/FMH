@@ -126,7 +126,7 @@ internal static class WorldFingerprint
 
     /// <summary>Felder, die AP 3 ergänzt hat (zweite Mannschaften, Staffeln, Bewegungsregeln); für den Vergleich wird die alte Form hergestellt.</summary>
     private static readonly string[] ClubFieldsSinceAp3 = { "reserveOf", "region", "latitude", "longitude" };
-    private static readonly string[] FormatFieldsSinceAp3 = { "groups", "assignment", "movements" };
+    private static readonly string[] FormatFieldsSinceAp3 = { "groups", "assignment", "movements", "phases" };
 
     private static string Legacy<T>(IEnumerable<T> items, string[]? remove, string[]? removeFromFormat)
     {
