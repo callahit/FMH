@@ -9,6 +9,9 @@ public static class ClubRules
     /// <summary>Größe des Vereins für Geldbeträge: 1,0 bei Reputation 10, ca. ×1,19 je Punkt.</summary>
     public static double Scale(Club club) => Math.Max(0.15, Math.Pow(1.19, club.Reputation - 10));
 
+    /// <summary>Wochengehalt des Cheftrainers: rund 1,9 Mio. im Jahr bei Reputation 15, 85.000 bei Reputation 3.</summary>
+    public static int ManagerWage(Club club) => (int)(Math.Round(10_000 * Math.Pow(Scale(club), 1.5) / 100) * 100);
+
     /// <summary>Finanzrahmen der Spielklasse eines Vereins: Liga bzw. Staffel, sonst ihre Division, sonst Standardwerte.</summary>
     public static DivisionFinance DivisionFinance(World world, Club club) =>
         world.Country(club.CountryCode).Finance.Divisions is var all && (all.TryGetValue(club.LeagueId, out var d)

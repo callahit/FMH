@@ -360,84 +360,106 @@
   "finance": {
     "divisions": {
       "DE1": {
-        "tvPool": 85000000,
+        "tvPool": 1500000000,
         "tvEqualShare": 0.5,
-        "standing": 8,
-        "seating": 17,
-        "box": 2500,
+        "standing": 20,
+        "seating": 48,
+        "box": 12000,
         "floodlightRequired": 3,
         "youthCenterRequired": 2,
-        "minEquity": -6000000,
-        "travelPerAwayMatch": 35000
+        "minEquity": -20000000,
+        "travelPerAwayMatch": 60000,
+        "wageLevel": 1.0,
+        "sponsorLevel": 1.0,
+        "targetAnnualWage": 2900000,
+        "operatingCostShare": 0.6,
+        "maxAnnualWage": 25000000
       },
       "DE2": {
-        "tvPool": 56000000,
+        "tvPool": 360000000,
         "tvEqualShare": 0.6,
-        "standing": 7,
-        "seating": 14,
-        "box": 1200,
+        "standing": 14,
+        "seating": 28,
+        "box": 4000,
         "floodlightRequired": 2,
         "youthCenterRequired": 1,
-        "minEquity": -2500000,
-        "travelPerAwayMatch": 20000
+        "minEquity": -8000000,
+        "travelPerAwayMatch": 30000,
+        "wageLevel": 0.7,
+        "sponsorLevel": 0.8,
+        "targetAnnualWage": 420000,
+        "operatingCostShare": 0.6,
+        "maxAnnualWage": 1500000
       },
       "DE3": {
-        "tvPool": 24000000,
-        "tvEqualShare": 0.7,
-        "standing": 6,
-        "seating": 11,
-        "box": 700,
+        "tvPool": 32000000,
+        "tvEqualShare": 0.8,
+        "standing": 10,
+        "seating": 18,
+        "box": 1200,
         "floodlightRequired": 1,
         "youthCenterRequired": 0,
-        "minEquity": -1000000,
-        "travelPerAwayMatch": 10000,
-        "wageLevel": 0.55
+        "minEquity": -2000000,
+        "travelPerAwayMatch": 12000,
+        "wageLevel": 0.4,
+        "sponsorLevel": 0.6,
+        "targetAnnualWage": 165000,
+        "operatingCostShare": 0.3,
+        "maxAnnualWage": 400000
       },
       "DE4": {
         "tvPool": 12600000,
-        "standing": 5,
-        "seating": 9,
-        "box": 400,
+        "standing": 8,
+        "seating": 12,
+        "box": 500,
         "floodlightRequired": 0,
         "youthCenterRequired": 0,
         "minEquity": -400000,
         "travelPerAwayMatch": 5000,
-        "wageLevel": 0.3,
-        "tvEqualShare": 1.0
+        "wageLevel": 0.11,
+        "tvEqualShare": 1.0,
+        "sponsorLevel": 0.25,
+        "targetAnnualWage": 25000,
+        "operatingCostShare": 0.3,
+        "maxAnnualWage": 90000
       },
       "DE-AMA": {
         "tvPool": 0,
-        "standing": 5,
+        "standing": 6,
         "seating": 9,
-        "box": 400,
+        "box": 300,
         "floodlightRequired": 0,
         "youthCenterRequired": 0,
         "minEquity": -200000,
         "travelPerAwayMatch": 3000,
-        "wageLevel": 0.25
+        "wageLevel": 0.05,
+        "sponsorLevel": 0.12,
+        "targetAnnualWage": 8000,
+        "operatingCostShare": 0.25,
+        "maxAnnualWage": 25000
       }
     },
     "cupPrizes": [
-      100000,
-      200000,
-      400000,
-      800000,
-      1500000,
-      2500000
+      210000,
+      420000,
+      840000,
+      1680000,
+      3360000,
+      4400000
     ],
-    "cupWinnerPrize": 4000000,
+    "cupWinnerPrize": 4400000,
     "playoffPrize": 500000,
     "creditLimitPercent": 15,
-    "boardApprovalAbove": 2000000,
-    "permitAbove": 1000000,
+    "boardApprovalAbove": 10000000,
+    "permitAbove": 5000000,
     "seasonTicketDeadline": "07-31",
     "licenseApplication": "03-15",
     "licenseDecision": "04-30",
     "licenseDeadline": "05-31",
     "conditionPenalty": 3,
-    "stadiumCostPerPlace": 900,
-    "stadiumBaseCost": 4000000,
-    "stadiumCostPerBox": 60000,
+    "stadiumCostPerPlace": 2500,
+    "stadiumBaseCost": 15000000,
+    "stadiumCostPerBox": 150000,
     "stadiumBuildDays": 720
   },
   "europe": {
@@ -465,12 +487,76 @@
       {
         "id": "UCL",
         "fieldStrength": 13.6,
-        "entryPrize": 4000000,
+        "entryPrize": 18600000,
         "stages": [
           {
             "key": "europe.stage.league",
             "date": "01-31",
-            "prize": 1500000
+            "prize": 6300000
+          },
+          {
+            "key": "europe.stage.r16",
+            "date": "03-15",
+            "prize": 11000000
+          },
+          {
+            "key": "europe.stage.qf",
+            "date": "04-15",
+            "prize": 12500000
+          },
+          {
+            "key": "europe.stage.sf",
+            "date": "05-05",
+            "prize": 15000000
+          },
+          {
+            "key": "europe.stage.final",
+            "date": "05-31",
+            "prize": 18500000
+          }
+        ]
+      },
+      {
+        "id": "UEL",
+        "fieldStrength": 12.6,
+        "entryPrize": 4300000,
+        "stages": [
+          {
+            "key": "europe.stage.league",
+            "date": "01-31",
+            "prize": 2000000
+          },
+          {
+            "key": "europe.stage.r16",
+            "date": "03-15",
+            "prize": 4000000
+          },
+          {
+            "key": "europe.stage.qf",
+            "date": "04-15",
+            "prize": 5000000
+          },
+          {
+            "key": "europe.stage.sf",
+            "date": "05-05",
+            "prize": 6000000
+          },
+          {
+            "key": "europe.stage.final",
+            "date": "05-28",
+            "prize": 7000000
+          }
+        ]
+      },
+      {
+        "id": "UECL",
+        "fieldStrength": 11.8,
+        "entryPrize": 3200000,
+        "stages": [
+          {
+            "key": "europe.stage.league",
+            "date": "01-31",
+            "prize": 1000000
           },
           {
             "key": "europe.stage.r16",
@@ -485,76 +571,12 @@
           {
             "key": "europe.stage.sf",
             "date": "05-05",
-            "prize": 3500000
-          },
-          {
-            "key": "europe.stage.final",
-            "date": "05-31",
-            "prize": 5000000
-          }
-        ]
-      },
-      {
-        "id": "UEL",
-        "fieldStrength": 12.6,
-        "entryPrize": 1200000,
-        "stages": [
-          {
-            "key": "europe.stage.league",
-            "date": "01-31",
-            "prize": 500000
-          },
-          {
-            "key": "europe.stage.r16",
-            "date": "03-15",
-            "prize": 700000
-          },
-          {
-            "key": "europe.stage.qf",
-            "date": "04-15",
-            "prize": 900000
-          },
-          {
-            "key": "europe.stage.sf",
-            "date": "05-05",
-            "prize": 1300000
-          },
-          {
-            "key": "europe.stage.final",
-            "date": "05-28",
-            "prize": 2000000
-          }
-        ]
-      },
-      {
-        "id": "UECL",
-        "fieldStrength": 11.8,
-        "entryPrize": 600000,
-        "stages": [
-          {
-            "key": "europe.stage.league",
-            "date": "01-31",
-            "prize": 250000
-          },
-          {
-            "key": "europe.stage.r16",
-            "date": "03-15",
-            "prize": 350000
-          },
-          {
-            "key": "europe.stage.qf",
-            "date": "04-15",
-            "prize": 450000
-          },
-          {
-            "key": "europe.stage.sf",
-            "date": "05-05",
-            "prize": 650000
+            "prize": 4000000
           },
           {
             "key": "europe.stage.final",
             "date": "05-27",
-            "prize": 1000000
+            "prize": 7000000
           }
         ]
       }
@@ -565,8 +587,8 @@
       "academyStars": 1
     },
     "ffp": {
-      "acceptableDeviation": 5000000,
-      "severeDeviation": 30000000,
+      "acceptableDeviation": 60000000,
+      "severeDeviation": 90000000,
       "squadCostRatio": 0.7,
       "finePercent": 3
     }

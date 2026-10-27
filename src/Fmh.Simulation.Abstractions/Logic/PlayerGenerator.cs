@@ -17,12 +17,8 @@ public static class PlayerGenerator
     /// <summary>Durchschnittliche Positionsstärke (1–20) eines Kaders je Vereinsreputation.</summary>
     public static double ClubLevel(int reputation) => 6.6 + reputation * 0.4;
 
-    /// <summary>Wochengehalt in Vereinswährung, abhängig von der Spielstärke.</summary>
-    public static int WeeklyWage(double level, Rng rng)
-    {
-        var wage = 60 * Math.Pow(1.55, level) * rng.Range(0.8, 1.25);
-        return (int)(Math.Round(wage / 100) * 100);
-    }
+    /// <summary>Wochengehalt in Vereinswährung, abhängig von der Spielstärke (Profimarkt, siehe <see cref="MarketValue.Wage"/>).</summary>
+    public static int WeeklyWage(double level, World world, Rng rng) => (int)(Math.Round(MarketValue.Wage(level, world, null) * rng.Range(0.8, 1.25) / 100) * 100);
 
     public static Player Create(World world, GameData data, Rng rng, Position pos, double level, int age, string country)
     {
@@ -48,7 +44,7 @@ public static class PlayerGenerator
         p.Reputation = (int)Math.Clamp(Math.Round(level - 3 + rng.Normal(0, 1.5)), 1, 20);
         p.Contract = new Contract
         {
-            WeeklyWage = WeeklyWage(level, rng),
+            WeeklyWage = WeeklyWage(level, world, rng),
             Until = new DateOnly(world.SeasonYear + rng.Next(1, 4), 6, 30),
         };
         p.State.Condition = rng.Range(92, 100);

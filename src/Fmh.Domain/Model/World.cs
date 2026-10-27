@@ -12,6 +12,13 @@ public sealed class World
     public ulong[] RngState { get; set; } = Array.Empty<ulong>();
     public DateOnly Date { get; set; }
     public int SeasonYear { get; set; }
+    /// <summary>
+    /// Marktniveau je Spielklasse (Division bzw. Pool): Ø Stärke der besten elf je Verein zum letzten Saisonstart und zum
+    /// Spielstart (<see cref="MarketBases"/>). Gehälter und Marktwerte richten sich nach dem Abstand zum Marktniveau der
+    /// Spielklasse, nicht nach der absoluten Stärke; so bleibt das Gehaltsgefüge stabil, wenn Kader stärker werden.
+    /// </summary>
+    public Dictionary<string, double> MarketLevels { get; set; } = new();
+    public Dictionary<string, double> MarketBases { get; set; } = new();
     public WorldRules Rules { get; set; } = new();
     /// <summary>Datenpakete, aus denen der Spielstand erzeugt wurde (Id und Version).</summary>
     public List<string> Packages { get; set; } = new();

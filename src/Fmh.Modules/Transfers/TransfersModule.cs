@@ -13,7 +13,7 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
     public override IReadOnlyList<string> DependsOn => new[] { "matchday" };
     public override void OnDay(DayContext day) => MarketDaily();
 
-    public long ValueOf(Player p) => MarketValue.Of(p, World.Date, Data.PositionProfiles);
+    public long ValueOf(Player p) => MarketValue.Of(p, World, Data.PositionProfiles);
 
     public IEnumerable<Player> FreeAgents => World.Players.Values.Where(p => p.ClubId is null && !p.Retired && !p.IsYouth);
 
