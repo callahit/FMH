@@ -30,7 +30,7 @@ public sealed partial class BoardModule : GameModule, IBoardService
             .ToList();
         b.Goal = ExpectedGoal(club);
         b.ManagerContractUntil = World.SeasonYear + 2;
-        b.ManagerWeeklyWage = (int)(Math.Round(2_500 * ClubRules.Scale(club) / 100) * 100);
+        b.ManagerWeeklyWage = ClubRules.ManagerWage(club);
     }
 
     private bool HasTrait(Club club, BoardTrait t) => club.Board.Members.Any(m => m.Trait == t);

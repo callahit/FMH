@@ -43,6 +43,8 @@ public enum TransactionType
     Tickets, SeasonTickets, Tv, Sponsorship, Merchandise, Catering, PrizeMoney, BuildingIncome,
     Wages, StaffWages, Bonuses, Upkeep, Construction, Interest, LoanPayout, LoanRepayment, Deposit, Travel, Fines, Event,
     Youth, European,
+    // Wirtschaft: Verwaltung, Spielbetrieb und sonstiges Personal als Anteil der laufenden Einnahmen.
+    Operations,
 }
 
 /// <summary>Finanzbuchung (Datenmodell Kapitel 12).</summary>

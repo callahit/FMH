@@ -20,7 +20,7 @@ public sealed partial class FinanceModule : GameModule, IFinanceService
     {
         TransactionType.Wages, TransactionType.StaffWages, TransactionType.Bonuses, TransactionType.Upkeep, TransactionType.Construction,
         TransactionType.Interest, TransactionType.LoanRepayment, TransactionType.Travel, TransactionType.Fines, TransactionType.TrainingCamp,
-        TransactionType.TransferIn, TransactionType.SigningFee, TransactionType.AgentFee,
+        TransactionType.TransferIn, TransactionType.SigningFee, TransactionType.AgentFee, TransactionType.Operations,
     };
 
     public DivisionFinance DivisionFinance(Club club) => ClubRules.DivisionFinance(World, club);
@@ -153,8 +153,8 @@ public sealed partial class FinanceModule : GameModule, IFinanceService
         var gate = (long)(paying * (standingShare * prices.Standing + (1 - standingShare) * prices.Seating) * surcharge)
                    + (long)(boxes * prices.Box * surcharge);
         // Gebäudewirkungen auf Catering und Fanartikel wirken anteilig (Wert je Stufe x 20 %).
-        var catering = (long)(attendance * 1.2 * (1 + Facilities.Effect(home, "income.catering") * 0.2) + boxes * 600 * (1 + Facilities.Effect(home, "income.box")));
-        var merch = (long)(attendance * 0.8 * (1 + Facilities.Effect(home, "income.merch") * 0.2) * Math.Clamp(home.Fans.Mood / 60, 0.5, 1.4));
+        var catering = (long)(attendance * 5 * (1 + Facilities.Effect(home, "income.catering") * 0.2) + boxes * 1_500 * (1 + Facilities.Effect(home, "income.box")));
+        var merch = (long)(attendance * 10 * (1 + Facilities.Effect(home, "income.merch") * 0.2) * Math.Clamp(home.Fans.Mood / 60, 0.5, 1.4));
         var extra = (long)(Facilities.Effect(home, "income.matchday") + home.Stadium.Scoreboard * 6_000);
         var text = TR("tx.match", away.Name);
         if (f.Kind == CompetitionKind.League)

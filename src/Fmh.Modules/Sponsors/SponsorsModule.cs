@@ -27,10 +27,10 @@ public sealed partial class SponsorsModule : GameModule, ISponsorsService
     /// <summary>Jährlicher Sponsorenwert aller Plätze aus Vereinsgröße, Liga, Medien und Anlagen.</summary>
     public double SponsorValue(Club club)
     {
-        var level = World.FindLeague(club.LeagueId)?.Level ?? 3;
-        var leagueFactor = level switch { 1 => 1.0, 2 => 0.72, _ => 0.25 };
+        var leagueFactor = Finance.DivisionFinance(club).SponsorLevel;
         var media = IsHuman(club) ? 0.8 + HumanManager.Career.Media / 250 : 1.0;
-        return 3_000_000 * ClubRules.Scale(club) * leagueFactor * media * (1 + Facilities.Effect(club, "sponsor") + club.Stadium.Scoreboard * 0.02);
+        // Große Vereine ziehen überproportional mehr Sponsoren an (real: Spitzenklub etwa das Sechsfache des Ligaschnitts).
+        return 21_000_000 * Math.Pow(ClubRules.Scale(club), 1.5) * leagueFactor * media * (1 + Facilities.Effect(club, "sponsor") + club.Stadium.Scoreboard * 0.02);
     }
 
     public IEnumerable<(SponsorSlot slot, int index)> AllSlots()
