@@ -18,11 +18,11 @@ public static partial class Pyramid
             var table = LeagueTable.Compute(league);
             var last = league.Fixtures.Max(f => f.Date);
             var start = (world.Date > last ? world.Date : last).AddDays(3);
-            while (start.DayOfWeek != country.Season.MatchDay) start = start.AddDays(1);
             foreach (var group in phase.Groups)
             {
                 var ids = group.PositionList().Where(p => p <= table.Count).Select(p => table[p - 1].ClubId).ToList();
                 var days = ScheduleGenerator.RoundRobin(ids, phase.Rounds, rng);
+                var dates = ScheduleGenerator.WeeklyDates(country.Season, world.SeasonYear, start, days.Count);
                 for (var d = 0; d < days.Count; d++)
                     foreach (var (home, away) in days[d])
                         league.Fixtures.Add(new Fixture
@@ -31,7 +31,7 @@ public static partial class Pyramid
                             CompetitionId = league.Id,
                             Kind = CompetitionKind.League,
                             Matchday = league.RegularMatchdays + d + 1,
-                            Date = start.AddDays(7 * d),
+                            Date = dates[d],
                             HomeId = home,
                             AwayId = away,
                             RefereeId = world.Referees.Count == 0 ? 0 : world.Referees[rng.Next(world.Referees.Count)].Id,
