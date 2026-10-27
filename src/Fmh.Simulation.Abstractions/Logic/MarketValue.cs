@@ -46,8 +46,14 @@ public static class Budgets
 {
     public static long StartingBalance(Club club) => MarketValue.Round(2_000_000 * Math.Pow(1.25, club.Reputation - 5));
 
+    /// <summary>
+    /// Wöchentliche Gehaltssumme: eigener Kader (Leihspieler mit dem übernommenen Anteil) plus der Restanteil für
+    /// verliehene Spieler, den der abgebende Verein weiter zahlt.
+    /// </summary>
     public static long WageBill(Club club, World world) =>
-        world.SquadOf(club).Sum(p => (long)(p.Contract?.WeeklyWage ?? 0) * (p.Loan is { } l ? l.WageSharePercent : 100) / 100);
+        world.SquadOf(club).Sum(p => (long)(p.Contract?.WeeklyWage ?? 0) * (p.Loan is { } l ? l.WageSharePercent : 100) / 100)
+        + world.Players.Values.Where(p => p.Loan?.ParentClubId == club.Id && p.ClubId != club.Id)
+            .Sum(p => (long)(p.Contract?.WeeklyWage ?? 0) * (100 - p.Loan!.WageSharePercent) / 100);
 
     /// <summary>Budget für die neue Saison: Transferbudget aus dem Kontostand, Gehaltsbudget mit Spielraum.</summary>
     public static void SetSeasonBudget(Club club, World world)

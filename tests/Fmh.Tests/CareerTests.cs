@@ -138,6 +138,12 @@ public class CareerTests
         s.HumanClub.PlayerIds.Remove(p.Id);
         Assert.Equal(wage * 60 / 100, billWith - Budgets.WageBill(s.HumanClub, s.World));
         s.HumanClub.PlayerIds.Add(p.Id);
+        // Den Restanteil zahlt der abgebende Verein weiter.
+        var parentBill = Budgets.WageBill(parent, s.World);
+        var share = p.Loan.WageSharePercent;
+        p.Loan.WageSharePercent = 100;
+        Assert.Equal(wage * (100 - share) / 100, parentBill - Budgets.WageBill(parent, s.World));
+        p.Loan.WageSharePercent = share;
 
         var year = s.World.SeasonYear;
         TestData.PlayUntil(s, _ => s.World.SeasonYear > year);
