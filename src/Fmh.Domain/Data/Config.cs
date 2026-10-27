@@ -13,7 +13,8 @@ public sealed class CountryConfig
 {
     public string Code { get; set; } = "";
     public string Name { get; set; } = "";
-    public string Currency { get; set; } = "EUR";
+    /// <summary>Währung der Beträge in den Daten; im Spiel nur Euro zulässig (Leitwährung, siehe <see cref="CurrencyConfig"/>).</summary>
+    public string Currency { get; set; } = CurrencyConfig.Base;
     public int ValidFrom { get; set; }
     /// <summary>Letzte Saison (Startjahr), in der diese Formatversion gilt; null = unbegrenzt.</summary>
     public int? ValidTo { get; set; }

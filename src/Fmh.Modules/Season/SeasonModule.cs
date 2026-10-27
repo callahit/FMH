@@ -120,7 +120,7 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
 
         Sponsors.SponsorSeasonStart();
         var b = HumanClub.Budget;
-        var currency = World.Country(HumanClub.CountryCode).Currency;
+        var currency = Currency;
         Notify(MessageType.Board, "msg.sender.board",
             TR("msg.newSeason.subject", SeasonLabel(World.SeasonYear)),
             TR("msg.newSeason.body", HumanClub.Name, Comp(HumanClub.LeagueId),

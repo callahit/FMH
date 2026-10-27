@@ -49,7 +49,7 @@
                 <Button Content="{s:L inbox.reject}" Command="{Binding RejectOfferCommand}" />
               </StackPanel>
               <StackPanel Orientation="Horizontal" Spacing="8">
-                <NumericUpDown Value="{Binding CounterFee}" Minimum="0" Increment="50000" FormatString="N0" Width="200" />
+                <NumericUpDown Value="{Binding CounterFee, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="50000" FormatString="N0" Width="200" />
                 <Button Content="{s:L inbox.counter}" Command="{Binding CounterOfferCommand}" />
               </StackPanel>
             </StackPanel>

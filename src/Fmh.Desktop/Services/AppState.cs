@@ -60,7 +60,29 @@ public sealed class AppState
         System.Globalization.CultureInfo.DefaultThreadCurrentCulture = Fmh.Core.Fmt.Culture;
         System.Globalization.CultureInfo.CurrentCulture = Fmh.Core.Fmt.Culture;
     }
-    public GameSession? Session { get; set; }
+    private GameSession? _session;
+
+    /// <summary>Laufendes Spiel; beim Setzen gilt die Anzeigewährung des Managerprofils.</summary>
+    public GameSession? Session
+    {
+        get => _session;
+        set
+        {
+            _session = value;
+            ApplyCurrency();
+        }
+    }
+
+    /// <summary>Kurs einer Währung für die Anzeige: eigener Kurs des Profils, sonst der Standardkurs aus den Daten.</summary>
+    public double RateOf(string code) =>
+        _session?.HumanManager.Profile.ExchangeRates.TryGetValue(code, out var own) == true && own > 0 ? own : Data.Currencies.PerEuro(code);
+
+    /// <summary>Anzeigewährung des Profils übernehmen (gerechnet wird immer in Euro).</summary>
+    public void ApplyCurrency()
+    {
+        var code = _session?.HumanManager.Profile.DisplayCurrency ?? Fmh.Core.Data.CurrencyConfig.Base;
+        Fmh.Core.Fmt.UseCurrency(code, RateOf(code));
+    }
 
     public string SaveCurrent()
     {

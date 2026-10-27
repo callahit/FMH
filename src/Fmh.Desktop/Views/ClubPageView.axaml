@@ -191,7 +191,7 @@
                   <TextBlock Classes="h3" Text="{s:L academy.budget}" />
                   <Grid ColumnDefinitions="200,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="6">
                     <TextBlock Text="{s:L academy.budgetYear}" VerticalAlignment="Center" />
-                    <NumericUpDown Grid.Column="1" Value="{Binding AcademyBudget}" Minimum="0" Increment="100000" FormatString="N0" />
+                    <NumericUpDown Grid.Column="1" Value="{Binding AcademyBudget, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="100000" FormatString="N0" />
                     <TextBlock Grid.Row="1" Text="{s:L academy.shareCoaching}" VerticalAlignment="Center" />
                     <NumericUpDown Grid.Row="1" Grid.Column="1" Value="{Binding ShareCoaching}" Minimum="0" Maximum="100" Increment="5" FormatString="N0" />
                     <TextBlock Grid.Row="2" Text="{s:L academy.shareRecruitment}" VerticalAlignment="Center" />

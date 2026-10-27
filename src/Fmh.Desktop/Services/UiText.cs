@@ -59,5 +59,6 @@ public static class UiText
     /// <summary>Farbcodierung zusätzlich als Symbol (Barrierefreiheit).</summary>
     public static string AttributeSymbol(int v) => v switch { <= 5 => "▼", <= 10 => "·", <= 15 => "▲", _ => "★" };
 
-    public static string Currency(Club club) => AppState.Current.Session!.World.Country(club.CountryCode).Currency;
+    /// <summary>Spielwährung (Euro); die Anzeige rechnet über <see cref="Fmt.Money"/> in die gewählte Währung um.</summary>
+    public static string Currency(Club club) => Fmh.Core.Data.CurrencyConfig.Base;
 }

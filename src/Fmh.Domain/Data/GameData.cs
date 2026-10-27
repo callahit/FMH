@@ -24,6 +24,8 @@ public sealed class GameData
     public List<EventDef> Events { get; init; } = new();
     public List<PressQuestionDef> PressQuestions { get; init; } = new();
     public Dictionary<string, SponsorList> Sponsors { get; init; } = new();
+    /// <summary>Anzeigekurse; gerechnet wird immer in Euro.</summary>
+    public CurrencyConfig Currencies { get; init; } = new();
 
     public BuildingDef? Building(string id) => Buildings.FirstOrDefault(b => b.Id == id);
     /// <summary>Alle verfügbaren Sprachen (Code → Texte und Kommentarbausteine).</summary>

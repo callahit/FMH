@@ -1,0 +1,8 @@
+{
+  "asOf": "EZB/ECB 2025-10",
+  "rates": [
+    { "code": "EUR", "perEuro": 1.0 },
+    { "code": "GBP", "perEuro": 0.87 },
+    { "code": "USD", "perEuro": 1.16 }
+  ]
+}

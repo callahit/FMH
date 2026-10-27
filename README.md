@@ -230,6 +230,11 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
 
 ### Wirtschaft
 
+**Währung:** Gerechnet wird überall in Euro (Leitwährung); alle Datenpakete geben Beträge in Euro an (der Validator
+prüft `currency: "EUR"`). Pfund und US-Dollar gibt es nur als Anzeige: Unter Optionen wählt der Manager die
+Anzeigewährung, die Standardkurse stehen in `rules/currencies.json` (EZB-Referenzkurse) und lassen sich je Profil
+überschreiben. Geldeingaben (Verhandlungen, Preise, Kredite) rechnen die Anzeigewährung zurück in Euro.
+
 Gehälter und Einnahmen haben reale Größenordnungen. Referenz für Deutschland sind der
 [DFL-Wirtschaftsreport 24/25](https://report.bundesliga.de/2425/de/_assets/downloads/key-economic-figures-dfl-er25.pdf)
 (Bundesliga je Klub rund 284 Mio. Umsatz, 96 Mio. Personalaufwand Spielbetrieb; 2. Bundesliga 67 bzw.
@@ -494,12 +499,12 @@ liegt noch im Grundpaket. Die meisten Tests laden nur `base`, die Länder-Tests 
 | Land | Ebene 1 | Ebene 2 | Ebene 3 | Ebene 4 | Unterbau | Besonderheiten |
 |---|---|---|---|---|---|---|
 | Deutschland | 18 | 18 | 20 | Regionalliga 5 × 18 | Oberliga (Pool) | Relegationen, rotierender Regionalliga-Aufstieg, zweite Mannschaften |
-| England (GBP) | 20 | 24 | 24 | 24 | National Non-League (Pool) | 46 Spieltage mit Englischen Wochen, Play-offs 3–6 bzw. 4–7, keine Winterpause |
+| England | 20 | 24 | 24 | 24 | National Non-League (Pool) | 46 Spieltage mit Englischen Wochen, Play-offs 3–6 bzw. 4–7, keine Winterpause |
 
 England (Stand 2025/26): Premier Division ohne Relegation (18–20 steigen ab); First, Second und Third Division
 steigen mit 2, 2 bzw. 3 Vereinen direkt auf, dazu je ein Play-off-Sieger; Absteiger 3, 4 und 2 (in den Pool).
 Gehälter und Einnahmen nach der Größenordnung des Deloitte Annual Review of Football Finance (Premier League je
-Klub rund 315 Mio. £ Umsatz, rund 4 Mrd. £ Lohnkosten insgesamt).
+Klub rund 315 Mio. £ Umsatz, rund 4 Mrd. £ Lohnkosten insgesamt), umgerechnet in Euro.
 
 ## Offene Entscheidungen
 
@@ -519,7 +524,7 @@ Klub rund 315 Mio. £ Umsatz, rund 4 Mrd. £ Lohnkosten insgesamt).
   Betriebskosten, Sponsorenniveau 1,0) und ihre Gehälter, rechnen aber Sponsoren, Marktwerte und neue Verträge
   nach den neuen Formeln und werden dadurch reicher; eine Migration der Länderdaten im Spielstand ist offen.
 - **England:** Ein Pokal (National Cup mit 64 Plätzen ab der 3. Runde); der Ligapokal fehlt. Beträge stehen in
-  der Landeswährung; Ablösen und Gehälter bei Wechseln zwischen Ländern werden noch ohne Wechselkurs übernommen.
+  Euro.
   Lizenzierung läuft wie in Deutschland mit großzügigen Eigenkapitalgrenzen, statt der englischen PSR-Regeln.
   Die fiktiven Ortsnamen sind zusammengesetzt; Übereinstimmungen mit kleinen realen Orten sind möglich.
 - **Karten in unteren Ligen:** Über alle vier Ebenen zeigt die Engine 3,2 Gelbe und 0,13 Rote Karten je Spiel

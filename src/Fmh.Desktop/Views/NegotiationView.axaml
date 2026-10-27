@@ -30,7 +30,7 @@
           <StackPanel Spacing="8" IsVisible="{Binding ClubStage}">
             <StackPanel Spacing="8" IsVisible="{Binding IsTransfer}">
               <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.fee}" VerticalAlignment="Center" />
-                <NumericUpDown Grid.Column="1" Value="{Binding Fee}" Minimum="0" Increment="50000" FormatString="N0" /></Grid>
+                <NumericUpDown Grid.Column="1" Value="{Binding Fee, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="50000" FormatString="N0" /></Grid>
               <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.installments}" VerticalAlignment="Center" />
                 <NumericUpDown Grid.Column="1" Value="{Binding InstallmentYears}" Minimum="0" Maximum="3" Increment="1" /></Grid>
               <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.sellOn}" VerticalAlignment="Center" />
@@ -47,7 +47,7 @@
                 <NumericUpDown Grid.Column="1" Value="{Binding WageShare}" Minimum="0" Maximum="100" Increment="10" /></Grid>
               <CheckBox Content="{s:L neg.purchaseOption}" IsChecked="{Binding HasPurchaseOption}" />
               <Grid ColumnDefinitions="170,*" IsVisible="{Binding HasPurchaseOption}"><TextBlock Text="{s:L neg.purchaseFee}" VerticalAlignment="Center" />
-                <NumericUpDown Grid.Column="1" Value="{Binding PurchaseFee}" Minimum="0" Increment="50000" FormatString="N0" /></Grid>
+                <NumericUpDown Grid.Column="1" Value="{Binding PurchaseFee, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="50000" FormatString="N0" /></Grid>
               <CheckBox Content="{s:L neg.purchaseObligation}" IsChecked="{Binding PurchaseObligation}" IsVisible="{Binding HasPurchaseOption}" />
               <CheckBox Content="{s:L neg.recall}" IsChecked="{Binding RecallInWinter}" />
             </StackPanel>
@@ -58,19 +58,19 @@
             <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.years}" VerticalAlignment="Center" />
               <NumericUpDown Grid.Column="1" Value="{Binding Years}" Minimum="1" Maximum="5" Increment="1" /></Grid>
             <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.weeklyWage}" VerticalAlignment="Center" />
-              <NumericUpDown Grid.Column="1" Value="{Binding WeeklyWage}" Minimum="0" Increment="500" FormatString="N0" /></Grid>
+              <NumericUpDown Grid.Column="1" Value="{Binding WeeklyWage, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="500" FormatString="N0" /></Grid>
             <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.status}" VerticalAlignment="Center" />
               <ComboBox Grid.Column="1" ItemsSource="{Binding StatusOptions}" SelectedIndex="{Binding StatusIndex}" HorizontalAlignment="Stretch" /></Grid>
             <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.signingFee}" VerticalAlignment="Center" />
-              <NumericUpDown Grid.Column="1" Value="{Binding SigningFee}" Minimum="0" Increment="10000" FormatString="N0" /></Grid>
+              <NumericUpDown Grid.Column="1" Value="{Binding SigningFee, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="10000" FormatString="N0" /></Grid>
             <Grid ColumnDefinitions="170,*,*" ColumnSpacing="8"><TextBlock Text="{s:L neg.bonuses}" VerticalAlignment="Center" />
-              <NumericUpDown Grid.Column="1" Value="{Binding AppearanceBonus}" Minimum="0" Increment="500" FormatString="N0" ToolTip.Tip="{s:L neg.appearanceBonus}" />
-              <NumericUpDown Grid.Column="2" Value="{Binding GoalBonus}" Minimum="0" Increment="500" FormatString="N0" ToolTip.Tip="{s:L neg.goalBonus}" /></Grid>
+              <NumericUpDown Grid.Column="1" Value="{Binding AppearanceBonus, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="500" FormatString="N0" ToolTip.Tip="{s:L neg.appearanceBonus}" />
+              <NumericUpDown Grid.Column="2" Value="{Binding GoalBonus, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="500" FormatString="N0" ToolTip.Tip="{s:L neg.goalBonus}" /></Grid>
             <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.yearlyRaise}" VerticalAlignment="Center" />
               <NumericUpDown Grid.Column="1" Value="{Binding YearlyRaise}" Minimum="0" Maximum="20" Increment="5" /></Grid>
             <Grid ColumnDefinitions="170,*">
               <CheckBox Content="{s:L neg.releaseClause}" IsChecked="{Binding HasReleaseClause}" />
-              <NumericUpDown Grid.Column="1" Value="{Binding ReleaseClause}" Minimum="0" Increment="100000" FormatString="N0" IsEnabled="{Binding HasReleaseClause}" /></Grid>
+              <NumericUpDown Grid.Column="1" Value="{Binding ReleaseClause, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="100000" FormatString="N0" IsEnabled="{Binding HasReleaseClause}" /></Grid>
             <CheckBox Content="{s:L neg.relegationClause}" IsChecked="{Binding RelegationClause}" />
           </StackPanel>
         </StackPanel>
