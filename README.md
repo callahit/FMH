@@ -86,9 +86,10 @@ Farbthemen: Klassik, Hell, Terminal.
   Scouts beobachten Spieler, durchsuchen Ligen nach Kriterien (Berichte A–D mit Sternen für Stärke
   und Potenzial) oder analysieren den nächsten Gegner.
 - **Pokal und Relegation:**
-  - Pokal mit 64 Teams einschließlich 28 Amateurvereinen; Freilose und Heimrecht für
-    Unterklassige; Verlängerung und Elfmeterschießen; neutrales Finale.
-  - Relegation 16. gegen 3. in Hin- und Rückspiel.
+  - Pokal mit 64 Teams: alle Vereine der 1. bis 3. Liga und die acht Regionalligisten mit dem höchsten
+    Ruf; Freilose und Heimrecht für Unterklassige; Verlängerung und Elfmeterschießen; neutrales Finale.
+  - Relegation 16. gegen 3. in Hin- und Rückspiel (1./2. und 2./3. Liga), Aufstiegsspiele der
+    Regionalliga-Meister aus Nord und Nordost.
   - Ansicht mit allen Runden und Duellen.
 - **Jugend:** Nachwuchsleistungszentrum mit drei Altersstufen, siehe
   [Nachwuchsleistungszentrum](#nachwuchsleistungszentrum).
@@ -242,7 +243,7 @@ Amateurfußball, und Vereine mit dünnem Kader verpflichten unter der Saison nac
 | Kapitel | Umgesetzt | Folgt laut Roadmap |
 |---|---|---|
 | 2 Spielmodi und Spielstart | Karriere mit neuem Spiel (Name, Werdegang, Verein, Seed, Weltregeln), Managerprofil, Speichern, Autosave vor jedem Spieltag in 3 rotierenden Slots, optional Ironman | Schnellsaison, Hot-Seat, Herausforderungen (Phase 4) |
-| 3 Spielwelt, Wettbewerbe | Tagesgenauer Kalender, Ligen als Daten, Deutschland mit 1. und 2. Liga und Amateurbereich, **Pokal**, **Relegation**, Transferfenster, Pflicht-Entscheidungen, **Ligapyramiden mit Staffeln, Bewegungsregeln, Aufstiegsrunden, zweiten Mannschaften und Formatversionen** | Europapokal, weitere Länder (Phase 3) |
+| 3 Spielwelt, Wettbewerbe | Tagesgenauer Kalender, Ligen als Daten, Deutschland bis zur 4. Liga (Regionalliga in fünf Staffeln) mit Oberliga als Pool, **Pokal**, **Relegation**, Transferfenster, Pflicht-Entscheidungen, **Ligapyramiden mit Staffeln, Bewegungsregeln, Aufstiegsrunden, zweiten Mannschaften und Formatversionen** | Europapokal, weitere Länder (Phase 3) |
 | 4 Spielerdatenmodell | 44 Attribute, versteckte Werte, Kondition, Form, Moral, Spielpraxis, Positionseignung, Entwicklung durch **Training** und Saisonwechsel, Karriereende, Dauerschäden | Zufriedenheit, Tutor-System |
 | 5 Kader, Training, Taktik | Kader, Profil, **Training**, **Trainingslager**, 25 Formationen, **Rollen und Aufgaben**, **Spieleranweisungen**, **freie Positionierung**, **Taktikvertrautheit**, **3 Taktikvarianten**, Standardvarianten, Co-Trainer | – |
 | 6 Spieltag und Matchengine | Vorbericht, Kabinenansprache, Kommentar/Ticker/Sofort/**Konferenz**, Wechsel, Taktik und Zurufe live, Nachbericht mit Noten und Statistik, **Verlängerung und Elfmeterschießen**, Hin- und Rückspiel, **Pressekonferenzen** | – |
@@ -425,6 +426,13 @@ Ein Land beschreibt seine Pyramide als Ebenen mit Divisionen. Formate ändern si
   darauf abgebildet. Wer keine Lizenz hat oder als zweite Mannschaft nicht aufsteigen darf, gibt seinen Platz an
   den Nächsten ab; Zwangsabsteiger ersetzt der bestplatzierte sportliche Absteiger bzw. ein Nachrücker. Zu- und
   Abgänge je Ebene gleichen sich immer aus.
+- **Eigene Regeln je Staffel:** `groups[].movements` ersetzt die Regeln der Division für diese Staffel, z. B. steigen
+  in der Regionalliga nur drei Meister direkt auf, die übrigen zwei spielen den vierten Platz aus.
+- **Pool unter der untersten Ebene:** Ein Pool mit `feeds: "<Division>"` nimmt deren Absteiger auf; dafür steigen
+  ebenso viele Poolvereine mit Lizenz auf (nach Ruf mit Zufallsanteil, bevorzugt aus der Region des Absteigers).
+  Der Pool spielt keine Liga. Ohne `feeds` nimmt er nur am Pokal teil.
+- **Pokalplätze:** Haben die Teilnehmerligen mehr Vereine als `teams`, kommen die höheren Ebenen zuerst, innerhalb
+  einer Ebene die Vereine mit dem höchsten Ruf.
 - **Relegation und Aufstiegsrunden:** `playoffs` mit `entrants` (Liga oder Division und Tabellenplatz; bei einer
   Division aus jeder Staffel) und `places`. Zwei Teilnehmer spielen ein Duell, mehr ein K.-o.-Turnier.
 - **Zweite Mannschaften:** Vereine mit `reserveOf` (Schlüssel der ersten Mannschaft). `reserves` im Land regelt den
@@ -446,6 +454,10 @@ Mannschaften liegt unter `tests/Fmh.Tests/Packages/testland` (nur für Tests).
   ausländische Vereine. Echte Partien brauchen weitere Länder als Datenpakete.
 - **Saisonphasen:** Grunddurchgang mit Meister- und Abstiegsrunde (`phases`, `pointsCarry`, Konzept 6.1) ist noch
   nicht umgesetzt; die Pyramide kennt bisher nur eine Phase je Saison.
+- **Deutschland:** Die Regionalliga-Aufstiegsregel ist fest (West, Südwest und Süd direkt, Nord gegen Nordost);
+  real wechselt der Aufstiegsmodus jährlich zwischen den Staffeln. Pokalplätze für Amateure gehen nach Ruf statt
+  über Landespokale. Die fiktiven Ortsnamen sind zusammengesetzt; Übereinstimmungen mit kleinen realen Orten sind
+  möglich, bekannte Vereinsorte sind ausgeschlossen.
 - **Zweite Mannschaften als eigene Vereine:** Eine zweite Mannschaft ist bisher ein eigener Verein mit Verweis
   `reserveOf` (eigener Kader, eigene Finanzen). Die Mannschaft eines Vereins (`Team`) übernimmt das, sobald
   Spiele Mannschaften statt Vereine referenzieren.

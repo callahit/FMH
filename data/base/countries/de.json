@@ -67,7 +67,113 @@
             "AwayGoals"
           ],
           "promotion": 2,
-          "relegation": 0
+          "relegation": 2
+        }
+      ]
+    },
+    {
+      "level": 3,
+      "divisions": [
+        {
+          "id": "DE3",
+          "name": "3. Liga",
+          "teams": 20,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "GoalDifference",
+            "GoalsFor",
+            "HeadToHead",
+            "AwayGoals"
+          ],
+          "promotion": 2,
+          "relegation": 4
+        }
+      ]
+    },
+    {
+      "level": 4,
+      "divisions": [
+        {
+          "id": "DE4",
+          "name": "Regionalliga",
+          "teams": 18,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "GoalDifference",
+            "GoalsFor",
+            "HeadToHead",
+            "AwayGoals"
+          ],
+          "movements": [
+            {
+              "positions": "1",
+              "to": "Up"
+            },
+            {
+              "positions": "17-18",
+              "to": "Down"
+            }
+          ],
+          "groups": [
+            {
+              "id": "DE4N",
+              "name": "Regionalliga Nord",
+              "regions": [
+                "Nord"
+              ],
+              "movements": [
+                {
+                  "positions": "17-18",
+                  "to": "Down"
+                }
+              ]
+            },
+            {
+              "id": "DE4NO",
+              "name": "Regionalliga Nordost",
+              "regions": [
+                "Nordost"
+              ],
+              "movements": [
+                {
+                  "positions": "17-18",
+                  "to": "Down"
+                }
+              ]
+            },
+            {
+              "id": "DE4W",
+              "name": "Regionalliga West",
+              "regions": [
+                "West"
+              ]
+            },
+            {
+              "id": "DE4SW",
+              "name": "Regionalliga Südwest",
+              "regions": [
+                "Südwest"
+              ]
+            },
+            {
+              "id": "DE4S",
+              "name": "Regionalliga Süd",
+              "regions": [
+                "Süd"
+              ]
+            }
+          ],
+          "assignment": "Fixed"
         }
       ]
     }
@@ -75,8 +181,9 @@
   "pools": [
     {
       "id": "DE-AMA",
-      "name": "Amateure",
-      "teams": 28
+      "name": "Oberliga",
+      "teams": 40,
+      "feeds": "DE4"
     }
   ],
   "cups": [
@@ -86,7 +193,8 @@
       "participants": [
         "DE1",
         "DE2",
-        "DE-AMA"
+        "DE3",
+        "DE4"
       ],
       "teams": 64,
       "lowerTierHome": true,
@@ -116,6 +224,43 @@
       "dates": [
         "05-13",
         "05-17"
+      ]
+    },
+    {
+      "id": "DE-REL2",
+      "name": "Relegation 2./3. Liga",
+      "upperDivision": "DE2",
+      "upperPosition": 16,
+      "lowerDivision": "DE3",
+      "lowerPosition": 3,
+      "legs": 2,
+      "awayGoals": false,
+      "dates": [
+        "05-26",
+        "05-30"
+      ]
+    },
+    {
+      "id": "DE-AUF",
+      "name": "Aufstiegsspiele Regionalliga",
+      "upperDivision": "DE3",
+      "lowerDivision": "DE4",
+      "entrants": [
+        {
+          "division": "DE4N",
+          "position": 1
+        },
+        {
+          "division": "DE4NO",
+          "position": 1
+        }
+      ],
+      "places": 1,
+      "legs": 2,
+      "awayGoals": false,
+      "dates": [
+        "05-06",
+        "05-10"
       ]
     }
   ],
@@ -160,6 +305,27 @@
         "minEquity": -2500000,
         "travelPerAwayMatch": 20000
       },
+      "DE3": {
+        "tvPool": 16000000,
+        "tvEqualShare": 0.7,
+        "standing": 6,
+        "seating": 11,
+        "box": 700,
+        "floodlightRequired": 1,
+        "youthCenterRequired": 0,
+        "minEquity": -1000000,
+        "travelPerAwayMatch": 10000
+      },
+      "DE4": {
+        "tvPool": 0,
+        "standing": 5,
+        "seating": 9,
+        "box": 400,
+        "floodlightRequired": 0,
+        "youthCenterRequired": 0,
+        "minEquity": -400000,
+        "travelPerAwayMatch": 5000
+      },
       "DE-AMA": {
         "tvPool": 0,
         "standing": 5,
@@ -167,8 +333,8 @@
         "box": 400,
         "floodlightRequired": 0,
         "youthCenterRequired": 0,
-        "minEquity": -300000,
-        "travelPerAwayMatch": 4000
+        "minEquity": -200000,
+        "travelPerAwayMatch": 3000
       }
     },
     "cupPrizes": [
@@ -324,5 +490,11 @@
       "squadCostRatio": 0.7,
       "finePercent": 3
     }
+  },
+  "reserves": {
+    "minLevelGap": 2,
+    "playInCups": false,
+    "ageLimit": 23,
+    "overAgePlayers": 3
   }
 }

@@ -31,22 +31,15 @@ public static class PyramidValidator
             if (div.Rounds is < 1 or > 4) errors.Add($"Liga '{div.Name}': {div.Rounds} Runden (erlaubt 1–4).");
             foreach (var dup in div.Groups.GroupBy(g => g.Id).Where(g => g.Count() > 1))
                 errors.Add($"Liga '{div.Name}': Staffel '{dup.Key}' ist mehrfach definiert.");
-            var used = new HashSet<int>();
-            foreach (var m in div.Movements)
-            {
-                var positions = m.PositionList();
-                if (positions.Count == 0 || positions.Any(p => p < 1 || p > div.Teams))
-                    errors.Add($"Liga '{div.Name}': ungültige Plätze '{m.Positions}' in einer Bewegungsregel.");
-                if (m.OnlySeason is null && positions.Any(p => !used.Add(p)))
-                    errors.Add($"Liga '{div.Name}': Platz in mehreren Bewegungsregeln.");
-                if (m.Kind == MovementKind.Playoff && country.Playoffs.All(p => p.Id != m.Playoff))
-                    errors.Add($"Liga '{div.Name}': Bewegungsregel verweist auf unbekannte Relegation '{m.Playoff}'.");
-            }
+            ValidateMovements(country, div, div.Name, div.Movements, errors);
+            foreach (var g in div.Groups.Where(g => g.Movements.Count > 0))
+                ValidateMovements(country, div, g.Name, g.Movements, errors);
         }
         if (levels.Count > 0 && levels[0].Divisions.Any(d => HasDirect(d, MovementDirection.Up, null)))
             errors.Add($"{Name(country)}: die oberste Ebene kann keine Aufsteiger haben.");
-        if (levels.Count > 0 && levels[^1].Divisions.Any(d => HasDirect(d, MovementDirection.Down, null)))
-            errors.Add($"{Name(country)}: die unterste Ebene kann keine Absteiger haben.");
+        if (levels.Count > 0 && levels[^1].Divisions.Any(d => HasDirect(d, MovementDirection.Down, null) && country.Pools.All(p => p.Feeds != d.Id)))
+            errors.Add($"{Name(country)}: die unterste Ebene kann keine Absteiger haben (außer in einen Pool mit \"feeds\").");
+        foreach (var pool in country.Pools.Where(p => p.Feeds is not null)) ValidatePool(country, levels, pool, errors);
         foreach (var po in country.Playoffs) ValidatePlayoff(country, po, errors);
         for (var i = 0; i + 1 < levels.Count; i++)
         {
@@ -56,8 +49,36 @@ public static class PyramidValidator
         }
     }
 
-    private static bool HasDirect(DivisionConfig d, MovementDirection to, int? season) =>
-        d.Movements.Any(m => m.Kind == MovementKind.Direct && m.To == to && (season is null ? m.OnlySeason is null : m.AppliesTo(season.Value)));
+    private static void ValidateMovements(CountryConfig country, DivisionConfig div, string name, List<MovementRule> movements, List<string> errors)
+    {
+        var used = new HashSet<int>();
+        foreach (var m in movements)
+        {
+            var positions = m.PositionList();
+            if (positions.Count == 0 || positions.Any(p => p < 1 || p > div.Teams))
+                errors.Add($"Liga '{name}': ungültige Plätze '{m.Positions}' in einer Bewegungsregel.");
+            if (m.OnlySeason is null && positions.Any(p => !used.Add(p)))
+                errors.Add($"Liga '{name}': Platz in mehreren Bewegungsregeln.");
+            if (m.Kind == MovementKind.Playoff && country.Playoffs.All(p => p.Id != m.Playoff))
+                errors.Add($"Liga '{name}': Bewegungsregel verweist auf unbekannte Relegation '{m.Playoff}'.");
+        }
+    }
+
+    /// <summary>Pool unter der untersten Ebene: muss eine Division dieser Ebene speisen und genug Vereine für deren Absteiger haben.</summary>
+    private static void ValidatePool(CountryConfig country, List<LevelConfig> levels, PoolConfig pool, List<string> errors)
+    {
+        var div = levels.Count == 0 ? null : levels[^1].Divisions.FirstOrDefault(d => d.Id == pool.Feeds);
+        if (div is null) { errors.Add($"Pool '{pool.Name}': '{pool.Feeds}' ist keine Division der untersten Ebene."); return; }
+        var down = Direct(div, MovementDirection.Down, null);
+        if (pool.Teams < down) errors.Add($"Pool '{pool.Name}': {pool.Teams} Vereine reichen nicht für {down} Absteiger.");
+    }
+
+    /// <summary>Direkte Auf- oder Absteiger einer Division über alle Staffeln (eigene Regeln der Staffeln eingerechnet).</summary>
+    private static int Direct(DivisionConfig d, MovementDirection to, int? season) => d.LeagueIds.Sum(id =>
+        d.MovementsOf(id).Where(m => m.Kind == MovementKind.Direct && m.To == to && (season is null ? m.OnlySeason is null : m.AppliesTo(season.Value)))
+            .SelectMany(m => m.PositionList()).Distinct().Count());
+
+    private static bool HasDirect(DivisionConfig d, MovementDirection to, int? season) => Direct(d, to, season) > 0;
 
     private static int Leagues(DivisionConfig d) => Math.Max(1, d.Groups.Count);
 
@@ -67,9 +88,7 @@ public static class PyramidValidator
     /// </summary>
     private static (int down, int up) Flow(CountryConfig country, LevelConfig upper, LevelConfig lower, int? season)
     {
-        int Count(LevelConfig level, MovementDirection to) => level.Divisions.Sum(d =>
-            Leagues(d) * d.Movements.Where(m => m.Kind == MovementKind.Direct && m.To == to && (season is null ? m.OnlySeason is null : m.AppliesTo(season.Value)))
-                .SelectMany(m => m.PositionList()).Distinct().Count());
+        int Count(LevelConfig level, MovementDirection to) => level.Divisions.Sum(d => Direct(d, to, season));
         var down = Count(upper, MovementDirection.Down);
         var up = Count(lower, MovementDirection.Up);
         bool In(LevelConfig level, string id) => level.Divisions.Any(d => d.Id == id || d.Groups.Any(g => g.Id == id));
@@ -92,7 +111,8 @@ public static class PyramidValidator
             if (Find(e.Division) is not { } div) { errors.Add($"Relegation '{po.Name}': unbekannte Liga '{e.Division}'."); continue; }
             entrants += div.Id == e.Division ? Leagues(div) : 1;
             if (e.Position < 1 || e.Position > div.Teams) errors.Add($"Relegation '{po.Name}': ungültiger Tabellenplatz {e.Position}.");
-            else if (div.Movements.Any(m => m.Kind == MovementKind.Direct && m.OnlySeason is null && m.PositionList().Contains(e.Position)))
+            else if ((div.Id == e.Division ? div.LeagueIds : new[] { e.Division }).Any(id => div.MovementsOf(id)
+                         .Any(m => m.Kind == MovementKind.Direct && m.OnlySeason is null && m.PositionList().Contains(e.Position))))
                 errors.Add($"Relegation '{po.Name}': Platz {e.Position} überschneidet sich mit direktem Auf- oder Abstieg.");
         }
         if (entrants < 2) errors.Add($"Relegation '{po.Name}': mindestens zwei Teilnehmer nötig.");

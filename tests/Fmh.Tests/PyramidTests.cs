@@ -43,7 +43,7 @@ public class PyramidTests
         var top = de.Divisions.Single(d => d.Id == "DE1");
         var rule = Assert.Single(top.Movements);
         Assert.Equal((MovementDirection.Down, "17-18"), (rule.To, rule.Positions));
-        var playoff = Assert.Single(de.Playoffs);
+        var playoff = de.Playoffs.Single(p => p.Id == "DE-REL");
         Assert.Equal(new[] { ("DE1", 16), ("DE2", 3) }, playoff.Entrants.Select(e => (e.Division, e.Position)));
         var tl3 = Data.Countries.Single(c => c.Code == "TL").Divisions.Single(d => d.Id == "TL3");
         Assert.Equal((2, 3), (tl3.Promotion, tl3.Relegation));
