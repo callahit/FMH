@@ -22,6 +22,8 @@ public sealed class GroupConfig
     public string Name { get; set; } = "";
     /// <summary>Regionen, deren Vereine bevorzugt in diese Staffel kommen (Zuteilung "fixed").</summary>
     public List<string> Regions { get; set; } = new();
+    /// <summary>Eigene Bewegungsregeln der Staffel; leer = Regeln der Division (z. B. Direktaufstieg nur für einige Staffelsieger).</summary>
+    public List<MovementRule> Movements { get; set; } = new();
 }
 
 /// <summary>

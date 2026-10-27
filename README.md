@@ -86,9 +86,10 @@ Farbthemen: Klassik, Hell, Terminal.
   Scouts beobachten Spieler, durchsuchen Ligen nach Kriterien (Berichte A–D mit Sternen für Stärke
   und Potenzial) oder analysieren den nächsten Gegner.
 - **Pokal und Relegation:**
-  - Pokal mit 64 Teams einschließlich 28 Amateurvereinen; Freilose und Heimrecht für
-    Unterklassige; Verlängerung und Elfmeterschießen; neutrales Finale.
-  - Relegation 16. gegen 3. in Hin- und Rückspiel.
+  - Pokal mit 64 Teams: alle Vereine der 1. bis 3. Liga und die acht Regionalligisten mit dem höchsten
+    Ruf; Freilose und Heimrecht für Unterklassige; Verlängerung und Elfmeterschießen; neutrales Finale.
+  - Relegation 16. gegen 3. in Hin- und Rückspiel (1./2. und 2./3. Liga), Aufstiegsspiele der
+    Regionalliga-Meister aus Nord und Nordost.
   - Ansicht mit allen Runden und Duellen.
 - **Jugend:** Nachwuchsleistungszentrum mit drei Altersstufen, siehe
   [Nachwuchsleistungszentrum](#nachwuchsleistungszentrum).
@@ -141,7 +142,9 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
   - Einnahmen: Zuschauer nach Preis, Stärke, Wetter, Derby und Fanstimmung; Dauerkarten bis Ende Juli;
     Fernsehgelder in zehn Raten plus Leistungsanteil; Sponsoren; Catering, Fanartikel und Gelände;
     Pokal- und Relegationsprämien.
-  - Ausgaben: Gehälter, Personal, Unterhalt, Reisen, Prämien, Zinsen.
+  - Ausgaben: Gehälter, Personal, Unterhalt, Reisen, Prämien, Zinsen. Das Gehaltsniveau je Spielklasse
+    (`wageLevel` in `finance.divisions`, z. B. 0,55 in der 3. Liga, 0,3 in der Regionalliga) gilt für
+    Startkader, Gehaltsforderungen und Jugendverträge.
   - Bank: Kredite (3–12 % Zins je nach Verschuldung), Festgeld, Umschichten zwischen Transfer- und
     Gehaltsbudget (52:1), Eintrittspreise mit Fanreaktion.
   - Lizenzierung mit Stichtagen, jedes Jahr für die nächste Saison:
@@ -228,7 +231,9 @@ Die Finanzsimulation über fünf Saisons ergibt folgende Werte je Verein:
 | Liga | Einnahmen | Ausgaben | Saldo pro Saison |
 |---|---|---|---|
 | 1. Liga | 26–32 Mio. | 21–26 Mio. | +4 bis +6 Mio. |
-| 2. Liga | 7–8 Mio. | 7–8 Mio. | etwa ±0 Mio. |
+| 2. Liga | 7–8 Mio. | 7–9 Mio. | etwa ±0 Mio., in späteren Saisons leicht negativ |
+| 3. Liga | 3–4 Mio. | 3,5–4 Mio. | ±0 bis −0,9 Mio. |
+| Regionalliga | 1,4–1,6 Mio. | 1,5–1,9 Mio. | −0,1 bis −0,4 Mio. |
 
 Darin sind die Budgets der Nachwuchsleistungszentren und die Europapokalprämien bereits enthalten.
 Absteiger geraten mit ihren Gehältern ins Minus. Es gibt keine Kettenpleiten. In der 2. Liga bekommen
@@ -242,7 +247,7 @@ Amateurfußball, und Vereine mit dünnem Kader verpflichten unter der Saison nac
 | Kapitel | Umgesetzt | Folgt laut Roadmap |
 |---|---|---|
 | 2 Spielmodi und Spielstart | Karriere mit neuem Spiel (Name, Werdegang, Verein, Seed, Weltregeln), Managerprofil, Speichern, Autosave vor jedem Spieltag in 3 rotierenden Slots, optional Ironman | Schnellsaison, Hot-Seat, Herausforderungen (Phase 4) |
-| 3 Spielwelt, Wettbewerbe | Tagesgenauer Kalender, Ligen als Daten, Deutschland mit 1. und 2. Liga und Amateurbereich, **Pokal**, **Relegation**, Transferfenster, Pflicht-Entscheidungen, **Ligapyramiden mit Staffeln, Bewegungsregeln, Aufstiegsrunden, zweiten Mannschaften und Formatversionen** | Europapokal, weitere Länder (Phase 3) |
+| 3 Spielwelt, Wettbewerbe | Tagesgenauer Kalender, Ligen als Daten, Deutschland bis zur 4. Liga (Regionalliga in fünf Staffeln) mit Oberliga als Pool, **Pokal**, **Relegation**, Transferfenster, Pflicht-Entscheidungen, **Ligapyramiden mit Staffeln, Bewegungsregeln, Aufstiegsrunden, zweiten Mannschaften und Formatversionen** | Europapokal, weitere Länder (Phase 3) |
 | 4 Spielerdatenmodell | 44 Attribute, versteckte Werte, Kondition, Form, Moral, Spielpraxis, Positionseignung, Entwicklung durch **Training** und Saisonwechsel, Karriereende, Dauerschäden | Zufriedenheit, Tutor-System |
 | 5 Kader, Training, Taktik | Kader, Profil, **Training**, **Trainingslager**, 25 Formationen, **Rollen und Aufgaben**, **Spieleranweisungen**, **freie Positionierung**, **Taktikvertrautheit**, **3 Taktikvarianten**, Standardvarianten, Co-Trainer | – |
 | 6 Spieltag und Matchengine | Vorbericht, Kabinenansprache, Kommentar/Ticker/Sofort/**Konferenz**, Wechsel, Taktik und Zurufe live, Nachbericht mit Noten und Statistik, **Verlängerung und Elfmeterschießen**, Hin- und Rückspiel, **Pressekonferenzen** | – |
@@ -330,6 +335,8 @@ des Umsetzungskonzepts:
 Mit `--strict` endet das Programm mit Exitcode 1, wenn eine Kennzahl außerhalb liegt; die CI nutzt das.
 Weitere Prüfungen:
 
+- `--max-level 4` bezieht die unteren Ebenen in die Engine-Kalibrierung ein (Standard: Ebene 1–2, für die die
+  Toleranzen gelten).
 - `--max-ms 3` prüft zusätzlich die Rechenzeit je Spiel. Sie hängt von der Hardware ab und läuft
   deshalb nicht in der CI (gemessen: 2,4 ms in der Cloud-Umgebung, davon etwa 0,4 ms Aufstellung und
   KI-Taktik, der Rest Engine).
@@ -425,6 +432,13 @@ Ein Land beschreibt seine Pyramide als Ebenen mit Divisionen. Formate ändern si
   darauf abgebildet. Wer keine Lizenz hat oder als zweite Mannschaft nicht aufsteigen darf, gibt seinen Platz an
   den Nächsten ab; Zwangsabsteiger ersetzt der bestplatzierte sportliche Absteiger bzw. ein Nachrücker. Zu- und
   Abgänge je Ebene gleichen sich immer aus.
+- **Eigene Regeln je Staffel:** `groups[].movements` ersetzt die Regeln der Division für diese Staffel, z. B. steigen
+  in der Regionalliga nur drei Meister direkt auf, die übrigen zwei spielen den vierten Platz aus.
+- **Pool unter der untersten Ebene:** Ein Pool mit `feeds: "<Division>"` nimmt deren Absteiger auf; dafür steigen
+  ebenso viele Poolvereine mit Lizenz auf (nach Ruf mit Zufallsanteil, bevorzugt aus der Region des Absteigers).
+  Der Pool spielt keine Liga. Ohne `feeds` nimmt er nur am Pokal teil.
+- **Pokalplätze:** Haben die Teilnehmerligen mehr Vereine als `teams`, kommen die höheren Ebenen zuerst, innerhalb
+  einer Ebene die Vereine mit dem höchsten Ruf.
 - **Relegation und Aufstiegsrunden:** `playoffs` mit `entrants` (Liga oder Division und Tabellenplatz; bei einer
   Division aus jeder Staffel) und `places`. Zwei Teilnehmer spielen ein Duell, mehr ein K.-o.-Turnier.
 - **Saisonphasen:** `phases` mit einer zweiten Phase nach dem Grunddurchgang, z. B. Meister- und Abstiegsrunde:
@@ -449,6 +463,16 @@ Mannschaften liegt unter `tests/Fmh.Tests/Packages/testland` (nur für Tests).
   ausländische Vereine. Echte Partien brauchen weitere Länder als Datenpakete.
 - **Saisonphasen:** Umgesetzt ist eine zweite Phase je Saison; mehrere Folgephasen (z. B. Play-offs um den Titel nach
   der Meisterrunde) folgen, wenn ein Land sie braucht.
+- **Deutschland:** Die Regionalliga-Aufstiegsregel ist fest (West, Südwest und Süd direkt, Nord gegen Nordost);
+  real wechselt der Aufstiegsmodus jährlich zwischen den Staffeln. Pokalplätze für Amateure gehen nach Ruf statt
+  über Landespokale. Die fiktiven Ortsnamen sind zusammengesetzt; Übereinstimmungen mit kleinen realen Orten sind
+  möglich, bekannte Vereinsorte sind ausgeschlossen.
+- **Finanzen in Ebene 3–4:** Die Kosten steigen über fünf Saisons leicht stärker als die Einnahmen; in der
+  fünften Saison bekommen einzelne Vereine der 3. Liga und Regionalliga Punktabzüge. Feinabstimmung mit
+  weiteren Ländern (AP 4b).
+- **Karten in unteren Ligen:** Über alle vier Ebenen zeigt die Engine 3,2 Gelbe und 0,13 Rote Karten je Spiel
+  (Ziel 3,8 bzw. 0,2), weil schwächere Spieler seltener in Zweikämpfe kommen. Die Kalibrierung prüft deshalb
+  Ebene 1–2 (`--max-level`); ob untere Ligen eigene Zielwerte bekommen, ist offen.
 - **Zweite Mannschaften als eigene Vereine:** Eine zweite Mannschaft ist bisher ein eigener Verein mit Verweis
   `reserveOf` (eigener Kader, eigene Finanzen). Die Mannschaft eines Vereins (`Team`) übernimmt das, sobald
   Spiele Mannschaften statt Vereine referenzieren.

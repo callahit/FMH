@@ -43,7 +43,7 @@ public class PyramidTests
         var top = de.Divisions.Single(d => d.Id == "DE1");
         var rule = Assert.Single(top.Movements);
         Assert.Equal((MovementDirection.Down, "17-18"), (rule.To, rule.Positions));
-        var playoff = Assert.Single(de.Playoffs);
+        var playoff = de.Playoffs.Single(p => p.Id == "DE-REL");
         Assert.Equal(new[] { ("DE1", 16), ("DE2", 3) }, playoff.Entrants.Select(e => (e.Division, e.Position)));
         var tl3 = Data.Countries.Single(c => c.Code == "TL").Divisions.Single(d => d.Id == "TL3");
         Assert.Equal((2, 3), (tl3.Promotion, tl3.Relegation));
@@ -338,6 +338,21 @@ public class PyramidTests
         var season = new SeasonConfig { StartMonth = 7, WinterBreakStart = "12-21", WinterBreakEnd = "01-14", MatchDay = DayOfWeek.Saturday };
         var dates = ScheduleGenerator.WeeklyDates(season, 2026, new DateOnly(2026, 12, 15), 3);
         Assert.Equal(new[] { new DateOnly(2026, 12, 19), new DateOnly(2027, 1, 16), new DateOnly(2027, 1, 23) }, dates);
+    }
+
+    /// <summary>Ein Meister ohne Lizenz steigt zwangsweise ab statt auf; kein Verein steht in zwei Wechseln zugleich.</summary>
+    [Fact]
+    public void ForcedRelegationBlocksPromotion()
+    {
+        var s = NewTestland(81);
+        var w = s.World;
+        TestData.PlayUntil(s, r => r.Reason == StopReason.SeasonEnd, 20_000);
+        var champion = w.Clubs[LeagueTable.Compute(w.League("TL3"))[0].ClubId];
+        champion.License.ForcedRelegation = true;
+        champion.License.PromotionAllowed = true;
+        TestData.PlayUntil(s, r => r.Reason == StopReason.NewSeason, 20_000);
+        AssertConsistent(w);
+        Assert.Equal(4, w.FindLeague(champion.LeagueId)!.Level);
     }
 
     private static GameData WithCountry(CountryConfig country)

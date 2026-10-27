@@ -6,8 +6,8 @@ namespace Fmh.Core.Logic;
 /// <summary>Vollzug des Plans: Vereine wechseln die Liga; geteilte Ebenen werden auf ihre Staffeln verteilt.</summary>
 public static partial class Pyramid
 {
-    private static void Apply(World world, CountryConfig country, List<List<League>> levels, List<Exchange> plan, Rng rng,
-                              Action<int> onRelegated)
+    private static void Apply(World world, CountryConfig country, List<List<League>> levels, List<Exchange> plan,
+                              (PoolConfig pool, Exchange x)? pool, Rng rng, Action<int> onRelegated)
     {
         // Lizenzflags gelten für die abgelaufene Saison; die Vereine unterhalb der obersten Ebene beginnen neu.
         foreach (var level in levels.Skip(1))
@@ -23,6 +23,16 @@ public static partial class Pyramid
                 onRelegated(id);
             }
             foreach (var id in plan[i].Up) Move(world, id, levels[i], arrivals[i]);
+        }
+        if (pool is { } p)
+        {
+            foreach (var id in p.x.Down)
+            {
+                world.FindLeague(world.Clubs[id].LeagueId)?.ClubIds.Remove(id);
+                world.Clubs[id].LeagueId = p.pool.Id;
+                onRelegated(id);
+            }
+            foreach (var id in p.x.Up) Move(world, id, levels[^1], arrivals[^1]);
         }
         for (var i = 0; i < levels.Count; i++)
             if (levels[i].Count > 1) AssignGroups(world, levels[i], arrivals[i], rng);

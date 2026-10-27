@@ -47,7 +47,7 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
         var champ = World.Clubs[ownTable[0].ClubId];
         var playoff = World.Cups.FirstOrDefault(c => c.Kind == CompetitionKind.Playoff && c.ParticipantIds.Contains(own.Id));
         var upperPlayoff = playoff?.UpperDivision is { } ud && Pyramid.Matching(World, ud).Any(l => l.Id == own.LeagueId);
-        var zone = Pyramid.DirectZone(ownLeague.Format, row.Position, World.SeasonYear);
+        var zone = Pyramid.DirectZone(ownLeague, row.Position, World.SeasonYear);
         var verdictKey = playoff is not null
             ? (playoff.WinnerId == own.Id ? (upperPlayoff ? "msg.seasonEnd.stayedUp" : "msg.seasonEnd.promoted") : (upperPlayoff ? "msg.seasonEnd.relegated" : "msg.seasonEnd.neutral"))
             : zone == MovementDirection.Up ? "msg.seasonEnd.promoted"
