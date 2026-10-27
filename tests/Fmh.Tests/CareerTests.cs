@@ -20,7 +20,7 @@ public class CareerTests
     public void NewGameHasCupDrawBudgetsAndScouts()
     {
         var s = TestData.NewSession();
-        var cup = Assert.Single(s.World.Cups);
+        var cup = s.World.Cups.Single(c => c.Id == "DE-CUP");
         Assert.Equal(64, cup.ParticipantIds.Count);
         Assert.Equal(32, cup.Rounds[0].Ties.Count);
         Assert.Equal(6, cup.Rounds.Count);

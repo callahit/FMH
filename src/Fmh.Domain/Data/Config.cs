@@ -50,26 +50,6 @@ public sealed class PoolConfig
     public string? Feeds { get; set; }
 }
 
-/// <summary>Pokalformat (Kapitel 3): Teilnehmer, Runden, Heimrecht, Termine.</summary>
-public sealed class CupConfig
-{
-    public string Id { get; set; } = "";
-    public string Name { get; set; } = "";
-    /// <summary>Ligen und Pools, deren Vereine teilnehmen.</summary>
-    public List<string> Participants { get; set; } = new();
-    /// <summary>Teilnehmerzahl (Zweierpotenz). Fehlende Plätze werden mit Freilosen aufgefüllt.</summary>
-    public int Teams { get; set; } = 64;
-    /// <summary>Unterklassige Vereine haben Heimrecht (wie im DFB-Pokal).</summary>
-    public bool LowerTierHome { get; set; } = true;
-    public int Legs { get; set; } = 1;
-    /// <summary>Spiele im Finale, abweichend von <see cref="Legs"/>.</summary>
-    public int? FinalLegs { get; set; }
-    public bool AwayGoals { get; set; }
-    /// <summary>Termine je Runde im Format MM-TT (bei zwei Spielen zwei Termine je Runde, durch Komma getrennt).</summary>
-    public List<string> Dates { get; set; } = new();
-    public bool NeutralFinal { get; set; } = true;
-}
-
 /// <summary>
 /// Relegation bzw. Aufstiegsturnier zwischen zwei Ebenen. Zwei Teilnehmer spielen ein Duell, vier oder acht ein
 /// K.-o.-Turnier. Die <see cref="Places"/> Sieger spielen in der nächsten Saison in <see cref="UpperDivision"/>,
