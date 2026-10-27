@@ -93,7 +93,7 @@ public static class WorldGenerator
         humanClub.ManagerId = manager.Id;
         world.Managers.Add(manager);
         if (!world.Scouts.Any(s => s.ClubId == humanClub.Id))
-            Game.GameSession.CreateScouts(world, humanClub, data, rng, 2);
+            ScoutGenerator.CreateScouts(world, humanClub, data, rng, 2);
 
         Messages.Add(world, manager, MessageType.Board, "msg.sender.board",
             TextRef.Of("msg.welcome.subject", humanClub.Name),
