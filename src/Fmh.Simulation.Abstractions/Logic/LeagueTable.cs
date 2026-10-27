@@ -28,6 +28,8 @@ public static class LeagueTable
 {
     public static List<TableRow> Compute(League league, int? upToMatchday = null)
     {
+        if (league.Format.Phases.Count > 0 && league.PhaseScheduled && (upToMatchday is null || upToMatchday > league.RegularMatchdays))
+            return ComputeWithPhase(league, league.Format.Phases[0], upToMatchday);
         var played = league.Fixtures
             .Where(f => f.Result is not null && (upToMatchday is null || f.Matchday <= upToMatchday))
             .OrderBy(f => f.Matchday)
@@ -38,6 +40,39 @@ public static class LeagueTable
         var sorted = Sort(rows.Values.ToList(), played, league.Format);
         for (var i = 0; i < sorted.Count; i++) sorted[i].Position = i + 1;
         return sorted;
+    }
+
+    /// <summary>
+    /// Endtabelle mit zweiter Phase: Die Gruppen stehen nach ihren Plätzen im Grunddurchgang hintereinander. Je Gruppe zählen
+    /// die übernommenen Punkte plus die Punkte der zweiten Phase; Tore und Bilanz laufen über die ganze Saison.
+    /// </summary>
+    private static List<TableRow> ComputeWithPhase(League league, PhaseConfig phase, int? upToMatchday)
+    {
+        var regular = Compute(league, league.RegularMatchdays);
+        var played = league.Fixtures
+            .Where(f => f.Result is not null && (upToMatchday is null || f.Matchday <= upToMatchday))
+            .OrderBy(f => f.Matchday)
+            .ToList();
+        var season = Accumulate(league.ClubIds, played, league.Format.Points);
+        var result = new List<TableRow>();
+        foreach (var group in phase.Groups)
+        {
+            var ids = group.PositionList().Where(p => p <= regular.Count).Select(p => regular[p - 1].ClubId).ToList();
+            var idSet = ids.ToHashSet();
+            var phaseFixtures = played.Where(f => f.Matchday > league.RegularMatchdays && idSet.Contains(f.HomeId) && idSet.Contains(f.AwayId)).ToList();
+            var phasePoints = Accumulate(ids, phaseFixtures, league.Format.Points);
+            var rows = ids.Select(id => season[id]).ToList();
+            foreach (var id in ids)
+            {
+                var row = season[id];
+                var before = regular.First(r => r.ClubId == id);
+                row.Points = phase.Carry(before.Points) + phasePoints[id].Points;
+                row.Deducted = before.Deducted;
+            }
+            result.AddRange(Sort(rows, played, league.Format));
+        }
+        for (var i = 0; i < result.Count; i++) result[i].Position = i + 1;
+        return result;
     }
 
     private static Dictionary<int, TableRow> Accumulate(IEnumerable<int> clubIds, IEnumerable<Fixture> fixtures, PointsConfig points)

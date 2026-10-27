@@ -1,4 +1,5 @@
 using Fmh.Core.Game;
+using Fmh.Core.Logic;
 using Fmh.Core.Simulation;
 
 namespace Fmh.Core.Modules;
@@ -18,7 +19,10 @@ public sealed partial class SeasonModule
 
     public override void OnDay(DayContext day)
     {
-        if (World.SeasonFinished || !Cups.CompetitionsDaily()) return;
+        if (World.SeasonFinished) return;
+        // Meister- und Abstiegsrunden, sobald der Grunddurchgang einer Liga beendet ist.
+        Pyramid.SchedulePhases(World, Rng);
+        if (!Cups.CompetitionsDaily()) return;
         FinishSeason();
         day.Stop = StopReason.SeasonEnd;
     }
