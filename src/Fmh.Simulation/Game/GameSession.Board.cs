@@ -26,4 +26,6 @@ public sealed partial class GameSession
     public void Resign() => _board.Resign();
     public string? AcceptJob(JobOffer offer) => _board.AcceptJob(offer);
     public void DeclineJob(JobOffer offer) => _board.DeclineJob(offer);
+    public void CareerSeasonEnd(Club club, int position, bool goalReached, bool promoted, bool champion) =>
+        _board.CareerSeasonEnd(club, position, goalReached, promoted, champion);
 }

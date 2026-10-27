@@ -116,6 +116,20 @@ public class CupsTests
         Assert.Equal(2, w.Cups.Single(c => c.Id == "ENG-SC").ParticipantIds.Count);
     }
 
+    /// <summary>Gewinnt der eigene Verein mehrere Pokale, zählt jeder als Titel der Karrierestation, der Erfolg nur einmal.</summary>
+    [Fact]
+    public void EveryCupWonCountsAsCareerTitle()
+    {
+        var s = TestData.NewSession();
+        var club = s.HumanClub;
+        foreach (var cup in s.World.Cups.Where(c => c.Id is "DE-CUP" or "DE-SC")) cup.WinnerId = club.Id;
+        s.CareerSeasonEnd(club, 5, true, false, false);
+        var titles = s.HumanManager.Career.Stations[^1].Titles;
+        Assert.Contains($"DE-CUP|{s.World.SeasonYear}", titles);
+        Assert.Contains($"DE-SC|{s.World.SeasonYear}", titles);
+        Assert.Single(s.HumanManager.Career.Achievements, a => a == "cupWin");
+    }
+
     /// <summary>Halbfinale im League Cup mit Hin- und Rückspiel, alle übrigen Runden in einem Spiel.</summary>
     [Fact]
     public void RoundLegsOverrideTheDefault()
