@@ -54,8 +54,11 @@ public sealed partial class LicenseModule : GameModule, ILicenseService
         if (higher is null) return Finance.DivisionFinance(club);
         var table = LeagueTable.Compute(league);
         var pos = table.FindIndex(r => r.ClubId == club.Id) + 1;
-        // Aufstiegs- und Relegationsplätze plus ein Platz Puffer.
-        if (pos > 0 && pos <= league.Format.Promotion + 2 && country.Finance.Divisions.TryGetValue(higher.Id, out var div))
+        // Aufstiegs- und Relegationsplätze plus ein Platz Puffer; dazu Teilnehmer einer Relegation in die höhere Ebene.
+        var playoff = country.Playoffs.Any(p => p.Entrants.Any(e => (e.Division == league.Id || e.Division == league.Format.Id) && e.Position == pos)
+                                                && Pyramid.Matching(World, p.UpperDivision).Any(l => l.Level == league.Level - 1));
+        if (pos > 0 && (pos <= league.Format.Promotion + 2 || playoff)
+            && (country.Finance.Divisions.TryGetValue(higher.Id, out var div) || country.Finance.Divisions.TryGetValue(higher.Format.Id, out div)))
         {
             upper = true;
             return div;

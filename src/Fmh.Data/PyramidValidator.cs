@@ -96,7 +96,8 @@ public static class PyramidValidator
                 errors.Add($"Relegation '{po.Name}': Platz {e.Position} überschneidet sich mit direktem Auf- oder Abstieg.");
         }
         if (entrants < 2) errors.Add($"Relegation '{po.Name}': mindestens zwei Teilnehmer nötig.");
-        if (po.Places < 1 || po.Places >= entrants) errors.Add($"Relegation '{po.Name}': ungültige Zahl der Plätze.");
+        // Ein Duell oder K.-o.-Turnier hat genau einen Sieger; mehrere Plätze je Relegation sind noch nicht umgesetzt.
+        if (po.Places != 1) errors.Add($"Relegation '{po.Name}': {po.Places} Plätze, unterstützt wird genau einer.");
         var rounds = entrants <= 2 ? 1 : (int)Math.Ceiling(Math.Log2(entrants));
         if (entrants <= 2 ? po.Dates.Count < po.Legs : po.Dates.Count < rounds) errors.Add($"Relegation '{po.Name}': zu wenige Termine.");
     }

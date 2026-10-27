@@ -334,6 +334,7 @@
  "lineup.foreign": "A player is no longer in the squad.",
  "lineup.injured": "An injured player is in the starting XI.",
  "lineup.suspended": "A suspended player is in the starting XI.",
+ "lineup.reserveAge": "Reserve team: too many players over the age limit in the matchday squad.",
  "lineup.benchUnavailable": "An unavailable player is on the bench.",
  "sub.noneLeft": "No substitutions left.",
  "sub.notOnPitch": "The player is not on the pitch.",
