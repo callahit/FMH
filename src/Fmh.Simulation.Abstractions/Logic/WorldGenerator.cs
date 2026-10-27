@@ -12,6 +12,8 @@ public sealed class NewGameOptions
     public int StartYear { get; init; } = 2026;
     public ManagerProfile Profile { get; init; } = new();
     public WorldRules Rules { get; init; } = new();
+    /// <summary>Aktivierungsstufe je Land (Ländercode), abweichend von den Daten (Umsetzungskonzept 6.2).</summary>
+    public Dictionary<string, CountryActivation> Activation { get; init; } = new();
 }
 
 /// <summary>Erzeugt eine neue Spielwelt aus den Datenpaketen (Kapitel 2, Spielstart).</summary>
@@ -29,10 +31,10 @@ public static class WorldGenerator
         };
 
         var countries = data.Countries
-            .Where(c => c.ValidFrom <= options.StartYear)
+            .Where(c => c.ValidIn(options.StartYear))
             .GroupBy(c => c.Code)
             .Select(g => g.OrderByDescending(c => c.ValidFrom).First())
-            .Where(c => c.Activation == CountryActivation.Playable)
+            .Where(c => options.Activation.GetValueOrDefault(c.Code, c.Activation) == CountryActivation.Playable)
             .ToList();
         if (countries.Count == 0) throw new InvalidDataException("Keine spielbaren Länder in den Daten.");
         world.Countries = countries;
@@ -43,32 +45,10 @@ public static class WorldGenerator
 
         foreach (var country in countries)
         {
-            foreach (var level in country.Levels.OrderBy(l => l.Level))
-            {
-                foreach (var div in level.Divisions)
-                {
-                    var league = new League
-                    {
-                        Id = div.Id,
-                        Name = div.Name,
-                        CountryCode = country.Code,
-                        Level = level.Level,
-                        Format = div,
-                    };
-                    var defs = data.Clubs.Where(c => c.Division == div.Id).ToList();
-                    if (defs.Count != div.Teams)
-                        throw new InvalidDataException($"Liga '{div.Name}' braucht {div.Teams} Vereine, Daten enthalten {defs.Count}.");
-                    foreach (var def in defs)
-                    {
-                        var club = CreateClub(world, def, country.Code, league.Id);
-                        league.ClubIds.Add(club.Id);
-                        CreateSquad(world, data, rng, club, country.Code);
-                    }
-                    world.Leagues.Add(league);
-                }
-            }
+            CreateLeagues(world, data, rng, country);
             AddPoolClubs(world, data, rng, country);
         }
+        LinkReserves(world, data);
 
         foreach (var club in world.Clubs.Values)
         {
@@ -101,6 +81,53 @@ public static class WorldGenerator
 
         world.RngState = rng.GetState();
         return world;
+    }
+
+    /// <summary>Ligen eines Landes; geteilte Divisionen bekommen je Staffel eine Liga.</summary>
+    private static void CreateLeagues(World world, GameData data, Rng rng, CountryConfig country)
+    {
+        foreach (var level in country.Levels.OrderBy(l => l.Level))
+        {
+            foreach (var div in level.Divisions)
+            {
+                var groups = new List<League>();
+                foreach (var (id, name) in div.Groups.Count == 0 ? new[] { (div.Id, div.Name) } : div.Groups.Select(g => (g.Id, g.Name)).ToArray())
+                {
+                    var league = new League { Id = id, Name = name, CountryCode = country.Code, Level = level.Level, Format = div };
+                    var defs = data.Clubs.Where(c => c.Division == id).ToList();
+                    if (div.Groups.Count == 0 && defs.Count != div.Teams)
+                        throw new InvalidDataException($"Liga '{div.Name}' braucht {div.Teams} Vereine, Daten enthalten {defs.Count}.");
+                    foreach (var def in defs)
+                    {
+                        var club = CreateClub(world, def, country.Code, league.Id);
+                        league.ClubIds.Add(club.Id);
+                        CreateSquad(world, data, rng, club, country.Code, def.ReserveOf is null ? null : country.Reserves);
+                    }
+                    world.Leagues.Add(league);
+                    groups.Add(league);
+                }
+                if (div.Groups.Count == 0) continue;
+                // Vereine, die nur der Division zugeordnet sind, verteilt die Staffelzuteilung.
+                var open = new List<int>();
+                foreach (var def in data.Clubs.Where(c => c.Division == div.Id))
+                {
+                    var club = CreateClub(world, def, country.Code, div.Id);
+                    CreateSquad(world, data, rng, club, country.Code, def.ReserveOf is null ? null : country.Reserves);
+                    open.Add(club.Id);
+                }
+                Pyramid.AssignGroups(world, groups, open, rng);
+                if (groups.Any(g => g.ClubIds.Count != div.Teams))
+                    throw new InvalidDataException($"Liga '{div.Name}' braucht {div.Teams} Vereine je Staffel.");
+            }
+        }
+    }
+
+    /// <summary>Zweite Mannschaften: Verweis auf den Verein der ersten Mannschaft (über den Schlüssel in den Daten).</summary>
+    private static void LinkReserves(World world, GameData data)
+    {
+        var byKey = world.Clubs.Values.ToDictionary(c => c.Key);
+        foreach (var def in data.Clubs.Where(d => d.ReserveOf is not null && byKey.ContainsKey(d.Key)))
+            if (byKey.TryGetValue(def.ReserveOf!, out var parent)) byKey[def.Key].ReserveOf = parent.Id;
     }
 
     /// <summary>Vereine unterhalb der Ligen (Amateurbereich): nehmen am Pokal teil und dienen als Transferumfeld.</summary>
@@ -164,19 +191,25 @@ public static class WorldGenerator
             StadiumName = def.Stadium,
             StadiumCapacity = def.Capacity,
             LeagueId = leagueId,
+            Region = def.Region,
+            Latitude = def.Latitude,
+            Longitude = def.Longitude,
         };
         world.Clubs[club.Id] = club;
         return club;
     }
 
-    public static void CreateSquad(World world, GameData data, Rng rng, Club club, string country)
+    /// <summary>Kader nach Schablone; zweite Mannschaften bekommen junge Spieler unter der Altersgrenze und wenige Ältere.</summary>
+    public static void CreateSquad(World world, GameData data, Rng rng, Club club, string country, ReserveRules? reserve = null)
     {
         var level = PlayerGenerator.ClubLevel(club.Reputation);
+        var older = 0;
         foreach (var (pos, count) in PlayerGenerator.SquadTemplate)
         {
             for (var i = 0; i < count; i++)
             {
-                var age = PlayerGenerator.RandomAge(rng);
+                var age = reserve is null ? PlayerGenerator.RandomAge(rng)
+                    : older++ < reserve.OverAgePlayers ? rng.Next(reserve.AgeLimit + 1, reserve.AgeLimit + 7) : rng.Next(17, reserve.AgeLimit);
                 // Der erste Spieler je Position ist eher Stammspieler, die weiteren eher Ergänzung.
                 var playerLevel = level + (i == 0 ? 0.8 : -0.6) + rng.Normal(0, 1.1) + AgeLevelOffset(age);
                 var p = PlayerGenerator.Create(world, data, rng, pos, Math.Clamp(playerLevel, 3, 19), age, country);

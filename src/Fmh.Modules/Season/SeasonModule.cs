@@ -46,10 +46,12 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
         var row = ownTable.First(r => r.ClubId == own.Id);
         var champ = World.Clubs[ownTable[0].ClubId];
         var playoff = World.Cups.FirstOrDefault(c => c.Kind == CompetitionKind.Playoff && c.ParticipantIds.Contains(own.Id));
+        var upperPlayoff = playoff?.UpperDivision is { } ud && Pyramid.Matching(World, ud).Any(l => l.Id == own.LeagueId);
+        var zone = Pyramid.DirectZone(ownLeague.Format, row.Position, World.SeasonYear);
         var verdictKey = playoff is not null
-            ? (playoff.WinnerId == own.Id ? (playoff.UpperDivision == own.LeagueId ? "msg.seasonEnd.stayedUp" : "msg.seasonEnd.promoted") : (playoff.UpperDivision == own.LeagueId ? "msg.seasonEnd.relegated" : "msg.seasonEnd.neutral"))
-            : row.Position <= ownLeague.Format.Promotion ? "msg.seasonEnd.promoted"
-            : row.Position > ownTable.Count - ownLeague.Format.Relegation ? "msg.seasonEnd.relegated"
+            ? (playoff.WinnerId == own.Id ? (upperPlayoff ? "msg.seasonEnd.stayedUp" : "msg.seasonEnd.promoted") : (upperPlayoff ? "msg.seasonEnd.relegated" : "msg.seasonEnd.neutral"))
+            : zone == MovementDirection.Up ? "msg.seasonEnd.promoted"
+            : zone == MovementDirection.Down ? "msg.seasonEnd.relegated"
             : row.Position == 1 ? "msg.seasonEnd.champion" : "msg.seasonEnd.neutral";
         Notify(MessageType.Season, "msg.sender.league",
             TR("msg.seasonEnd.subject", Comp(ownLeague.Id), SeasonLabel(World.SeasonYear)),
@@ -82,6 +84,8 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
         PromoteAndRelegate();
         World.SeasonYear++;
         World.SeasonFinished = false;
+        // Neue Formatversion eines Landes (z. B. Ligareform): Ligen und Staffeln werden umgebaut.
+        Pyramid.SwitchFormat(World, Data, Rng);
 
         Transfers.ExpireContractsAndLoans();
         foreach (var club in World.Clubs.Values) RenewSquad(club);
@@ -124,38 +128,11 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
         return true;
     }
 
+    /// <summary>Auf- und Abstieg in allen Ländern nach den Bewegungsregeln der Ligapyramide.</summary>
     private void PromoteAndRelegate()
     {
         foreach (var country in World.Countries)
-        {
-            var leagues = World.Leagues.Where(l => l.CountryCode == country.Code).OrderBy(l => l.Level).ToList();
-            for (var i = 0; i < leagues.Count - 1; i++)
-            {
-                var upper = leagues[i];
-                var lower = leagues[i + 1];
-                var count = Math.Min(upper.Format.Relegation, lower.Format.Promotion);
-                var down = count <= 0 ? new List<int>() : LeagueTable.Compute(upper).TakeLast(count).Select(r => r.ClubId).ToList();
-                // Lizenz verweigert: Zwangsabstieg; dafür bleibt der bestplatzierte sportliche Absteiger oben.
-                foreach (var forced in LeagueTable.Compute(upper).Select(r => r.ClubId).Where(id => World.Clubs[id].License.ForcedRelegation && !down.Contains(id)).ToList())
-                {
-                    down.Add(forced);
-                    if (down.Count > count && down.Count > 1) down.RemoveAt(0);
-                }
-                // Aufsteigen kann nur, wer die Lizenz für die höhere Liga hat.
-                var up = count <= 0 ? new List<int>() : LeagueTable.Compute(lower).Select(r => r.ClubId)
-                    .Where(id => World.Clubs[id].License.PromotionAllowed).Take(count).ToList();
-                foreach (var forced in lower.ClubIds.Where(id => World.Clubs[id].License.ForcedRelegation)) World.Clubs[forced].License.ForcedRelegation = false;
-                // Relegation: Verlierer des Erstligisten steigt ab, Sieger des Zweitligisten auf.
-                foreach (var po in World.Cups.Where(c => c.Kind == CompetitionKind.Playoff && c.UpperDivision == upper.Id && c.LowerDivision == lower.Id && c.WinnerId is not null))
-                {
-                    var upperClub = po.ParticipantIds.First(id => upper.ClubIds.Contains(id));
-                    var lowerClub = po.ParticipantIds.First(id => lower.ClubIds.Contains(id));
-                    if (po.WinnerId == lowerClub && World.Clubs[lowerClub].License.PromotionAllowed) { down.Add(upperClub); up.Add(lowerClub); }
-                }
-                foreach (var id in down) { upper.ClubIds.Remove(id); lower.ClubIds.Add(id); World.Clubs[id].LeagueId = lower.Id; ApplyRelegationClauses(id); }
-                foreach (var id in up) { lower.ClubIds.Remove(id); upper.ClubIds.Add(id); World.Clubs[id].LeagueId = upper.Id; }
-            }
-        }
+            Pyramid.PromoteAndRelegate(World, country, Rng, ApplyRelegationClauses);
     }
 
     /// <summary>Abstiegsklausel: Gehalt −30 % nach Abstieg (Kapitel 7).</summary>

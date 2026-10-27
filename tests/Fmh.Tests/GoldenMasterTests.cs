@@ -111,9 +111,9 @@ internal static class WorldFingerprint
             ["ids"] = J(new { w.NextPlayerId, w.NextFixtureId, w.NextMessageId, w.NextTieId, w.NextNegotiationId, w.NextScoutId, w.NextAssignmentId,
                 w.NextStaffId, w.NextBuildingId, w.NextProjectId, w.NextSponsorId, w.NextLoanId, w.NextEventId }),
             ["managers"] = J(w.Managers),
-            ["clubs"] = J(w.Clubs.Values.OrderBy(c => c.Id)),
+            ["clubs"] = Legacy(w.Clubs.Values.OrderBy(c => c.Id), ClubFieldsSinceAp3, null),
             ["players"] = J(w.Players.Values.OrderBy(p => p.Id)),
-            ["leagues"] = J(w.Leagues),
+            ["leagues"] = Legacy(w.Leagues, null, FormatFieldsSinceAp3),
             ["cups"] = J(w.Cups),
             ["messages"] = J(w.Messages),
             ["transfers"] = J(new { w.Transfers, w.Transactions, w.Installments, w.Negotiations, w.NegotiationLocks }),
@@ -122,5 +122,21 @@ internal static class WorldFingerprint
             ["history"] = J(w.History),
         };
         return sections.ToDictionary(kv => kv.Key, kv => GoldenMasterTests.Hash(kv.Value));
+    }
+
+    /// <summary>Felder, die AP 3 ergänzt hat (zweite Mannschaften, Staffeln, Bewegungsregeln); für den Vergleich wird die alte Form hergestellt.</summary>
+    private static readonly string[] ClubFieldsSinceAp3 = { "reserveOf", "region", "latitude", "longitude" };
+    private static readonly string[] FormatFieldsSinceAp3 = { "groups", "assignment", "movements" };
+
+    private static string Legacy<T>(IEnumerable<T> items, string[]? remove, string[]? removeFromFormat)
+    {
+        var array = JsonSerializer.SerializeToNode(items, Json.Compact)!.AsArray();
+        foreach (var item in array.OfType<JsonObject>())
+        {
+            foreach (var key in remove ?? Array.Empty<string>()) item.Remove(key);
+            if (item["format"] is JsonObject format)
+                foreach (var key in removeFromFormat ?? Array.Empty<string>()) format.Remove(key);
+        }
+        return array.ToJsonString(Json.Compact);
     }
 }
