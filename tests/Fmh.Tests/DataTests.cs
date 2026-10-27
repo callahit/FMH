@@ -13,7 +13,7 @@ public class DataTests
     {
         Assert.Empty(DataValidator.Validate(TestData.Data));
         Assert.Contains(TestData.Data.Packages, p => p.Id == "base");
-        Assert.Equal(64, TestData.Data.Clubs.Count);
+        Assert.Equal(186, TestData.Data.Clubs.Count);
         Assert.True(TestData.Data.Formations.Count >= 15);
     }
 

@@ -46,9 +46,7 @@ public static class DataValidator
             {
                 foreach (var id in cup.Participants.Where(id => !KnownDivision(id)))
                     errors.Add($"Pokal '{cup.Name}': unbekannte Teilnehmerliga '{id}'.");
-                var teams = data.Clubs.Count(c => (c.ReserveOf is null || country.Reserves.PlayInCups)
-                    && (cup.Participants.Contains(c.Division) || country.Divisions.Any(d => cup.Participants.Contains(d.Id) && d.Groups.Any(g => g.Id == c.Division))));
-                if (teams > cup.Teams) errors.Add($"Pokal '{cup.Name}': {teams} Teilnehmer, aber nur {cup.Teams} Plätze.");
+                // Mehr Bewerber als Plätze sind erlaubt: Der Pokal nimmt die höheren Ebenen zuerst (CupLogic.CreateCup).
                 var rounds = (int)Math.Ceiling(Math.Log2(Math.Max(2, cup.Teams)));
                 if (cup.Dates.Count < rounds) errors.Add($"Pokal '{cup.Name}': {rounds} Runden, aber nur {cup.Dates.Count} Termine.");
             }

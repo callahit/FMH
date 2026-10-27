@@ -36,9 +36,9 @@ public class SessionTests
         TestData.PlayUntil(s, r => r.Reason == StopReason.SeasonEnd);
         Assert.True(s.World.Leagues.All(l => l.IsComplete));
         Assert.All(s.World.Leagues, l => Assert.Equal(l.ClubIds.Count * (l.ClubIds.Count - 1), l.Fixtures.Count));
-        Assert.Equal(2, s.World.History.Count(h => s.World.FindLeague(h.LeagueId) is not null));
+        Assert.Equal(s.World.Leagues.Count, s.World.History.Count(h => s.World.FindLeague(h.LeagueId) is not null));
         Assert.Contains(s.World.Cups, c => c.Kind == CompetitionKind.Cup && c.IsFinished);
-        var playoff = Assert.Single(s.World.Cups, c => c.Kind == CompetitionKind.Playoff);
+        var playoff = Assert.Single(s.World.Cups, c => c.Kind == CompetitionKind.Playoff && c.Id == "DE-REL");
         Assert.True(playoff.IsFinished);
         Assert.Contains(s.Inbox, m => m.Type == MessageType.Season);
 
@@ -56,7 +56,7 @@ public class SessionTests
         Assert.Equal(year + 1, s.World.SeasonYear);
         Assert.All(relegated, id => Assert.Contains(id, l2.ClubIds));
         Assert.All(promoted, id => Assert.Contains(id, l1.ClubIds));
-        Assert.All(s.World.Leagues, l => Assert.Equal(18, l.ClubIds.Count));
+        Assert.All(s.World.Leagues, l => Assert.Equal(l.Format.Teams, l.ClubIds.Count));
         Assert.All(s.World.Leagues, l => Assert.All(l.Fixtures, f => Assert.Null(f.Result)));
         Assert.All(s.World.Clubs.Values, c => Assert.Empty(LineupSelector.Validate(c, s.World, TestData.Data)));
         // Der menschliche Verein verlängert in diesem Test nie Verträge; das Sicherheitsnetz hält ihn bei 16.

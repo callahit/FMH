@@ -42,6 +42,11 @@ public sealed class PoolConfig
     public string Id { get; set; } = "";
     public string Name { get; set; } = "";
     public int Teams { get; set; }
+    /// <summary>
+    /// Division der untersten Ebene, unter der der Pool liegt: Ihre Absteiger fallen in den Pool, dafür steigen
+    /// ebenso viele Poolvereine auf. Leer = der Pool spielt nur im Pokal.
+    /// </summary>
+    public string? Feeds { get; set; }
 }
 
 /// <summary>Pokalformat (Kapitel 3): Teilnehmer, Runden, Heimrecht, Termine.</summary>
@@ -191,6 +196,10 @@ public sealed class DivisionConfig
     /// <summary>Kennungen der Ligen im Spiel: die Staffeln oder die Division selbst.</summary>
     [System.Text.Json.Serialization.JsonIgnore]
     public IEnumerable<string> LeagueIds => Groups.Count == 0 ? new[] { Id } : Groups.Select(g => g.Id);
+
+    /// <summary>Bewegungsregeln einer Liga im Spiel: die der Staffel, falls sie eigene hat, sonst die der Division.</summary>
+    public List<MovementRule> MovementsOf(string leagueId) =>
+        Groups.FirstOrDefault(g => g.Id == leagueId) is { Movements.Count: > 0 } g ? g.Movements : Movements;
 }
 
 public sealed class PointsConfig
