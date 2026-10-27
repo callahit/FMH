@@ -102,7 +102,7 @@ public static class CupLogic
             CountryCode = country.Code,
             Kind = CompetitionKind.Playoff,
             SeasonYear = world.SeasonYear,
-            Config = new CupConfig { Id = cfg.Id, Name = cfg.Name, Legs = cfg.Legs, AwayGoals = cfg.AwayGoals, LowerTierHome = true, NeutralFinal = false },
+            Config = new CupConfig { Id = cfg.Id, Name = cfg.Name, Legs = cfg.Legs, FinalLegs = cfg.FinalLegs, AwayGoals = cfg.AwayGoals, LowerTierHome = true, NeutralFinal = false },
             ParticipantIds = participants.ToList(),
             UpperDivision = cfg.UpperDivision,
             LowerDivision = cfg.LowerDivision,
@@ -118,7 +118,10 @@ public static class CupLogic
                 Dates = dates.Select(d => ScheduleGenerator.ParseDate(d.Trim(), world.SeasonYear, country.Season.StartMonth)).ToList(),
             });
         }
-        Draw(world, cup, cup.Rounds[0], participants, rng);
+        if (cfg.Seeded && participants.Count == size)
+            for (var i = 0; i < size / 2; i++)
+                AddTie(world, cup, cup.Rounds[0], participants[size - 1 - i], participants[i]);
+        else Draw(world, cup, cup.Rounds[0], participants, rng);
         return cup;
     }
 
@@ -146,7 +149,7 @@ public static class CupLogic
 
     private static void AddTie(World world, Cup cup, CupRound round, int home, int away)
     {
-        var legs = Math.Max(1, cup.Config.Legs);
+        var legs = Math.Max(1, round.Number == cup.Rounds.Count && cup.Config.FinalLegs is { } fl ? fl : cup.Config.Legs);
         var tie = new CupTie { Id = world.NextTieId++, HomeId = home, AwayId = away, Legs = legs };
         for (var leg = 1; leg <= legs; leg++)
         {

@@ -61,6 +61,8 @@ public sealed class CupConfig
     /// <summary>Unterklassige Vereine haben Heimrecht (wie im DFB-Pokal).</summary>
     public bool LowerTierHome { get; set; } = true;
     public int Legs { get; set; } = 1;
+    /// <summary>Spiele im Finale, abweichend von <see cref="Legs"/>.</summary>
+    public int? FinalLegs { get; set; }
     public bool AwayGoals { get; set; }
     /// <summary>Termine je Runde im Format MM-TT (bei zwei Spielen zwei Termine je Runde, durch Komma getrennt).</summary>
     public List<string> Dates { get; set; } = new();
@@ -90,6 +92,13 @@ public sealed class PlayoffConfig
     public int? Cycle { get; set; }
     public int CycleStart { get; set; }
     public int Legs { get; set; } = 2;
+    /// <summary>Spiele im Finale eines Aufstiegsturniers, abweichend von <see cref="Legs"/> (z. B. 1 in England).</summary>
+    public int? FinalLegs { get; set; }
+    /// <summary>
+    /// Gesetzte Paarungen statt Auslosung: Teilnehmer in der Reihenfolge der <see cref="Entrants"/>, der Beste gegen den
+    /// Schwächsten (3. gegen 6., 4. gegen 5.); der Besserplatzierte hat im Rückspiel Heimrecht.
+    /// </summary>
+    public bool Seeded { get; set; }
 
     public bool AppliesTo(int seasonYear) => (OnlySeason is null || OnlySeason == seasonYear) && SeasonCycle.InCycle(Cycle, CycleStart, seasonYear);
     public bool AwayGoals { get; set; }
@@ -155,6 +164,12 @@ public sealed class SeasonConfig
     public string WinterBreakStart { get; set; } = "12-20";
     public string WinterBreakEnd { get; set; } = "01-15";
     public DayOfWeek MatchDay { get; set; } = DayOfWeek.Saturday;
+    /// <summary>
+    /// Letzter Termin für reguläre Spieltage (MM-TT). Passen nicht alle Spieltage wöchentlich davor, kommen Englische Wochen
+    /// am <see cref="MidweekDay"/> hinzu, gleichmäßig über die Saison verteilt. Leer = nur wöchentlich.
+    /// </summary>
+    public string? LastMatchday { get; set; }
+    public DayOfWeek MidweekDay { get; set; } = DayOfWeek.Tuesday;
 }
 
 public sealed class SquadRules

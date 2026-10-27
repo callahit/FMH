@@ -306,7 +306,8 @@ public class UiTests
         AssertNoMissingTexts(w);
         Shot(w, "30_transfers");
 
-        // Spielerprofil eines fremden Spielers: Attribute als Spanne, Kaufen öffnet den Verhandlungsdialog.
+        // Spielerprofil eines fremden Spielers aus der eigenen Liga: Attribute als Spanne, Kaufen öffnet den Verhandlungsdialog.
+        page.League = page.Leagues.First(o => Equals(o.Value, session.HumanClub.LeagueId));
         var row = page.Results.First(r => r.Player.ClubId is { } c && session.World.FindLeague(session.World.Clubs[c].LeagueId) is not null
                                            && Fmh.Core.Logic.Negotiations.RefusalReason(r.Player, session.HumanClub, session.World, session.Data) is null
                                            && Fmh.Core.Logic.Negotiations.AskingPrice(r.Player, session.World.Clubs[r.Player.ClubId!.Value], session.World, session.Data) < session.HumanClub.Budget.TransferBudget / 2);

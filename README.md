@@ -270,7 +270,7 @@ Amateurfußball, und Vereine mit dünnem Kader verpflichten unter der Saison nac
 | Kapitel | Umgesetzt | Folgt laut Roadmap |
 |---|---|---|
 | 2 Spielmodi und Spielstart | Karriere mit neuem Spiel (Name, Werdegang, Verein, Seed, Weltregeln), Managerprofil, Speichern, Autosave vor jedem Spieltag in 3 rotierenden Slots, optional Ironman | Schnellsaison, Hot-Seat, Herausforderungen (Phase 4) |
-| 3 Spielwelt, Wettbewerbe | Tagesgenauer Kalender, Ligen als Daten, Deutschland bis zur 4. Liga (Regionalliga in fünf Staffeln) mit Oberliga als Pool, **Pokal**, **Relegation**, Transferfenster, Pflicht-Entscheidungen, **Ligapyramiden mit Staffeln, Bewegungsregeln, Aufstiegsrunden, zweiten Mannschaften und Formatversionen** | Europapokal, weitere Länder (Phase 3) |
+| 3 Spielwelt, Wettbewerbe | Tagesgenauer Kalender, Ligen als Daten, Deutschland bis zur 4. Liga (Regionalliga in fünf Staffeln) mit Oberliga als Pool, England mit vier Profiligen und National League als Pool, **Pokal**, **Relegation**, Transferfenster, Pflicht-Entscheidungen, **Ligapyramiden mit Staffeln, Bewegungsregeln, Aufstiegsrunden, zweiten Mannschaften und Formatversionen** | Europapokal, weitere Länder (Phase 3) |
 | 4 Spielerdatenmodell | 44 Attribute, versteckte Werte, Kondition, Form, Moral, Spielpraxis, Positionseignung, Entwicklung durch **Training** und Saisonwechsel, Karriereende, Dauerschäden | Zufriedenheit, Tutor-System |
 | 5 Kader, Training, Taktik | Kader, Profil, **Training**, **Trainingslager**, 25 Formationen, **Rollen und Aufgaben**, **Spieleranweisungen**, **freie Positionierung**, **Taktikvertrautheit**, **3 Taktikvarianten**, Standardvarianten, Co-Trainer | – |
 | 6 Spieltag und Matchengine | Vorbericht, Kabinenansprache, Kommentar/Ticker/Sofort/**Konferenz**, Wechsel, Taktik und Zurufe live, Nachbericht mit Noten und Statistik, **Verlängerung und Elfmeterschießen**, Hin- und Rückspiel, **Pressekonferenzen** | – |
@@ -402,7 +402,8 @@ src/
   Fmh.Calibrate/     Kommandozeilen-Simulator "fmh-calibrate"
 tests/Fmh.Tests/     xUnit-Tests für Kern, Engine, Karriere, Spielstände, Daten, Oberfläche, Architektur
                      und Golden Master
-data/base/           Datenpaket "base": Länder, Vereine, Namen, Formationen, Rollen, Regeln, Sprachdateien
+data/base/           Datenpaket "base": Deutschland, Formationen, Rollen, Regeln, Sprachdateien
+data/england/        Länderpaket England (dependsOn base): Ligen, Vereine, Namen, Sponsoren, Wettbewerbsnamen
 ```
 
 Regeln, die ein Architekturtest prüft: erlaubte Projektverweise (Konzept 4.1), keine Datei in
@@ -477,8 +478,28 @@ Ein Land beschreibt seine Pyramide als Ebenen mit Divisionen. Formate ändern si
   Staffeln werden umgebaut. Der Validator prüft für jede Version, dass Zu- und Abgänge je Ebene aufgehen, und
   beim Wechsel, dass die Teamzahlen nach den Übergangsregeln zur neuen Version passen.
 
+- **Englische Wochen:** `season.lastMatchday` (MM-TT) begrenzt die regulären Spieltage; passen sie nicht wöchentlich
+  davor, kommen Spieltage am `season.midweekDay` (Standard Dienstag) gleichmäßig verteilt hinzu.
+- **Play-offs wie in England:** `seeded` paart die Teilnehmer in der Reihenfolge der `entrants` (3. gegen 6., 4.
+  gegen 5.; Rückspiel beim Besserplatzierten), `finalLegs` gibt die Spiele im Finale vor (z. B. 1).
+
 Ein Testland mit vier Ebenen, geteilter 4. Liga (drei Staffeln), Relegation, Aufstiegsrunde und zweiten
 Mannschaften liegt unter `tests/Fmh.Tests/Packages/testland` (nur für Tests).
+
+### Länderpakete (AP 4)
+
+Jedes Land ist ein eigenes Paket `data/<land>/` mit `dependsOn: ["base"]` und nur fiktiven Namen. Deutschland
+liegt noch im Grundpaket. Die meisten Tests laden nur `base`, die Länder-Tests und die Kalibrierung alle Pakete.
+
+| Land | Ebene 1 | Ebene 2 | Ebene 3 | Ebene 4 | Unterbau | Besonderheiten |
+|---|---|---|---|---|---|---|
+| Deutschland | 18 | 18 | 20 | Regionalliga 5 × 18 | Oberliga (Pool) | Relegationen, rotierender Regionalliga-Aufstieg, zweite Mannschaften |
+| England (GBP) | 20 | 24 | 24 | 24 | National Non-League (Pool) | 46 Spieltage mit Englischen Wochen, Play-offs 3–6 bzw. 4–7, keine Winterpause |
+
+England (Stand 2025/26): Premier Division ohne Relegation (18–20 steigen ab); First, Second und Third Division
+steigen mit 2, 2 bzw. 3 Vereinen direkt auf, dazu je ein Play-off-Sieger; Absteiger 3, 4 und 2 (in den Pool).
+Gehälter und Einnahmen nach der Größenordnung des Deloitte Annual Review of Football Finance (Premier League je
+Klub rund 315 Mio. £ Umsatz, rund 4 Mrd. £ Lohnkosten insgesamt).
 
 ## Offene Entscheidungen
 
@@ -497,6 +518,10 @@ Mannschaften liegt unter `tests/Fmh.Tests/Packages/testland` (nur für Tests).
   neuen Größenordnungen angepasst. Ältere Spielstände behalten ihre gespeicherte Länderkonfiguration (ohne
   Betriebskosten, Sponsorenniveau 1,0) und ihre Gehälter, rechnen aber Sponsoren, Marktwerte und neue Verträge
   nach den neuen Formeln und werden dadurch reicher; eine Migration der Länderdaten im Spielstand ist offen.
+- **England:** Ein Pokal (National Cup mit 64 Plätzen ab der 3. Runde); der Ligapokal fehlt. Beträge stehen in
+  der Landeswährung; Ablösen und Gehälter bei Wechseln zwischen Ländern werden noch ohne Wechselkurs übernommen.
+  Lizenzierung läuft wie in Deutschland mit großzügigen Eigenkapitalgrenzen, statt der englischen PSR-Regeln.
+  Die fiktiven Ortsnamen sind zusammengesetzt; Übereinstimmungen mit kleinen realen Orten sind möglich.
 - **Karten in unteren Ligen:** Über alle vier Ebenen zeigt die Engine 3,2 Gelbe und 0,13 Rote Karten je Spiel
   (Ziel 3,8 bzw. 0,2), weil schwächere Spieler seltener in Zweikämpfe kommen. Die Kalibrierung prüft deshalb
   Ebene 1–2 (`--max-level`); ob untere Ligen eigene Zielwerte bekommen, ist offen.

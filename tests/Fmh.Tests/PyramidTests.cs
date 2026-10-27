@@ -16,7 +16,7 @@ public class PyramidTests
     {
         PackageLoader.FindDataRoot(),
         Path.Combine(TestData.RepoRoot(), "tests", "Fmh.Tests", "Packages"),
-    }));
+    }, enabledPackages: new[] { "base", "testland" }));
 
     private static GameData Data => Lazy.Value;
 

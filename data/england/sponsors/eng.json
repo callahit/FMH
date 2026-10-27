@@ -1,0 +1,605 @@
+{
+  "country": "ENG",
+  "companies": [
+    {
+      "name": "Albion Bank",
+      "industry": "bank",
+      "size": 2,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Thames Assurance",
+      "industry": "insurance",
+      "size": 9,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Pennine Mobile",
+      "industry": "telecom",
+      "size": 16,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Crown Drinks",
+      "industry": "drinks",
+      "size": 4,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Harbour Brewery",
+      "industry": "brewery",
+      "size": 11,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Mercia Energy",
+      "industry": "energy",
+      "size": 18,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Northgate Stores",
+      "industry": "retail",
+      "size": 6,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Kestrel Motors",
+      "industry": "cars",
+      "size": 13,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Oakline Digital",
+      "industry": "tech",
+      "size": 20,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Union Jackline Holidays",
+      "industry": "travel",
+      "size": 8,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Redbridge Freight",
+      "industry": "logistics",
+      "size": 15,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Highfield Builders",
+      "industry": "construction",
+      "size": 3,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Stonegate Foods",
+      "industry": "food",
+      "size": 10,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Riverside Hotels",
+      "industry": "hotel",
+      "size": 17,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Kingsway Bet",
+      "industry": "gaming",
+      "size": 5,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Fairway Capital",
+      "industry": "finance",
+      "size": 12,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Lionheart Bank",
+      "industry": "bank",
+      "size": 19,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Bluewater Assurance",
+      "industry": "insurance",
+      "size": 7,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Greystone Mobile",
+      "industry": "telecom",
+      "size": 14,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Eastwind Drinks",
+      "industry": "drinks",
+      "size": 2,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Westmoor Brewery",
+      "industry": "brewery",
+      "size": 9,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Brightwell Energy",
+      "industry": "energy",
+      "size": 16,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Copperleaf Stores",
+      "industry": "retail",
+      "size": 4,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Silverline Motors",
+      "industry": "cars",
+      "size": 11,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Ironworks Digital",
+      "industry": "tech",
+      "size": 18,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Lakeshore Holidays",
+      "industry": "travel",
+      "size": 6,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Moorland Freight",
+      "industry": "logistics",
+      "size": 13,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Elmstead Builders",
+      "industry": "construction",
+      "size": 20,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Foxglove Foods",
+      "industry": "food",
+      "size": 8,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Hawthorn Hotels",
+      "industry": "hotel",
+      "size": 15,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Albion Bet",
+      "industry": "gaming",
+      "size": 3,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Thames Capital",
+      "industry": "finance",
+      "size": 10,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Pennine Bank",
+      "industry": "bank",
+      "size": 17,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Crown Assurance",
+      "industry": "insurance",
+      "size": 5,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Harbour Mobile",
+      "industry": "telecom",
+      "size": 12,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Mercia Drinks",
+      "industry": "drinks",
+      "size": 19,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Northgate Brewery",
+      "industry": "brewery",
+      "size": 7,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Kestrel Energy",
+      "industry": "energy",
+      "size": 14,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Oakline Stores",
+      "industry": "retail",
+      "size": 2,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Union Jackline Motors",
+      "industry": "cars",
+      "size": 9,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Redbridge Digital",
+      "industry": "tech",
+      "size": 16,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Highfield Holidays",
+      "industry": "travel",
+      "size": 4,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Stonegate Freight",
+      "industry": "logistics",
+      "size": 11,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Riverside Builders",
+      "industry": "construction",
+      "size": 18,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Kingsway Foods",
+      "industry": "food",
+      "size": 6,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Fairway Hotels",
+      "industry": "hotel",
+      "size": 13,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Lionheart Bet",
+      "industry": "gaming",
+      "size": 20,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Bluewater Capital",
+      "industry": "finance",
+      "size": 8,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Greystone Bank",
+      "industry": "bank",
+      "size": 15,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Eastwind Assurance",
+      "industry": "insurance",
+      "size": 3,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Westmoor Mobile",
+      "industry": "telecom",
+      "size": 10,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Brightwell Drinks",
+      "industry": "drinks",
+      "size": 17,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Copperleaf Brewery",
+      "industry": "brewery",
+      "size": 5,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Silverline Energy",
+      "industry": "energy",
+      "size": 12,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Ironworks Stores",
+      "industry": "retail",
+      "size": 19,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Lakeshore Motors",
+      "industry": "cars",
+      "size": 7,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Moorland Digital",
+      "industry": "tech",
+      "size": 14,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Elmstead Holidays",
+      "industry": "travel",
+      "size": 2,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Foxglove Freight",
+      "industry": "logistics",
+      "size": 9,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Hawthorn Builders",
+      "industry": "construction",
+      "size": 16,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    }
+  ]
+}

@@ -111,10 +111,10 @@ internal static class WorldFingerprint
             ["ids"] = J(new { w.NextPlayerId, w.NextFixtureId, w.NextMessageId, w.NextTieId, w.NextNegotiationId, w.NextScoutId, w.NextAssignmentId,
                 w.NextStaffId, w.NextBuildingId, w.NextProjectId, w.NextSponsorId, w.NextLoanId, w.NextEventId }),
             ["managers"] = J(w.Managers),
-            ["clubs"] = Legacy(w.Clubs.Values.OrderBy(c => c.Id), ClubFieldsSinceAp3, null),
+            ["clubs"] = Legacy(w.Clubs.Values.OrderBy(c => c.Id), ClubFieldsSinceAp3, "format", null),
             ["players"] = J(w.Players.Values.OrderBy(p => p.Id)),
-            ["leagues"] = Legacy(w.Leagues, null, FormatFieldsSinceAp3),
-            ["cups"] = J(w.Cups),
+            ["leagues"] = Legacy(w.Leagues, null, "format", FormatFieldsSinceAp3),
+            ["cups"] = Legacy(w.Cups, null, "config", CupFieldsSinceAp4),
             ["messages"] = J(w.Messages),
             ["transfers"] = J(new { w.Transfers, w.Transactions, w.Installments, w.Negotiations, w.NegotiationLocks }),
             ["scouting"] = J(new { w.Scouts, w.ScoutAssignments, w.ScoutReports, w.Knowledge }),
@@ -128,14 +128,17 @@ internal static class WorldFingerprint
     private static readonly string[] ClubFieldsSinceAp3 = { "reserveOf", "region", "latitude", "longitude" };
     private static readonly string[] FormatFieldsSinceAp3 = { "groups", "assignment", "movements", "phases" };
 
-    private static string Legacy<T>(IEnumerable<T> items, string[]? remove, string[]? removeFromFormat)
+    /// <summary>Felder, die AP 4 an Pokalformaten ergänzt hat (eigene Spielzahl im Finale).</summary>
+    private static readonly string[] CupFieldsSinceAp4 = { "finalLegs" };
+
+    private static string Legacy<T>(IEnumerable<T> items, string[]? remove, string nested, string[]? removeFromNested)
     {
         var array = JsonSerializer.SerializeToNode(items, Json.Compact)!.AsArray();
         foreach (var item in array.OfType<JsonObject>())
         {
             foreach (var key in remove ?? Array.Empty<string>()) item.Remove(key);
-            if (item["format"] is JsonObject format)
-                foreach (var key in removeFromFormat ?? Array.Empty<string>()) format.Remove(key);
+            if (item[nested] is JsonObject inner)
+                foreach (var key in removeFromNested ?? Array.Empty<string>()) inner.Remove(key);
         }
         return array.ToJsonString(Json.Compact);
     }
