@@ -27,28 +27,11 @@ public static class DataValidator
         {
             if (!data.Names.ContainsKey(country.Code))
                 errors.Add($"Land '{country.Code}': keine Namensliste vorhanden.");
-            var levels = country.Levels.OrderBy(l => l.Level).ToList();
-            foreach (var div in country.Divisions)
-            {
-                var clubs = data.Clubs.Count(c => c.Division == div.Id);
-                if (clubs != div.Teams)
-                    errors.Add($"Liga '{div.Name}' hat {clubs} statt {div.Teams} Teams.");
-                if (div.Teams is < 2 or > 24) errors.Add($"Liga '{div.Name}': Teamzahl {div.Teams} liegt außerhalb von 2–24.");
-                if (div.Rounds is < 1 or > 4) errors.Add($"Liga '{div.Name}': {div.Rounds} Runden (erlaubt 1–4).");
-                if (div.Promotion + div.Relegation >= div.Teams) errors.Add($"Liga '{div.Name}': zu viele Auf- und Abstiegsplätze.");
-            }
-            for (var i = 0; i < levels.Count - 1; i++)
-            {
-                var down = levels[i].Divisions.Sum(d => d.Relegation);
-                var up = levels[i + 1].Divisions.Sum(d => d.Promotion);
-                if (down != up)
-                    errors.Add($"Land '{country.Code}': {down} Absteiger aus Ebene {levels[i].Level}, aber {up} Aufsteiger aus Ebene {levels[i + 1].Level}.");
-            }
-            if (levels.Count > 0 && levels[0].Divisions.Any(d => d.Promotion > 0))
-                errors.Add($"Land '{country.Code}': die oberste Ebene kann keine Aufsteiger haben.");
         }
+        errors.AddRange(PyramidValidator.Validate(data));
         bool KnownDivision(string id) =>
-            data.Countries.SelectMany(x => x.Divisions).Any(d => d.Id == id) || data.Countries.SelectMany(x => x.Pools).Any(p => p.Id == id);
+            data.Countries.SelectMany(x => x.Divisions).Any(d => d.Id == id || d.Groups.Any(g => g.Id == id))
+            || data.Countries.SelectMany(x => x.Pools).Any(p => p.Id == id);
         foreach (var club in data.Clubs.Where(c => !KnownDivision(c.Division)))
             errors.Add($"Verein '{club.Name}' gehört zu unbekannter Liga '{club.Division}'.");
 
@@ -63,21 +46,11 @@ public static class DataValidator
             {
                 foreach (var id in cup.Participants.Where(id => !KnownDivision(id)))
                     errors.Add($"Pokal '{cup.Name}': unbekannte Teilnehmerliga '{id}'.");
-                var teams = data.Clubs.Count(c => cup.Participants.Contains(c.Division));
+                var teams = data.Clubs.Count(c => (c.ReserveOf is null || country.Reserves.PlayInCups)
+                    && (cup.Participants.Contains(c.Division) || country.Divisions.Any(d => cup.Participants.Contains(d.Id) && d.Groups.Any(g => g.Id == c.Division))));
                 if (teams > cup.Teams) errors.Add($"Pokal '{cup.Name}': {teams} Teilnehmer, aber nur {cup.Teams} Plätze.");
                 var rounds = (int)Math.Ceiling(Math.Log2(Math.Max(2, cup.Teams)));
                 if (cup.Dates.Count < rounds) errors.Add($"Pokal '{cup.Name}': {rounds} Runden, aber nur {cup.Dates.Count} Termine.");
-            }
-            foreach (var po in country.Playoffs)
-            {
-                var upper = country.Divisions.FirstOrDefault(d => d.Id == po.UpperDivision);
-                var lower = country.Divisions.FirstOrDefault(d => d.Id == po.LowerDivision);
-                if (upper is null || lower is null) { errors.Add($"Relegation '{po.Name}': unbekannte Liga."); continue; }
-                if (po.UpperPosition < 1 || po.UpperPosition > upper.Teams || po.LowerPosition < 1 || po.LowerPosition > lower.Teams)
-                    errors.Add($"Relegation '{po.Name}': ungültige Tabellenplätze.");
-                if (po.UpperPosition > upper.Teams - upper.Relegation || po.LowerPosition <= lower.Promotion)
-                    errors.Add($"Relegation '{po.Name}': Plätze überschneiden sich mit direktem Auf- oder Abstieg.");
-                if (po.Dates.Count < po.Legs) errors.Add($"Relegation '{po.Name}': zu wenige Termine.");
             }
         }
 

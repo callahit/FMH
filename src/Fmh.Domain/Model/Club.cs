@@ -34,6 +34,12 @@ public sealed class Club
     public string ShortName { get; set; } = "";
     public string City { get; set; } = "";
     public string CountryCode { get; set; } = "";
+    /// <summary>Zweite Mannschaft: Id des Vereins der ersten Mannschaft (eigener Kader, eigene Finanzen).</summary>
+    public int? ReserveOf { get; set; }
+    /// <summary>Region und Koordinaten für die Staffelzuteilung geteilter Ligen.</summary>
+    public string? Region { get; set; }
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
     /// <summary>Reputation 1–20.</summary>
     public int Reputation { get; set; } = 10;
     /// <summary>Vereinsfarben als ConsoleColor-Namen (färben Kopfzeile und Tabellenmarkierung).</summary>

@@ -55,11 +55,11 @@ public static class LineupSelector
     }
 
     /// <summary>Komplette Aufstellung für einen Verein: Startelf, Bank (mit Ersatztorwart) und Standardschützen.</summary>
-    public static void PickBest(Club club, World world, GameData data, int benchSize, SlotScores? scores = null)
+    public static void PickBest(Club club, World world, GameData data, int benchSize, SlotScores? scores = null, Func<Player, bool>? eligible = null)
     {
         scores ??= new SlotScores(data.PositionProfiles);
         var formation = TacticResolver.Resolve(club.Tactic, data);
-        var available = world.SquadOf(club).Where(p => p.IsAvailable).ToList();
+        var available = world.SquadOf(club).Where(p => p.IsAvailable && (eligible is null || eligible(p))).ToList();
         club.Tactic.Lineup = Assign(formation, available, data.PositionProfiles, scores);
         club.Tactic.Bench = PickBench(club.Tactic.Lineup, available, benchSize, data.PositionProfiles, scores);
         PickSetPieceTakers(club, world);

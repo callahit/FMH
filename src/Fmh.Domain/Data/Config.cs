@@ -15,6 +15,8 @@ public sealed class CountryConfig
     public string Name { get; set; } = "";
     public string Currency { get; set; } = "EUR";
     public int ValidFrom { get; set; }
+    /// <summary>Letzte Saison (Startjahr), in der diese Formatversion gilt; null = unbegrenzt.</summary>
+    public int? ValidTo { get; set; }
     public CountryActivation Activation { get; set; } = CountryActivation.Playable;
     public SeasonConfig Season { get; set; } = new();
     public SquadRules Squad { get; set; } = new();
@@ -28,8 +30,11 @@ public sealed class CountryConfig
     public YouthConfig Youth { get; set; } = new();
     public FinanceConfig Finance { get; set; } = new();
     public EuropeConfig? Europe { get; set; }
+    public ReserveRules Reserves { get; set; } = new();
 
     public IEnumerable<DivisionConfig> Divisions => Levels.SelectMany(l => l.Divisions);
+
+    public bool ValidIn(int seasonYear) => ValidFrom <= seasonYear && (ValidTo is null || ValidTo >= seasonYear);
 }
 
 public sealed class PoolConfig
@@ -57,15 +62,25 @@ public sealed class CupConfig
     public bool NeutralFinal { get; set; } = true;
 }
 
-/// <summary>Relegation zwischen zwei Ebenen (Hin- und Rückspiel).</summary>
+/// <summary>
+/// Relegation bzw. Aufstiegsturnier zwischen zwei Ebenen. Zwei Teilnehmer spielen ein Duell, vier oder acht ein
+/// K.-o.-Turnier. Die <see cref="Places"/> Sieger spielen in der nächsten Saison in <see cref="UpperDivision"/>,
+/// alle übrigen Teilnehmer in <see cref="LowerDivision"/>.
+/// </summary>
 public sealed class PlayoffConfig
 {
     public string Id { get; set; } = "";
     public string Name { get; set; } = "";
     public string UpperDivision { get; set; } = "";
+    /// <summary>Älteres Format: Platz in der oberen Liga (wird auf <see cref="Entrants"/> abgebildet).</summary>
     public int UpperPosition { get; set; }
     public string LowerDivision { get; set; } = "";
+    /// <summary>Älteres Format: Platz in der unteren Liga (wird auf <see cref="Entrants"/> abgebildet).</summary>
     public int LowerPosition { get; set; }
+    public List<PlayoffEntrant> Entrants { get; set; } = new();
+    public int Places { get; set; } = 1;
+    /// <summary>Übergangsregel, die nur in dieser Saison gilt.</summary>
+    public int? OnlySeason { get; set; }
     public int Legs { get; set; } = 2;
     public bool AwayGoals { get; set; }
     public List<string> Dates { get; set; } = new();
@@ -166,6 +181,14 @@ public sealed class DivisionConfig
     public int Promotion { get; set; }
     /// <summary>Direkte Abstiegsplätze in die nächsttiefere Ebene.</summary>
     public int Relegation { get; set; }
+    /// <summary>Staffeln (geteilte Liga); leer = eine Liga mit der Kennung der Division. <see cref="Teams"/> gilt je Staffel.</summary>
+    public List<GroupConfig> Groups { get; set; } = new();
+    public GroupAssignment Assignment { get; set; } = GroupAssignment.Fixed;
+    public List<MovementRule> Movements { get; set; } = new();
+
+    /// <summary>Kennungen der Ligen im Spiel: die Staffeln oder die Division selbst.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public IEnumerable<string> LeagueIds => Groups.Count == 0 ? new[] { Id } : Groups.Select(g => g.Id);
 }
 
 public sealed class PointsConfig
@@ -184,6 +207,12 @@ public sealed class ClubDefinition
     public string City { get; set; } = "";
     public string Division { get; set; } = "";
     public int Reputation { get; set; } = 10;
+    /// <summary>Zweite Mannschaft: Schlüssel des Vereins der ersten Mannschaft.</summary>
+    public string? ReserveOf { get; set; }
+    /// <summary>Region für die Staffelzuteilung.</summary>
+    public string? Region { get; set; }
+    public double? Latitude { get; set; }
+    public double? Longitude { get; set; }
     public string PrimaryColor { get; set; } = "White";
     public string SecondaryColor { get; set; } = "Black";
     public string Stadium { get; set; } = "";
