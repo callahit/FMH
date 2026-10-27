@@ -323,5 +323,31 @@
     }
    }
   ]
+ },
+ {
+  "id": "citySite",
+  "category": "stadium",
+  "weight": 0.5,
+  "when": {
+   "minReputation": 6,
+   "noStadiumSite": true
+  },
+  "cooldownDays": 1800,
+  "options": [
+   {
+    "id": "accept",
+    "effects": {
+     "stadiumSite": 1,
+     "board": 2,
+     "media": 2
+    }
+   },
+   {
+    "id": "decline",
+    "effects": {
+     "fans": 2
+    }
+   }
+  ]
  }
 ]

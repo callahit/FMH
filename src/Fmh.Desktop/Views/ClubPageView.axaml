@@ -163,6 +163,91 @@
         </ScrollViewer>
       </TabItem>
 
+      <TabItem Header="{s:L club.tab.youth}">
+        <ScrollViewer>
+          <StackPanel Spacing="14">
+            <Grid ColumnDefinitions="*,*" ColumnSpacing="14">
+              <Border Classes="card">
+                <StackPanel Spacing="8">
+                  <TextBlock Classes="h3" Text="{Binding AcademyTitle}" />
+                  <TextBlock Classes="muted small" Text="{Binding AcademyInfo}" TextWrapping="Wrap" />
+                  <ItemsControl ItemsSource="{Binding AcademyCriteria}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:AcademyCriterion">
+                        <Grid ColumnDefinitions="150,*,120,20" Margin="0,4" ColumnSpacing="8">
+                          <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                          <c:Meter Grid.Column="1" Value="{Binding Value}" Maximum="20" Height="8" Fill="{DynamicResource AccentBrush}" Track="{DynamicResource LineBrush}" VerticalAlignment="Center" />
+                          <TextBlock Grid.Column="2" Text="{Binding Text}" Classes="small" VerticalAlignment="Center" />
+                          <TextBlock Grid.Column="3" Text="{Binding Trend}" Foreground="{Binding TrendBrush}" VerticalAlignment="Center" />
+                        </Grid>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                  <TextBlock Classes="muted small" Text="{s:L academy.help}" TextWrapping="Wrap" />
+                </StackPanel>
+              </Border>
+              <Border Grid.Column="1" Classes="card" VerticalAlignment="Top">
+                <StackPanel Spacing="8">
+                  <TextBlock Classes="h3" Text="{s:L academy.budget}" />
+                  <Grid ColumnDefinitions="200,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="6">
+                    <TextBlock Text="{s:L academy.budgetYear}" VerticalAlignment="Center" />
+                    <NumericUpDown Grid.Column="1" Value="{Binding AcademyBudget}" Minimum="0" Increment="100000" FormatString="N0" />
+                    <TextBlock Grid.Row="1" Text="{s:L academy.shareCoaching}" VerticalAlignment="Center" />
+                    <NumericUpDown Grid.Row="1" Grid.Column="1" Value="{Binding ShareCoaching}" Minimum="0" Maximum="100" Increment="5" FormatString="N0" />
+                    <TextBlock Grid.Row="2" Text="{s:L academy.shareRecruitment}" VerticalAlignment="Center" />
+                    <NumericUpDown Grid.Row="2" Grid.Column="1" Value="{Binding ShareRecruitment}" Minimum="0" Maximum="100" Increment="5" FormatString="N0" />
+                    <TextBlock Grid.Row="3" Text="{s:L academy.shareEducation}" VerticalAlignment="Center" />
+                    <NumericUpDown Grid.Row="3" Grid.Column="1" Value="{Binding ShareEducation}" Minimum="0" Maximum="100" Increment="5" FormatString="N0" />
+                  </Grid>
+                  <TextBlock Classes="muted small" Text="{Binding BudgetHint}" TextWrapping="Wrap" />
+                  <StackPanel Orientation="Horizontal" Spacing="10">
+                    <Button Classes="primary" Content="{s:L academy.saveBudget}" Command="{Binding SaveAcademyBudgetCommand}" />
+                    <TextBlock Text="{Binding AcademyResult}" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                  </StackPanel>
+                  <TextBlock Classes="h3" Text="{s:L academy.graduates}" Margin="0,8,0,0" />
+                  <TextBlock Text="{Binding GraduatesText}" TextWrapping="Wrap" Classes="small" />
+                </StackPanel>
+              </Border>
+            </Grid>
+            <ItemsControl ItemsSource="{Binding YouthGroups}">
+              <ItemsControl.ItemsPanel><ItemsPanelTemplate><UniformGrid Columns="3" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:YouthGroupCard">
+                  <Border Classes="card" Margin="0,0,14,0" VerticalAlignment="Top">
+                    <StackPanel Spacing="6">
+                      <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Classes="h3" Text="{Binding Title}" />
+                        <TextBlock Grid.Column="1" Text="{Binding Size}" Classes="muted small" VerticalAlignment="Center" />
+                      </Grid>
+                      <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="{s:L academy.coach}" Classes="muted small" VerticalAlignment="Center" />
+                        <ComboBox ItemsSource="{Binding Coaches}" SelectedIndex="{Binding CoachIndex}" MinWidth="200" />
+                      </StackPanel>
+                      <TextBlock Text="{s:L academy.emptyGroup}" Classes="muted small" IsVisible="{Binding Empty}" />
+                      <ItemsControl ItemsSource="{Binding Players}">
+                        <ItemsControl.ItemTemplate>
+                          <DataTemplate x:DataType="vm:YouthLine">
+                            <Button Command="{Binding Open}" Classes="row" HorizontalAlignment="Stretch" HorizontalContentAlignment="Stretch" Padding="4,2" Background="Transparent">
+                              <Grid ColumnDefinitions="*,28,34,36,80">
+                                <TextBlock Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+                                <TextBlock Grid.Column="1" Text="{Binding Age}" Classes="muted small" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="2" Text="{Binding Position}" Classes="muted small" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="3" Text="{Binding Strength}" Classes="small" VerticalAlignment="Center" />
+                                <TextBlock Grid.Column="4" Text="{Binding Potential}" Foreground="{DynamicResource GoldBrush}" Classes="small" VerticalAlignment="Center" />
+                              </Grid>
+                            </Button>
+                          </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                      </ItemsControl>
+                    </StackPanel>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </StackPanel>
+        </ScrollViewer>
+      </TabItem>
+
       <TabItem Header="{s:L club.tab.fans}">
         <ScrollViewer>
           <Border Classes="card" VerticalAlignment="Top">

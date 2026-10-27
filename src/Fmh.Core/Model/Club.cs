@@ -46,4 +46,6 @@ public sealed class Club
     public FanState Fans { get; set; } = new();
     /// <summary>Lokalrivalen (Club-Ids) für Derbys.</summary>
     public List<int> Rivals { get; set; } = new();
+    public YouthAcademy Academy { get; set; } = new();
+    public LicenseFile License { get; set; } = new();
 }

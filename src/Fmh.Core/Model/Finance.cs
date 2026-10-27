@@ -76,6 +76,8 @@ public sealed class FinanceState
     public bool Insolvent { get; set; }
     /// <summary>Punktabzug aus der Lizenzierung, gilt in der kommenden Saison.</summary>
     public int PendingDeduction { get; set; }
+    /// <summary>Abgeschlossene Spielzeiten (für FFP und Lizenz), neueste zuletzt.</summary>
+    public List<SeasonFinance> Seasons { get; set; } = new();
     public long MonthIncome { get; set; }
     public long MonthExpenses { get; set; }
 }

@@ -26,6 +26,7 @@ public sealed partial class GameSession
             var div = DivisionFinance(club);
             club.Finance.Prices = new TicketPrices { Standing = div.Standing, Seating = div.Seating, Box = div.Box };
         }
+        foreach (var club in World.Clubs.Values.OrderBy(c => c.Id)) InitAcademy(club);
         if (fresh.Count == 0) return;
         AssignRivals();
         if (!World.Staff.Any(s => s.ClubId is null)) RefreshStaffMarket();

@@ -226,7 +226,8 @@ public sealed partial class GameSession
         p.End = null;
         var days = (int)Math.Round(baseDays * df);
         if (!financed && p.Cost > club.Budget.Balance) return "neg.error.balance";
-        if (financed && p.Cost > LoanCapacity(club)) return "fin.error.loanLimit";
+        var stadiumLoan = p.Kind == ProjectKind.NewStadium;
+        if (financed && p.Cost > (stadiumLoan ? StadiumLoanCapacity(club) : LoanCapacity(club))) return "fin.error.loanLimit";
 
         // Großprojekte: erst der Vorstand, dann ggf. die Baugenehmigung der Stadt.
         if (p.Cost > fin.BoardApprovalAbove)
@@ -240,7 +241,7 @@ public sealed partial class GameSession
                 return "build.error.boardRejected";
             }
         }
-        if (financed) TakeLoan(club, p.Cost, 10, silent: true);
+        if (financed) TakeLoan(club, p.Cost, stadiumLoan ? 20 : 10, silent: true, stadiumLoan ? StadiumLoanCapacity(club) : null);
         Book(club, TransactionType.Construction, -p.Cost, TR("tx.construction", ProjectName(p)));
         if (p.Cost > fin.PermitAbove)
         {
@@ -263,6 +264,7 @@ public sealed partial class GameSession
     public TextArg ProjectName(ConstructionProject p) => p.Kind switch
     {
         ProjectKind.NewBuilding or ProjectKind.UpgradeBuilding => TextArg.Of(TR("project." + p.Kind, TR("building." + p.BuildingType), p.Amount)),
+        ProjectKind.NewStadium => TextArg.Of(TR("project.NewStadium", p.Design?.Name ?? "", p.Amount)),
         _ => TextArg.Of(TR("project." + p.Kind, p.Side is { } s ? TR("stand." + s) : TR("stadium.whole"), p.Amount)),
     };
 
@@ -311,6 +313,8 @@ public sealed partial class GameSession
                         Book(club, TransactionType.Construction, (long)(p.Cost * 0.9), TR("tx.constructionRefund", ProjectName(p)));
                         if (p.BuildingId is { } bid) club.Grounds.Buildings.RemoveAll(b => b.Id == bid && b.Level == 0);
                         foreach (var b in club.Grounds.Buildings.Where(b => b.Id == p.BuildingId)) b.UnderConstruction = false;
+                        // Abgelehnter Neubau: das Grundstück steht weiter zur Verfügung.
+                        if (p.Kind == ProjectKind.NewStadium && club.Grounds.Site is { } site) site.Used = false;
                         InvalidateEffects(club);
                         if (human) Notify(MessageType.Stadium, "msg.sender.city", TR("msg.build.permitNo.subject"), TR("msg.build.permitNo.body", ProjectName(p)));
                         continue;
@@ -358,6 +362,12 @@ public sealed partial class GameSession
             case ProjectKind.Floodlight: st.Floodlight = Math.Min(4, st.Floodlight + 1); break;
             case ProjectKind.Heating: st.UndersoilHeating = true; break;
             case ProjectKind.Scoreboard: st.Scoreboard = Math.Min(3, st.Scoreboard + 1); break;
+            case ProjectKind.NewStadium when p.Design is { } design:
+                club.Stadium = BuildNewStadium(club, design);
+                st = club.Stadium;
+                club.StadiumName = design.Name;
+                if (st.Capacity >= 50_000 && IsHuman(club)) Achieve("bigStadium");
+                break;
             case ProjectKind.NewBuilding or ProjectKind.UpgradeBuilding:
                 if (club.Grounds.Buildings.FirstOrDefault(b => b.Id == p.BuildingId) is { } b)
                 {
@@ -377,6 +387,7 @@ public sealed partial class GameSession
     /// <summary>Monatlich: Zustand der Gebäude, Rasenpflege.</summary>
     private void FacilitiesMonthly(Club club)
     {
+        SiteMonthly(club);
         foreach (var b in club.Grounds.Buildings.Where(b => b.Level > 0))
             b.Condition = club.Grounds.Maintenance ? Math.Min(100, b.Condition + 1.5) : Math.Max(0, b.Condition - 4);
         var pitchCare = Effect(club, "pitch") + StaffAbility(club, StaffRole.Groundsman) * 0.25;

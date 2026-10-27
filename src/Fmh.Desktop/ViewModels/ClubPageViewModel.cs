@@ -18,6 +18,37 @@ public sealed record AchievementLine(string Name, string Info, bool Done, double
 
 public sealed record StationLine(string Club, string Period, string Record, string Exit);
 
+/// <summary>Qualitätskriterium des Nachwuchsleistungszentrums mit Zielwert (wohin es sich bewegt).</summary>
+public sealed record AcademyCriterion(string Name, double Value, double Target, string Text, string Trend, IBrush TrendBrush);
+
+public sealed record YouthLine(Player Player, string Name, string Age, string Position, string Strength, string Potential, IRelayCommand Open);
+
+/// <summary>Eine Altersstufe mit Trainer und Spielern.</summary>
+public sealed partial class YouthGroupCard : ObservableObject
+{
+    private readonly Action<int>? _onCoach;
+    private bool _loading = true;
+
+    public YouthGroupCard(string title, string size, IReadOnlyList<string> coaches, int coachIndex, IReadOnlyList<YouthLine> players, Action<int>? onCoach)
+    {
+        Title = title;
+        Size = size;
+        Coaches = coaches;
+        _coachIndex = coachIndex;
+        Players = players;
+        _onCoach = onCoach;
+        _loading = false;
+    }
+
+    public string Title { get; }
+    public string Size { get; }
+    public IReadOnlyList<string> Coaches { get; }
+    public IReadOnlyList<YouthLine> Players { get; }
+    public bool Empty => Players.Count == 0;
+    [ObservableProperty] private int _coachIndex;
+    partial void OnCoachIndexChanged(int value) { if (!_loading) _onCoach?.Invoke(value); }
+}
+
 /// <summary>Verein: Stammdaten, Historie, Vorstand, Personal, Fans und Managerkarriere.</summary>
 public sealed partial class ClubPageViewModel : PageViewModel, IRefreshable
 {
@@ -86,6 +117,77 @@ public sealed partial class ClubPageViewModel : PageViewModel, IRefreshable
 
     partial void OnRoleIndexChanged(int value) => Refresh();
 
+    // Nachwuchsleistungszentrum
+    [ObservableProperty] private IReadOnlyList<AcademyCriterion> _academyCriteria = Array.Empty<AcademyCriterion>();
+    [ObservableProperty] private string _academyTitle = "";
+    [ObservableProperty] private string _academyInfo = "";
+    [ObservableProperty] private IReadOnlyList<YouthGroupCard> _youthGroups = Array.Empty<YouthGroupCard>();
+    [ObservableProperty] private string _graduatesText = "";
+    [ObservableProperty] private decimal _academyBudget;
+    [ObservableProperty] private decimal _shareCoaching;
+    [ObservableProperty] private decimal _shareRecruitment;
+    [ObservableProperty] private decimal _shareEducation;
+    [ObservableProperty] private string _budgetHint = "";
+    [ObservableProperty] private string _academyResult = "";
+
+    private void RefreshAcademy()
+    {
+        var s = Session;
+        var club = s.HumanClub;
+        var a = club.Academy;
+        var currency = UiText.Currency(club);
+        var t = s.AcademyTargets(club);
+        AcademyCriterion C(string key, double value, double target)
+        {
+            var diff = target - value;
+            var trend = diff > 0.3 ? "▲" : diff < -0.3 ? "▼" : "■";
+            return new AcademyCriterion(T["academy." + key], value, target, T.Format("academy.value", Fmt.Num(value, "0.0"), Fmt.Num(target, "0.0")), trend,
+                new SolidColorBrush(diff > 0.3 ? P.Good : diff < -0.3 ? P.Bad : P.Muted));
+        }
+        AcademyCriteria = new List<AcademyCriterion>
+        {
+            C("coaching", a.Coaching, t.coaching), C("facilities", a.Facilities, t.facilities),
+            C("recruitment", a.Recruitment, t.recruitment), C("education", a.Education, t.education),
+        };
+        AcademyTitle = T.Format("academy.title", new string('★', a.Stars) + new string('☆', 3 - a.Stars), Fmt.Num(a.Rating, "0.0"));
+        var required = s.DivisionFinance(club).YouthCenterRequired;
+        AcademyInfo = T.Format("academy.info", (int)Math.Round(a.Reputation), required, club.YouthIds.Count, s.YouthCapacity(club));
+        AcademyBudget = a.Budget;
+        ShareCoaching = a.ShareCoaching;
+        ShareRecruitment = a.ShareRecruitment;
+        ShareEducation = a.ShareEducation;
+        BudgetHint = T.Format("academy.budgetHint", Fmt.Money(s.ReferenceAcademyBudget(club), currency), Fmt.Money(a.Budget / 12, currency));
+        var coaches = s.StaffOf(club).Where(x => x.Role == StaffRole.YouthCoach).ToList();
+        var coachNames = new[] { T["academy.noCoach"] }.Concat(coaches.Select(x => $"{x.Name} ({x.Ability}/20)")).ToList();
+        var all = s.YouthOf(club).ToList();
+        YouthGroups = Enum.GetValues<YouthAgeGroup>().Select(g =>
+        {
+            var players = s.YouthGroup(club, g).OrderByDescending(p => p.Hidden.PotentialAbility).Select(p => new YouthLine(p, p.Name, p.Age(s.World.Date).ToString(),
+                UiText.Position(p.MainPosition), UiText.Strength(Ratings.PositionRating(p, p.MainPosition, Data.PositionProfiles)),
+                UiText.Stars(p.Hidden.PotentialAbility / 40.0),
+                new RelayCommand(() => Shell.ShowSubPage(new PlayerPageViewModel(Shell, all, all.IndexOf(p)))))).ToList();
+            var coach = s.GroupCoach(club, g);
+            var group = g;
+            return new YouthGroupCard(T["ageGroup." + g], T.Format("academy.groupSize", players.Count, s.GroupCapacity(club, g)), coachNames,
+                coach is null ? 0 : coaches.IndexOf(coach) + 1, players, i =>
+                {
+                    if (i <= 0 || i > coaches.Count) return;
+                    AcademyResult = s.AssignYouthCoach(coaches[i - 1], group) is { } e ? T[e] : T["academy.coachAssigned"];
+                    RefreshAcademy();
+                });
+        }).ToList();
+        var graduates = a.Graduates.Where(s.World.Players.ContainsKey).Select(id => s.World.Players[id]).ToList();
+        GraduatesText = graduates.Count == 0 ? T["academy.noGraduates"] : string.Join(", ", graduates.TakeLast(12).Select(p => p.ShortName));
+    }
+
+    [RelayCommand]
+    private void SaveAcademyBudget()
+    {
+        var error = Session.SetAcademyBudget((long)AcademyBudget, (int)ShareCoaching, (int)ShareRecruitment, (int)ShareEducation);
+        AcademyResult = error is null ? T["academy.saved"] : T[error];
+        RefreshAcademy();
+    }
+
     public void Refresh()
     {
         var s = Session;
@@ -129,6 +231,7 @@ public sealed partial class ClubPageViewModel : PageViewModel, IRefreshable
             new(T["fans.rivals"], string.Join(", ", club.Rivals.Select(id => s.World.Clubs[id].Name)) is { Length: > 0 } r ? r : T["ui.none"]),
         };
 
+        RefreshAcademy();
         var c = m.Career;
         Media = c.Media;
         CareerFacts = new List<InfoLine>

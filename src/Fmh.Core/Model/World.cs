@@ -42,6 +42,8 @@ public sealed class World
     /// <summary>Zuletzt ausgelöste Ereignisse je Ereignis-Id (gegen Wiederholungen).</summary>
     public Dictionary<string, DateOnly> EventHistory { get; set; } = new();
     public PressConference? PendingPress { get; set; }
+    /// <summary>Teilnehmer an europäischen Wettbewerben (laufende und kommende Saison).</summary>
+    public List<EuropeanEntry> EuropeanEntries { get; set; } = new();
 
     /// <summary>Alle Ligen der laufenden Saison sind beendet und ausgewertet; der Wechsel folgt zum Saisonstart.</summary>
     public bool SeasonFinished { get; set; }
@@ -126,7 +128,7 @@ public sealed class Manager
 public enum MessageType { Info, Board, Medical, Discipline, Result, Season, Transfer, Contract, Scouting, Youth, Training, Cup, Finance, Stadium, Fans, Press, Event, Career }
 
 /// <summary>Aktion, die eine Nachricht auslöst (z. B. Transferangebot annehmen oder ablehnen).</summary>
-public enum MessageAction { None, IncomingOffer, ContractExpiring, ScoutReport, Negotiation, YouthIntake, Event, SponsorOffer, PressConference, SeasonGoal, JobOffer, Construction }
+public enum MessageAction { None, IncomingOffer, ContractExpiring, ScoutReport, Negotiation, YouthIntake, Event, SponsorOffer, PressConference, SeasonGoal, JobOffer, Construction, Academy, License }
 
 public sealed class Message
 {

@@ -172,6 +172,19 @@ public static class Program
                 .Select(g => (g.Key, avg: g.Sum(kv => kv.Value) / (double)clubs.Count)).Where(x => Math.Abs(x.avg) >= 10_000).OrderByDescending(x => x.avg);
             Console.WriteLine("  " + string.Join(", ", types.Select(x => $"{x.Key} {M(x.avg)}")));
         }
+        foreach (var league in w.Leagues)
+        {
+            var clubs = league.ClubIds.Select(id => w.Clubs[id]).ToList();
+            string Groups(Club c) => string.Join("/", Enum.GetValues<YouthAgeGroup>().Select(g => session.YouthGroup(c, g).Count));
+            Console.WriteLine($"{league.Name} Nachwuchs: Wert Ø {clubs.Average(c => c.Academy.Rating):F1}, Sterne Ø {clubs.Average(c => c.Academy.Stars):F1}, " +
+                              $"Budget Ø {M(clubs.Average(c => (double)c.Academy.Budget))} Mio., Jugend Ø {clubs.Average(c => c.YouthIds.Count):F1} (U15/U17/U19 z. B. {Groups(clubs[0])}), " +
+                              $"Absolventen Ø {clubs.Average(c => c.Academy.Graduates.Count):F1}; Lizenz: {string.Join(", ", clubs.GroupBy(c => c.License.Outcome).Select(g => $"{g.Key} {g.Count()}"))}, " +
+                              $"Europa-Lizenz {clubs.Count(c => c.License.UefaLicense)}, FFP {string.Join(", ", clubs.GroupBy(c => c.License.Ffp).Select(g => $"{g.Key} {g.Count()}"))}");
+        }
+        foreach (var c in w.Leagues.SelectMany(l => l.ClubIds).Select(id => w.Clubs[id]).Where(c => c.License.Outcome != LicenseOutcome.Granted || !c.License.UefaLicense && c.LeagueId == "DE1"))
+            Console.WriteLine($"  Lizenz {c.ShortName} ({c.LeagueId}): {c.License.Outcome}, Eigenkapital {M(session.Equity(c))}, Kredite {M(c.Finance.Loans.Sum(l => l.Remaining))}, " +
+                              $"Sterne {c.Academy.Stars}, Flutlicht {c.Stadium.Floodlight}, Sitze {c.Stadium.SeatingTotal}, Auflagen [{string.Join(",", c.License.Conditions)}], Europa [{string.Join(",", c.License.UefaReasons)}]");
+        Console.WriteLine("Europa: " + string.Join(", ", w.EuropeanEntries.Select(e => $"{w.Clubs[e.ClubId].ShortName} {e.CompetitionId} {e.SeasonYear} R{e.Stage}{(e.Replacement ? " (nachgerückt)" : "")}")));
         var h = session.HumanClub;
         Console.WriteLine($"Eigener Verein: Vorstand {h.Board.Trust:F0}, Fans {h.Fans.Mood:F0}, Medien {session.HumanManager.Career.Media:F0}, " +
                           $"Ereignisse {w.Events.Count(e => e.ClubId == h.Id)}, Erfolge {session.HumanManager.Career.Achievements.Count}, " +

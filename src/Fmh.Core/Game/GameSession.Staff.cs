@@ -8,7 +8,7 @@ namespace Fmh.Core.Game;
 public sealed partial class GameSession
 {
     /// <summary>Planstellen je Rolle ohne Ausbau der Geschäftsstelle.</summary>
-    public static int BaseSlots(StaffRole role) => role == StaffRole.Physio ? 2 : 1;
+    public static int BaseSlots(StaffRole role) => role switch { StaffRole.Physio => 2, StaffRole.YouthCoach => 3, _ => 1 };
 
     public int StaffSlots(Club club, StaffRole role) =>
         BaseSlots(role) + (role is StaffRole.Physio or StaffRole.AssistantManager or StaffRole.FitnessCoach ? (int)Effect(club, "staff.slots") / 2 : 0);
@@ -76,6 +76,7 @@ public sealed partial class GameSession
         if (World.Staff.Count(x => x.ClubId == club.Id && x.Role == s.Role) >= StaffSlots(club, s.Role)) return "staff.error.slots";
         if (Budgets.WageBill(club, World) + s.WeeklyWage > club.Budget.WageBudget * 1.1) return "neg.error.wageBudget";
         s.ClubId = club.Id;
+        s.AgeGroup = null;
         s.ContractUntil = new DateOnly(World.SeasonYear + Math.Clamp(years, 1, 4), 6, 30);
         RefreshStaffEffects(club);
         Notify(MessageType.Info, "msg.sender.assistant", TR("msg.staffHired.subject", s.Name), TR("msg.staffHired.body", s.Name, TR("staff." + s.Role)));
@@ -90,6 +91,7 @@ public sealed partial class GameSession
         var weeks = Math.Min(26, Math.Max(0, (s.ContractUntil.DayNumber - World.Date.DayNumber) / 7));
         Book(club, TransactionType.StaffWages, -(long)weeks * s.WeeklyWage, TR("tx.severance", s.Name));
         s.ClubId = null;
+        s.AgeGroup = null;
         RefreshStaffEffects(club);
         return null;
     }
@@ -105,9 +107,9 @@ public sealed partial class GameSession
         var gk = StaffAbility(club, StaffRole.GoalkeepingCoach);
         var license = IsHuman(club) ? (int)HumanManager.Career.License * 0.5 : 1;
         club.CoachQuality = (int)Math.Clamp(Math.Round(assistant * 0.55 + fitness * 0.25 + gk * 0.1 + license + Effect(club, "training.quality") * 20), 1, 20);
-        var youthCoach = StaffAbility(club, StaffRole.YouthCoach);
-        club.YouthFacilities = (int)Math.Clamp(Math.Round(2 + BuildingLevel(club, "youthCentre") * 2.2 + youthCoach * 0.3 + Effect(club, "youth.development") * 20), 1, 20);
-        club.YouthRecruitment = (int)Math.Clamp(Math.Round(3 + Effect(club, "youth.count") * 3 + Effect(club, "youth.quality") * 1.5 + youthCoach * 0.25), 1, 20);
+        // Jugend: Kennzahlen kommen aus dem Nachwuchsleistungszentrum (Altersstufen, Budget, Gebäude).
+        AssignYouthCoaches(club);
+        if (club.Academy.Initialized) SyncYouthValues(club);
     }
 
     /// <summary>Saisonwechsel: auslaufende Personalverträge. KI verlängert gute Leute, ersetzt schwache.</summary>
@@ -125,6 +127,7 @@ public sealed partial class GameSession
                     continue;
                 }
                 s.ClubId = null;
+                s.AgeGroup = null;
                 Notify(MessageType.Info, "msg.sender.assistant", TR("msg.staffLeft.subject", s.Name), TR("msg.staffLeft.body", s.Name, TR("staff." + s.Role)));
                 continue;
             }
@@ -132,8 +135,9 @@ public sealed partial class GameSession
             else
             {
                 s.ClubId = null;
+                s.AgeGroup = null;
                 var replacement = StaffMarket.FirstOrDefault(x => x.Role == s.Role && x.Ability <= 5 + club.Reputation * 0.8);
-                if (replacement is not null) { replacement.ClubId = club.Id; replacement.ContractUntil = new DateOnly(World.SeasonYear + 2, 6, 30); }
+                if (replacement is not null) { replacement.ClubId = club.Id; replacement.AgeGroup = null; replacement.ContractUntil = new DateOnly(World.SeasonYear + 2, 6, 30); }
             }
         }
         RefreshStaffMarket();

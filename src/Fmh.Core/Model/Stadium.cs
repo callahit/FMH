@@ -37,7 +37,7 @@ public sealed class Stadium
     public Stand Stand(StandSide side) => Stands.First(s => s.Side == side);
 }
 
-public enum ProjectKind { Standing, Seating, Roof, Boxes, Floodlight, Heating, Scoreboard, NewBuilding, UpgradeBuilding }
+public enum ProjectKind { Standing, Seating, Roof, Boxes, Floodlight, Heating, Scoreboard, NewBuilding, UpgradeBuilding, NewStadium }
 
 public enum ProjectState { AwaitingBoard, AwaitingPermit, Building, Done, Rejected }
 
@@ -65,4 +65,6 @@ public sealed class ConstructionProject
     public DateOnly? End { get; set; }
     /// <summary>Finanzierung über Kredit statt aus der Kasse.</summary>
     public bool Financed { get; set; }
+    /// <summary>Planung beim Stadionneubau.</summary>
+    public StadiumDesign? Design { get; set; }
 }

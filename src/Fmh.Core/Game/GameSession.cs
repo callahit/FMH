@@ -134,6 +134,7 @@ public sealed partial class GameSession
         YouthDaily();
         ConstructionDaily();
         FinanceDaily();
+        LicenseDaily();
         EnvironmentDaily();
 
         if (!World.SeasonFinished && CompetitionsDaily())

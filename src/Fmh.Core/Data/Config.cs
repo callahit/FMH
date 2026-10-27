@@ -27,6 +27,7 @@ public sealed class CountryConfig
     public TransferWindowConfig TransferWindows { get; set; } = new();
     public YouthConfig Youth { get; set; } = new();
     public FinanceConfig Finance { get; set; } = new();
+    public EuropeConfig? Europe { get; set; }
 
     public IEnumerable<DivisionConfig> Divisions => Levels.SelectMany(l => l.Divisions);
 }
@@ -88,6 +89,12 @@ public sealed class YouthConfig
     public int MaxPlayers { get; set; } = 16;
     public int ProContractAge { get; set; } = 17;
     public int PromoteAge { get; set; } = 16;
+    /// <summary>Alter der Neuzugänge im Nachwuchsleistungszentrum (jüngste Altersstufe U15).</summary>
+    public int IntakeAge { get; set; } = 14;
+    /// <summary>Kader je Altersstufe (Grundwert; die Infrastruktur erweitert ihn).</summary>
+    public int GroupSize { get; set; } = 14;
+    /// <summary>Jahresbudget eines durchschnittlichen Leistungszentrums bei Reputation 10.</summary>
+    public long ReferenceBudget { get; set; } = 900_000;
 }
 
 /// <summary>Spielerrolle (Kapitel 5, FM22): erlaubte Positionen, Aufgaben und Wirkung in der Matchengine.</summary>
