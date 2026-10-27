@@ -3,6 +3,6 @@
     <RootNamespace>Fmh.MatchEngine</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Fmh.Core\Fmh.Core.csproj" />
+    <ProjectReference Include="..\Fmh.Domain\Fmh.Domain.csproj" />
   </ItemGroup>
 </Project>

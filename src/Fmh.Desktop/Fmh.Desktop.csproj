@@ -15,7 +15,10 @@
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\Fmh.Core\Fmh.Core.csproj" />
+    <ProjectReference Include="..\Fmh.Domain\Fmh.Domain.csproj" />
+    <ProjectReference Include="..\Fmh.Data\Fmh.Data.csproj" />
+    <ProjectReference Include="..\Fmh.Persistence\Fmh.Persistence.csproj" />
+    <ProjectReference Include="..\Fmh.Simulation\Fmh.Simulation.csproj" />
     <ProjectReference Include="..\Fmh.MatchEngine\Fmh.MatchEngine.csproj" />
   </ItemGroup>
   <ItemGroup>
