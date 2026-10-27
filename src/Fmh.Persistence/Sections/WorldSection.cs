@@ -11,6 +11,21 @@ public sealed class WorldSection : SaveSection
 {
     public override string ModuleId => "world";
 
+    /// <summary>Version 6: Mannschaften (Tabelle teams), Verein und Mannschaft getrennt.</summary>
+    public override int Version => 6;
+
+    private const string TeamsTable = """
+        CREATE TABLE teams (id INTEGER PRIMARY KEY, club_id INTEGER NOT NULL, world_id TEXT NOT NULL, ord INTEGER NOT NULL, data TEXT);
+        """;
+
+    /// <summary>5 → 6: jeder Verein bekommt seine erste Mannschaft (Männer) mit der Kennung des Vereins.</summary>
+    public override void Migrate(SqliteConnection c, SqliteTransaction tx, int fromVersion)
+    {
+        if (fromVersion != BaseVersion) base.Migrate(c, tx, fromVersion);
+        Exec(c, tx, TeamsTable);
+        Exec(c, tx, "INSERT INTO teams (id, club_id, world_id, ord, data) SELECT id, id, 'men', 0, NULL FROM clubs");
+    }
+
     protected override string Schema => """
         CREATE TABLE countries (code TEXT PRIMARY KEY, config TEXT NOT NULL);
         CREATE TABLE referees (id INTEGER PRIMARY KEY, name TEXT NOT NULL, strictness INTEGER NOT NULL);
@@ -34,7 +49,7 @@ public sealed class WorldSection : SaveSection
             subject_ref TEXT, body_ref TEXT);
         CREATE TABLE history (ord INTEGER NOT NULL, season_year INTEGER NOT NULL, league_id TEXT NOT NULL, league_name TEXT NOT NULL,
             champion_id INTEGER NOT NULL, champion_name TEXT NOT NULL, final_order TEXT NOT NULL);
-        """;
+        """ + TeamsTable;
 
     public override void Save(SqliteConnection con, SqliteTransaction tx, World w)
     {
@@ -55,6 +70,12 @@ public sealed class WorldSection : SaveSection
                     J(c.SavedTactics), J(c.Familiarity), J(c.Training), c.Camp is null ? null : J(c.Camp), J(c.YouthIds), J(c.Shortlist), J(c.PlayerIds),
                     J(c.Finance), J(c.Stadium), J(c.Grounds), J(c.Sponsors), J(c.SponsorOffers), J(c.Board), J(c.Fans), J(c.Rivals),
                     J(c.Academy), J(c.License));
+
+        // Die erste Mannschaft steht in den Vereinsspalten, weitere Mannschaften vollständig als JSON.
+        using (var cmd = Insert(con, tx, "teams", 5))
+            foreach (var c in w.Clubs.Values)
+                for (var i = 0; i < c.Teams.Count; i++)
+                    Run(cmd, c.Teams[i].Id, c.Id, c.Teams[i].WorldId, i, i == 0 ? null : J(c.Teams[i]));
 
         using (var cmd = Insert(con, tx, "leagues", 7))
             for (var i = 0; i < w.Leagues.Count; i++)
@@ -100,6 +121,16 @@ public sealed class WorldSection : SaveSection
         {
             var c = ReadClub(r);
             w.Clubs[c.Id] = c;
+        }
+        foreach (var r in Rows(con, "SELECT club_id, ord, id, world_id, data FROM teams ORDER BY club_id, ord"))
+        {
+            var club = w.Clubs[r.GetInt32(0)];
+            if (r.GetInt32(1) == 0)
+            {
+                club.FirstTeam.Id = r.GetInt32(2);
+                club.FirstTeam.WorldId = r.GetString(3);
+            }
+            else club.Teams.Add(PJ<Team>(r.GetString(4))!);
         }
 
         foreach (var r in Rows(con, "SELECT id, name, country, level, format, deductions FROM leagues ORDER BY ord"))
