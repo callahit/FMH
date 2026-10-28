@@ -183,6 +183,12 @@ public sealed class FinanceReference
     public Dictionary<string, long> Income { get; set; } = new();
     /// <summary>Aufwand je Kategorie: squad (Personal Spielbetrieb), operations (Verwaltung, Spielbetrieb, Sonstiges), youth und total.</summary>
     public Dictionary<string, long> Expenses { get; set; } = new();
+    /// <summary>
+    /// Abweichende Toleranzen der Kalibrierung je Kennzahl, z. B. „income.merchandising“: 0,4. Nur mit Begründung in
+    /// <see cref="ToleranceNote"/>, sonst gelten 10 % für Summen und 20 % für Kategorien.
+    /// </summary>
+    public Dictionary<string, double> Tolerances { get; set; } = new();
+    public string ToleranceNote { get; set; } = "";
 
     public static readonly string[] IncomeCategories = { "matchday", "advertising", "media", "merchandising", "other", "total" };
     public static readonly string[] ExpenseCategories = { "squad", "operations", "youth", "total" };
