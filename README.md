@@ -141,9 +141,10 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
 
 - **Finanzen** (Kapitel 8):
   - Einnahmen: Zuschauer nach Preis, Stärke, Wetter, Derby und Fanstimmung; Dauerkarten bis Ende Juli;
-    Fernsehgelder in zehn Raten plus Leistungsanteil; Sponsoren; Catering, Fanartikel und Gelände;
+    Fernsehgelder in zehn Monatsraten (August–Mai), Grundbetrag und Leistungsanteil nach dem aktuellen Tabellenplatz;
+    Sponsoren; Catering, Fanartikel und Gelände;
     Pokal- und Relegationsprämien.
-  - Ausgaben: Gehälter, Personal, Unterhalt, Reisen, Prämien, Zinsen und Betriebskosten (Verwaltung,
+  - Ausgaben: Gehälter, Personal (Marktgehalt mal `wageLevel` der Spielklasse, wie bei Spielern), Unterhalt, Reisen, Prämien, Zinsen und Betriebskosten (Verwaltung,
     Spielbetrieb, Personal außerhalb des Kaders) als Anteil der laufenden Einnahmen (`operatingCostShare`).
   - Gehälter (siehe „Wirtschaft“ unten): Marktgehalt nach Stärke, angepasst an das Gehaltsniveau der
     Spielklasse (`wageLevel`) und begrenzt durch ihr Spitzengehalt (`maxAnnualWage`).
@@ -166,7 +167,11 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
     - Aufstiegskandidaten werden zusätzlich nach den Kriterien der höheren Liga geprüft.
       Fehlt das Geld, ist kein Aufstieg möglich; fehlende Infrastruktur kostet eine Geldstrafe.
   - Insolvenz nach 30 Tagen unter dem Kreditrahmen: KI-Vereine bekommen neun Punkte Abzug, der
-    Mensch wird entlassen.
+    Mensch wird entlassen. Vorher nimmt die KI zum Monatsersten einen Kredit, sobald der halbe Kreditrahmen verbraucht
+    ist und die Kreditlinie (1,5 Jahreseinnahmen abzüglich laufender Kredite) reicht.
+  - KI und Gehaltsbudget: Vereinslose verpflichtet die KI nur im Budget, außer der Spieltagskader ist nicht mehr voll.
+    Liegen die Gehälter mehr als 10 % über dem Budget, setzt sie den bestbezahlten Spieler außerhalb der ersten Elf auf
+    die Transferliste.
   - **Financial Fair Play:**
     - Prüfung zum Saisonstart für die Vereine der 1. Liga und alle Europapokalteilnehmer.
     - Regel 1: Das Break-even-Ergebnis über drei Spielzeiten darf höchstens 5 Mio. im Minus liegen.
@@ -324,9 +329,9 @@ im Monat, Spitze bis 6.500 €).
   für 2024/25 (laut Pressezusammenfassungen des Jahresberichts): Ligue 1 Erträge ohne Transfers 2.161 Mio. € für 18
   Klubs (120,1 je Klub), davon Ticketing 252 Mio. € (14,0 je Klub); Lohnsumme 51,7 % von 3.350 Mio. € Aufwand (96,2 je
   Klub). Ligue 2 Erträge 202 Mio. € (11,2 je Klub). Für die Federación-Ligen gibt es keinen Ligabericht.
-- **Lizenz und TV-Geld:** Der Leistungsanteil der TV-Gelder fließt erst zum Saisonende. Bei der Lizenzprüfung im
-  Frühjahr zählt er nach dem aktuellen Tabellenplatz als Forderung zum Eigenkapital. Vorher bekam ein Spitzenclub
-  mitten in der Saison wegen dieser Lücke Punktabzug oder keine Lizenz.
+- **Lizenz und TV-Geld:** Der Leistungsanteil der TV-Gelder fließt in zehn Monatsraten nach dem aktuellen
+  Tabellenplatz (bis Oktober 2026 erst zum Saisonende; die Lücke trieb vor allem in Spanien Vereine in die Insolvenz,
+  Review F-01). Bei der Lizenzprüfung zählen die noch ausstehenden Raten als Forderung zum Eigenkapital.
 - **Kalibrierung:** `fmh-calibrate --season --seasons 5 --strict` prüft je Spielklasse, dass das Ø-Jahresgehalt
   im Korridor ±30 % um das Ziel liegt; erlaubt ist eine Lohnentwicklung von 4 % je Saison (real etwa 4 % im
   Jahr laut DFL 2019/20–2024/25). Außerdem müssen die Ligazahlen im Durchschnitt aller ausgewerteten
