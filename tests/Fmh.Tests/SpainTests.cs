@@ -35,10 +35,10 @@ public class SpainTests
         var reserves = w.Clubs.Values.Where(c => c.CountryCode == "ESP" && c.ReserveOf is not null).ToList();
         Assert.Equal(15, reserves.Count);
         Assert.All(reserves, r => Assert.True(w.FindLeague(r.LeagueId)!.Level > w.FindLeague(w.Clubs[r.ReserveOf!.Value].LeagueId)!.Level));
-        // 42 Spieltage in der Segunda División mit Englischen Wochen am Mittwoch, die Primera kommt ohne aus.
+        // 42 Spieltage in der Segunda División mit Englischen Wochen am Dienstag (Pokalspiele liegen mittwochs), die Primera kommt ohne aus.
         var dates = w.League("ES2").Fixtures.GroupBy(f => f.Matchday).Select(g => g.Select(f => f.Date).Distinct().Single()).ToList();
         Assert.Equal(42, dates.Distinct().Count());
-        Assert.Contains(dates, d => d.DayOfWeek == DayOfWeek.Wednesday);
+        Assert.Contains(dates, d => d.DayOfWeek == DayOfWeek.Tuesday);
         Assert.All(w.League("ES1").Fixtures, f => Assert.Equal(DayOfWeek.Saturday, f.Date.DayOfWeek));
         // Tabellen: direkter Vergleich vor der Tordifferenz.
         Assert.Equal(TieBreaker.HeadToHead, w.Country("ESP").Divisions.First().TieBreakers[0]);

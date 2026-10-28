@@ -11,7 +11,7 @@
     "winterBreakEnd": "01-02",
     "matchDay": "Saturday",
     "lastMatchday": "05-24",
-    "midweekDay": "Wednesday"
+    "midweekDay": "Tuesday"
   },
   "squad": {
     "maxSquad": 32,
@@ -241,7 +241,7 @@
       "legs": 1,
       "dates": [
         "01-07",
-        "01-11"
+        "01-14"
       ],
       "neutralFinal": true,
       "prizes": [
@@ -287,7 +287,7 @@
         "10-29",
         "12-03",
         "12-17",
-        "01-14",
+        "01-21",
         "02-04",
         "02-11,03-04",
         "04-25"
@@ -599,8 +599,8 @@
     "overAgePlayers": 5
   },
   "finance": {
-    "cateringPerSpectator": 3,
-    "merchPerSpectator": 5,
+    "cateringPerSpectator": 2,
+    "merchPerSpectator": 6,
     "sponsorRelegationPercent": 40,
     "sponsorPromotionPercent": 25,
     "divisions": {
@@ -614,12 +614,12 @@
         "youthCenterRequired": 2,
         "minEquity": -60000000,
         "travelPerAwayMatch": 55000,
-        "wageLevel": 1.05,
-        "sponsorLevel": 0.75,
+        "wageLevel": 0.8,
+        "sponsorLevel": 0.36,
         "academyBudgetFactor": 9.0,
         "operatingCostShare": 0.55,
         "maxAnnualWage": 25000000,
-        "targetAnnualWage": 3000000,
+        "targetAnnualWage": 3500000,
         "relegationWagePercent": 50,
         "squadSize": 27,
         "reference": {
@@ -640,19 +640,19 @@
       "ES2": {
         "tvPool": 142000000,
         "tvEqualShare": 0.5,
-        "standing": 15,
-        "seating": 24,
+        "standing": 9,
+        "seating": 15,
         "box": 3000,
         "floodlightRequired": 2,
         "youthCenterRequired": 1,
         "minEquity": -10000000,
         "travelPerAwayMatch": 25000,
-        "wageLevel": 0.55,
-        "sponsorLevel": 0.3,
+        "wageLevel": 0.43,
+        "sponsorLevel": 0.16,
         "academyBudgetFactor": 6.0,
         "operatingCostShare": 0.6,
         "maxAnnualWage": 1200000,
-        "targetAnnualWage": 330000,
+        "targetAnnualWage": 400000,
         "relegationWagePercent": 50,
         "promotionWagePercent": 50,
         "squadSize": 26,
@@ -663,7 +663,6 @@
             "matchday": 3900000,
             "advertising": 3600000,
             "media": 6500000,
-            "merchandising": 1000000,
             "total": 15300000
           },
           "expenses": {

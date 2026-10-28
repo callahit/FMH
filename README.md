@@ -260,7 +260,7 @@ Jedes Land hat beliebig viele Pokale (`cups` in `countries/*.json`). Ein Pokal n
 | | National Cup | Third, Second Division und National League ab Runde 1, Premier und First Division ab Runde 3 |
 | | League Cup | First bis Third Division ab Runde 1, Premier Division ab Runde 2, Europapokalteilnehmer ab Runde 3; Halbfinale mit Hin- und Rückspiel; Sieger in den Conference-Pokal |
 | | League Trophy | Second und Third Division |
-| Spanien | Supercopa (4) | Finalisten der Copa Nacional und die ersten zwei der Primera División (bei Überschneidung der Nächste), Halbfinale und Finale neutral |
+| Spanien | Supercopa (4) | Finalisten der Copa Nacional und die ersten zwei der Primera División (bei Überschneidung der Nächste), Halbfinale und Finale neutral; das Finale eine Woche nach dem Halbfinale (real am Wochenende danach) |
 | | Copa Nacional | 112 Vereine ab Runde 1 (Primera División bis Tercera Federación, ohne Filiales, Heimrecht für Unterklassige), die ersten vier der Primera División der Vorsaison ab Runde 3 (Runde der letzten 32, wie die Supercopa-Teilnehmer); Halbfinale mit Hin- und Rückspiel |
 
 Spielstände: Neue Felder haben Standardwerte, ältere Spielstände spielen mit ihrer gespeicherten Pokalkonfiguration
@@ -309,8 +309,9 @@ im Monat, Spitze bis 6.500 €).
   (Tabellen 20 ff.), je Klub: Primera División (LALIGA EA Sports) Netto-Umsatz 199,4 Mio. € (Spieltag 40,8, TV 64,4
   plus UEFA 20,3, Sponsoring und Werbung 44,1, Fanartikel 15,8), Kaderaufwand (Spieler und Trainerstab der ersten und
   der übrigen Mannschaften) 106,2 Mio. €; Segunda División (LALIGA HYPERMOTION) Netto-Umsatz 15,3 Mio. € (Spieltag
-  3,9, TV 6,5, Sponsoring und Werbung 3,6, Fanartikel 1,0), Kaderaufwand 10,8 Mio. €. Für die Federación-Ligen gibt
-  es keinen Ligabericht.
+  3,9, TV 6,5, Sponsoring und Werbung 3,6, Fanartikel 1,0), Kaderaufwand 10,8 Mio. €. Die Fanartikel der Segunda
+  prüft die Kalibrierung nur in der Summe, weil der Fanartikelerlös je Zuschauer für das ganze Land gilt und die
+  Segunda real weit unter diesem Wert liegt. Für die Federación-Ligen gibt es keinen Ligabericht.
 - **Lizenz und TV-Geld:** Der Leistungsanteil der TV-Gelder fließt erst zum Saisonende. Bei der Lizenzprüfung im
   Frühjahr zählt er nach dem aktuellen Tabellenplatz als Forderung zum Eigenkapital. Vorher bekam ein Spitzenclub
   mitten in der Saison wegen dieser Lücke Punktabzug oder keine Lizenz.
@@ -619,11 +620,12 @@ TV-Grundbetrags eines Premier-Division-Vereins, nach nur einer Saison in der Pre
 (`parachuteShares`, `parachuteShortTenure`).
 
 Spanien (Stand 2025/26): Primera División mit drei Absteigern; Segunda División mit 42 Spieltagen (Englische Wochen am
-Mittwoch), zwei Direktaufsteigern und Play-off 3–6 mit Hin- und Rückspiel auch im Finale, vier Absteiger. Primera
-Federación in zwei Gruppen: Gruppensieger steigen auf, Platz 2–5 spielen je Gruppe einen Aufstiegsplatz aus, 16–20
-steigen ab. Segunda Federación in fünf Gruppen nach Regionen: Sieger direkt, Platz 2–5 je Gruppe im Play-off mit
-Einzelspielen beim Besserplatzierten, 14–18 in die Tercera Federación. Filiales (zweite Mannschaften) spielen
-mindestens eine Ebene unter der ersten Mannschaft und nicht im Pokal. Tabellen: direkter Vergleich vor Tordifferenz.
+Dienstag, Pokalspiele liegen mittwochs), zwei Direktaufsteigern und Play-off 3–6 mit Hin- und Rückspiel auch im
+Finale, vier Absteiger. Primera Federación in zwei Gruppen: Gruppensieger steigen auf, Platz 2–5 spielen je Gruppe
+einen Aufstiegsplatz aus, 16–20 steigen ab. Segunda Federación in fünf Gruppen nach Regionen: Sieger direkt, Platz 2–5
+je Gruppe im Play-off mit Einzelspielen beim Besserplatzierten, 14–18 in die Tercera Federación. Filiales (zweite
+Mannschaften) spielen mindestens eine Ebene unter der ersten Mannschaft und nicht im Pokal. Tabellen: direkter
+Vergleich vor Tordifferenz.
 
 ## Offene Entscheidungen
 
