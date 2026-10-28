@@ -258,19 +258,6 @@ public static class Program
             var result = session.Advance(1);
             EconomyReport.Observe(world);
             if (result.Reason == StopReason.Decision) session.DelegateDecisions();
-            if (session.AwaitingNewJob)
-            {
-                var reason = world.Messages.LastOrDefault(m => m.SubjectRef?.Key == "msg.sacked.subject")?.BodyText(data.Texts);
-                Console.WriteLine($"Entlassen am {world.Date:yyyy-MM-dd}: {reason}");
-                // Mit dem ersten Jobangebot weiter, damit die Kalibrierung nicht am Zufall einer Entlassung hängt.
-                if (session.HumanManager.Career.Offers.FirstOrDefault() is { } offer && session.AcceptJob(offer) is null)
-                {
-                    Console.WriteLine($"Neuer Verein: {session.HumanClub.Name}");
-                    continue;
-                }
-                PrintFinanceStats(session);
-                break;
-            }
             if (dayWatch is not null)
             {
                 // Spieltag gemessen vom eigenen Spiel bis alle übrigen Spiele des Tages berechnet sind.
@@ -296,6 +283,20 @@ public static class Program
                     Console.WriteLine();
                 }
                 PrintCareerStats(session);
+            }
+            // Nach der Saisonauswertung, damit eine Entlassung am letzten Spieltag die Saison nicht überspringt.
+            if (session.AwaitingNewJob)
+            {
+                var reason = world.Messages.LastOrDefault(m => m.SubjectRef?.Key == "msg.sacked.subject")?.BodyText(data.Texts);
+                Console.WriteLine($"Entlassen am {world.Date:yyyy-MM-dd}: {reason}");
+                // Mit dem ersten Jobangebot weiter, damit die Kalibrierung nicht am Zufall einer Entlassung hängt.
+                if (session.HumanManager.Career.Offers.FirstOrDefault() is { } offer && session.AcceptJob(offer) is null)
+                {
+                    Console.WriteLine($"Neuer Verein: {session.HumanClub.Name}");
+                    continue;
+                }
+                PrintFinanceStats(session);
+                break;
             }
         }
         sw.Stop();
