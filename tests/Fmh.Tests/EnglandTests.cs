@@ -71,10 +71,25 @@ public class EnglandTests
         if (leagueCup.License.UefaLicense && !leagueCup.License.ForcedRelegation)
             Assert.Contains(w.EuropeanEntries, e => e.ClubId == leagueCup.Id && e.SeasonYear == w.SeasonYear + 1);
         var bottom = LeagueTable.Compute(w.League("ENG4")).Skip(22).Select(r => r.ClubId).ToList();
+        var relegated = LeagueTable.Compute(w.League("ENG1")).Skip(17).Select(r => r.ClubId).ToList();
         TestData.PlayUntil(s, r => r.Reason == StopReason.NewSeason, 20_000);
         foreach (var l in w.Leagues.Where(l => l.CountryCode == "ENG")) Assert.Equal(l.Format.Teams, l.ClubIds.Count);
         Assert.True(w.Clubs[winner].LeagueId == "ENG1" || !w.Clubs[winner].License.PromotionAllowed);
         Assert.All(bottom, id => Assert.Equal("ENG-NL", w.Clubs[id].LeagueId));
         Assert.Equal(24, w.Clubs.Values.Count(c => c.LeagueId == "ENG-NL"));
+
+        // Fallschirmzahlungen: Die Absteiger der Premier Division erhalten ab August Raten über 55 % des TV-Grundbetrags.
+        TestData.PlayUntil(s, _ => w.Date.Month == 9, 20_000);
+        var top = s.DivisionFinance(w.Clubs[w.League("ENG1").ClubIds[0]]);
+        var rate = (long)(top.TvPool * top.TvEqualShare / 20 * 0.55 / 10);
+        // Gleiche Liga, gleiche Grundraten: Der Unterschied der TV-Einnahmen sind die Fallschirmraten.
+        long Tv(int id) => w.Clubs[id].Finance.Season.GetValueOrDefault(TransactionType.Tv);
+        var other = w.League("ENG2").ClubIds.First(id => !relegated.Contains(id) && w.Clubs[id].LeagueId == "ENG2");
+        Assert.Equal(3, relegated.Count(id => w.Clubs[id].LeagueId == "ENG2"));
+        Assert.All(relegated.Where(id => w.Clubs[id].LeagueId == "ENG2"), id =>
+        {
+            var diff = Tv(id) - Tv(other);
+            Assert.True(diff > 0 && diff % rate == 0, $"Differenz {diff}, Rate {rate}");
+        });
     }
 }

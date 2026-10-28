@@ -1136,6 +1136,7 @@
  "tx.upkeep": "Unterhalt Stadion und Gelände",
  "tx.operations": "Betriebskosten (Verwaltung, Spielbetrieb)",
  "tx.tv": "Fernsehgelder (Rate)",
+ "tx.parachute": "Fallschirmzahlung (Rate)",
  "tx.sponsors": "Sponsoren (Monatsrate)",
  "tx.members": "Mitgliedsbeiträge",
  "tx.interest": "Kreditzinsen",

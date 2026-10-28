@@ -294,7 +294,11 @@ im Monat, Spitze bis 6.500 €).
   Personal). Für die Premier Division gibt es keinen amtlichen Ligabericht. Hier dienen die Zahlen aus Deloittes
   [Annual Review of Football Finance 2026](https://www.deloitte.com/uk/en/services/consulting/research/annual-review-of-football-finance-premier-league-clubs.html)
   als Ziel (2024/25: 6,8 Mrd. £ Umsatz, davon 3,4 Mrd. £ TV; umgerechnet zu 0,87 £ je Euro), ausdrücklich als nicht
-  amtlich gekennzeichnet. Für Championship und tiefere englische Ligen fehlen aktuelle Zahlen, dort gibt es kein Ziel.
+  amtlich gekennzeichnet. Derselbe Bericht liefert die Football-League-Zahlen 2024/25: Championship je Klub 39 Mio. £
+  Umsatz (Spieltag 8,7, TV einschließlich Fallschirmzahlungen 19,2), League One 11,7 Mio. £, League Two 6,6 Mio. £.
+  Die Lohnkosten (Premier League 4,4 Mrd. £, Championship 903 Mio. £ = 96 % des Umsatzes, League One 94 %, League Two
+  74 %) umfassen bei Deloitte alle Beschäftigten und sind deshalb nicht direkt mit dem Kaderaufwand vergleichbar; sie
+  werden nicht geprüft.
   Zuordnung der Buchungen: Spielertrag = Tickets und Dauerkarten; Werbung = Sponsoren; mediale Verwertung = TV und
   Europapokal; Merchandising = Fanartikel; Sonstiges = Catering, Mitglieder, Gelände und Prämien; Personal
   Spielbetrieb = Gehälter, Prämien und Trainerstab; Verwaltung, Spielbetrieb und Sonstiges = Betriebskosten,
@@ -572,8 +576,10 @@ liegt noch im Grundpaket. Die meisten Tests laden nur `base`, die Länder-Tests 
 
 England (Stand 2025/26): Premier Division ohne Relegation (18–20 steigen ab); First, Second und Third Division
 steigen mit 2, 2 bzw. 3 Vereinen direkt auf, dazu je ein Play-off-Sieger; Absteiger 3, 4 und 2 (in den Pool).
-Gehälter und Einnahmen nach der Größenordnung des Deloitte Annual Review of Football Finance (Premier League je
-Klub rund 315 Mio. £ Umsatz, rund 4 Mrd. £ Lohnkosten insgesamt), umgerechnet in Euro.
+Gehälter und Einnahmen nach dem Deloitte Annual Review of Football Finance 2026 (siehe Ligazahlen), umgerechnet in
+Euro. **Fallschirmzahlungen:** Absteiger aus der Premier Division erhalten drei Saisons lang 55 %, 45 % und 20 % des
+TV-Grundbetrags eines Premier-Division-Vereins, nach nur einer Saison in der Premier Division zwei Saisons lang
+(`parachuteShares`, `parachuteShortTenure`).
 
 ## Offene Entscheidungen
 
