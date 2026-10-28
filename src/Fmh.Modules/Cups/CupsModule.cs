@@ -28,6 +28,12 @@ public sealed partial class CupsModule : GameModule, ICupsService
 
     private void DrawRound(Cup cup, CupRound round, List<int> teams)
     {
+        // Liegt der Termin schon zurück (Vorrunde nach hinten verschoben), rückt die Runde mit gleichen Abständen nach.
+        if (round.Dates.Count > 0 && round.Dates[0] <= World.Date)
+        {
+            var shift = World.Date.AddDays(3).DayNumber - round.Dates[0].DayNumber;
+            round.Dates = round.Dates.Select(d => d.AddDays(shift)).ToList();
+        }
         CupLogic.Draw(World, cup, round, teams, Rng);
         Finance.CupPrize(cup, round.Number, teams);
         var own = round.Ties.FirstOrDefault(t => t.HomeId == HumanClub.Id || t.AwayId == HumanClub.Id);
