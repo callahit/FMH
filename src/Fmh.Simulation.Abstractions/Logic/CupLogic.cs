@@ -35,13 +35,18 @@ public static class CupLogic
         for (var r = 0; r < sizes.Count; r++)
         {
             var dates = r < cfg.Dates.Count ? cfg.Dates[r].Split(',') : new[] { "06-01" };
+            var days = dates.Select(d => ToWeekday(ScheduleGenerator.ParseDate(d.Trim(), world.SeasonYear, country.Season.StartMonth), DayOfWeek.Wednesday)).ToList();
+            // Zwei Termine in derselben Woche fallen auf denselben Mittwoch: Die Folgerunde rückt dann um Wochen nach hinten,
+            // sonst läge sie beim Auslosen schon in der Vergangenheit und die Saison endete nie.
+            if (cup.Rounds.Count > 0 && cup.Rounds[^1].Dates[^1] is var last)
+                while (days[0] <= last) days = days.Select(d => d.AddDays(7)).ToList();
             cup.Rounds.Add(new CupRound
             {
                 Number = r + 1,
                 NameKey = RoundKey(sizes[r], r + 1),
                 Teams = sizes[r],
                 Entrants = entrants.TryGetValue(r + 1, out var ids) ? ids : new List<int>(),
-                Dates = dates.Select(d => ToWeekday(ScheduleGenerator.ParseDate(d.Trim(), world.SeasonYear, country.Season.StartMonth), DayOfWeek.Wednesday)).ToList(),
+                Dates = days,
             });
         }
         return cup;
@@ -111,9 +116,12 @@ public static class CupLogic
                 Dates = dates.Select(d => ScheduleGenerator.ParseDate(d.Trim(), world.SeasonYear, country.Season.StartMonth)).ToList(),
             });
         }
+        // Gesetzt: Der Besserplatzierte hat im Rückspiel Heimrecht, bei nur einem Spiel in diesem Spiel.
+        var singleLeg = (rounds == 1 && cfg.FinalLegs is { } fl ? fl : cfg.Legs) == 1;
         if (cfg.Seeded && participants.Count == size)
             for (var i = 0; i < size / 2; i++)
-                AddTie(world, cup, cup.Rounds[0], participants[size - 1 - i], participants[i]);
+                if (singleLeg) AddTie(world, cup, cup.Rounds[0], participants[i], participants[size - 1 - i]);
+                else AddTie(world, cup, cup.Rounds[0], participants[size - 1 - i], participants[i]);
         else Draw(world, cup, cup.Rounds[0], participants, rng);
         return cup;
     }

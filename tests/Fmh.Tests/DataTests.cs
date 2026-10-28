@@ -48,7 +48,7 @@ public class DataTests
             var data = PackageLoader.Load(root);
             Assert.Equal("Mannschaft", data.Texts["menu.squad"]);
             Assert.Equal("Taktik", data.Texts["menu.tactics"]);
-            Assert.Equal(new[] { "base", "england", "zz-mod" }, data.Packages.Select(p => p.Id));
+            Assert.Equal(new[] { "base", "england", "spain", "zz-mod" }, data.Packages.Select(p => p.Id));
         }
         finally
         {
