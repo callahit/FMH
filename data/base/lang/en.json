@@ -1347,6 +1347,7 @@
  "rumour.1": "According to well-informed sources, {1} have their eye on {0}. {2} remain relaxed.",
  "rumour.2": "A scout from {1} was spotted in the stands at the last match — supposedly watching {0}.",
  "rumour.3": "{0}'s agent is said to have met officials from {1}. {2} deny it.",
+ "rumour.4": "According to a report, {0} is on the wish list of {1}. {2} say they know nothing of an offer.",
  "interview.unhappy.subject": "{0} unhappy",
  "interview.unhappy.body": "In an interview, {0} complains about a lack of playing time at {1}: \"I can't go on like this.\"",
  "interview.happy.subject": "{0} full of praise",
