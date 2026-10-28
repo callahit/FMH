@@ -7,7 +7,8 @@ namespace Fmh.Calibrate;
 
 /// <summary>
 /// Vergleicht Erträge und Aufwand einer Saison je Spielklasse mit den veröffentlichten Ligazahlen aus den Daten
-/// (<see cref="DivisionFinance.Reference"/>), ohne Transfers.
+/// (<see cref="DivisionFinance.Reference"/>), ohne Transfers. Geprüft wird der Durchschnitt aller bisher ausgewerteten
+/// Saisons, weil auch die Ligazahlen Durchschnitte sind und ein einzelner reicher Absteiger eine Saison verzerrt.
 /// </summary>
 public static class ReferenceReport
 {
@@ -16,7 +17,13 @@ public static class ReferenceReport
     /// <summary>Erlaubte Abweichung einzelner Kategorien.</summary>
     public const double CategoryTolerance = 0.4;
 
-    /// <summary>Gibt den Vergleich aus; true, wenn alle Werte in der Toleranz liegen.</summary>
+    /// <summary>Summe und Anzahl der Saisonwerte je Spielklasse und Kennzahl.</summary>
+    private static readonly Dictionary<string, (double Sum, int Seasons)> History = new();
+
+    /// <summary>
+    /// Gibt den Vergleich der Saison aus (Abweichungen als Hinweis) und den Durchschnitt aller ausgewerteten Saisons;
+    /// true, wenn dieser Durchschnitt in der Toleranz liegt.
+    /// </summary>
     public static bool Print(World w)
     {
         var ok = true;
@@ -27,20 +34,29 @@ public static class ReferenceReport
             if (ClubRules.DivisionFinance(w, clubs[0]).Reference is not { } r) continue;
             var actual = Actuals(clubs);
             var parts = new List<string>();
+            var means = new List<string>();
+            var seasons = 0;
             void Check(string side, Dictionary<string, long> targets)
             {
                 foreach (var (key, target) in targets)
                 {
                     var value = actual.GetValueOrDefault(side + "." + key);
                     var tol = key == "total" ? TotalTolerance : CategoryTolerance;
-                    var inside = Math.Abs(value / target - 1) <= tol;
+                    parts.Add($"{key} {M(value)}/{M(target)}{(Math.Abs(value / target - 1) <= tol ? "" : " abweichend")}");
+                    var id = $"{div.Key.CountryCode}/{div.Key.Id}/{side}.{key}";
+                    var (sum, n) = History.GetValueOrDefault(id);
+                    History[id] = (sum + value, n + 1);
+                    seasons = n + 1;
+                    var mean = (sum + value) / (n + 1);
+                    var inside = Math.Abs(mean / target - 1) <= tol;
                     ok &= inside;
-                    parts.Add($"{key} {M(value)}/{M(target)}{(inside ? "" : " ABWEICHUNG")}");
+                    means.Add($"{key} {M(mean)}{(inside ? "" : " ABWEICHUNG")}");
                 }
             }
             Check("income", r.Income);
             Check("expenses", r.Expenses);
             Console.WriteLine($"Ligazahlen {div.First().Format.Name} ({r.Source}{(r.Official ? "" : ", nicht amtlich")}), Spiel/Bericht in Mio.: {string.Join(", ", parts)}");
+            Console.WriteLine($"  Ø {seasons} Saison(s): {string.Join(", ", means)}");
         }
         return ok;
     }
