@@ -77,8 +77,14 @@ public sealed class Contract
     public int GoalBonus { get; set; }
     public long? ReleaseClause { get; set; }
     public int YearlyRaisePercent { get; set; }
-    /// <summary>Abstiegsklausel: Gehalt −30 % nach Abstieg.</summary>
+    /// <summary>Abstiegsklausel älterer Spielstände: Gehalt −30 % nach Abstieg (neu: <see cref="RelegationPercent"/>).</summary>
     public bool RelegationClause { get; set; }
+    /// <summary>
+    /// Gehaltsänderung bei Abstieg (−%) bzw. Aufstieg (+%) des Vereins, je Spielklasse. null = Vertrag aus älterem
+    /// Spielstand: Gehalt folgt dem Gehaltsniveau der neuen Spielklasse.
+    /// </summary>
+    public int? RelegationPercent { get; set; }
+    public int? PromotionPercent { get; set; }
     public int ExtensionOptionYears { get; set; }
     public SquadStatus Status { get; set; } = SquadStatus.Rotation;
     /// <summary>Jugendvertrag (vor dem ersten Profivertrag).</summary>

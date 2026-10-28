@@ -164,7 +164,7 @@ public sealed partial class TransfersModule
                 .FirstOrDefault(p => Negotiations.RefusalReason(p, club, World, Data) is null);
             if (target is null) continue;
             var contract = Negotiations.SuggestContract(target, club, World, Data);
-            target.PreContract = new PreContract { ClubId = club.Id, Contract = MakeContract(contract, new DateOnly(World.SeasonYear + 1, 7, 1)) };
+            target.PreContract = new PreContract { ClubId = club.Id, Contract = MakeContract(contract, new DateOnly(World.SeasonYear + 1, 7, 1), club) };
             if (target.ClubId == HumanClub.Id)
                 Notify(MessageType.Transfer, "msg.sender.assistant", TR("msg.preContractLost.subject", target.Name),
                     TR("msg.preContractLost.body", target.Name, club.Name));

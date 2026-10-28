@@ -55,8 +55,11 @@ public sealed partial class SponsorsModule : GameModule, ISponsorsService
         var years = Rng.Next(1, 4);
         // Langfristige Verträge zahlen etwas weniger pro Jahr, Bonus bei Erreichen des Saisonziels.
         var value = SponsorValue(club) * SlotShare(slot) * Rng.Range(0.8, 1.2) * (1 - (years - 1) * 0.04);
+        // Übliche Klausel: Zahlung sinkt bei Abstieg, steigt bei Aufstieg.
+        var (rel, pro) = ContractClauses.SponsorDefaults(World, club);
         return new SponsorDeal
         {
+            RelegationPercent = rel, PromotionPercent = pro,
             Id = World.NextSponsorId++, Slot = slot, Index = index, Company = company.Name,
             PerSeason = MarketValue.Round(value), Bonus = MarketValue.Round(value * Rng.Range(0.1, 0.3)),
             UntilSeason = World.SeasonYear + years - 1, Expires = forHuman ? World.Date.AddDays(21) : null,
