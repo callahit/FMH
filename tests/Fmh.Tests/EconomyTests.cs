@@ -114,4 +114,26 @@ public class EconomyTests
         }
         finally { File.Delete(path); }
     }
+
+    /// <summary>Fanartikel je Zuschauer skalieren mit dem Fanartikel-Niveau der Spielklasse (Review F-01, Segunda División).</summary>
+    [Fact]
+    public void MerchandiseFollowsTheDivisionLevel()
+    {
+        double Merch(double level)
+        {
+            var s = TestData.NewSession(41);
+            s.World.Country("DE").Finance.Divisions["DE2"].MerchLevel = level;
+            for (var i = 0; i < 40; i++)
+            {
+                var r = s.Advance(1);
+                if (r.Reason == StopReason.HumanMatch && r.Fixture is { } f) s.PlayInstant(f);
+                if (r.Reason == StopReason.Decision) s.DelegateDecisions();
+            }
+            return s.World.Leagues.Single(l => l.Id == "DE2").ClubIds
+                .Sum(id => (double)s.World.Clubs[id].Finance.Season.GetValueOrDefault(TransactionType.Merchandise));
+        }
+        var full = Merch(1.0);
+        Assert.True(full > 0);
+        Assert.InRange(Merch(0.5) / full, 0.45, 0.55);
+    }
 }
