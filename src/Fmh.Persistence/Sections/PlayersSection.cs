@@ -10,6 +10,16 @@ public sealed class PlayersSection : SaveSection
 {
     public override string ModuleId => "players";
 
+    /// <summary>Version 6: Meldeliste und Ausbildungsjahre (Spalte registration).</summary>
+    public override int Version => 6;
+
+    /// <summary>5 → 6: Spalte für Meldung und Ausbildungsjahre; ältere Spieler gelten beim Laden als für ihren Verein gemeldet.</summary>
+    public override void Migrate(SqliteConnection c, SqliteTransaction tx, int fromVersion)
+    {
+        if (fromVersion < BaseVersion || fromVersion > Version) base.Migrate(c, tx, fromVersion);
+        if (fromVersion <= 5) Exec(c, tx, "ALTER TABLE players ADD COLUMN registration TEXT");
+    }
+
     internal static string AttrCol(Attr a) => "a_" + a;
 
     internal static readonly string[] HiddenCols =
@@ -28,7 +38,7 @@ public sealed class PlayersSection : SaveSection
             condition REAL NOT NULL, match_practice REAL NOT NULL, morale TEXT NOT NULL, recent_grades TEXT NOT NULL,
             injury_type TEXT, injury_days INTEGER, injury_total INTEGER, suspended INTEGER NOT NULL, yellow_acc INTEGER NOT NULL,
             contract TEXT, is_youth INTEGER NOT NULL DEFAULT 0, retired INTEGER NOT NULL DEFAULT 0, transfer_listed INTEGER NOT NULL DEFAULT 0,
-            asking_price INTEGER, transfer TEXT, loan TEXT, training TEXT, pre_contract TEXT);
+            asking_price INTEGER, transfer TEXT, loan TEXT, training TEXT, pre_contract TEXT, registration TEXT);
         CREATE INDEX players_club ON players (club_id);
         CREATE TABLE player_positions (player_id INTEGER NOT NULL, position TEXT NOT NULL, suitability TEXT NOT NULL,
             PRIMARY KEY (player_id, position));
@@ -48,7 +58,7 @@ public sealed class PlayersSection : SaveSection
         cols.AddRange(AttrInfo.All.Select(AttrCol));
         cols.AddRange(HiddenCols);
         cols.AddRange(new[] { "condition", "match_practice", "morale", "recent_grades", "injury_type", "injury_days", "injury_total", "suspended", "yellow_acc" });
-        cols.AddRange(new[] { "contract", "is_youth", "retired", "transfer_listed", "asking_price", "transfer", "loan", "training", "pre_contract" });
+        cols.AddRange(new[] { "contract", "is_youth", "retired", "transfer_listed", "asking_price", "transfer", "loan", "training", "pre_contract", "registration" });
         var names = cols.Select((_, i) => "$p" + i).ToArray();
         using var cmd = Cmd(con, tx, $"INSERT INTO players ({string.Join(",", cols)}) VALUES ({string.Join(",", names)})", names);
         using var pos = Insert(con, tx, "player_positions", 3);
@@ -72,6 +82,7 @@ public sealed class PlayersSection : SaveSection
                 st.Injury?.Type, st.Injury?.DaysRemaining, st.Injury?.TotalDays, st.SuspendedMatches, st.YellowCardsAccumulated,
                 p.Contract is null ? null : J(p.Contract), p.IsYouth, p.Retired, p.Transfer.Listed, p.Transfer.AskingPrice,
                 J(p.Transfer), p.Loan is null ? null : J(p.Loan), J(p.Training), p.PreContract is null ? null : J(p.PreContract),
+                J(p.Registration),
             });
             Run(cmd, values.ToArray());
 
@@ -160,6 +171,8 @@ public sealed class PlayersSection : SaveSection
         p.Training = r.IsDBNull(col) ? new PlayerTraining() : PJ<PlayerTraining>(r.GetString(col)) ?? new();
         col++;
         p.PreContract = r.IsDBNull(col) ? null : PJ<PreContract>(r.GetString(col));
+        col++;
+        p.Registration = col < r.FieldCount && !r.IsDBNull(col) ? PJ<PlayerRegistration>(r.GetString(col)) ?? new() : new PlayerRegistration { ClubId = p.ClubId };
         return p;
     }
 }

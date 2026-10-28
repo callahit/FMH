@@ -436,6 +436,23 @@
     "groupSize": 14,
     "referenceBudget": 1700000
   },
+  "registration": {
+    "ENG1": {
+      "maxPlayers": 25,
+      "exemptAge": 21,
+      "minLocal": 8
+    },
+    "ENG2": {
+      "maxPlayers": 25,
+      "exemptAge": 21,
+      "loansNeedSlot": true,
+      "minLocal": 8
+    }
+  },
+  "formative": {
+    "club": 0.15,
+    "country": 0.45
+  },
   "finance": {
     "cateringPerSpectator": 4,
     "merchPerSpectator": 7,

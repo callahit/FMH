@@ -49,6 +49,13 @@ public static class DataValidator
                 if (string.IsNullOrWhiteSpace(r.Source) || r.Income.Values.Concat(r.Expenses.Values).Any(v => v <= 0))
                     errors.Add($"Ligazahlen '{div}': Quelle fehlt oder Betrag nicht positiv.");
             }
+            foreach (var (div, r) in country.Registration)
+            {
+                if (!KnownDivision(div)) errors.Add($"Meldeliste: unbekannte Liga '{div}'.");
+                var cap = r.MaxPlayers > 0 ? r.MaxPlayers : country.Squad.MaxSquad;
+                if (r.MinLocal > cap || r.MinClubTrained > r.MinLocal || r.MinNationals > cap)
+                    errors.Add($"Meldeliste '{div}': Mindestzahlen passen nicht zu {cap} Plätzen.");
+            }
             foreach (var pool in country.Pools)
             {
                 var count = data.Clubs.Count(c => c.Division == pool.Id);

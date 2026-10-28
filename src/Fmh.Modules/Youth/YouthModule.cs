@@ -245,6 +245,7 @@ public sealed partial class YouthModule : GameModule, IYouthService
         p.IsYouth = true;
         p.Reputation = 1;
         p.ClubId = club.Id;
+        Registration.InitFormative(p, World, club, Rng, youth: true);
         p.Contract = new Contract { WeeklyWage = age >= 16 ? 150 : 50, Start = World.Date, Until = new DateOnly(World.SeasonYear + 1, 6, 30), Youth = true, Status = SquadStatus.Prospect };
         p.SeasonStats = new PlayerSeasonStats { SeasonYear = World.SeasonYear, ClubId = club.Id };
         World.Players[p.Id] = p;

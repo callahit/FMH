@@ -68,10 +68,11 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
     private void PrepareClub(Club club, Club opponent, bool home)
     {
         if (IsHuman(club))
-            LineupSelector.Repair(club, World, Data, BenchSize(club), AiTactics.ReserveEligibility(club, World, Data));
+            LineupSelector.Repair(club, World, Data, BenchSize(club), AiTactics.MatchEligibility(club, World, Data));
         else
             AiTactics.Prepare(club, opponent, home, World, Data, BenchSize(club));
         EnsureEleven(club);
+        AiTactics.EnsureYoungPlayers(club, World, Data);
     }
 
     /// <summary>Notfall: zu wenige einsatzfähige Spieler. Erst Talente aus der Jugend, dann Spieler aus dem Umfeld des Vereins.</summary>
@@ -97,10 +98,13 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
                 p.SeasonStats = new PlayerSeasonStats { SeasonYear = World.SeasonYear, ClubId = club.Id };
                 World.Players[p.Id] = p;
                 club.PlayerIds.Add(p.Id);
+                Registration.InitFormative(p, World, null, Rng);
             }
+            // Notfall: wird sofort nachgemeldet.
+            p.Registration.ClubId = club.Id;
             if (club.Id == HumanClub.Id)
                 Notify(MessageType.Info, "msg.sender.assistant", TR("msg.emergency.subject", p.Name), TR("msg.emergency.body", p.Name));
-            LineupSelector.Repair(club, World, Data, BenchSize(club), AiTactics.ReserveEligibility(club, World, Data));
+            LineupSelector.Repair(club, World, Data, BenchSize(club), AiTactics.MatchEligibility(club, World, Data));
         }
     }
 
