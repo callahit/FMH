@@ -1,0 +1,605 @@
+{
+  "country": "FRA",
+  "companies": [
+    {
+      "name": "Banque Hexagone",
+      "industry": "bank",
+      "size": 2,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Assurances Atlantique",
+      "industry": "insurance",
+      "size": 9,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Mobile Provence",
+      "industry": "telecom",
+      "size": 16,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Boissons Armor",
+      "industry": "drinks",
+      "size": 4,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Brasserie Loire",
+      "industry": "brewery",
+      "size": 11,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Énergie Rhône",
+      "industry": "energy",
+      "size": 18,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Magasins Gascogne",
+      "industry": "retail",
+      "size": 6,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Automobiles Picardie",
+      "industry": "cars",
+      "size": 13,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Numérique Bocage",
+      "industry": "tech",
+      "size": 20,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Voyages Alpes Bleues",
+      "industry": "travel",
+      "size": 8,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Transports Vosges",
+      "industry": "logistics",
+      "size": 15,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Bâtiment Camargue",
+      "industry": "construction",
+      "size": 3,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Alimentation Bourgogne Or",
+      "industry": "food",
+      "size": 10,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Hôtels Ardenne",
+      "industry": "hotel",
+      "size": 17,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Paris Sportifs Quercy",
+      "industry": "gaming",
+      "size": 5,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Capital Cévennes",
+      "industry": "finance",
+      "size": 12,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Banque Morvan",
+      "industry": "bank",
+      "size": 19,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Assurances Vendée",
+      "industry": "insurance",
+      "size": 7,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Mobile Artois",
+      "industry": "telecom",
+      "size": 14,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Boissons Lorraine Ciel",
+      "industry": "drinks",
+      "size": 2,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Brasserie Savoie",
+      "industry": "brewery",
+      "size": 9,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Énergie Corniche",
+      "industry": "energy",
+      "size": 16,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Magasins Beauce",
+      "industry": "retail",
+      "size": 4,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Automobiles Sologne",
+      "industry": "cars",
+      "size": 11,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Numérique Périgord",
+      "industry": "tech",
+      "size": 18,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Voyages Landes",
+      "industry": "travel",
+      "size": 6,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Transports Jura",
+      "industry": "logistics",
+      "size": 13,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Bâtiment Médoc",
+      "industry": "construction",
+      "size": 20,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Alimentation Auvergne",
+      "industry": "food",
+      "size": 8,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Hôtels Côte d'Opale",
+      "industry": "hotel",
+      "size": 15,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Paris Sportifs Hexagone",
+      "industry": "gaming",
+      "size": 3,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Capital Atlantique",
+      "industry": "finance",
+      "size": 10,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Banque Provence",
+      "industry": "bank",
+      "size": 17,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Assurances Armor",
+      "industry": "insurance",
+      "size": 5,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Mobile Loire",
+      "industry": "telecom",
+      "size": 12,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Boissons Rhône",
+      "industry": "drinks",
+      "size": 19,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Brasserie Gascogne",
+      "industry": "brewery",
+      "size": 7,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Énergie Picardie",
+      "industry": "energy",
+      "size": 14,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Magasins Bocage",
+      "industry": "retail",
+      "size": 2,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Automobiles Alpes Bleues",
+      "industry": "cars",
+      "size": 9,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Numérique Vosges",
+      "industry": "tech",
+      "size": 16,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Voyages Camargue",
+      "industry": "travel",
+      "size": 4,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Transports Bourgogne Or",
+      "industry": "logistics",
+      "size": 11,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Bâtiment Ardenne",
+      "industry": "construction",
+      "size": 18,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Alimentation Quercy",
+      "industry": "food",
+      "size": 6,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Hôtels Cévennes",
+      "industry": "hotel",
+      "size": 13,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Paris Sportifs Morvan",
+      "industry": "gaming",
+      "size": 20,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Capital Vendée",
+      "industry": "finance",
+      "size": 8,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Banque Artois",
+      "industry": "bank",
+      "size": 15,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Assurances Lorraine Ciel",
+      "industry": "insurance",
+      "size": 3,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Mobile Savoie",
+      "industry": "telecom",
+      "size": 10,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Boissons Corniche",
+      "industry": "drinks",
+      "size": 17,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Brasserie Beauce",
+      "industry": "brewery",
+      "size": 5,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Énergie Sologne",
+      "industry": "energy",
+      "size": 12,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Magasins Périgord",
+      "industry": "retail",
+      "size": 19,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Automobiles Landes",
+      "industry": "cars",
+      "size": 7,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Numérique Jura",
+      "industry": "tech",
+      "size": 14,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Voyages Médoc",
+      "industry": "travel",
+      "size": 2,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Transports Auvergne",
+      "industry": "logistics",
+      "size": 9,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Bâtiment Côte d'Opale",
+      "industry": "construction",
+      "size": 16,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    }
+  ]
+}

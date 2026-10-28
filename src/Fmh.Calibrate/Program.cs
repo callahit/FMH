@@ -176,7 +176,7 @@ public static class Program
 
     private static int _startYear;
 
-    /// <summary>Erträge und Aufwand der zuletzt ausgewerteten Saison nahe an den Ligazahlen (<see cref="ReferenceReport"/>)?</summary>
+    /// <summary>Erträge und Aufwand im Durchschnitt der ausgewerteten Saisons nahe an den Ligazahlen (<see cref="ReferenceReport"/>)?</summary>
     private static bool _financeOk = true;
 
     /// <summary>Durchschnittliches Jahresgehalt der Kaderspieler je Division gegen das Kalibrierungsziel aus den Daten.</summary>
