@@ -28,7 +28,8 @@ public class CareerTests
         // Unterklassige Vereine haben Heimrecht.
         Assert.All(cup.Rounds[0].Ties, t => Assert.True(CupLogic.Level(s.World, t.HomeId) >= CupLogic.Level(s.World, t.AwayId)));
         Assert.Contains(s.Inbox, m => m.Type == MessageType.Cup);
-        Assert.All(s.World.Clubs.Values, c => Assert.True(c.Budget.TransferBudget > 0));
+        // Zweite Mannschaften haben keine eigene Kasse und damit kein Transferbudget.
+        Assert.All(s.World.Clubs.Values, c => Assert.True(c.ReserveOf is null ? c.Budget.TransferBudget > 0 : c.Budget.TransferBudget == 0));
         Assert.Equal(2, s.HumanScouts.Count);
         Assert.True(s.Familiarity(s.HumanClub, s.HumanClub.Tactic.FormationId) >= 70);
     }

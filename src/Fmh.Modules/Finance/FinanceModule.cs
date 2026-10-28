@@ -79,6 +79,12 @@ public sealed partial class FinanceModule : GameModule, IFinanceService
 
     public void Book(Club club, TransactionType type, long amount, TextRef text)
     {
+        // Zweite Mannschaften haben keine eigene Kasse: Gehälter und Einnahmen laufen über den Hauptverein.
+        if (club.ReserveOf is { } parentId && World.Clubs.TryGetValue(parentId, out var parent))
+        {
+            Book(parent, type, amount, TR("tx.reserve", club.Name, text));
+            return;
+        }
         club.Budget.Balance += amount;
         var f = club.Finance;
         f.Season[type] = f.Season.GetValueOrDefault(type) + amount;

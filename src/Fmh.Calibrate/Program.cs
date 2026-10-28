@@ -262,6 +262,12 @@ public static class Program
             {
                 var reason = world.Messages.LastOrDefault(m => m.SubjectRef?.Key == "msg.sacked.subject")?.BodyText(data.Texts);
                 Console.WriteLine($"Entlassen am {world.Date:yyyy-MM-dd}: {reason}");
+                // Mit dem ersten Jobangebot weiter, damit die Kalibrierung nicht am Zufall einer Entlassung hängt.
+                if (session.HumanManager.Career.Offers.FirstOrDefault() is { } offer && session.AcceptJob(offer) is null)
+                {
+                    Console.WriteLine($"Neuer Verein: {session.HumanClub.Name}");
+                    continue;
+                }
                 PrintFinanceStats(session);
                 break;
             }

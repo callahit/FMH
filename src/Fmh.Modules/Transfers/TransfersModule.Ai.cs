@@ -32,7 +32,7 @@ public sealed partial class TransfersModule
         {
             ManageAiSquadSize(club);
             // Dünne Kader: zuerst Vereinslose, sonst Talente aus der eigenen Jugend oder dem Umfeld.
-            if (club.PlayerIds.Count < 22 && !SignBestFreeAgent(club, Season.NeededPosition(club)) && club.PlayerIds.Count < 21) Season.AddEmergencyPlayer(club);
+            if (club.PlayerIds.Count < Math.Max(22, Finance.DivisionFinance(club).SquadSize - 3) && !SignBestFreeAgent(club, Season.NeededPosition(club)) && club.PlayerIds.Count < 21) Season.AddEmergencyPlayer(club);
             if (window && Rng.Chance(0.3)) TryAiSigning(club);
         }
         if (window && Rng.Chance(0.3)) MakeIncomingOffer();
@@ -132,7 +132,7 @@ public sealed partial class TransfersModule
     {
         var max = World.Country(club.CountryCode).Squad.MaxSquad;
         var ranked = World.SquadOf(club).Where(p => p.Loan is null).OrderBy(Rating).ToList();
-        foreach (var p in ranked.Take(Math.Max(0, club.PlayerIds.Count - 26)))
+        foreach (var p in ranked.Take(Math.Max(0, club.PlayerIds.Count - Finance.DivisionFinance(club).SquadSize - 1)))
             if (!p.Transfer.Listed) SetTransferListed(p, true, MarketValue.Round(ValueOf(p) * 0.8));
         while (club.PlayerIds.Count > max && ranked.Count > 0)
         {
@@ -146,7 +146,8 @@ public sealed partial class TransfersModule
     private bool ShouldAiRenew(Club club, Player p)
     {
         var rank = World.SquadOf(club).OrderByDescending(Rating).ToList().IndexOf(p);
-        return rank is >= 0 and < 18 && p.Age(World.Date) <= 33;
+        // Die besten (Kadergröße − 7) Spieler bekommen einen neuen Vertrag.
+        return rank >= 0 && rank < Finance.DivisionFinance(club).SquadSize - 7 && p.Age(World.Date) <= 33;
     }
 
     /// <summary>KI-Vereine sichern sich ablösefreie Spieler mit auslaufendem Vertrag per Vorvertrag.</summary>

@@ -17,6 +17,8 @@ public static partial class Pyramid
         public List<int> Up { get; } = new();
         /// <summary>Absteiger, die nicht durch einen Aufsteiger ersetzt werden dürfen (Lizenz, zweite Mannschaft).</summary>
         public HashSet<int> Forced { get; } = new();
+        /// <summary>Zweite Mannschaften, die wegen des Abstands zur ersten zwingend absteigen (bleiben auch ohne Nachrücker nicht oben).</summary>
+        public HashSet<int> Mandatory { get; } = new();
     }
 
     /// <summary>Ligen eines Landes nach Ebene; jede Ebene in Anlegereihenfolge.</summary>
@@ -44,6 +46,15 @@ public static partial class Pyramid
         var newLevels = NewLevels(world, levels, plan);
         var pool = PoolExchange(world, country, levels[^1], tables, rng, newLevels);
         plan = Plan(world, country, levels, tables, newLevels, pool?.x.Down.ToHashSet() ?? new HashSet<int>());
+        // Ändert der zweite Durchgang die Ebene einer ersten Mannschaft (z. B. Zwangsabstieg erst mit Nachrücker), mit den
+        // neuen Ebenen erneut planen, bis die Abstände der zweiten Mannschaften stimmen.
+        for (var round = 0; round < 3; round++)
+        {
+            var again = NewLevels(world, levels, plan);
+            if (world.Clubs.Values.Where(c => c.ReserveOf is { } p && again.ContainsKey(p)).All(c => again[c.ReserveOf!.Value] == newLevels[c.ReserveOf!.Value])) break;
+            newLevels = again;
+            plan = Plan(world, country, levels, tables, newLevels, pool?.x.Down.ToHashSet() ?? new HashSet<int>());
+        }
         Apply(world, country, levels, plan, pool, rng, onRelegated);
     }
 
@@ -97,12 +108,15 @@ public static partial class Pyramid
                 var rules = Rules(league, MovementDirection.Down, year);
                 var down = rules.Where(p => p <= table.Count).Select(p => table[p - 1]).ToList();
                 var count = down.Count;
+                // Zweite Mannschaften auf einem Abstiegsplatz, die ohnehin zu nah an der ersten spielen, steigen zwingend ab.
+                foreach (var id in down.Where(id => MustDrop(world, country, id, upperLevel, newLevels))) { x.Forced.Add(id); x.Mandatory.Add(id); }
                 // Lizenz verweigert (oder zweite Mannschaft zu hoch): Zwangsabstieg; dafür bleibt der bestplatzierte sportliche Absteiger.
                 foreach (var forced in table.Where(id => !down.Contains(id) &&
                              (world.Clubs[id].License.ForcedRelegation || MustDrop(world, country, id, upperLevel, newLevels))).ToList())
                 {
                     down.Add(forced);
                     x.Forced.Add(forced);
+                    if (MustDrop(world, country, forced, upperLevel, newLevels)) x.Mandatory.Add(forced);
                     if (down.Count > count && down.Count > 1 && !x.Forced.Contains(down[0])) down.RemoveAt(0);
                 }
                 x.Down.AddRange(down);
@@ -116,7 +130,8 @@ public static partial class Pyramid
                 x.Up.AddRange(table.Skip(rules.Min() - 1).Where(id => Rises(id, upperLevel)).Take(rules.Count));
             }
             AddPlayoffs(world, country, levels[i], levels[i + 1], x, id => Rises(id, upperLevel));
-            Balance(x, Successors(levels[i + 1], tables).Where(id => Rises(id, upperLevel)));
+            Balance(x, Successors(levels[i + 1], tables).Where(id => Rises(id, upperLevel)),
+                Successors(levels[i + 1], tables).Where(id => !leaving.Contains(id) && world.Clubs[id].ReserveOf is null));
             plan[i] = x;
         }
         return plan.ToList();
@@ -155,10 +170,11 @@ public static partial class Pyramid
 
     /// <summary>
     /// Gleicht Zu- und Abgänge aus: Überzählige sportliche Absteiger bleiben oben, danach rücken Vereine der unteren Ebene
-    /// nach (bestplatzierte zuerst). Gibt es keinen Nachrücker, bleibt auch ein Zwangsabsteiger oben. Überzählige
-    /// Aufsteiger bleiben unten.
+    /// nach (bestplatzierte zuerst). Gibt es keinen Nachrücker, bleibt auch ein Zwangsabsteiger oben, außer einer zweiten
+    /// Mannschaft, die zu nah an der ersten spielt; dann rückt ein Verein ohne Aufstiegslizenz nach. Überzählige Aufsteiger
+    /// bleiben unten.
     /// </summary>
-    private static void Balance(Exchange x, IEnumerable<int> successors)
+    private static void Balance(Exchange x, IEnumerable<int> successors, IEnumerable<int> fallback)
     {
         while (x.Down.Count > x.Up.Count && x.Down.FirstOrDefault(id => !x.Forced.Contains(id)) is var keep && keep != 0)
             x.Down.Remove(keep);
@@ -166,7 +182,14 @@ public static partial class Pyramid
         while (x.Down.Count > x.Up.Count)
         {
             if (next.MoveNext()) x.Up.Add(next.Current);
-            else x.Down.RemoveAt(x.Down.Count - 1);
+            else
+            {
+                // Ohne Nachrücker bleibt ein Absteiger oben, aber nie eine zweite Mannschaft, die zu nah an der ersten spielt.
+                var stay = x.Down.FindLastIndex(id => !x.Mandatory.Contains(id));
+                if (stay >= 0) { x.Down.RemoveAt(stay); continue; }
+                if (fallback.FirstOrDefault(id => !x.Up.Contains(id) && !x.Down.Contains(id)) is var extra && extra != 0) x.Up.Add(extra);
+                else break;
+            }
         }
         while (x.Up.Count > x.Down.Count) x.Up.RemoveAt(x.Up.Count - 1);
     }

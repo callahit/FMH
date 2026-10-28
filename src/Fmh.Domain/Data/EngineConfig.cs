@@ -65,7 +65,7 @@ public sealed class EngineConfig
 
     // Fouls und Karten
     public double FoulPerDuel { get; set; } = 0.17;
-    public double YellowPerFoul { get; set; } = 0.155;
+    public double YellowPerFoul { get; set; } = 0.148;
     public double RedPerFoul { get; set; } = 0.0025;
     /// <summary>Anteil der Fouls in Reihe 6 (zentral), die im Strafraum passieren.</summary>
     public double BoxFoulShare { get; set; } = 0.3;

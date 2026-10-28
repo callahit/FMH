@@ -205,7 +205,7 @@ public static class WorldGenerator
     {
         var level = PlayerGenerator.ClubLevel(club.Reputation);
         var older = 0;
-        foreach (var (pos, count) in PlayerGenerator.SquadTemplate)
+        foreach (var (pos, count) in PlayerGenerator.Template(ClubRules.DivisionFinance(world, club).SquadSize))
         {
             for (var i = 0; i < count; i++)
             {
