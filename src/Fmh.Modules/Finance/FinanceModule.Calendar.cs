@@ -58,6 +58,7 @@ public sealed partial class FinanceModule
             var equal = div.TvPool * div.TvEqualShare / Math.Max(1, league.ClubIds.Count) / 10;
             Book(club, TransactionType.Tv, (long)equal, TR("tx.tv"));
         }
+        if (World.Date.Month is >= 8 or <= 5) Parachute(club);
         // Sponsoren monatlich, Mitgliedsbeiträge.
         var sponsorMonthly = club.Sponsors.Where(s => s.UntilSeason >= World.SeasonYear).Sum(s => s.PerSeason) / 12;
         if (sponsorMonthly > 0) Book(club, TransactionType.Sponsorship, sponsorMonthly, TR("tx.sponsors"));
@@ -115,6 +116,29 @@ public sealed partial class FinanceModule
         var income = OperatingIncome.Sum(t => Math.Max(0, club.Finance.Season.GetValueOrDefault(t)));
         var due = (long)(income * div.OperatingCostShare) + club.Finance.Season.GetValueOrDefault(TransactionType.Operations);
         if (due > 0) Book(club, TransactionType.Operations, -due, TR("tx.operations"));
+    }
+
+    /// <summary>
+    /// Fallschirmzahlungen in 10 Monatsraten: Absteiger aus einer Spielklasse mit <see cref="DivisionFinance.ParachuteShares"/>
+    /// erhalten in der k-ten Saison danach den k-ten Anteil an deren TV-Grundbetrag je Verein.
+    /// </summary>
+    private void Parachute(Club club)
+    {
+        foreach (var (id, upper) in World.Country(club.CountryCode).Finance.Divisions.Where(kv => kv.Value.ParachuteShares.Count > 0 && kv.Value.TvPool > 0))
+        {
+            bool InDivision(string leagueId) => World.FindLeague(leagueId) is { } l && (l.Id == id || l.Format.Id == id);
+            if (InDivision(club.LeagueId)) continue;
+            // Saisons seit dem letzten Jahr in der Spielklasse und Dauer der Zugehörigkeit davor.
+            var since = 0;
+            for (var k = 1; k <= upper.ParachuteShares.Count && since == 0; k++)
+                if (World.History.Any(h => h.SeasonYear == World.SeasonYear - k && InDivision(h.LeagueId) && h.FinalOrder.Contains(club.Id))) since = k;
+            if (since == 0) continue;
+            var tenure = World.History.Any(h => h.SeasonYear == World.SeasonYear - since - 1 && InDivision(h.LeagueId) && h.FinalOrder.Contains(club.Id)) ? 2 : 1;
+            if (tenure == 1 && upper.ParachuteShortTenure > 0 && since > upper.ParachuteShortTenure) continue;
+            var teams = World.Leagues.Where(l => l.Id == id || l.Format.Id == id).Sum(l => l.ClubIds.Count);
+            var amount = upper.TvPool * upper.TvEqualShare / Math.Max(1, teams) * upper.ParachuteShares[since - 1] / 10;
+            if (amount > 0) Book(club, TransactionType.Tv, (long)amount, TR("tx.parachute"));
+        }
     }
 
     /// <summary>Dauerkarten werden zum Stichtag verkauft (Kapitel 8).</summary>

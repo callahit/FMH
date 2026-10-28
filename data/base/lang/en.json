@@ -1136,6 +1136,7 @@
  "tx.upkeep": "Stadium and grounds upkeep",
  "tx.operations": "Operating costs (administration, match operations)",
  "tx.tv": "TV money (instalment)",
+ "tx.parachute": "Parachute payment (instalment)",
  "tx.sponsors": "Sponsors (monthly)",
  "tx.members": "Membership fees",
  "tx.interest": "Loan interest",

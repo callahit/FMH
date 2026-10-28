@@ -437,6 +437,8 @@
     "referenceBudget": 1700000
   },
   "finance": {
+    "cateringPerSpectator": 4,
+    "merchPerSpectator": 7,
     "sponsorRelegationPercent": 40,
     "sponsorPromotionPercent": 30,
     "divisions": {
@@ -456,32 +458,44 @@
         "maxAnnualWage": 28700000,
         "targetAnnualWage": 5700000,
         "relegationWagePercent": 40,
+        "parachuteShares": [0.55, 0.45, 0.2],
+        "parachuteShortTenure": 2,
         "reference": {
           "source": "Deloitte Annual Review of Football Finance 2026, Saison 2024/25 (keine amtliche Ligazahl), £ zu 0,87 je Euro",
           "official": false,
           "income": {
+            "matchday": 57500000,
             "media": 195400000,
             "total": 390800000
           }
         }
       },
       "ENG2": {
-        "tvPool": 229900000,
+        "tvPool": 317000000,
         "tvEqualShare": 0.8,
-        "standing": 25,
-        "seating": 34,
+        "standing": 18,
+        "seating": 25,
         "box": 5750,
         "floodlightRequired": 2,
         "youthCenterRequired": 1,
         "minEquity": -46000000,
         "travelPerAwayMatch": 34000,
         "wageLevel": 1.03,
-        "sponsorLevel": 0.52,
+        "sponsorLevel": 0.2,
         "operatingCostShare": 0.35,
         "maxAnnualWage": 4600000,
         "targetAnnualWage": 1300000,
         "relegationWagePercent": 40,
-        "promotionWagePercent": 60
+        "promotionWagePercent": 60,
+        "reference": {
+          "source": "Deloitte Annual Review of Football Finance 2026, Saison 2024/25 (keine amtliche Ligazahl), £ zu 0,87 je Euro",
+          "official": false,
+          "income": {
+            "matchday": 10000000,
+            "media": 22100000,
+            "total": 45100000
+          }
+        }
       },
       "ENG3": {
         "tvPool": 41400000,
@@ -499,7 +513,14 @@
         "maxAnnualWage": 805000,
         "targetAnnualWage": 264000,
         "relegationWagePercent": 35,
-        "promotionWagePercent": 50
+        "promotionWagePercent": 50,
+        "reference": {
+          "source": "Deloitte Annual Review of Football Finance 2026, Saison 2024/25 (keine amtliche Ligazahl), £ zu 0,87 je Euro",
+          "official": false,
+          "income": {
+            "total": 13400000
+          }
+        }
       },
       "ENG4": {
         "tvPool": 27600000,
@@ -517,7 +538,14 @@
         "maxAnnualWage": 345000,
         "targetAnnualWage": 115000,
         "relegationWagePercent": 40,
-        "promotionWagePercent": 40
+        "promotionWagePercent": 40,
+        "reference": {
+          "source": "Deloitte Annual Review of Football Finance 2026, Saison 2024/25 (keine amtliche Ligazahl), £ zu 0,87 je Euro",
+          "official": false,
+          "income": {
+            "total": 7600000
+          }
+        }
       },
       "ENG-NL": {
         "tvPool": 0,

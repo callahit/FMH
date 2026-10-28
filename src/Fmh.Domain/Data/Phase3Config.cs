@@ -149,6 +149,14 @@ public sealed class DivisionFinance
     public int PromotionWagePercent { get; set; }
 
     /// <summary>
+    /// Fallschirmzahlungen (England): Absteiger aus dieser Spielklasse erhalten je Saison nach dem Abstieg diesen Anteil am
+    /// TV-Grundbetrag eines Vereins dieser Spielklasse, z. B. 55 %, 45 %, 20 %.
+    /// </summary>
+    public List<double> ParachuteShares { get; set; } = new();
+    /// <summary>Höchstzahl der Fallschirmzahlungen nach nur einer Saison in der Spielklasse (0 = alle).</summary>
+    public int ParachuteShortTenure { get; set; }
+
+    /// <summary>
     /// Jahresbudget des Nachwuchsleistungszentrums als Vielfaches des Länder-Referenzbudgets (skaliert nach Vereinsgröße);
     /// 0 = bisherige Staffel nach Ligaebene.
     /// </summary>
