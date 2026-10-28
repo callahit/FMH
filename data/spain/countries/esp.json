@@ -634,6 +634,10 @@
           },
           "expenses": {
             "squad": 106200000
+          },
+          "toleranceNote": "Fanartikel je Zuschauer gelten für das ganze Land; real konzentrieren sich die Shop-Umsätze der Primera auf die Großvereine (Segunda: 1,0 Mio. je Klub).",
+          "tolerances": {
+            "income.merchandising": 0.3
           }
         }
       },
@@ -648,7 +652,7 @@
         "minEquity": -10000000,
         "travelPerAwayMatch": 25000,
         "wageLevel": 0.36,
-        "sponsorLevel": 0.14,
+        "sponsorLevel": 0.12,
         "academyBudgetFactor": 1.1,
         "operatingCostShare": 0.29,
         "maxAnnualWage": 1200000,
@@ -698,8 +702,8 @@
         "minEquity": -300000,
         "travelPerAwayMatch": 4000,
         "wageLevel": 0.09,
-        "sponsorLevel": 0.2,
-        "operatingCostShare": 0.2,
+        "sponsorLevel": 0.3,
+        "operatingCostShare": 0.1,
         "maxAnnualWage": 70000,
         "targetAnnualWage": 22000,
         "relegationWagePercent": 50,
