@@ -242,10 +242,25 @@ public class Phase3Tests
         var s = TestData.NewSession(26);
         var league = s.World.Leagues.First(l => l.Level == 1);
         var victim = s.World.Clubs[league.ClubIds.First(id => id != s.HumanClub.Id)];
-        victim.Budget.Balance = -1_000_000_000;
+        // Mehr Schulden, als ein Notkredit decken kann.
+        victim.Budget.Balance = -10_000_000_000;
         AdvanceDays(s, 35);
         Assert.Equal(9, league.Deductions.GetValueOrDefault(victim.Id));
         Assert.True(victim.Budget.Balance >= -s.CreditLimit(victim));
+    }
+
+    /// <summary>KI im Minus: Ist der halbe Kreditrahmen verbraucht, nimmt sie zum Monatsersten einen Kredit (Review F-01).</summary>
+    [Fact]
+    public void AiClubTakesALoanBeforeInsolvency()
+    {
+        var s = TestData.NewSession(26);
+        var league = s.World.Leagues.First(l => l.Level == 2);
+        var club = s.World.Clubs[league.ClubIds.First(id => id != s.HumanClub.Id)];
+        club.Budget.Balance = -(long)(s.CreditLimit(club) * 0.8);
+        AdvanceDays(s, 40);
+        Assert.Single(club.Finance.Loans);
+        Assert.False(club.Finance.Insolvent);
+        Assert.Equal(0, league.Deductions.GetValueOrDefault(club.Id));
     }
 
     [Fact]

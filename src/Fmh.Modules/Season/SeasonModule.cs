@@ -58,8 +58,7 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
             TR("msg.seasonEnd.subject", Comp(ownLeague.Id), SeasonLabel(World.SeasonYear)),
             TR("msg.seasonEnd.body", champ.Name, row.Position, row.Points, TR(verdictKey, own.Name)));
 
-        // Phase 3: TV-Leistungsanteil, Vorstand, Sponsorenboni, Karriere, Lizenzierung.
-        Finance.SeasonEndFinances();
+        // Phase 3: Vorstand, Sponsorenboni, Karriere, Lizenzierung (der TV-Leistungsanteil fließt monatlich).
         foreach (var club in World.Clubs.Values.Where(c => Finance.HasFinances(c) && !IsHuman(c)))
         {
             var table = LeagueTable.Compute(World.LeagueOf(club));

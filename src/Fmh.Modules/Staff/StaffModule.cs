@@ -27,6 +27,13 @@ public sealed partial class StaffModule : GameModule, IStaffService
 
     public static int StaffWage(int ability) => (int)(Math.Round(350 * Math.Pow(1.27, ability) / 100) * 100);
 
+    /// <summary>
+    /// Gehalt beim Verein: Marktgehalt auf das Lohnniveau der Spielklasse umgerechnet wie bei Spielern (Review F-01),
+    /// sonst kostet das Personal kleiner Ligen einen Großteil ihrer Einnahmen.
+    /// </summary>
+    private int ClubStaffWage(Club club, int ability) =>
+        (int)(Math.Round(StaffWage(ability) * Math.Clamp(Finance.DivisionFinance(club).WageLevel, 0.1, 1.2) / 100) * 100);
+
     private StaffMember NewStaff(StaffRole role, int ability, string country)
     {
         var names = Data.Names.TryGetValue(country, out var n) ? n : Data.Names.Values.First();
@@ -57,6 +64,7 @@ public sealed partial class StaffModule : GameModule, IStaffService
             {
                 var s = NewStaff(role, (int)Math.Round(3 + club.Reputation * 0.75 + Rng.Normal(0, 2)), club.CountryCode);
                 s.ClubId = club.Id;
+                s.WeeklyWage = ClubStaffWage(club, s.Ability);
                 World.Staff.Add(s);
             }
         }
@@ -78,8 +86,10 @@ public sealed partial class StaffModule : GameModule, IStaffService
         var club = HumanClub;
         if (s.ClubId is not null) return "staff.error.taken";
         if (World.Staff.Count(x => x.ClubId == club.Id && x.Role == s.Role) >= StaffSlots(club, s.Role)) return "staff.error.slots";
-        if (Budgets.WageBill(club, World) + s.WeeklyWage > club.Budget.WageBudget * 1.1) return "neg.error.wageBudget";
+        var wage = ClubStaffWage(club, s.Ability);
+        if (Budgets.WageBill(club, World) + wage > club.Budget.WageBudget * 1.1) return "neg.error.wageBudget";
         s.ClubId = club.Id;
+        s.WeeklyWage = wage;
         s.AgeGroup = null;
         s.ContractUntil = new DateOnly(World.SeasonYear + Math.Clamp(years, 1, 4), 6, 30);
         RefreshStaffEffects(club);
@@ -141,7 +151,13 @@ public sealed partial class StaffModule : GameModule, IStaffService
                 s.ClubId = null;
                 s.AgeGroup = null;
                 var replacement = StaffMarket.FirstOrDefault(x => x.Role == s.Role && x.Ability <= 5 + club.Reputation * 0.8);
-                if (replacement is not null) { replacement.ClubId = club.Id; replacement.AgeGroup = null; replacement.ContractUntil = new DateOnly(World.SeasonYear + 2, 6, 30); }
+                if (replacement is not null)
+                {
+                    replacement.ClubId = club.Id;
+                    replacement.AgeGroup = null;
+                    replacement.WeeklyWage = ClubStaffWage(club, replacement.Ability);
+                    replacement.ContractUntil = new DateOnly(World.SeasonYear + 2, 6, 30);
+                }
             }
         }
         RefreshStaffMarket();

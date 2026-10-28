@@ -79,6 +79,8 @@ public class EnglandTests
         Assert.Equal(24, w.Clubs.Values.Count(c => c.LeagueId == "ENG-NL"));
 
         // Fallschirmzahlungen: Die Absteiger der Premier Division erhalten ab August Raten über 55 % des TV-Grundbetrags.
+        // Ohne Leistungsanteil in der First Division (der monatlich nach Tabellenplatz fließt) bleibt nur der Fallschirm als Unterschied.
+        w.Country("ENG").Finance.Divisions["ENG2"].TvEqualShare = 1.0;
         TestData.PlayUntil(s, _ => w.Date.Month == 9, 20_000);
         var top = s.DivisionFinance(w.Clubs[w.League("ENG1").ClubIds[0]]);
         var rate = (long)(top.TvPool * top.TvEqualShare / 20 * 0.55 / 10);
