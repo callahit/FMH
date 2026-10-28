@@ -296,8 +296,9 @@ im Monat, Spitze bis 6.500 €).
   Verein gemessen. Gehälter und Marktwerte richten sich nach dem Abstand dazu, damit stärker werdende Kader
   das Gehaltsgefüge nicht aufblähen (Spielstand: `market_levels`/`market_bases` in `meta`).
 - **Daten je Spielklasse** (`finance.divisions`): TV-Topf, Eintrittspreise, `wageLevel`, `maxAnnualWage`,
-  `sponsorLevel`, `operatingCostShare`, `academyBudgetFactor`, `squadSize` und `targetAnnualWage` als Kalibrierungsziel. Je Land
-  gelten `cateringPerSpectator` und `merchPerSpectator`. KI-Vereine übernehmen nach Auf- und Abstieg die
+  `sponsorLevel`, `merchLevel`, `operatingCostShare`, `academyBudgetFactor`, `squadSize` und `targetAnnualWage` als
+  Kalibrierungsziel. Je Land gelten `cateringPerSpectator` und `merchPerSpectator`; `merchLevel` (Standard 1,0) senkt
+  die Fanartikel je Zuschauer einer Spielklasse, z. B. in der Segunda División. KI-Vereine übernehmen nach Auf- und Abstieg die
   Eintrittspreise ihrer neuen Spielklasse.
 - **Ligazahlen** (`finance.divisions.*.reference`): Erträge und Aufwand je Verein ohne Transfers, in den Kategorien
   des DFL-Wirtschaftsreports, jeweils mit Quelle und Kennzeichen „amtlich“. Für 1. und 2. Liga stammen die Werte
