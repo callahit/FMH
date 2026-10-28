@@ -630,7 +630,7 @@
             "advertising": 44100000,
             "media": 84700000,
             "merchandising": 15800000,
-            "total": 199400000
+            "total": 206100000
           },
           "expenses": {
             "squad": 106200000
@@ -640,15 +640,15 @@
       "ES2": {
         "tvPool": 142000000,
         "tvEqualShare": 0.5,
-        "standing": 9,
-        "seating": 15,
+        "standing": 8,
+        "seating": 14,
         "box": 3000,
         "floodlightRequired": 2,
         "youthCenterRequired": 1,
         "minEquity": -10000000,
         "travelPerAwayMatch": 25000,
         "wageLevel": 0.43,
-        "sponsorLevel": 0.16,
+        "sponsorLevel": 0.14,
         "academyBudgetFactor": 6.0,
         "operatingCostShare": 0.6,
         "maxAnnualWage": 1200000,
@@ -663,7 +663,7 @@
             "matchday": 3900000,
             "advertising": 3600000,
             "media": 6500000,
-            "total": 15300000
+            "total": 18100000
           },
           "expenses": {
             "squad": 10800000
