@@ -34,6 +34,8 @@ public sealed partial class TransfersModule
             // Dünne Kader: zuerst Vereinslose, sonst Talente aus der eigenen Jugend oder dem Umfeld.
             if (club.PlayerIds.Count < Math.Max(22, Finance.DivisionFinance(club).SquadSize - 3) && !SignBestFreeAgent(club, Season.NeededPosition(club)) && club.PlayerIds.Count < 21) Season.AddEmergencyPlayer(club);
             if (window && Rng.Chance(0.3)) TryAiSigning(club);
+            // Neuzugänge im Fenster nachmelden, solange Plätze frei sind.
+            if (window) Registration.Fill(World, club, Data, keep: true);
         }
         if (window && Rng.Chance(0.3)) MakeIncomingOffer();
         if (window) foreach (var club in aiClubs.Where(_ => Rng.Chance(0.15))) TryAiLoanOut(club);

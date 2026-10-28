@@ -557,6 +557,22 @@ Ein Land beschreibt seine Pyramide als Ebenen mit Divisionen. Formate ändern si
   Mannschaft hat kein Transferbudget und ergänzt ihren Kader nur ablösefrei im Rahmen ihrer laufenden Gehälter. Muss
   sie wegen des Abstands zur ersten Mannschaft absteigen, gilt das auch, wenn kein Verein aufsteigen darf; dann rückt
   der bestplatzierte Verein der Ebene darunter ohne Aufstiegslizenz nach.
+- **Meldelisten** (`registration` je Liga bzw. Division): Wer nicht gemeldet ist, darf in Liga und Pokal nicht spielen.
+  - Ausbildung: Jeder Spieler sammelt zwischen 15 und 21 je Saison eine Ausbildungsspielzeit bei seinem Verein. Ab drei
+    Spielzeiten bei Vereinen des Landes gilt er als lokal ausgebildet (Local Player, Homegrown), ab drei beim eigenen
+    Verein als im Verein ausgebildet. Spieler, die zu Spielbeginn erzeugt werden, verteilen sich nach `formative`
+    (Deutschland und England: 15 % im eigenen Verein, 45 % bei einem anderen Verein des Landes, der Rest im Ausland).
+  - 1. und 2. Liga (DFL): Liste bis zur Kadergrenze (32), mindestens 8 Local Player, davon 4 aus dem eigenen Verein,
+    und 12 Spieler mit deutscher Staatsangehörigkeit.
+  - Premier Division: 25 Plätze für Spieler ab 21, höchstens 17 ohne Homegrown-Status; Jüngere ohne Meldeplatz.
+  - First Division: wie die Premier Division, Leihspieler brauchen aber immer einen Meldeplatz (Pressequellen).
+  - 3. Liga: mindestens vier U23-Spieler im Spieltagskader (`matchdayMinYoung`); die KI und der Assistent setzen sie auf
+    die Bank.
+  - Meldungen ändern sich nur bei offenem Transferfenster. Zu Saisonbeginn und im Fenster melden die Vereine nach
+    Spielstärke nach. Zum Meldeschluss meldet der Assistent freie Plätze nach und schickt eine Nachricht, wer nicht
+    spielberechtigt ist. In der Kaderansicht gibt es die Spalte „Meldung“ und die Schaltfläche „Melden / abmelden“.
+  - Spielstand: Abschnitt `players` Version 6 (Spalte `registration`). Ältere Spielstände laden mit allen Spielern
+    gemeldet; die Ausbildungsjahre werden beim Öffnen nach den Anteilen der Daten ergänzt.
 - **Kadergröße:** `squadSize` je Spielklasse (Standard 25): Deutschland 1. Liga 29, 2. Liga 28, 3. Liga 26; England
   Premier Division 30, First Division 28, Third Division 24. Danach richten sich Kaderaufbau, Nachverpflichtungen der
   KI (bis drei unter der Kadergröße) und Vertragsverlängerungen.

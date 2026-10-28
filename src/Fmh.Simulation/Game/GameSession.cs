@@ -61,12 +61,26 @@ public sealed partial class GameSession
         WorldGenerator.InitCareer(World, Data, _kernel.Rng);
         if (!World.Scouts.Any(s => s.ClubId == HumanClub.Id)) ScoutGenerator.CreateScouts(World, HumanClub, Data, _kernel.Rng, 2);
         _economy.InitEconomy();
+        EnsureRegistration();
         if (!World.SeasonFinished && World.Cups.Count == 0 && World.Leagues.All(l => l.Fixtures.All(f => f.Result is null)))
         {
             _cups.CreateCups();
             _youth.InitialYouth();
         }
         SyncRng();
+    }
+
+    /// <summary>
+    /// Meldelisten nachrüsten: Ausbildungsjahre für ältere Spielstände (Spieler gelten als im aktuellen Verein bzw. Land
+    /// ausgebildet nach den Anteilen der Daten), erste Meldeliste einer neuen Welt.
+    /// </summary>
+    private void EnsureRegistration()
+    {
+        if (World.Players.Values.All(p => p.Registration.Formative.Count == 0))
+            foreach (var p in World.Players.Values.Where(p => p.ClubId is { } id && World.Clubs.ContainsKey(id)).OrderBy(p => p.Id))
+                Registration.InitFormative(p, World, World.Clubs[p.ClubId!.Value], _kernel.Rng, p.IsYouth);
+        if (World.Players.Values.All(p => p.Registration.ClubId is null))
+            foreach (var club in World.Clubs.Values.OrderBy(c => c.Id)) Registration.Fill(World, club, Data, keep: false);
     }
 
     public World World => _kernel.World;

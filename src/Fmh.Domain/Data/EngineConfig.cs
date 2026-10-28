@@ -40,8 +40,8 @@ public sealed class EngineConfig
     };
 
     // Schüsse
-    public double[] XgCentralByRow { get; set; } = { 0, 0, 0, 0.015, 0.03, 0.066, 0.16 };
-    public double[] XgWideByRow { get; set; } = { 0, 0, 0, 0.01, 0.02, 0.05, 0.12 };
+    public double[] XgCentralByRow { get; set; } = { 0, 0, 0, 0.015, 0.03, 0.069, 0.168 };
+    public double[] XgWideByRow { get; set; } = { 0, 0, 0, 0.01, 0.02, 0.052, 0.126 };
     public double HeaderXg { get; set; } = 0.10;
     public double OneOnOneXg { get; set; } = 0.38;
     public double OneOnOneChance { get; set; } = 0.22;

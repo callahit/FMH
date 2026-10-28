@@ -40,6 +40,8 @@ public sealed class Player
     public bool Retired { get; set; }
     /// <summary>Vorvertrag: Wechsel ablösefrei zum 1. Juli (Kapitel 7).</summary>
     public PreContract? PreContract { get; set; }
+    /// <summary>Meldung für die Liga und Ausbildungsjahre (Local Player, Homegrown).</summary>
+    public PlayerRegistration Registration { get; set; } = new();
 
     public string Name => $"{FirstName} {LastName}";
     public string ShortName => LastName;
@@ -58,6 +60,14 @@ public sealed class Player
         Math.Abs(LeftFoot - RightFoot) <= 3 ? PreferredFoot.Both : LeftFoot > RightFoot ? PreferredFoot.Left : PreferredFoot.Right;
 
     public bool IsAvailable => State.Injury is null && State.SuspendedMatches == 0;
+}
+
+public sealed class PlayerRegistration
+{
+    /// <summary>Verein, auf dessen Meldeliste der Spieler steht (gilt für Liga und nationale Pokale); null = nicht gemeldet.</summary>
+    public int? ClubId { get; set; }
+    /// <summary>Spielzeiten zwischen 15 und 21 je Verein (Vereins-Id; −1 = im Ausland).</summary>
+    public Dictionary<int, int> Formative { get; set; } = new();
 }
 
 public sealed class PreContract

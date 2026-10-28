@@ -21,6 +21,14 @@
       </ItemsControl>
     </Grid>
     <TextBlock DockPanel.Dock="Bottom" Classes="muted small" Text="{s:L help.squad}" Margin="0,8,0,0" />
+    <Grid DockPanel.Dock="Bottom" ColumnDefinitions="*,Auto" Margin="0,8,0,0" IsVisible="{Binding RegistrationSummary, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+      <StackPanel Spacing="2">
+        <TextBlock Classes="muted" Text="{Binding RegistrationSummary}" TextWrapping="Wrap" />
+        <TextBlock Classes="small" Foreground="{DynamicResource AccentBrush}" Text="{Binding RegistrationMessage}" TextWrapping="Wrap"
+                   IsVisible="{Binding RegistrationMessage, Converter={x:Static StringConverters.IsNotNullOrEmpty}}" />
+      </StackPanel>
+      <Button Grid.Column="1" Content="{s:L squad.toggleRegistration}" Command="{Binding ToggleRegistrationCommand}" VerticalAlignment="Top" />
+    </Grid>
     <Border Classes="card" Padding="4">
       <DataGrid x:Name="Grid" ItemsSource="{Binding Rows}" SelectedItem="{Binding Selected}" DoubleTapped="OnDoubleTapped">
         <DataGrid.Columns>
@@ -66,6 +74,13 @@
             <DataGridTemplateColumn.CellTemplate>
               <DataTemplate x:DataType="vm:PlayerRow">
                 <TextBlock Text="{Binding Status}" Foreground="{Binding StatusBrush}" VerticalAlignment="Center" Margin="6,0" />
+              </DataTemplate>
+            </DataGridTemplateColumn.CellTemplate>
+          </DataGridTemplateColumn>
+          <DataGridTemplateColumn Header="{s:L col.registration}" SortMemberPath="RegistrationText" Width="120">
+            <DataGridTemplateColumn.CellTemplate>
+              <DataTemplate x:DataType="vm:PlayerRow">
+                <TextBlock Text="{Binding RegistrationText}" Foreground="{Binding RegistrationBrush}" VerticalAlignment="Center" Margin="6,0" />
               </DataTemplate>
             </DataGridTemplateColumn.CellTemplate>
           </DataGridTemplateColumn>
