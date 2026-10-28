@@ -26,8 +26,6 @@ public interface IFinanceService
     bool IsTopMatch(Club home, Club away, Fixture f);
     /// <summary>Einnahmen eines Heimspiels: Tickets (ohne Dauerkarten), Logen, Catering, Merchandising, Umfeld.</summary>
     void MatchdayFinances(Fixture f, MatchResult result, int standing, int seating, int boxes);
-    /// <summary>Saisonende: TV-Leistungsanteil nach Abschlussplatz, Saisonstatistik übertragen.</summary>
-    void SeasonEndFinances();
     void RollSeasonFinances();
     /// <summary>Pokalprämie für das Erreichen einer Runde bzw. den Sieg.</summary>
     void CupPrize(Cup cup, int roundReached, IEnumerable<int> clubs);
