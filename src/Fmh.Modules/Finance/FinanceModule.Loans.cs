@@ -171,8 +171,9 @@ public sealed partial class FinanceModule
     private void AiFinance(Club club)
     {
         var b = club.Budget;
-        // Jeden Monat: Ist die Hälfte des Kreditrahmens verbraucht, nimmt die KI einen Kredit, bevor die Insolvenz droht.
-        if (b.Balance < -CreditLimit(club) / 2 && club.Finance.Loans.Count == 0 && LoanCapacity(club) > 0)
+        // Jeden Monat: Ist die Hälfte des Kreditrahmens verbraucht, nimmt die KI einen Kredit, bevor die Insolvenz droht,
+        // solange die Kreditlinie (1,5 Jahreseinnahmen abzüglich laufender Kredite) reicht.
+        if (b.Balance < -CreditLimit(club) / 2 && LoanCapacity(club) > 0)
             TakeLoan(club, Math.Min(LoanCapacity(club), -b.Balance), 5, silent: true);
         if (World.Date.Month != 6) return;
         var income = Math.Max(1, ExpectedIncome(club));
