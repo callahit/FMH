@@ -80,7 +80,7 @@ public sealed class PlayoffConfig
     public int? FinalLegs { get; set; }
     /// <summary>
     /// Gesetzte Paarungen statt Auslosung: Teilnehmer in der Reihenfolge der <see cref="Entrants"/>, der Beste gegen den
-    /// Schwächsten (3. gegen 6., 4. gegen 5.); der Besserplatzierte hat im Rückspiel Heimrecht.
+    /// Schwächsten (3. gegen 6., 4. gegen 5.); der Besserplatzierte hat im Rückspiel Heimrecht, bei nur einem Spiel in diesem.
     /// </summary>
     public bool Seeded { get; set; }
 
