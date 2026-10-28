@@ -596,7 +596,7 @@
         "sponsorLevel": 1.1,
         "academyBudgetFactor": 8.0,
         "targetAnnualWage": 480000,
-        "operatingCostShare": 0.67,
+        "operatingCostShare": 0.63,
         "maxAnnualWage": 1500000,
         "relegationWagePercent": 50,
         "promotionWagePercent": 40,
