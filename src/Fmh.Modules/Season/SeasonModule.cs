@@ -155,8 +155,8 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
             ? World.Leagues.Where(l => l.CountryCode == club.CountryCode).Select(l => l.Level).DefaultIfEmpty(0).Max() + 1 : 0);
 
     /// <summary>
-    /// Auf- und Abstiegsklauseln (Kapitel 7): Spielergehälter nach der Klausel im Vertrag, Personal nach der üblichen Klausel der
-    /// bisherigen Spielklasse, Sponsoren nach der Klausel im Sponsorenvertrag. Verträge aus älteren Spielständen ohne Klausel
+    /// Auf- und Abstiegsklauseln (Kapitel 7): Spielergehälter nach der Klausel im Vertrag, Personal und Manager nach der üblichen
+    /// Klausel der bisherigen Spielklasse, Sponsoren nach der Klausel im Sponsorenvertrag. Verträge aus älteren Spielständen ohne Klausel
     /// folgen wie bisher dem Gehaltsniveau der neuen Spielklasse.
     /// </summary>
     private void ApplyClauses(Club club, int steps, DivisionFinance old)
@@ -179,6 +179,9 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
         }
         var staffFactor = ContractClauses.Factor(steps, old.RelegationWagePercent, old.PromotionWagePercent);
         foreach (var s in World.Staff.Where(s => s.ClubId == club.Id)) s.WeeklyWage = Math.Max(100, (int)(Math.Round(s.WeeklyWage * staffFactor / 100) * 100));
+        // Managervertrag mit derselben üblichen Klausel.
+        if (club.Board.ManagerWeeklyWage > 0)
+            club.Board.ManagerWeeklyWage = Math.Max(100, (int)(Math.Round(club.Board.ManagerWeeklyWage * staffFactor / 100) * 100));
         long sponsorsBefore = 0, sponsorsAfter = 0;
         // Nur Verträge, die in die neue Saison hineinlaufen.
         foreach (var deal in club.Sponsors.Where(d => d.UntilSeason > World.SeasonYear))
