@@ -82,6 +82,8 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
         var startMonth = World.Countries[0].Season.StartMonth;
         if (World.Date != new DateOnly(World.SeasonYear + 1, startMonth, 1)) return false;
 
+        // Ausbildungsjahre für die abgelaufene Saison: Alter und Verein vor Vertragsende, Leihrückkehr und Saisonwechsel.
+        foreach (var p in World.Players.Values.Where(p => !p.Retired)) Registration.CountSeason(p, World);
         PromoteAndRelegate();
         World.SeasonYear++;
         World.SeasonFinished = false;
@@ -208,7 +210,6 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
         {
             Development.ApplySeason(p, today, Data.PositionProfiles, Rng);
             if (p.SeasonStats.Appearances > 0) p.History.Add(p.SeasonStats);
-            Registration.CountSeason(p, World);
             p.SeasonStats = new PlayerSeasonStats { SeasonYear = World.SeasonYear, ClubId = club.Id };
             p.State.YellowCardsAccumulated = 0;
             p.State.Condition = Math.Max(p.State.Condition, 92);

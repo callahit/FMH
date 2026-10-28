@@ -120,6 +120,22 @@ public class RegistrationTests
         Assert.Equal(before + 1, p.Registration.Formative[p.ClubId.Value]);
     }
 
+    /// <summary>Saisonwechsel: Gezählt wird die abgelaufene Saison mit dem Alter und Verein vor dem Wechsel.</summary>
+    [Fact]
+    public void RolloverCountsTheFinishedSeason()
+    {
+        var s = TestData.NewSession();
+        var w = s.World;
+        var players = w.Players.Values.Where(p => p.ClubId is not null && !p.IsYouth).ToList();
+        var last = players.First(p => Registration.SeasonAge(p, w) == 21);
+        var tooOld = players.First(p => Registration.SeasonAge(p, w) == 22);
+        var before = (Last: last.Registration.Formative.GetValueOrDefault(last.ClubId!.Value), Club: last.ClubId.Value,
+            Old: tooOld.Registration.Formative.Values.Sum());
+        TestData.PlayUntil(s, r => r.Reason == StopReason.NewSeason, 20_000);
+        Assert.Equal(before.Last + 1, last.Registration.Formative[before.Club]);
+        Assert.Equal(before.Old, tooOld.Registration.Formative.Values.Sum());
+    }
+
     /// <summary>Spielstand Version 6; ältere Spielstände (ohne Spalte) laden mit Meldung beim aktuellen Verein.</summary>
     [Fact]
     public void RegistrationSurvivesSavingAndOldSavesMigrate()
