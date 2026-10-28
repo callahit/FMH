@@ -12,7 +12,7 @@
     "matchDay": "Saturday"
   },
   "squad": {
-    "maxSquad": 30,
+    "maxSquad": 32,
     "benchSize": 9,
     "substitutions": 5
   },
@@ -562,6 +562,7 @@
         "operatingCostShare": 0.6,
         "maxAnnualWage": 25000000,
         "relegationWagePercent": 40,
+        "squadSize": 29,
         "reference": {
           "source": "DFL-Wirtschaftsreport 24/25, Saison 2024/25, Durchschnitt je Klub",
           "official": true,
@@ -599,6 +600,7 @@
         "maxAnnualWage": 1500000,
         "relegationWagePercent": 50,
         "promotionWagePercent": 40,
+        "squadSize": 28,
         "reference": {
           "source": "DFL-Wirtschaftsreport 24/25, Saison 2024/25, Durchschnitt je Klub",
           "official": true,
@@ -621,8 +623,8 @@
       "DE3": {
         "tvPool": 32000000,
         "tvEqualShare": 0.8,
-        "standing": 10,
-        "seating": 18,
+        "standing": 13,
+        "seating": 24,
         "box": 1200,
         "floodlightRequired": 1,
         "youthCenterRequired": 0,
@@ -635,6 +637,7 @@
         "maxAnnualWage": 400000,
         "relegationWagePercent": 70,
         "promotionWagePercent": 80,
+        "squadSize": 26,
         "reference": {
           "source": "DFB-Saisonreport 3. Liga, Saison 2023/24, Durchschnitt je Klub",
           "official": true,

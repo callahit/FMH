@@ -100,6 +100,13 @@ public sealed partial class FinanceModule
     public void SetSeasonBudget(Club club)
     {
         var b = club.Budget;
+        // Zweite Mannschaft: keine eigene Kasse, der Hauptverein trägt nur den laufenden Kader (ablösefreie Ergänzungen).
+        if (club.ReserveOf is not null)
+        {
+            b.WageBudget = Budgets.WageBill(club, World);
+            b.TransferBudget = 0;
+            return;
+        }
         if (!HasFinances(club))
         {
             Budgets.SetSeasonBudget(club, World);

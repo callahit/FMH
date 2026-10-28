@@ -14,7 +14,7 @@
     "midweekDay": "Tuesday"
   },
   "squad": {
-    "maxSquad": 30,
+    "maxSquad": 32,
     "benchSize": 9,
     "substitutions": 5
   },
@@ -460,6 +460,7 @@
         "relegationWagePercent": 40,
         "parachuteShares": [0.55, 0.45, 0.2],
         "parachuteShortTenure": 2,
+        "squadSize": 30,
         "reference": {
           "source": "Deloitte Annual Review of Football Finance 2026, Saison 2024/25 (keine amtliche Ligazahl), £ zu 0,87 je Euro",
           "official": false,
@@ -487,6 +488,7 @@
         "targetAnnualWage": 1300000,
         "relegationWagePercent": 40,
         "promotionWagePercent": 60,
+        "squadSize": 28,
         "reference": {
           "source": "Deloitte Annual Review of Football Finance 2026, Saison 2024/25 (keine amtliche Ligazahl), £ zu 0,87 je Euro",
           "official": false,
@@ -539,6 +541,7 @@
         "targetAnnualWage": 115000,
         "relegationWagePercent": 40,
         "promotionWagePercent": 40,
+        "squadSize": 24,
         "reference": {
           "source": "Deloitte Annual Review of Football Finance 2026, Saison 2024/25 (keine amtliche Ligazahl), £ zu 0,87 je Euro",
           "official": false,

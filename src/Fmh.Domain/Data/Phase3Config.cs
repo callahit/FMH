@@ -138,6 +138,9 @@ public sealed class DivisionFinance
     /// <summary>Höchstes Wochengehalt der Spielklasse (<see cref="int.MaxValue"/> ohne Grenze).</summary>
     public int MaxWeeklyWage => MaxAnnualWage > 0 ? (int)(MaxAnnualWage / 52) : int.MaxValue;
 
+    /// <summary>Übliche Kadergröße der Spielklasse (Profis und Vertragsspieler); Grundlage für Kaderaufbau und Kaderplanung der KI.</summary>
+    public int SquadSize { get; set; } = 25;
+
     /// <summary>Kalibrierungsziel: durchschnittliches Jahresgehalt eines Kaderspielers (0 = ohne Ziel).</summary>
     public long TargetAnnualWage { get; set; }
 

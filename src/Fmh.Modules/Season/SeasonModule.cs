@@ -248,12 +248,15 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
     /// <summary>Sicherheitsnetz: KI-Vereine füllen den Kader mit vereinslosen Spielern oder eigenen Talenten auf.</summary>
     private void FillSquad(Club club)
     {
+        // KI füllt bis drei unter die übliche Kadergröße der Spielklasse auf (Vereinslose zuerst), Notverpflichtungen nur unter 22.
         const int minimum = 22;
+        var target = Math.Max(minimum, Finance.DivisionFinance(club).SquadSize - 3);
         var guard = 0;
-        while (club.PlayerIds.Count < minimum && guard++ < 20)
+        while (club.PlayerIds.Count < target && guard++ < 20)
         {
             if (IsHuman(club) && club.PlayerIds.Count >= 16) break;
             if (!IsHuman(club) && Transfers.SignBestFreeAgent(club, NeededPosition(club))) continue;
+            if (club.PlayerIds.Count >= minimum) break;
             AddEmergencyPlayer(club);
         }
     }
@@ -280,7 +283,7 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
     public Position NeededPosition(Club club)
     {
         var squad = World.SquadOf(club).Where(p => p.Loan?.ParentClubId != club.Id).ToList();
-        return PlayerGenerator.SquadTemplate
+        return PlayerGenerator.Template(Finance.DivisionFinance(club).SquadSize)
             .OrderByDescending(t => t.count - squad.Count(p => p.MainPosition == t.pos))
             .ThenBy(t => squad.Where(p => p.MainPosition == t.pos).Select(p => Ratings.PositionRating(p, t.pos, Data.PositionProfiles)).DefaultIfEmpty(0).Max())
             .First().pos;

@@ -101,7 +101,7 @@
   "cornerHeaderChance": 0.35,
   "cornerHeaderXg": 0.09,
   "foulPerDuel": 0.17,
-  "yellowPerFoul": 0.155,
+  "yellowPerFoul": 0.148,
   "redPerFoul": 0.0025,
   "boxFoulShare": 0.3,
   "edgeFoulShare": 0.08,
