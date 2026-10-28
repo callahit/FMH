@@ -139,36 +139,59 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
     /// <summary>Auf- und Abstieg in allen Ländern nach den Bewegungsregeln der Ligapyramide.</summary>
     private void PromoteAndRelegate()
     {
-        var before = World.Clubs.Values.ToDictionary(c => c.Id, c => ClubRules.DivisionFinance(World, c).WageLevel);
+        var before = World.Clubs.Values.ToDictionary(c => c.Id, c => (level: Level(c), div: ClubRules.DivisionFinance(World, c)));
         foreach (var country in World.Countries)
-            Pyramid.PromoteAndRelegate(World, country, Rng, ApplyRelegationClauses);
+            Pyramid.PromoteAndRelegate(World, country, Rng, _ => { });
         foreach (var club in World.Clubs.Values)
-            if (before[club.Id] > 0 && ClubRules.DivisionFinance(World, club).WageLevel / before[club.Id] is var ratio && ratio != 1.0)
-                ApplyLeagueWages(club, ratio);
+        {
+            var (level, div) = before[club.Id];
+            if (Level(club) is var now && now != level && level > 0 && now > 0) ApplyClauses(club, now - level, div);
+        }
     }
+
+    /// <summary>Ebene der Liga bzw. des Pools (Pools unter der untersten Liga); 0 = ohne Ligabetrieb im Spiel.</summary>
+    private int Level(Club club) =>
+        World.FindLeague(club.LeagueId)?.Level ?? (World.Country(club.CountryCode).Pools.Any(p => p.Id == club.LeagueId)
+            ? World.Leagues.Where(l => l.CountryCode == club.CountryCode).Select(l => l.Level).DefaultIfEmpty(0).Max() + 1 : 0);
 
     /// <summary>
-    /// Ligaabhängige Verträge (in Deutschland unterhalb der Bundesliga üblich): Wechselt ein Verein in eine Spielklasse mit
-    /// anderem Gehaltsniveau, ändern sich die Gehälter seiner eigenen Spieler im selben Verhältnis.
+    /// Auf- und Abstiegsklauseln (Kapitel 7): Spielergehälter nach der Klausel im Vertrag, Personal nach der üblichen Klausel der
+    /// bisherigen Spielklasse, Sponsoren nach der Klausel im Sponsorenvertrag. Verträge aus älteren Spielständen ohne Klausel
+    /// folgen wie bisher dem Gehaltsniveau der neuen Spielklasse.
     /// </summary>
-    private void ApplyLeagueWages(Club club, double ratio)
+    private void ApplyClauses(Club club, int steps, DivisionFinance old)
     {
-        var max = ClubRules.DivisionFinance(World, club).MaxWeeklyWage;
+        var now = ClubRules.DivisionFinance(World, club);
+        var max = now.MaxWeeklyWage;
+        long wagesBefore = 0, wagesAfter = 0;
+        int Adjust(int wage, double factor) => Math.Min(max, Math.Max(100, (int)(Math.Round(wage * factor / 100) * 100)));
         // Leihspieler bleiben außen vor: Ihren Vertrag trägt der abgebende Verein.
         foreach (var p in World.SquadOf(club).Where(p => p.Loan is null))
-            if (p.Contract is { Youth: false } c)
-                c.WeeklyWage = Math.Min(max, Math.Max(100, (int)(Math.Round(c.WeeklyWage * ratio / 100) * 100)));
-    }
-
-    /// <summary>Abstiegsklausel: Gehalt −30 % nach Abstieg (Kapitel 7).</summary>
-    private void ApplyRelegationClauses(int clubId)
-    {
-        foreach (var p in World.SquadOf(World.Clubs[clubId]))
-            if (p.Contract is { RelegationClause: true } c)
-            {
-                c.WeeklyWage = (int)(c.WeeklyWage * 0.7);
-                c.RelegationClause = false;
-            }
+        {
+            if (p.Contract is not { Youth: false } c) continue;
+            var factor = c.RelegationPercent is { } rel
+                ? ContractClauses.Factor(steps, rel, c.PromotionPercent ?? 0)
+                : (old.WageLevel > 0 ? now.WageLevel / old.WageLevel : 1.0) * (steps > 0 && c.RelegationClause ? 0.7 : 1.0);
+            if (steps > 0) c.RelegationClause = false;
+            wagesBefore += c.WeeklyWage;
+            c.WeeklyWage = Adjust(c.WeeklyWage, factor);
+            wagesAfter += c.WeeklyWage;
+        }
+        var staffFactor = ContractClauses.Factor(steps, old.RelegationWagePercent, old.PromotionWagePercent);
+        foreach (var s in World.Staff.Where(s => s.ClubId == club.Id)) s.WeeklyWage = Math.Max(100, (int)(Math.Round(s.WeeklyWage * staffFactor / 100) * 100));
+        long sponsorsBefore = 0, sponsorsAfter = 0;
+        // Nur Verträge, die in die neue Saison hineinlaufen.
+        foreach (var deal in club.Sponsors.Where(d => d.UntilSeason > World.SeasonYear))
+        {
+            var factor = ContractClauses.Factor(steps, deal.RelegationPercent, deal.PromotionPercent);
+            sponsorsBefore += deal.PerSeason;
+            deal.PerSeason = MarketValue.Round(deal.PerSeason * factor);
+            deal.Bonus = MarketValue.Round(deal.Bonus * factor);
+            sponsorsAfter += deal.PerSeason;
+        }
+        if (IsHuman(club))
+            Notify(MessageType.Finance, "msg.sender.assistant", TR(steps > 0 ? "msg.clauses.relegation.subject" : "msg.clauses.promotion.subject"),
+                TR("msg.clauses.body", TextArg.Money((wagesAfter - wagesBefore) * 52, Currency), TextArg.Money(sponsorsAfter - sponsorsBefore, Currency)));
     }
 
     /// <summary>Saisonwechsel je Verein: Entwicklung, Statistik, Karriereenden.</summary>
@@ -245,7 +268,7 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
         p.SeasonStats = new PlayerSeasonStats { SeasonYear = World.SeasonYear, ClubId = club.Id };
         // Vertrag wie ein ablösefreier Neuzugang, damit der Spieler nicht sofort wieder geht.
         var contract = Negotiations.SuggestContract(p, club, World, Data);
-        p.Contract = Transfers.MakeContract(contract, World.Date);
+        p.Contract = Transfers.MakeContract(contract, World.Date, club);
         World.Players[p.Id] = p;
         club.PlayerIds.Add(p.Id);
     }

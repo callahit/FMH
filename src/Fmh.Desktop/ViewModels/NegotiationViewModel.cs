@@ -80,7 +80,8 @@ public sealed partial class NegotiationViewModel : ViewModelBase
     [ObservableProperty] private bool _hasReleaseClause;
     [ObservableProperty] private decimal _releaseClause;
     [ObservableProperty] private decimal _yearlyRaise;
-    [ObservableProperty] private bool _relegationClause;
+    [ObservableProperty] private decimal _relegationPercent;
+    [ObservableProperty] private decimal _promotionPercent;
 
     private void LoadOffer()
     {
@@ -108,7 +109,9 @@ public sealed partial class NegotiationViewModel : ViewModelBase
         HasReleaseClause = c.ReleaseClause is not null;
         ReleaseClause = c.ReleaseClause ?? MarketValue.Round(Session.ValueOf(Player) * 2.5);
         YearlyRaise = c.YearlyRaisePercent;
-        RelegationClause = c.RelegationClause;
+        var (rel, pro) = ContractClauses.Defaults(Session.World, Session.World.Clubs[_n.BuyerId]);
+        RelegationPercent = c.RelegationPercent ?? rel;
+        PromotionPercent = c.PromotionPercent ?? pro;
     }
 
     private void Update()
@@ -186,7 +189,8 @@ public sealed partial class NegotiationViewModel : ViewModelBase
                 GoalBonus = (int)GoalBonus,
                 ReleaseClause = HasReleaseClause ? (long)ReleaseClause : null,
                 YearlyRaisePercent = (int)YearlyRaise,
-                RelegationClause = RelegationClause,
+                RelegationPercent = (int)RelegationPercent,
+                PromotionPercent = (int)PromotionPercent,
             };
             r = Session.SubmitContract(_n, contract);
             if (r.Kind == ResponseKind.Counter && _n.WageDemand is { } wd) WeeklyWage = wd;

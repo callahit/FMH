@@ -71,7 +71,9 @@
             <Grid ColumnDefinitions="170,*">
               <CheckBox Content="{s:L neg.releaseClause}" IsChecked="{Binding HasReleaseClause}" />
               <NumericUpDown Grid.Column="1" Value="{Binding ReleaseClause, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="100000" FormatString="N0" IsEnabled="{Binding HasReleaseClause}" /></Grid>
-            <CheckBox Content="{s:L neg.relegationClause}" IsChecked="{Binding RelegationClause}" />
+            <Grid ColumnDefinitions="170,*,*" ColumnSpacing="8"><TextBlock Text="{s:L neg.leagueClause}" VerticalAlignment="Center" />
+              <NumericUpDown Grid.Column="1" Value="{Binding RelegationPercent}" Minimum="0" Maximum="80" Increment="5" FormatString="'−'0' %'" ToolTip.Tip="{s:L neg.relegationPercent}" />
+              <NumericUpDown Grid.Column="2" Value="{Binding PromotionPercent}" Minimum="0" Maximum="200" Increment="5" FormatString="'+'0' %'" ToolTip.Tip="{s:L neg.promotionPercent}" /></Grid>
           </StackPanel>
         </StackPanel>
 

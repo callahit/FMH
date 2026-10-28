@@ -183,6 +183,8 @@ public sealed partial class InboxPageViewModel : PageViewModel, IRefreshable
                 title = T["inbox.sponsorDecision"];
                 var current = s.DealFor(club, offer.Slot, offer.Index);
                 var detail = current is null ? T["inbox.slotFree"] : T.Format("inbox.slotTaken", current.Company, Fmt.Money(current.PerSeason, currency));
+                if (offer.RelegationPercent > 0 || offer.PromotionPercent > 0)
+                    detail += " · " + T.Format("inbox.sponsorClause", offer.RelegationPercent, offer.PromotionPercent);
                 options.Add(new DecisionOption(T["inbox.accept"], detail, new RelayCommand(() =>
                 {
                     var error = s.AcceptSponsor(offer);

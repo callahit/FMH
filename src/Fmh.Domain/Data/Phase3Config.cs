@@ -15,6 +15,9 @@ public sealed class FinanceConfig
     public long CateringPerSpectator { get; set; } = 5;
     /// <summary>Fanartikel-Umsatz je Zuschauer und Heimspiel, bevor Stimmung und Fanshop wirken.</summary>
     public long MerchPerSpectator { get; set; } = 10;
+    /// <summary>Übliche Klausel in Sponsorenverträgen: Zahlung −% bei Abstieg, +% bei Aufstieg.</summary>
+    public int SponsorRelegationPercent { get; set; }
+    public int SponsorPromotionPercent { get; set; }
     /// <summary>Kreditrahmen der Hausbank in Prozent der Saisoneinnahmen.</summary>
     public int CreditLimitPercent { get; set; } = 15;
     /// <summary>Bausumme, ab der der Vorstand zustimmen muss.</summary>
@@ -137,6 +140,13 @@ public sealed class DivisionFinance
 
     /// <summary>Kalibrierungsziel: durchschnittliches Jahresgehalt eines Kaderspielers (0 = ohne Ziel).</summary>
     public long TargetAnnualWage { get; set; }
+
+    /// <summary>
+    /// Übliche Vertragsklauseln für Spieler und Personal: Gehalt −% beim Abstieg aus bzw. +% beim Aufstieg aus dieser
+    /// Spielklasse. 0 = keine Klausel.
+    /// </summary>
+    public int RelegationWagePercent { get; set; }
+    public int PromotionWagePercent { get; set; }
 
     /// <summary>
     /// Jahresbudget des Nachwuchsleistungszentrums als Vielfaches des Länder-Referenzbudgets (skaliert nach Vereinsgröße);

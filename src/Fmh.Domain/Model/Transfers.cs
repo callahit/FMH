@@ -122,7 +122,9 @@ public sealed class ContractOffer
     public int GoalBonus { get; set; }
     public long? ReleaseClause { get; set; }
     public int YearlyRaisePercent { get; set; }
-    public bool RelegationClause { get; set; }
+    /// <summary>Gehalt bei Abstieg −% bzw. Aufstieg +%; null = übliche Klausel der Spielklasse.</summary>
+    public int? RelegationPercent { get; set; }
+    public int? PromotionPercent { get; set; }
     public int ExtensionOptionYears { get; set; }
     public SquadStatus Status { get; set; } = SquadStatus.Rotation;
 

@@ -437,6 +437,8 @@
     "referenceBudget": 1700000
   },
   "finance": {
+    "sponsorRelegationPercent": 40,
+    "sponsorPromotionPercent": 30,
     "divisions": {
       "ENG1": {
         "tvPool": 3448300000,
@@ -453,6 +455,7 @@
         "operatingCostShare": 0.55,
         "maxAnnualWage": 28700000,
         "targetAnnualWage": 5700000,
+        "relegationWagePercent": 40,
         "reference": {
           "source": "Deloitte Annual Review of Football Finance 2026, Saison 2024/25 (keine amtliche Ligazahl), £ zu 0,87 je Euro",
           "official": false,
@@ -476,7 +479,9 @@
         "sponsorLevel": 0.52,
         "operatingCostShare": 0.35,
         "maxAnnualWage": 4600000,
-        "targetAnnualWage": 1300000
+        "targetAnnualWage": 1300000,
+        "relegationWagePercent": 40,
+        "promotionWagePercent": 60
       },
       "ENG3": {
         "tvPool": 41400000,
@@ -492,7 +497,9 @@
         "sponsorLevel": 0.4,
         "operatingCostShare": 0.3,
         "maxAnnualWage": 805000,
-        "targetAnnualWage": 264000
+        "targetAnnualWage": 264000,
+        "relegationWagePercent": 35,
+        "promotionWagePercent": 50
       },
       "ENG4": {
         "tvPool": 27600000,
@@ -508,7 +515,9 @@
         "sponsorLevel": 0.34,
         "operatingCostShare": 0.3,
         "maxAnnualWage": 345000,
-        "targetAnnualWage": 115000
+        "targetAnnualWage": 115000,
+        "relegationWagePercent": 40,
+        "promotionWagePercent": 40
       },
       "ENG-NL": {
         "tvPool": 0,
@@ -523,7 +532,8 @@
         "sponsorLevel": 0.17,
         "operatingCostShare": 0.25,
         "maxAnnualWage": 172000,
-        "targetAnnualWage": 46000
+        "targetAnnualWage": 46000,
+        "promotionWagePercent": 40
       }
     },
     "cupPrizes": [

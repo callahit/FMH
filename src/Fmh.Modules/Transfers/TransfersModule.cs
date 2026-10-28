@@ -245,7 +245,7 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
         if (p.Loan is not { PurchaseFee: { } fee } loan || p.ClubId != HumanClub.Id) return "neg.error.noOption";
         if (fee > HumanClub.Budget.TransferBudget) return "neg.error.budget";
         var parent = World.Clubs[loan.ParentClubId];
-        var contract = p.Contract is { } c ? new ContractOffer { Years = Math.Max(1, (c.Until.Year - World.Date.Year)), WeeklyWage = c.WeeklyWage, Status = c.Status } : Negotiations.SuggestContract(p, HumanClub, World, Data);
+        var contract = p.Contract is { } c ? new ContractOffer { Years = Math.Max(1, (c.Until.Year - World.Date.Year)), WeeklyWage = c.WeeklyWage, Status = c.Status, RelegationPercent = c.RelegationPercent, PromotionPercent = c.PromotionPercent } : Negotiations.SuggestContract(p, HumanClub, World, Data);
         p.Loan = null;
         p.ClubId = parent.Id;
         HumanClub.PlayerIds.Remove(p.Id);
