@@ -87,7 +87,7 @@ Farbthemen: Klassik, Hell, Terminal.
   und Potenzial) oder analysieren den nächsten Gegner.
 - **Pokal und Relegation:**
   - Mehrere Pokale je Land, siehe [Pokale](#pokale): in Deutschland Supercup, Pokal und fünf Verbandspokale;
-    in England Supercup, National Cup, League Cup und League Trophy. Freilose und Heimrecht für Unterklassige;
+    in England Supercup, National Cup, League Cup und League Trophy; in Spanien Supercopa und Copa Nacional. Freilose und Heimrecht für Unterklassige;
     Verlängerung und Elfmeterschießen; neutrales Finale.
   - Relegation 16. gegen 3. in Hin- und Rückspiel (1./2. und 2./3. Liga), Aufstiegsspiele der beiden
     Regionalliga-Meister ohne Direktplatz (jährlich wechselnd).
@@ -151,7 +151,7 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
     - Spieler: Gehalt nach der Klausel im Vertrag. Sie ist verhandelbar, ein höherer Abschlag als üblich kostet je
       Prozentpunkt 0,3 % mehr Grundgehalt.
     - Personal und Manager: übliche Klausel der bisherigen Spielklasse.
-    - Sponsoren: Zahlung und Bonus nach der Klausel im Sponsorenvertrag (Deutschland −40/+25 %, England −40/+30 %).
+    - Sponsoren: Zahlung und Bonus nach der Klausel im Sponsorenvertrag (Deutschland −40/+25 %, England −40/+30 %, Spanien −40/+25 %).
     - Übliche Werte stehen je Spielklasse in `relegationWagePercent`/`promotionWagePercent`, zum Beispiel
       Deutschland: 1. Liga −40 %, 2. Liga −50/+40 %, 3. Liga −70/+80 %, Regionalliga −50/+100 %, Oberliga +60 %.
     - Verträge aus älteren Spielständen ohne Klausel folgen wie bisher dem Gehaltsniveau der neuen Spielklasse.
@@ -181,7 +181,7 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
   - **Europapokalplätze** zum Saisonende:
     - Platz 1–4 der 1. Liga spielen im Champions-Pokal, Platz 5 und der Pokalsieger im
       Europa-Pokal, Platz 6 im Conference-Pokal. In England geht der Conference-Platz an den Sieger des
-      League Cup statt an den Sechsten (`europe.cupPlaces`).
+      League Cup statt an den Sechsten (`europe.cupPlaces`). Spanien: Platz 1–4, 5 und 6 wie in Deutschland.
     - Ohne Zulassung rückt der nächste Verein nach. Ist ein Pokalsieger schon qualifiziert oder ohne
       Lizenz, geht sein Platz an den nächsten Ligaplatz.
     - Die Wettbewerbe laufen vereinfacht ohne eigene Spiele: An fünf Terminen entscheidet die
@@ -260,6 +260,8 @@ Jedes Land hat beliebig viele Pokale (`cups` in `countries/*.json`). Ein Pokal n
 | | National Cup | Third, Second Division und National League ab Runde 1, Premier und First Division ab Runde 3 |
 | | League Cup | First bis Third Division ab Runde 1, Premier Division ab Runde 2, Europapokalteilnehmer ab Runde 3; Halbfinale mit Hin- und Rückspiel; Sieger in den Conference-Pokal |
 | | League Trophy | Second und Third Division |
+| Spanien | Supercopa (4) | Finalisten der Copa Nacional und die ersten zwei der Primera División (bei Überschneidung der Nächste), Halbfinale und Finale neutral |
+| | Copa Nacional | 112 Vereine ab Runde 1 (Primera División bis Tercera Federación, ohne Filiales, Heimrecht für Unterklassige), die ersten vier der Primera División der Vorsaison ab Runde 3 (Runde der letzten 32, wie die Supercopa-Teilnehmer); Halbfinale mit Hin- und Rückspiel |
 
 Spielstände: Neue Felder haben Standardwerte, ältere Spielstände spielen mit ihrer gespeicherten Pokalkonfiguration
 weiter (ein Pokal je Land).
@@ -303,6 +305,12 @@ im Monat, Spitze bis 6.500 €).
   Europapokal; Merchandising = Fanartikel; Sonstiges = Catering, Mitglieder, Gelände und Prämien; Personal
   Spielbetrieb = Gehälter, Prämien und Trainerstab; Verwaltung, Spielbetrieb und Sonstiges = Betriebskosten,
   Instandhaltung und Reisen; Nachwuchs = Budget des Leistungszentrums (bei der DFL inklusive Amateure und Frauen).
+  Spanien: amtliche Zahlen aus dem [LALIGA Financial Report 2024/25](https://assets.laliga.com/assets/2026/04/13/originals/dd7aec50d2ee10d78a8f409e609c34a5.pdf)
+  (Tabellen 20 ff.), je Klub: Primera División (LALIGA EA Sports) Netto-Umsatz 199,4 Mio. € (Spieltag 40,8, TV 64,4
+  plus UEFA 20,3, Sponsoring und Werbung 44,1, Fanartikel 15,8), Kaderaufwand (Spieler und Trainerstab der ersten und
+  der übrigen Mannschaften) 106,2 Mio. €; Segunda División (LALIGA HYPERMOTION) Netto-Umsatz 15,3 Mio. € (Spieltag
+  3,9, TV 6,5, Sponsoring und Werbung 3,6, Fanartikel 1,0), Kaderaufwand 10,8 Mio. €. Für die Federación-Ligen gibt
+  es keinen Ligabericht.
 - **Lizenz und TV-Geld:** Der Leistungsanteil der TV-Gelder fließt erst zum Saisonende. Bei der Lizenzprüfung im
   Frühjahr zählt er nach dem aktuellen Tabellenplatz als Forderung zum Eigenkapital. Vorher bekam ein Spitzenclub
   mitten in der Saison wegen dieser Lücke Punktabzug oder keine Lizenz.
@@ -481,6 +489,7 @@ tests/Fmh.Tests/     xUnit-Tests für Kern, Engine, Karriere, Spielstände, Date
                      und Golden Master
 data/base/           Datenpaket "base": Deutschland, Formationen, Rollen, Regeln, Sprachdateien
 data/england/        Länderpaket England (dependsOn base): Ligen, Vereine, Namen, Sponsoren, Wettbewerbsnamen
+data/spain/          Länderpaket Spanien (dependsOn base): Ligen mit Gruppen, Filiales, Vereine, Namen, Sponsoren
 ```
 
 Regeln, die ein Architekturtest prüft: erlaubte Projektverweise (Konzept 4.1), keine Datei in
@@ -561,11 +570,14 @@ Ein Land beschreibt seine Pyramide als Ebenen mit Divisionen. Formate ändern si
   - Ausbildung: Jeder Spieler sammelt zwischen 15 und 21 je Saison eine Ausbildungsspielzeit bei seinem Verein. Ab drei
     Spielzeiten bei Vereinen des Landes gilt er als lokal ausgebildet (Local Player, Homegrown), ab drei beim eigenen
     Verein als im Verein ausgebildet. Spieler, die zu Spielbeginn erzeugt werden, verteilen sich nach `formative`
-    (Deutschland und England: 15 % im eigenen Verein, 45 % bei einem anderen Verein des Landes, der Rest im Ausland).
+    (Deutschland und England: 15 % im eigenen Verein, 45 % bei einem anderen Verein des Landes, der Rest im Ausland;
+    Spanien 20 % und 50 %).
   - 1. und 2. Liga (DFL): Liste bis zur Kadergrenze (32), mindestens 8 Local Player, davon 4 aus dem eigenen Verein,
     und 12 Spieler mit deutscher Staatsangehörigkeit.
   - Premier Division: 25 Plätze für Spieler ab 21, höchstens 17 ohne Homegrown-Status; Jüngere ohne Meldeplatz.
   - First Division: wie die Premier Division, Leihspieler brauchen aber immer einen Meldeplatz (Pressequellen).
+  - Primera und Segunda División: 25 Plätze; Spieler unter 23 brauchen keinen Platz (in der Realität mit Lizenz der
+    Filial-Mannschaft und Rückennummer ab 26).
   - 3. Liga: mindestens vier U23-Spieler im Spieltagskader (`matchdayMinYoung`); die KI und der Assistent setzen sie auf
     die Bank.
   - Meldungen ändern sich nur bei offenem Transferfenster. Zu Saisonbeginn und im Fenster melden die Vereine nach
@@ -574,7 +586,7 @@ Ein Land beschreibt seine Pyramide als Ebenen mit Divisionen. Formate ändern si
   - Spielstand: Abschnitt `players` Version 6 (Spalte `registration`). Ältere Spielstände laden mit allen Spielern
     gemeldet; die Ausbildungsjahre werden beim Öffnen nach den Anteilen der Daten ergänzt.
 - **Kadergröße:** `squadSize` je Spielklasse (Standard 25): Deutschland 1. Liga 29, 2. Liga 28, 3. Liga 26; England
-  Premier Division 30, First Division 28, Third Division 24. Danach richten sich Kaderaufbau, Nachverpflichtungen der
+  Premier Division 30, First Division 28, Third Division 24; Spanien Primera División 27, Segunda División 26. Danach richten sich Kaderaufbau, Nachverpflichtungen der
   KI (bis drei unter der Kadergröße) und Vertragsverlängerungen.
 - **Gültigkeit:** `validFrom`/`validTo` je Formatversion; beim Saisonwechsel gilt die passende Version, Ligen und
   Staffeln werden umgebaut. Der Validator prüft für jede Version, dass Zu- und Abgänge je Ebene aufgehen, und
@@ -597,6 +609,7 @@ liegt noch im Grundpaket. Die meisten Tests laden nur `base`, die Länder-Tests 
 |---|---|---|---|---|---|---|
 | Deutschland | 18 | 18 | 20 | Regionalliga 5 × 18 | Oberliga (Pool) | Relegationen, rotierender Regionalliga-Aufstieg, zweite Mannschaften |
 | England | 20 | 24 | 24 | 24 | National Non-League (Pool) | 46 Spieltage mit Englischen Wochen, Play-offs 3–6 bzw. 4–7, keine Winterpause |
+| Spanien | 20 | 22 | Primera Federación 2 × 20 | Segunda Federación 5 × 18 | Tercera Federación (Pool, 50) | Direkter Vergleich vor Tordifferenz, Play-offs je Gruppe, Filiales ab Ebene 3, kurze Weihnachtspause |
 
 England (Stand 2025/26): Premier Division ohne Relegation (18–20 steigen ab); First, Second und Third Division
 steigen mit 2, 2 bzw. 3 Vereinen direkt auf, dazu je ein Play-off-Sieger; Absteiger 3, 4 und 2 (in den Pool).
@@ -604,6 +617,13 @@ Gehälter und Einnahmen nach dem Deloitte Annual Review of Football Finance 2026
 Euro. **Fallschirmzahlungen:** Absteiger aus der Premier Division erhalten drei Saisons lang 55 %, 45 % und 20 % des
 TV-Grundbetrags eines Premier-Division-Vereins, nach nur einer Saison in der Premier Division zwei Saisons lang
 (`parachuteShares`, `parachuteShortTenure`).
+
+Spanien (Stand 2025/26): Primera División mit drei Absteigern; Segunda División mit 42 Spieltagen (Englische Wochen am
+Mittwoch), zwei Direktaufsteigern und Play-off 3–6 mit Hin- und Rückspiel auch im Finale, vier Absteiger. Primera
+Federación in zwei Gruppen: Gruppensieger steigen auf, Platz 2–5 spielen je Gruppe einen Aufstiegsplatz aus, 16–20
+steigen ab. Segunda Federación in fünf Gruppen nach Regionen: Sieger direkt, Platz 2–5 je Gruppe im Play-off mit
+Einzelspielen beim Besserplatzierten, 14–18 in die Tercera Federación. Filiales (zweite Mannschaften) spielen
+mindestens eine Ebene unter der ersten Mannschaft und nicht im Pokal. Tabellen: direkter Vergleich vor Tordifferenz.
 
 ## Offene Entscheidungen
 
@@ -629,6 +649,11 @@ TV-Grundbetrags eines Premier-Division-Vereins, nach nur einer Saison in der Pre
   in Runde 1 ein. Die League Trophy läuft ohne Gruppenphase und ohne U21-Teams. Beträge stehen in Euro.
   Lizenzierung läuft wie in Deutschland mit großzügigen Eigenkapitalgrenzen, statt der englischen PSR-Regeln.
   Die fiktiven Ortsnamen sind zusammengesetzt; Übereinstimmungen mit kleinen realen Orten sind möglich.
+- **Spanien:** Die Play-offs der Federación-Ligen laufen je Gruppe statt gruppenübergreifend ausgelost, die Tercera
+  Federación ist ein Pool statt 18 Gruppen. Die Copa Nacional lässt die ersten vier der Vorsaison statt der
+  Supercopa-Teilnehmer später einsteigen. Offen sind die Grenze für Spieler ohne EU-Pass (in der Primera drei je
+  Kader), die Kostengrenze der LaLiga (Límite de Coste de Plantilla), Ausgleichszahlungen für Absteiger und das
+  Hochziehen von Filial-Spielern in die erste Mannschaft. Die fiktiven Ortsnamen sind zusammengesetzt.
 - **Karten in unteren Ligen:** Über alle vier Ebenen zeigt die Engine 3,2 Gelbe und 0,13 Rote Karten je Spiel
   (Ziel 3,8 bzw. 0,2), weil schwächere Spieler seltener in Zweikämpfe kommen. Die Kalibrierung prüft deshalb
   Ebene 1–2 (`--max-level`); ob untere Ligen eigene Zielwerte bekommen, ist offen.
