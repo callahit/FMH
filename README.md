@@ -306,12 +306,13 @@ im Monat, Spitze bis 6.500 €).
   Spielbetrieb = Gehälter, Prämien und Trainerstab; Verwaltung, Spielbetrieb und Sonstiges = Betriebskosten,
   Instandhaltung und Reisen; Nachwuchs = Budget des Leistungszentrums (bei der DFL inklusive Amateure und Frauen).
   Spanien: amtliche Zahlen aus dem [LALIGA Financial Report 2024/25](https://assets.laliga.com/assets/2026/04/13/originals/dd7aec50d2ee10d78a8f409e609c34a5.pdf)
-  (Tabellen 20 ff.), je Klub: Primera División (LALIGA EA Sports) Netto-Umsatz 199,4 Mio. € (Spieltag 40,8, TV 64,4
-  plus UEFA 20,3, Sponsoring und Werbung 44,1, Fanartikel 15,8), Kaderaufwand (Spieler und Trainerstab der ersten und
-  der übrigen Mannschaften) 106,2 Mio. €; Segunda División (LALIGA HYPERMOTION) Netto-Umsatz 15,3 Mio. € (Spieltag
-  3,9, TV 6,5, Sponsoring und Werbung 3,6, Fanartikel 1,0), Kaderaufwand 10,8 Mio. €. Die Fanartikel der Segunda
-  prüft die Kalibrierung nur in der Summe, weil der Fanartikelerlös je Zuschauer für das ganze Land gilt und die
-  Segunda real weit unter diesem Wert liegt. Für die Federación-Ligen gibt es keinen Ligabericht.
+  (Tabellen 20 ff.), je Klub: Primera División (LALIGA EA Sports) Betriebserträge 206,1 Mio. €, davon Netto-Umsatz
+  199,4 (Spieltag 40,8, TV 64,4 plus UEFA 20,3, Sponsoring und Werbung 44,1, Fanartikel 15,8), Kaderaufwand (Spieler
+  und Trainerstab der ersten und der übrigen Mannschaften) 106,2 Mio. €; Segunda División (LALIGA HYPERMOTION)
+  Betriebserträge 18,1 Mio. €, davon Netto-Umsatz 15,3 (Spieltag 3,9, TV 6,5, Sponsoring und Werbung 3,6, Fanartikel
+  1,0), Kaderaufwand 10,8 Mio. €. Verglichen wird mit den Betriebserträgen, weil auch die DFL-Summe sonstige Erträge
+  enthält. Die Fanartikel der Segunda prüft die Kalibrierung nur in der Summe, weil der Fanartikelerlös je Zuschauer
+  für das ganze Land gilt und die Segunda real weit unter diesem Wert liegt. Für die Federación-Ligen gibt es keinen Ligabericht.
 - **Lizenz und TV-Geld:** Der Leistungsanteil der TV-Gelder fließt erst zum Saisonende. Bei der Lizenzprüfung im
   Frühjahr zählt er nach dem aktuellen Tabellenplatz als Forderung zum Eigenkapital. Vorher bekam ein Spitzenclub
   mitten in der Saison wegen dieser Lücke Punktabzug oder keine Lizenz.
