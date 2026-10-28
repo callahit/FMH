@@ -192,14 +192,14 @@
       "teams": 2,
       "entries": [
         {
+          "qualifiersOf": "FRA-CUP",
+          "count": 1
+        },
+        {
           "participants": [
             "FRA1"
           ],
           "previousSeason": true,
-          "count": 1
-        },
-        {
-          "qualifiersOf": "FRA-CUP",
           "count": 1
         }
       ],
