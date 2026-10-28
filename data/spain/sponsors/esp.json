@@ -1,0 +1,605 @@
+{
+  "country": "ESP",
+  "companies": [
+    {
+      "name": "Banco Ibérica",
+      "industry": "bank",
+      "size": 2,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Seguros Meseta",
+      "industry": "insurance",
+      "size": 9,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Móvil Levante Sol",
+      "industry": "telecom",
+      "size": 16,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Bebidas Cantábrica",
+      "industry": "drinks",
+      "size": 4,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Cervezas Atlántica",
+      "industry": "brewery",
+      "size": 11,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Energía Mediterránea",
+      "industry": "energy",
+      "size": 18,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Almacenes Sierra Alta",
+      "industry": "retail",
+      "size": 6,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Motor Olivar",
+      "industry": "cars",
+      "size": 13,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Digital Castell",
+      "industry": "tech",
+      "size": 20,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Viajes Peninsular",
+      "industry": "travel",
+      "size": 8,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Transportes Tajo",
+      "industry": "logistics",
+      "size": 15,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Construcciones Duero",
+      "industry": "construction",
+      "size": 3,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Alimentación Ebro",
+      "industry": "food",
+      "size": 10,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Hoteles Guadal",
+      "industry": "hotel",
+      "size": 17,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Apuestas Brisa",
+      "industry": "gaming",
+      "size": 5,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Capital Aurora",
+      "industry": "finance",
+      "size": 12,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Banco Faro",
+      "industry": "bank",
+      "size": 19,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Seguros Puerta Sur",
+      "industry": "insurance",
+      "size": 7,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Móvil Horizonte",
+      "industry": "telecom",
+      "size": 14,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Bebidas Mirador",
+      "industry": "drinks",
+      "size": 2,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Cervezas Solana",
+      "industry": "brewery",
+      "size": 9,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Energía Encina",
+      "industry": "energy",
+      "size": 16,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Almacenes Rocío",
+      "industry": "retail",
+      "size": 4,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Motor Altamar",
+      "industry": "cars",
+      "size": 11,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Digital Torreón",
+      "industry": "tech",
+      "size": 18,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Viajes Viñedo",
+      "industry": "travel",
+      "size": 6,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Transportes Azahar",
+      "industry": "logistics",
+      "size": 13,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Construcciones Alameda",
+      "industry": "construction",
+      "size": 20,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Alimentación Marisma",
+      "industry": "food",
+      "size": 8,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Hoteles Alborada",
+      "industry": "hotel",
+      "size": 15,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Apuestas Ibérica",
+      "industry": "gaming",
+      "size": 3,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Capital Meseta",
+      "industry": "finance",
+      "size": 10,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Banco Levante Sol",
+      "industry": "bank",
+      "size": 17,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Seguros Cantábrica",
+      "industry": "insurance",
+      "size": 5,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Móvil Atlántica",
+      "industry": "telecom",
+      "size": 12,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Bebidas Mediterránea",
+      "industry": "drinks",
+      "size": 19,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Cervezas Sierra Alta",
+      "industry": "brewery",
+      "size": 7,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Energía Olivar",
+      "industry": "energy",
+      "size": 14,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Almacenes Castell",
+      "industry": "retail",
+      "size": 2,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Motor Peninsular",
+      "industry": "cars",
+      "size": 9,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Digital Tajo",
+      "industry": "tech",
+      "size": 16,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Viajes Duero",
+      "industry": "travel",
+      "size": 4,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Transportes Ebro",
+      "industry": "logistics",
+      "size": 11,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Construcciones Guadal",
+      "industry": "construction",
+      "size": 18,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Alimentación Brisa",
+      "industry": "food",
+      "size": 6,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Hoteles Aurora",
+      "industry": "hotel",
+      "size": 13,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Apuestas Faro",
+      "industry": "gaming",
+      "size": 20,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Capital Puerta Sur",
+      "industry": "finance",
+      "size": 8,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Banco Horizonte",
+      "industry": "bank",
+      "size": 15,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Seguros Mirador",
+      "industry": "insurance",
+      "size": 3,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Móvil Solana",
+      "industry": "telecom",
+      "size": 10,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Bebidas Encina",
+      "industry": "drinks",
+      "size": 17,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Cervezas Rocío",
+      "industry": "brewery",
+      "size": 5,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Energía Altamar",
+      "industry": "energy",
+      "size": 12,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Almacenes Torreón",
+      "industry": "retail",
+      "size": 19,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Motor Viñedo",
+      "industry": "cars",
+      "size": 7,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Digital Azahar",
+      "industry": "tech",
+      "size": 14,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Viajes Alameda",
+      "industry": "travel",
+      "size": 2,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Transportes Marisma",
+      "industry": "logistics",
+      "size": 9,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Construcciones Alborada",
+      "industry": "construction",
+      "size": 16,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    }
+  ]
+}

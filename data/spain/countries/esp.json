@@ -1,0 +1,880 @@
+{
+  "code": "ESP",
+  "name": "Spanien",
+  "currency": "EUR",
+  "validFrom": 2026,
+  "activation": "Playable",
+  "season": {
+    "startMonth": 7,
+    "firstMatchday": "08-16",
+    "winterBreakStart": "12-23",
+    "winterBreakEnd": "01-02",
+    "matchDay": "Saturday",
+    "lastMatchday": "05-24",
+    "midweekDay": "Tuesday"
+  },
+  "squad": {
+    "maxSquad": 32,
+    "benchSize": 9,
+    "substitutions": 5
+  },
+  "discipline": {
+    "yellowCardsForSuspension": 5,
+    "redCardBanMin": 1,
+    "redCardBanMax": 3,
+    "secondYellowBan": 1
+  },
+  "levels": [
+    {
+      "level": 1,
+      "divisions": [
+        {
+          "id": "ES1",
+          "name": "Primera División",
+          "teams": 20,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "HeadToHead",
+            "GoalDifference",
+            "GoalsFor",
+            "Wins"
+          ],
+          "movements": [
+            {
+              "positions": "18-20",
+              "to": "Down"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "divisions": [
+        {
+          "id": "ES2",
+          "name": "Segunda División",
+          "teams": 22,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "HeadToHead",
+            "GoalDifference",
+            "GoalsFor",
+            "Wins"
+          ],
+          "movements": [
+            {
+              "positions": "1-2",
+              "to": "Up"
+            },
+            {
+              "positions": "19-22",
+              "to": "Down"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": 3,
+      "divisions": [
+        {
+          "id": "ES3",
+          "name": "Primera Federación",
+          "teams": 20,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "HeadToHead",
+            "GoalDifference",
+            "GoalsFor",
+            "Wins"
+          ],
+          "movements": [
+            {
+              "positions": "1",
+              "to": "Up"
+            },
+            {
+              "positions": "16-20",
+              "to": "Down"
+            }
+          ],
+          "groups": [
+            {
+              "id": "ES3A",
+              "name": "Primera Federación Gruppe 1",
+              "regions": [
+                "Noroeste",
+                "Norte",
+                "Centro"
+              ]
+            },
+            {
+              "id": "ES3B",
+              "name": "Primera Federación Gruppe 2",
+              "regions": [
+                "Este",
+                "Sur"
+              ]
+            }
+          ],
+          "assignment": "Fixed"
+        }
+      ]
+    },
+    {
+      "level": 4,
+      "divisions": [
+        {
+          "id": "ES4",
+          "name": "Segunda Federación",
+          "teams": 18,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "HeadToHead",
+            "GoalDifference",
+            "GoalsFor",
+            "Wins"
+          ],
+          "movements": [
+            {
+              "positions": "1",
+              "to": "Up"
+            },
+            {
+              "positions": "14-18",
+              "to": "Down"
+            }
+          ],
+          "groups": [
+            {
+              "id": "ES4A",
+              "name": "Segunda Federación Gruppe 1",
+              "regions": [
+                "Noroeste"
+              ]
+            },
+            {
+              "id": "ES4B",
+              "name": "Segunda Federación Gruppe 2",
+              "regions": [
+                "Norte"
+              ]
+            },
+            {
+              "id": "ES4C",
+              "name": "Segunda Federación Gruppe 3",
+              "regions": [
+                "Centro"
+              ]
+            },
+            {
+              "id": "ES4D",
+              "name": "Segunda Federación Gruppe 4",
+              "regions": [
+                "Este"
+              ]
+            },
+            {
+              "id": "ES4E",
+              "name": "Segunda Federación Gruppe 5",
+              "regions": [
+                "Sur"
+              ]
+            }
+          ],
+          "assignment": "Fixed"
+        }
+      ]
+    }
+  ],
+  "pools": [
+    {
+      "id": "ES-TER",
+      "name": "Tercera Federación",
+      "teams": 50,
+      "feeds": "ES4"
+    }
+  ],
+  "cups": [
+    {
+      "id": "ES-SC",
+      "name": "Supercopa",
+      "participants": [
+        "ES1"
+      ],
+      "teams": 4,
+      "entries": [
+        {
+          "qualifiersOf": "ES-CUP",
+          "count": 2
+        },
+        {
+          "participants": [
+            "ES1"
+          ],
+          "previousSeason": true,
+          "count": 2
+        }
+      ],
+      "lowerTierHome": false,
+      "legs": 1,
+      "dates": [
+        "01-07",
+        "01-14"
+      ],
+      "neutralFinal": true,
+      "prizes": [
+        3000000,
+        2000000
+      ],
+      "winnerPrize": 3000000
+    },
+    {
+      "id": "ES-CUP",
+      "name": "Copa Nacional",
+      "participants": [
+        "ES1",
+        "ES2",
+        "ES3",
+        "ES4",
+        "ES-TER"
+      ],
+      "teams": 116,
+      "entries": [
+        {
+          "participants": [
+            "ES1"
+          ],
+          "previousSeason": true,
+          "count": 4,
+          "round": 3
+        }
+      ],
+      "lowerTierHome": true,
+      "legs": 1,
+      "roundLegs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        2,
+        1
+      ],
+      "awayGoals": false,
+      "dates": [
+        "10-29",
+        "12-03",
+        "12-17",
+        "01-21",
+        "02-04",
+        "02-11,03-04",
+        "04-25"
+      ],
+      "neutralFinal": true
+    }
+  ],
+  "playoffs": [
+    {
+      "id": "ES-PO2",
+      "name": "Play-offs Segunda División",
+      "upperDivision": "ES1",
+      "lowerDivision": "ES2",
+      "entrants": [
+        {
+          "division": "ES2",
+          "position": 3
+        },
+        {
+          "division": "ES2",
+          "position": 4
+        },
+        {
+          "division": "ES2",
+          "position": 5
+        },
+        {
+          "division": "ES2",
+          "position": 6
+        }
+      ],
+      "places": 1,
+      "legs": 2,
+      "finalLegs": 2,
+      "seeded": true,
+      "awayGoals": false,
+      "dates": [
+        "05-30,06-03",
+        "06-07,06-14"
+      ]
+    },
+    {
+      "id": "ES-PO3A",
+      "name": "Play-offs Primera Federación 1",
+      "upperDivision": "ES2",
+      "lowerDivision": "ES3",
+      "entrants": [
+        {
+          "division": "ES3A",
+          "position": 2
+        },
+        {
+          "division": "ES3A",
+          "position": 3
+        },
+        {
+          "division": "ES3A",
+          "position": 4
+        },
+        {
+          "division": "ES3A",
+          "position": 5
+        }
+      ],
+      "places": 1,
+      "legs": 2,
+      "finalLegs": 2,
+      "seeded": true,
+      "awayGoals": false,
+      "dates": [
+        "05-31,06-07",
+        "06-14,06-21"
+      ]
+    },
+    {
+      "id": "ES-PO3B",
+      "name": "Play-offs Primera Federación 2",
+      "upperDivision": "ES2",
+      "lowerDivision": "ES3",
+      "entrants": [
+        {
+          "division": "ES3B",
+          "position": 2
+        },
+        {
+          "division": "ES3B",
+          "position": 3
+        },
+        {
+          "division": "ES3B",
+          "position": 4
+        },
+        {
+          "division": "ES3B",
+          "position": 5
+        }
+      ],
+      "places": 1,
+      "legs": 2,
+      "finalLegs": 2,
+      "seeded": true,
+      "awayGoals": false,
+      "dates": [
+        "05-31,06-07",
+        "06-14,06-21"
+      ]
+    },
+    {
+      "id": "ES-PO4A",
+      "name": "Play-offs Segunda Federación 1",
+      "upperDivision": "ES3",
+      "lowerDivision": "ES4",
+      "entrants": [
+        {
+          "division": "ES4A",
+          "position": 2
+        },
+        {
+          "division": "ES4A",
+          "position": 3
+        },
+        {
+          "division": "ES4A",
+          "position": 4
+        },
+        {
+          "division": "ES4A",
+          "position": 5
+        }
+      ],
+      "places": 1,
+      "legs": 1,
+      "finalLegs": 1,
+      "seeded": true,
+      "awayGoals": false,
+      "dates": [
+        "05-31",
+        "06-07"
+      ]
+    },
+    {
+      "id": "ES-PO4B",
+      "name": "Play-offs Segunda Federación 2",
+      "upperDivision": "ES3",
+      "lowerDivision": "ES4",
+      "entrants": [
+        {
+          "division": "ES4B",
+          "position": 2
+        },
+        {
+          "division": "ES4B",
+          "position": 3
+        },
+        {
+          "division": "ES4B",
+          "position": 4
+        },
+        {
+          "division": "ES4B",
+          "position": 5
+        }
+      ],
+      "places": 1,
+      "legs": 1,
+      "finalLegs": 1,
+      "seeded": true,
+      "awayGoals": false,
+      "dates": [
+        "05-31",
+        "06-07"
+      ]
+    },
+    {
+      "id": "ES-PO4C",
+      "name": "Play-offs Segunda Federación 3",
+      "upperDivision": "ES3",
+      "lowerDivision": "ES4",
+      "entrants": [
+        {
+          "division": "ES4C",
+          "position": 2
+        },
+        {
+          "division": "ES4C",
+          "position": 3
+        },
+        {
+          "division": "ES4C",
+          "position": 4
+        },
+        {
+          "division": "ES4C",
+          "position": 5
+        }
+      ],
+      "places": 1,
+      "legs": 1,
+      "finalLegs": 1,
+      "seeded": true,
+      "awayGoals": false,
+      "dates": [
+        "05-31",
+        "06-07"
+      ]
+    },
+    {
+      "id": "ES-PO4D",
+      "name": "Play-offs Segunda Federación 4",
+      "upperDivision": "ES3",
+      "lowerDivision": "ES4",
+      "entrants": [
+        {
+          "division": "ES4D",
+          "position": 2
+        },
+        {
+          "division": "ES4D",
+          "position": 3
+        },
+        {
+          "division": "ES4D",
+          "position": 4
+        },
+        {
+          "division": "ES4D",
+          "position": 5
+        }
+      ],
+      "places": 1,
+      "legs": 1,
+      "finalLegs": 1,
+      "seeded": true,
+      "awayGoals": false,
+      "dates": [
+        "05-31",
+        "06-07"
+      ]
+    },
+    {
+      "id": "ES-PO4E",
+      "name": "Play-offs Segunda Federación 5",
+      "upperDivision": "ES3",
+      "lowerDivision": "ES4",
+      "entrants": [
+        {
+          "division": "ES4E",
+          "position": 2
+        },
+        {
+          "division": "ES4E",
+          "position": 3
+        },
+        {
+          "division": "ES4E",
+          "position": 4
+        },
+        {
+          "division": "ES4E",
+          "position": 5
+        }
+      ],
+      "places": 1,
+      "legs": 1,
+      "finalLegs": 1,
+      "seeded": true,
+      "awayGoals": false,
+      "dates": [
+        "05-31",
+        "06-07"
+      ]
+    }
+  ],
+  "transferWindows": {
+    "summerStart": "07-01",
+    "summerEnd": "09-01",
+    "winterStart": "01-02",
+    "winterEnd": "02-02",
+    "preContractFrom": "01-01"
+  },
+  "youth": {
+    "intakeMonth": 3,
+    "minPlayers": 4,
+    "maxPlayers": 9,
+    "proContractAge": 16,
+    "promoteAge": 16,
+    "intakeAge": 14,
+    "groupSize": 14,
+    "referenceBudget": 1200000
+  },
+  "registration": {
+    "ES1": {
+      "maxPlayers": 25,
+      "exemptAge": 22
+    },
+    "ES2": {
+      "maxPlayers": 25,
+      "exemptAge": 22
+    }
+  },
+  "formative": {
+    "club": 0.2,
+    "country": 0.5
+  },
+  "reserves": {
+    "minLevelGap": 1,
+    "playInCups": false,
+    "ageLimit": 23,
+    "overAgePlayers": 5
+  },
+  "finance": {
+    "cateringPerSpectator": 2,
+    "merchPerSpectator": 6,
+    "sponsorRelegationPercent": 40,
+    "sponsorPromotionPercent": 25,
+    "divisions": {
+      "ES1": {
+        "tvPool": 1287000000,
+        "tvEqualShare": 0.5,
+        "standing": 30,
+        "seating": 55,
+        "box": 11000,
+        "floodlightRequired": 3,
+        "youthCenterRequired": 2,
+        "minEquity": -60000000,
+        "travelPerAwayMatch": 55000,
+        "wageLevel": 0.8,
+        "sponsorLevel": 0.36,
+        "academyBudgetFactor": 9.0,
+        "operatingCostShare": 0.55,
+        "maxAnnualWage": 25000000,
+        "targetAnnualWage": 3500000,
+        "relegationWagePercent": 50,
+        "squadSize": 27,
+        "reference": {
+          "source": "LALIGA Financial Report 2024/25 (LALIGA EA Sports, 20 Klubs), Saison 2024/25, Durchschnitt je Klub",
+          "official": true,
+          "income": {
+            "matchday": 40800000,
+            "advertising": 44100000,
+            "media": 84700000,
+            "merchandising": 15800000,
+            "total": 206100000
+          },
+          "expenses": {
+            "squad": 106200000
+          }
+        }
+      },
+      "ES2": {
+        "tvPool": 142000000,
+        "tvEqualShare": 0.5,
+        "standing": 8,
+        "seating": 14,
+        "box": 3000,
+        "floodlightRequired": 2,
+        "youthCenterRequired": 1,
+        "minEquity": -10000000,
+        "travelPerAwayMatch": 25000,
+        "wageLevel": 0.43,
+        "sponsorLevel": 0.14,
+        "academyBudgetFactor": 6.0,
+        "operatingCostShare": 0.6,
+        "maxAnnualWage": 1200000,
+        "targetAnnualWage": 400000,
+        "relegationWagePercent": 50,
+        "promotionWagePercent": 50,
+        "squadSize": 26,
+        "reference": {
+          "source": "LALIGA Financial Report 2024/25 (LALIGA HYPERMOTION, 22 Klubs), Saison 2024/25, Durchschnitt je Klub",
+          "official": true,
+          "income": {
+            "matchday": 3900000,
+            "advertising": 3600000,
+            "media": 6500000,
+            "total": 18100000
+          },
+          "expenses": {
+            "squad": 10800000
+          }
+        }
+      },
+      "ES3": {
+        "tvPool": 20000000,
+        "tvEqualShare": 1.0,
+        "standing": 10,
+        "seating": 15,
+        "box": 800,
+        "floodlightRequired": 1,
+        "youthCenterRequired": 0,
+        "minEquity": -1500000,
+        "travelPerAwayMatch": 10000,
+        "wageLevel": 0.2,
+        "sponsorLevel": 0.35,
+        "operatingCostShare": 0.45,
+        "maxAnnualWage": 250000,
+        "targetAnnualWage": 80000,
+        "relegationWagePercent": 50,
+        "promotionWagePercent": 80
+      },
+      "ES4": {
+        "tvPool": 0,
+        "standing": 7,
+        "seating": 10,
+        "box": 400,
+        "floodlightRequired": 0,
+        "youthCenterRequired": 0,
+        "minEquity": -300000,
+        "travelPerAwayMatch": 4000,
+        "wageLevel": 0.09,
+        "sponsorLevel": 0.2,
+        "operatingCostShare": 0.3,
+        "maxAnnualWage": 70000,
+        "targetAnnualWage": 22000,
+        "relegationWagePercent": 50,
+        "promotionWagePercent": 100
+      },
+      "ES-TER": {
+        "tvPool": 0,
+        "standing": 5,
+        "seating": 7,
+        "box": 250,
+        "floodlightRequired": 0,
+        "youthCenterRequired": 0,
+        "minEquity": -150000,
+        "travelPerAwayMatch": 2500,
+        "wageLevel": 0.04,
+        "sponsorLevel": 0.1,
+        "operatingCostShare": 0.25,
+        "maxAnnualWage": 20000,
+        "targetAnnualWage": 6000,
+        "promotionWagePercent": 60
+      }
+    },
+    "cupPrizes": [
+      30000,
+      60000,
+      120000,
+      300000,
+      600000,
+      1000000,
+      1500000
+    ],
+    "cupWinnerPrize": 2000000,
+    "playoffPrize": 300000,
+    "creditLimitPercent": 15,
+    "boardApprovalAbove": 10000000,
+    "permitAbove": 5000000,
+    "seasonTicketDeadline": "07-31",
+    "licenseApplication": "03-15",
+    "licenseDecision": "04-30",
+    "licenseDeadline": "05-31",
+    "conditionPenalty": 3,
+    "stadiumCostPerPlace": 2800,
+    "stadiumBaseCost": 18000000,
+    "stadiumCostPerBox": 180000,
+    "stadiumBuildDays": 720
+  },
+  "europe": {
+    "league": "ES1",
+    "places": [
+      {
+        "competition": "UCL",
+        "from": 1,
+        "to": 4
+      },
+      {
+        "competition": "UEL",
+        "from": 5,
+        "to": 5
+      },
+      {
+        "competition": "UECL",
+        "from": 6,
+        "to": 6
+      }
+    ],
+    "cupWinner": "UEL",
+    "cup": "ES-CUP",
+    "competitions": [
+      {
+        "id": "UCL",
+        "fieldStrength": 13.6,
+        "entryPrize": 18600000,
+        "stages": [
+          {
+            "key": "europe.stage.league",
+            "date": "01-31",
+            "prize": 6300000
+          },
+          {
+            "key": "europe.stage.r16",
+            "date": "03-15",
+            "prize": 11000000
+          },
+          {
+            "key": "europe.stage.qf",
+            "date": "04-15",
+            "prize": 12500000
+          },
+          {
+            "key": "europe.stage.sf",
+            "date": "05-05",
+            "prize": 15000000
+          },
+          {
+            "key": "europe.stage.final",
+            "date": "05-31",
+            "prize": 18500000
+          }
+        ]
+      },
+      {
+        "id": "UEL",
+        "fieldStrength": 12.6,
+        "entryPrize": 4300000,
+        "stages": [
+          {
+            "key": "europe.stage.league",
+            "date": "01-31",
+            "prize": 2000000
+          },
+          {
+            "key": "europe.stage.r16",
+            "date": "03-15",
+            "prize": 4000000
+          },
+          {
+            "key": "europe.stage.qf",
+            "date": "04-15",
+            "prize": 5000000
+          },
+          {
+            "key": "europe.stage.sf",
+            "date": "05-05",
+            "prize": 6000000
+          },
+          {
+            "key": "europe.stage.final",
+            "date": "05-28",
+            "prize": 7000000
+          }
+        ]
+      },
+      {
+        "id": "UECL",
+        "fieldStrength": 11.8,
+        "entryPrize": 3200000,
+        "stages": [
+          {
+            "key": "europe.stage.league",
+            "date": "01-31",
+            "prize": 1000000
+          },
+          {
+            "key": "europe.stage.r16",
+            "date": "03-15",
+            "prize": 2000000
+          },
+          {
+            "key": "europe.stage.qf",
+            "date": "04-15",
+            "prize": 2500000
+          },
+          {
+            "key": "europe.stage.sf",
+            "date": "05-05",
+            "prize": 4000000
+          },
+          {
+            "key": "europe.stage.final",
+            "date": "05-27",
+            "prize": 7000000
+          }
+        ]
+      }
+    ],
+    "license": {
+      "minSeats": 8000,
+      "floodlight": 3,
+      "academyStars": 1
+    },
+    "ffp": {
+      "acceptableDeviation": 60000000,
+      "severeDeviation": 90000000,
+      "squadCostRatio": 0.7,
+      "finePercent": 3
+    }
+  }
+}
