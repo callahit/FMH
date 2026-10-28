@@ -42,4 +42,23 @@ public class SquadTests
         Assert.Equal(balance, reserve.Budget.Balance);
         Assert.Empty(reserve.Finance.Season);
     }
+
+    /// <summary>Verkauft eine zweite Mannschaft einen Spieler, fließt der Budgetanteil der Ablöse an den Hauptverein.</summary>
+    [Fact]
+    public void ReserveTransferFeesRaiseTheParentBudget()
+    {
+        var s = TestData.NewSession(7);
+        var w = s.World;
+        var reserve = w.Clubs.Values.First(c => c.ReserveOf is not null && c.ReserveOf != s.HumanClub.Id);
+        var parent = w.Clubs[reserve.ReserveOf!.Value];
+        var p = w.SquadOf(reserve).Where(x => x.Loan is null).OrderByDescending(x => x.Contract!.WeeklyWage).First();
+        var budget = parent.Budget.TransferBudget;
+        var (n, error) = s.StartNegotiation(p, DealType.Transfer);
+        Assert.Null(error);
+        var ask = Negotiations.AskingPrice(p, reserve, w, s.Data);
+        Assert.Equal(ResponseKind.Accept, s.SubmitClubOffer(n!, new ClubOffer { Fee = ask }).Kind);
+        Assert.Equal(ResponseKind.Accept, s.SubmitContract(n!, n!.Contract).Kind);
+        Assert.Equal(budget + ask / 2, parent.Budget.TransferBudget);
+        Assert.Equal(0, reserve.Budget.TransferBudget);
+    }
 }
