@@ -1,0 +1,585 @@
+{
+  "code": "FRA",
+  "name": "Frankreich",
+  "currency": "EUR",
+  "validFrom": 2026,
+  "activation": "Playable",
+  "season": {
+    "startMonth": 7,
+    "firstMatchday": "08-15",
+    "winterBreakStart": "12-21",
+    "winterBreakEnd": "01-03",
+    "matchDay": "Saturday",
+    "lastMatchday": "05-16",
+    "midweekDay": "Tuesday"
+  },
+  "squad": {
+    "maxSquad": 32,
+    "benchSize": 9,
+    "substitutions": 5
+  },
+  "discipline": {
+    "yellowCardsForSuspension": 5,
+    "redCardBanMin": 1,
+    "redCardBanMax": 3,
+    "secondYellowBan": 1
+  },
+  "levels": [
+    {
+      "level": 1,
+      "divisions": [
+        {
+          "id": "FRA1",
+          "name": "Ligue 1",
+          "teams": 18,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "GoalDifference",
+            "GoalsFor",
+            "HeadToHead",
+            "Wins"
+          ],
+          "movements": [
+            {
+              "positions": "17-18",
+              "to": "Down"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "divisions": [
+        {
+          "id": "FRA2",
+          "name": "Ligue 2",
+          "teams": 18,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "GoalDifference",
+            "GoalsFor",
+            "HeadToHead",
+            "Wins"
+          ],
+          "movements": [
+            {
+              "positions": "1-2",
+              "to": "Up"
+            },
+            {
+              "positions": "17-18",
+              "to": "Down"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": 3,
+      "divisions": [
+        {
+          "id": "FRA3",
+          "name": "Ligue 3",
+          "teams": 18,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "GoalDifference",
+            "GoalsFor",
+            "HeadToHead",
+            "Wins"
+          ],
+          "movements": [
+            {
+              "positions": "1-2",
+              "to": "Up"
+            },
+            {
+              "positions": "16-18",
+              "to": "Down"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": 4,
+      "divisions": [
+        {
+          "id": "FRA4",
+          "name": "National 1",
+          "teams": 16,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "GoalDifference",
+            "GoalsFor",
+            "HeadToHead",
+            "Wins"
+          ],
+          "movements": [
+            {
+              "positions": "1",
+              "to": "Up"
+            },
+            {
+              "positions": "13-16",
+              "to": "Down"
+            }
+          ],
+          "groups": [
+            {
+              "id": "FRA4A",
+              "name": "National 1 Groupe A",
+              "regions": [
+                "Nord"
+              ]
+            },
+            {
+              "id": "FRA4B",
+              "name": "National 1 Groupe B",
+              "regions": [
+                "Ouest"
+              ]
+            },
+            {
+              "id": "FRA4C",
+              "name": "National 1 Groupe C",
+              "regions": [
+                "Sud"
+              ]
+            }
+          ],
+          "assignment": "Fixed"
+        }
+      ]
+    }
+  ],
+  "pools": [
+    {
+      "id": "FRA-N2",
+      "name": "National 2",
+      "teams": 50,
+      "feeds": "FRA4"
+    }
+  ],
+  "cups": [
+    {
+      "id": "FRA-SC",
+      "name": "Trophée des Champions",
+      "participants": [
+        "FRA1"
+      ],
+      "teams": 2,
+      "entries": [
+        {
+          "qualifiersOf": "FRA-CUP",
+          "count": 1
+        },
+        {
+          "participants": [
+            "FRA1"
+          ],
+          "previousSeason": true,
+          "count": 1
+        }
+      ],
+      "fixedPairing": true,
+      "lowerTierHome": false,
+      "legs": 1,
+      "dates": [
+        "08-08"
+      ],
+      "neutralFinal": true,
+      "prizes": [
+        0
+      ],
+      "winnerPrize": 0
+    },
+    {
+      "id": "FRA-CUP",
+      "name": "Coupe Nationale",
+      "participants": [
+        "FRA3",
+        "FRA4",
+        "FRA-N2"
+      ],
+      "teams": 149,
+      "entries": [
+        {
+          "participants": [
+            "FRA1"
+          ],
+          "round": 3
+        },
+        {
+          "participants": [
+            "FRA2"
+          ],
+          "round": 2
+        }
+      ],
+      "lowerTierHome": true,
+      "legs": 1,
+      "awayGoals": false,
+      "dates": [
+        "10-18",
+        "11-15",
+        "12-20",
+        "01-17",
+        "02-07",
+        "03-04",
+        "04-21",
+        "05-23"
+      ],
+      "neutralFinal": true
+    }
+  ],
+  "playoffs": [
+    {
+      "id": "FRA-BAR1",
+      "name": "Barrage Ligue 1",
+      "upperDivision": "FRA1",
+      "upperPosition": 16,
+      "lowerDivision": "FRA2",
+      "lowerPosition": 3,
+      "legs": 2,
+      "awayGoals": false,
+      "dates": [
+        "05-27",
+        "05-31"
+      ]
+    },
+    {
+      "id": "FRA-BAR2",
+      "name": "Barrage Ligue 2",
+      "upperDivision": "FRA2",
+      "upperPosition": 16,
+      "lowerDivision": "FRA3",
+      "lowerPosition": 3,
+      "legs": 2,
+      "awayGoals": false,
+      "dates": [
+        "05-26",
+        "05-30"
+      ]
+    }
+  ],
+  "transferWindows": {
+    "summerStart": "06-16",
+    "summerEnd": "09-01",
+    "winterStart": "01-02",
+    "winterEnd": "02-02",
+    "preContractFrom": "01-01"
+  },
+  "youth": {
+    "intakeMonth": 3,
+    "minPlayers": 4,
+    "maxPlayers": 9,
+    "proContractAge": 16,
+    "promoteAge": 16,
+    "intakeAge": 14,
+    "groupSize": 14,
+    "referenceBudget": 1300000
+  },
+  "formative": {
+    "club": 0.15,
+    "country": 0.5
+  },
+  "reserves": {
+    "minLevelGap": 3,
+    "playInCups": false,
+    "ageLimit": 23,
+    "overAgePlayers": 3
+  },
+  "finance": {
+    "cateringPerSpectator": 3,
+    "merchPerSpectator": 5,
+    "sponsorRelegationPercent": 40,
+    "sponsorPromotionPercent": 25,
+    "divisions": {
+      "FRA1": {
+        "tvPool": 750000000,
+        "tvEqualShare": 0.4,
+        "standing": 15,
+        "seating": 30,
+        "box": 8000,
+        "floodlightRequired": 3,
+        "youthCenterRequired": 2,
+        "minEquity": -60000000,
+        "travelPerAwayMatch": 45000,
+        "wageLevel": 1.0,
+        "sponsorLevel": 0.55,
+        "academyBudgetFactor": 8.0,
+        "operatingCostShare": 0.55,
+        "maxAnnualWage": 25000000,
+        "targetAnnualWage": 3400000,
+        "relegationWagePercent": 50,
+        "squadSize": 28,
+        "reference": {
+          "source": "DNCG, Rapport 2024/25 (Zahlen laut Pressezusammenfassungen), Ligue 1, 18 Klubs, Durchschnitt je Klub",
+          "official": true,
+          "income": {
+            "matchday": 14000000,
+            "total": 120100000
+          },
+          "expenses": {
+            "squad": 96200000
+          }
+        }
+      },
+      "FRA2": {
+        "tvPool": 50000000,
+        "tvEqualShare": 0.8,
+        "standing": 6,
+        "seating": 11,
+        "box": 2000,
+        "floodlightRequired": 2,
+        "youthCenterRequired": 1,
+        "minEquity": -10000000,
+        "travelPerAwayMatch": 18000,
+        "wageLevel": 0.3,
+        "sponsorLevel": 0.1,
+        "academyBudgetFactor": 5.0,
+        "operatingCostShare": 0.45,
+        "maxAnnualWage": 1000000,
+        "targetAnnualWage": 250000,
+        "relegationWagePercent": 50,
+        "promotionWagePercent": 60,
+        "squadSize": 26,
+        "reference": {
+          "source": "DNCG, Rapport 2024/25 (Zahlen laut Pressezusammenfassungen), Ligue 2, 18 Klubs, Durchschnitt je Klub",
+          "official": true,
+          "income": {
+            "total": 11200000
+          }
+        }
+      },
+      "FRA3": {
+        "tvPool": 8000000,
+        "tvEqualShare": 1.0,
+        "standing": 7,
+        "seating": 11,
+        "box": 600,
+        "floodlightRequired": 1,
+        "youthCenterRequired": 0,
+        "minEquity": -1500000,
+        "travelPerAwayMatch": 8000,
+        "wageLevel": 0.18,
+        "sponsorLevel": 0.2,
+        "operatingCostShare": 0.3,
+        "maxAnnualWage": 250000,
+        "targetAnnualWage": 70000,
+        "relegationWagePercent": 50,
+        "promotionWagePercent": 80
+      },
+      "FRA4": {
+        "tvPool": 0,
+        "standing": 5,
+        "seating": 8,
+        "box": 300,
+        "floodlightRequired": 0,
+        "youthCenterRequired": 0,
+        "minEquity": -300000,
+        "travelPerAwayMatch": 3500,
+        "wageLevel": 0.08,
+        "sponsorLevel": 0.15,
+        "operatingCostShare": 0.3,
+        "maxAnnualWage": 60000,
+        "targetAnnualWage": 20000,
+        "relegationWagePercent": 50,
+        "promotionWagePercent": 100
+      },
+      "FRA-N2": {
+        "tvPool": 0,
+        "standing": 4,
+        "seating": 6,
+        "box": 200,
+        "floodlightRequired": 0,
+        "youthCenterRequired": 0,
+        "minEquity": -150000,
+        "travelPerAwayMatch": 2500,
+        "wageLevel": 0.04,
+        "sponsorLevel": 0.1,
+        "operatingCostShare": 0.25,
+        "maxAnnualWage": 20000,
+        "targetAnnualWage": 6000,
+        "promotionWagePercent": 60
+      }
+    },
+    "cupPrizes": [
+      20000,
+      40000,
+      60000,
+      120000,
+      250000,
+      500000,
+      1000000,
+      1500000
+    ],
+    "cupWinnerPrize": 2000000,
+    "playoffPrize": 300000,
+    "creditLimitPercent": 15,
+    "boardApprovalAbove": 10000000,
+    "permitAbove": 5000000,
+    "seasonTicketDeadline": "07-31",
+    "licenseApplication": "03-15",
+    "licenseDecision": "04-30",
+    "licenseDeadline": "05-31",
+    "conditionPenalty": 3,
+    "stadiumCostPerPlace": 2800,
+    "stadiumBaseCost": 18000000,
+    "stadiumCostPerBox": 180000,
+    "stadiumBuildDays": 720
+  },
+  "europe": {
+    "league": "FRA1",
+    "places": [
+      {
+        "competition": "UCL",
+        "from": 1,
+        "to": 4
+      },
+      {
+        "competition": "UEL",
+        "from": 5,
+        "to": 5
+      },
+      {
+        "competition": "UECL",
+        "from": 6,
+        "to": 6
+      }
+    ],
+    "cupWinner": "UEL",
+    "cup": "FRA-CUP",
+    "competitions": [
+      {
+        "id": "UCL",
+        "fieldStrength": 13.6,
+        "entryPrize": 18600000,
+        "stages": [
+          {
+            "key": "europe.stage.league",
+            "date": "01-31",
+            "prize": 6300000
+          },
+          {
+            "key": "europe.stage.r16",
+            "date": "03-15",
+            "prize": 11000000
+          },
+          {
+            "key": "europe.stage.qf",
+            "date": "04-15",
+            "prize": 12500000
+          },
+          {
+            "key": "europe.stage.sf",
+            "date": "05-05",
+            "prize": 15000000
+          },
+          {
+            "key": "europe.stage.final",
+            "date": "05-31",
+            "prize": 18500000
+          }
+        ]
+      },
+      {
+        "id": "UEL",
+        "fieldStrength": 12.6,
+        "entryPrize": 4300000,
+        "stages": [
+          {
+            "key": "europe.stage.league",
+            "date": "01-31",
+            "prize": 2000000
+          },
+          {
+            "key": "europe.stage.r16",
+            "date": "03-15",
+            "prize": 4000000
+          },
+          {
+            "key": "europe.stage.qf",
+            "date": "04-15",
+            "prize": 5000000
+          },
+          {
+            "key": "europe.stage.sf",
+            "date": "05-05",
+            "prize": 6000000
+          },
+          {
+            "key": "europe.stage.final",
+            "date": "05-28",
+            "prize": 7000000
+          }
+        ]
+      },
+      {
+        "id": "UECL",
+        "fieldStrength": 11.8,
+        "entryPrize": 3200000,
+        "stages": [
+          {
+            "key": "europe.stage.league",
+            "date": "01-31",
+            "prize": 1000000
+          },
+          {
+            "key": "europe.stage.r16",
+            "date": "03-15",
+            "prize": 2000000
+          },
+          {
+            "key": "europe.stage.qf",
+            "date": "04-15",
+            "prize": 2500000
+          },
+          {
+            "key": "europe.stage.sf",
+            "date": "05-05",
+            "prize": 4000000
+          },
+          {
+            "key": "europe.stage.final",
+            "date": "05-27",
+            "prize": 7000000
+          }
+        ]
+      }
+    ],
+    "license": {
+      "minSeats": 8000,
+      "floodlight": 3,
+      "academyStars": 1
+    },
+    "ffp": {
+      "acceptableDeviation": 60000000,
+      "severeDeviation": 90000000,
+      "squadCostRatio": 0.7,
+      "finePercent": 3
+    }
+  }
+}

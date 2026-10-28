@@ -18,7 +18,7 @@ public class ItalyTests
         var world = WorldGenerator.Create(data, new NewGameOptions
         {
             Seed = seed, ClubKey = data.Clubs.First(c => c.Division == "ITA2").Key, ManagerName = "Test",
-            Activation = new() { ["DE"] = CountryActivation.Inactive, ["ENG"] = CountryActivation.Inactive, ["ESP"] = CountryActivation.Inactive },
+            Activation = new() { ["DE"] = CountryActivation.Inactive, ["ENG"] = CountryActivation.Inactive, ["ESP"] = CountryActivation.Inactive, ["FRA"] = CountryActivation.Inactive },
         });
         return new GameSession(world, data, new TextMatchEngine());
     }

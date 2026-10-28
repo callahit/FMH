@@ -87,7 +87,7 @@ Farbthemen: Klassik, Hell, Terminal.
   und Potenzial) oder analysieren den nächsten Gegner.
 - **Pokal und Relegation:**
   - Mehrere Pokale je Land, siehe [Pokale](#pokale): in Deutschland Supercup, Pokal und fünf Verbandspokale;
-    in England Supercup, National Cup, League Cup und League Trophy; in Spanien Supercopa und Copa Nacional; in Italien Supercoppa und Coppa Nazionale. Freilose und Heimrecht für Unterklassige;
+    in England Supercup, National Cup, League Cup und League Trophy; in Spanien Supercopa und Copa Nacional; in Italien Supercoppa und Coppa Nazionale; in Frankreich Trophée des Champions und Coupe Nationale. Freilose und Heimrecht für Unterklassige;
     Verlängerung und Elfmeterschießen; neutrales Finale.
   - Relegation 16. gegen 3. in Hin- und Rückspiel (1./2. und 2./3. Liga), Aufstiegsspiele der beiden
     Regionalliga-Meister ohne Direktplatz (jährlich wechselnd).
@@ -151,7 +151,7 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
     - Spieler: Gehalt nach der Klausel im Vertrag. Sie ist verhandelbar, ein höherer Abschlag als üblich kostet je
       Prozentpunkt 0,3 % mehr Grundgehalt.
     - Personal und Manager: übliche Klausel der bisherigen Spielklasse.
-    - Sponsoren: Zahlung und Bonus nach der Klausel im Sponsorenvertrag (Deutschland −40/+25 %, England −40/+30 %, Spanien und Italien −40/+25 %).
+    - Sponsoren: Zahlung und Bonus nach der Klausel im Sponsorenvertrag (Deutschland −40/+25 %, England −40/+30 %, Spanien, Italien und Frankreich −40/+25 %).
     - Übliche Werte stehen je Spielklasse in `relegationWagePercent`/`promotionWagePercent`, zum Beispiel
       Deutschland: 1. Liga −40 %, 2. Liga −50/+40 %, 3. Liga −70/+80 %, Regionalliga −50/+100 %, Oberliga +60 %.
     - Verträge aus älteren Spielständen ohne Klausel folgen wie bisher dem Gehaltsniveau der neuen Spielklasse.
@@ -181,7 +181,7 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
   - **Europapokalplätze** zum Saisonende:
     - Platz 1–4 der 1. Liga spielen im Champions-Pokal, Platz 5 und der Pokalsieger im
       Europa-Pokal, Platz 6 im Conference-Pokal. In England geht der Conference-Platz an den Sieger des
-      League Cup statt an den Sechsten (`europe.cupPlaces`). Spanien und Italien: Platz 1–4, 5 und 6 wie in Deutschland.
+      League Cup statt an den Sechsten (`europe.cupPlaces`). Spanien, Italien und Frankreich: Platz 1–4, 5 und 6 wie in Deutschland.
     - Ohne Zulassung rückt der nächste Verein nach. Ist ein Pokalsieger schon qualifiziert oder ohne
       Lizenz, geht sein Platz an den nächsten Ligaplatz.
     - Die Wettbewerbe laufen vereinfacht ohne eigene Spiele: An fünf Terminen entscheidet die
@@ -262,8 +262,10 @@ Jedes Land hat beliebig viele Pokale (`cups` in `countries/*.json`). Ein Pokal n
 | | League Trophy | Second und Third Division |
 | Spanien | Supercopa (4) | Finalisten der Copa Nacional und die ersten zwei der Primera División (bei Überschneidung der Nächste), Halbfinale und Finale neutral; das Finale eine Woche nach dem Halbfinale (real am Wochenende danach) |
 | | Copa Nacional | 112 Vereine ab Runde 1 (Primera División bis Tercera Federación, ohne Filiales, Heimrecht für Unterklassige), die ersten vier der Primera División der Vorsaison ab Runde 3 (Runde der letzten 32, wie die Supercopa-Teilnehmer); Halbfinale mit Hin- und Rückspiel |
-| Italien | Supercoppa (4) | Die ersten zwei der Serie A und die Finalisten der Coppa (bei Überschneidung der Nächste), neutral |
+| Italien | Supercoppa (4) | Die Finalisten der Coppa und die ersten zwei der Serie A (bei Überschneidung der nächste der Serie A), neutral |
 | | Coppa Nazionale (44) | 4 Vereine der Serie B und 4 der Serie C in Runde 1, 12 der Serie A und 16 der Serie B ab Runde 2, die besten acht der Serie A ab dem Achtelfinale; Heimrecht für den höher eingestuften Verein, Halbfinale mit Hin- und Rückspiel |
+| Frankreich | Trophée des Champions | Meister gegen Sieger der Coupe (Doublesieger: gegen den Zweiten), neutral |
+| | Coupe Nationale | Ligue 3, National 1 und 2 ab Runde 1 (ohne zweite Mannschaften, Heimrecht für Unterklassige), Ligue 2 ab Runde 2, Ligue 1 ab der Runde der letzten 64 |
 
 Spielstände: Neue Felder haben Standardwerte, ältere Spielstände spielen mit ihrer gespeicherten Pokalkonfiguration
 weiter (ein Pokal je Land).
@@ -318,14 +320,18 @@ im Monat, Spitze bis 6.500 €).
   Ligabericht; Ziel sind Deloittes Zahlen 2024/25 (3,0 Mrd. € Umsatz, davon 0,5 Spieltag und 1,5 TV einschließlich UEFA),
   als nicht amtlich gekennzeichnet. Serie B und C nach dem ReportCalcio der FIGC: Serie B 2023/24 Wert der Produktion
   483 Mio. € und Personalkosten 394 Mio. € (20 Klubs); ohne Spielerverkäufe (2022/23 rund 15 % des Werts) geschätzt
-  20,8 Mio. € je Klub. Serie C 2022/23 je Klub 3,6 Mio. €, Gehälter rund 90 % davon. Für die Federación-Ligen gibt es keinen Ligabericht.
+  20,8 Mio. € je Klub. Serie C 2022/23 je Klub 3,6 Mio. €, Gehälter rund 90 % davon. Frankreich: amtliche Zahlen der DNCG
+  für 2024/25 (laut Pressezusammenfassungen des Jahresberichts): Ligue 1 Erträge ohne Transfers 2.161 Mio. € für 18
+  Klubs (120,1 je Klub), davon Ticketing 252 Mio. € (14,0 je Klub); Lohnsumme 51,7 % von 3.350 Mio. € Aufwand (96,2 je
+  Klub). Ligue 2 Erträge 202 Mio. € (11,2 je Klub). Für die Federación-Ligen gibt es keinen Ligabericht.
 - **Lizenz und TV-Geld:** Der Leistungsanteil der TV-Gelder fließt erst zum Saisonende. Bei der Lizenzprüfung im
   Frühjahr zählt er nach dem aktuellen Tabellenplatz als Forderung zum Eigenkapital. Vorher bekam ein Spitzenclub
   mitten in der Saison wegen dieser Lücke Punktabzug oder keine Lizenz.
 - **Kalibrierung:** `fmh-calibrate --season --seasons 5 --strict` prüft je Spielklasse, dass das Ø-Jahresgehalt
   im Korridor ±30 % um das Ziel liegt; erlaubt ist eine Lohnentwicklung von 4 % je Saison (real etwa 4 % im
-  Jahr laut DFL 2019/20–2024/25). Außerdem müssen die Ligazahlen der letzten Saison passen: Summen ±25 %,
-  einzelne Kategorien ±40 %.
+  Jahr laut DFL 2019/20–2024/25). Außerdem müssen die Ligazahlen im Durchschnitt aller ausgewerteten
+  Saisons passen: Summen ±25 %, einzelne Kategorien ±40 %. Die Werte jeder Saison werden mit ausgegeben; ein einzelner
+  reicher Absteiger verzerrt sonst die zweite Liga einer Saison.
 
 Die Finanzsimulation über fünf Saisons ergibt folgende Werte je Verein:
 
@@ -499,6 +505,7 @@ data/base/           Datenpaket "base": Deutschland, Formationen, Rollen, Regeln
 data/england/        Länderpaket England (dependsOn base): Ligen, Vereine, Namen, Sponsoren, Wettbewerbsnamen
 data/spain/          Länderpaket Spanien (dependsOn base): Ligen mit Gruppen, Filiales, Vereine, Namen, Sponsoren
 data/italy/          Länderpaket Italien (dependsOn base): Serie A–C, Serie D als Pool, Under-23-Teams, Namen, Sponsoren
+data/france/         Länderpaket Frankreich (dependsOn base): Ligue 1–3, National 1 in Gruppen, National 2 als Pool
 ```
 
 Regeln, die ein Architekturtest prüft: erlaubte Projektverweise (Konzept 4.1), keine Datei in
@@ -580,7 +587,7 @@ Ein Land beschreibt seine Pyramide als Ebenen mit Divisionen. Formate ändern si
     Spielzeiten bei Vereinen des Landes gilt er als lokal ausgebildet (Local Player, Homegrown), ab drei beim eigenen
     Verein als im Verein ausgebildet. Spieler, die zu Spielbeginn erzeugt werden, verteilen sich nach `formative`
     (Deutschland und England: 15 % im eigenen Verein, 45 % bei einem anderen Verein des Landes, der Rest im Ausland;
-    Spanien 20 % und 50 %, Italien 15 % und 45 %).
+    Spanien 20 % und 50 %, Italien 15 % und 45 %, Frankreich 15 % und 50 %).
   - 1. und 2. Liga (DFL): Liste bis zur Kadergrenze (32), mindestens 8 Local Player, davon 4 aus dem eigenen Verein,
     und 12 Spieler mit deutscher Staatsangehörigkeit.
   - Premier Division: 25 Plätze für Spieler ab 21, höchstens 17 ohne Homegrown-Status; Jüngere ohne Meldeplatz.
@@ -621,6 +628,7 @@ liegt noch im Grundpaket. Die meisten Tests laden nur `base`, die Länder-Tests 
 | England | 20 | 24 | 24 | 24 | National Non-League (Pool) | 46 Spieltage mit Englischen Wochen, Play-offs 3–6 bzw. 4–7, keine Winterpause |
 | Spanien | 20 | 22 | Primera Federación 2 × 20 | Segunda Federación 5 × 18 | Tercera Federación (Pool, 50) | Direkter Vergleich vor Tordifferenz, Play-offs je Gruppe, Filiales ab Ebene 3, kurze Weihnachtspause |
 | Italien | 20 | 20 | Serie C 3 × 20 | – | Serie D (Pool, 50) | Play-off und Play-out der Serie B, Play-off der Serie C, Under-23-Teams in der Serie C |
+| Frankreich | 18 | 18 | 18 (Ligue 3) | National 1, 3 × 16 | National 2 (Pool, 50) | Barrages 16. gegen 3. zwischen Ligue 1/2 und Ligue 2/3, zweite Mannschaften in der National 1, keine Meldeliste |
 
 England (Stand 2025/26): Premier Division ohne Relegation (18–20 steigen ab); First, Second und Third Division
 steigen mit 2, 2 bzw. 3 Vereinen direkt auf, dazu je ein Play-off-Sieger; Absteiger 3, 4 und 2 (in den Pool).
@@ -644,6 +652,13 @@ Gruppenzweiten und eines Gruppendritten (die Gruppe wechselt jährlich, real 28 
 Under-23-Mannschaften der drei größten Vereine spielen in der Serie C, mindestens zwei Ebenen unter der ersten
 Mannschaft. Fallschirmgeld: Absteiger aus der Serie A erhalten eine Saison lang 50 % des TV-Grundbetrags (real 10 bis
 25 Mio. € je nach Zahl der Jahre in der Serie A). Tabellen: direkter Vergleich vor Tordifferenz.
+
+Frankreich (Stand 2026/27, erste Saison der Ligue 3): Ligue 1 mit zwei Absteigern und Barrage des 16. gegen den
+Dritten der Ligue 2 (real der Sieger eines Play-offs 3–5). Ligue 2 mit zwei Direktaufsteigern, zwei Absteigern und
+Barrage des 16. gegen den Dritten der Ligue 3. Ligue 3 mit zwei Direktaufsteigern und drei Absteigern. National 1 (bis
+2025 National 2) in drei Gruppen nach Regionen: Sieger steigen auf, 13–16 in die National 2. Zweite Mannschaften der
+drei größten Vereine spielen höchstens in der National 1 und nicht im Pokal. Tabellen: Tordifferenz vor direktem
+Vergleich.
 
 ## Offene Entscheidungen
 
@@ -678,6 +693,9 @@ Mannschaft. Fallschirmgeld: Absteiger aus der Serie A erhalten eine Saison lang 
   bei Punktgleichheit um Titel und Abstieg fehlen. Die Serie B prüft die Kalibrierung nur in Summe und Personalkosten,
   die Serie C ebenso (keine Kategorien im ReportCalcio-Auszug). Offen sind die Liste der Serie B, die Spielzeitregeln
   für junge Spieler in der Serie C und die Zahl älterer Spieler in den Under-23-Mannschaften (angenommen vier).
+- **Frankreich:** Die Barrage zwischen Ligue 1 und 2 trägt der Dritte der Ligue 2 statt des Siegers eines Play-offs
+  3–5 aus. Es gibt keine Meldeliste (real höchstens vier Spieler ohne EU-Pass) und keine Hilfen für Absteiger. Die DNCG-Zahlen
+  stammen aus Pressezusammenfassungen; geprüft werden Summe, Ticketing und Lohnsumme der Ligue 1 sowie die Summe der Ligue 2.
 - **Karten in unteren Ligen:** Über alle vier Ebenen zeigt die Engine 3,2 Gelbe und 0,13 Rote Karten je Spiel
   (Ziel 3,8 bzw. 0,2), weil schwächere Spieler seltener in Zweikämpfe kommen. Die Kalibrierung prüft deshalb
   Ebene 1–2 (`--max-level`); ob untere Ligen eigene Zielwerte bekommen, ist offen.

@@ -19,7 +19,7 @@ public class RegistrationTests
         var world = WorldGenerator.Create(data, new NewGameOptions
         {
             Seed = seed, ClubKey = data.Clubs.First(c => c.Division == "ENG1").Key, ManagerName = "Test",
-            Activation = new() { ["DE"] = CountryActivation.Inactive, ["ESP"] = CountryActivation.Inactive, ["ITA"] = CountryActivation.Inactive },
+            Activation = new() { ["DE"] = CountryActivation.Inactive, ["ESP"] = CountryActivation.Inactive, ["ITA"] = CountryActivation.Inactive, ["FRA"] = CountryActivation.Inactive },
         });
         return new GameSession(world, data, new TextMatchEngine());
     }
