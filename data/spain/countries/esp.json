@@ -672,7 +672,8 @@
           "expenses": {
             "squad": 10800000
           }
-        }
+        },
+        "merchLevel": 0.35
       },
       "ES3": {
         "tvPool": 20000000,

@@ -540,7 +540,7 @@
     "referenceBudget": 900000
   },
   "finance": {
-    "cateringPerSpectator": 12,
+    "cateringPerSpectator": 13,
     "merchPerSpectator": 10,
     "sponsorRelegationPercent": 40,
     "sponsorPromotionPercent": 25,
@@ -631,7 +631,7 @@
         "minEquity": -2000000,
         "travelPerAwayMatch": 12000,
         "wageLevel": 0.46,
-        "sponsorLevel": 1.15,
+        "sponsorLevel": 1.2,
         "targetAnnualWage": 165000,
         "operatingCostShare": 0.55,
         "maxAnnualWage": 400000,
