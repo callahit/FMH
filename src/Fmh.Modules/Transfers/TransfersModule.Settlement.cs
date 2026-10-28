@@ -44,6 +44,9 @@ public sealed partial class TransfersModule
         }
     }
 
+    /// <summary>Verein, dessen Budget eine Buchung trägt: bei zweiten Mannschaften der Hauptverein.</summary>
+    private Club Budgeted(Club club) => club.ReserveOf is { } id && World.Clubs.TryGetValue(id, out var parent) ? parent : club;
+
     public Contract MakeContract(ContractOffer o, DateOnly start, Club club)
     {
         // Verträge enden immer am 30. Juni.
@@ -76,8 +79,9 @@ public sealed partial class TransfersModule
             Finance.Book(seller, TransactionType.TransferOut, upfront, TR("tx.transferOut", p.Name));
             for (var k = 1; k <= offer.InstallmentYears; k++)
                 World.Installments.Add(new Installment { FromClubId = buyer.Id, ToClubId = seller.Id, Due = World.Date.AddDays(365 * k), Amount = (fee - upfront) / offer.InstallmentYears, TextRef = TR("tx.installment", p.Name) });
-            buyer.Budget.TransferBudget -= fee;
-            seller.Budget.TransferBudget += fee / 2;
+            // Budgets zweiter Mannschaften führt der Hauptverein (keine eigene Kasse).
+            Budgeted(buyer).Budget.TransferBudget -= fee;
+            Budgeted(seller).Budget.TransferBudget += fee / 2;
             // Weiterverkaufsbeteiligung eines früheren Vereins.
             if (p.Transfer.SellOnClubId is { } soc && soc != buyer.Id && World.Clubs.TryGetValue(soc, out var sellOnClub) && p.Transfer.SellOnPercent > 0)
             {

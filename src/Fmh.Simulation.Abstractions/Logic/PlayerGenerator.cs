@@ -14,6 +14,18 @@ public static class PlayerGenerator
         (Position.AMC, 2), (Position.AML, 1), (Position.AMR, 1), (Position.ST, 3),
     };
 
+    /// <summary>Zusätzliche Plätze für größere Kader, in dieser Reihenfolge.</summary>
+    private static readonly Position[] Extras = { Position.DC, Position.MC, Position.ST, Position.DM, Position.DL, Position.DR, Position.AMC, Position.GK };
+
+    /// <summary>Kaderschablone für <paramref name="size"/> Spieler: Grundschablone (25) plus Extras bzw. gekürzt am Ende.</summary>
+    public static (Position pos, int count)[] Template(int size)
+    {
+        var counts = SquadTemplate.ToDictionary(t => t.pos, t => t.count);
+        for (var i = 0; i < size - 25; i++) counts[Extras[i % Extras.Length]]++;
+        for (var i = 0; i < 25 - size; i++) counts[Extras[i % Extras.Length]] = Math.Max(1, counts[Extras[i % Extras.Length]] - 1);
+        return SquadTemplate.Select(t => (t.pos, counts[t.pos])).ToArray();
+    }
+
     /// <summary>Durchschnittliche Positionsstärke (1–20) eines Kaders je Vereinsreputation.</summary>
     public static double ClubLevel(int reputation) => 6.6 + reputation * 0.4;
 

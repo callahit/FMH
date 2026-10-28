@@ -285,7 +285,7 @@ im Monat, Spitze bis 6.500 €).
   Verein gemessen. Gehälter und Marktwerte richten sich nach dem Abstand dazu, damit stärker werdende Kader
   das Gehaltsgefüge nicht aufblähen (Spielstand: `market_levels`/`market_bases` in `meta`).
 - **Daten je Spielklasse** (`finance.divisions`): TV-Topf, Eintrittspreise, `wageLevel`, `maxAnnualWage`,
-  `sponsorLevel`, `operatingCostShare`, `academyBudgetFactor` und `targetAnnualWage` als Kalibrierungsziel. Je Land
+  `sponsorLevel`, `operatingCostShare`, `academyBudgetFactor`, `squadSize` und `targetAnnualWage` als Kalibrierungsziel. Je Land
   gelten `cateringPerSpectator` und `merchPerSpectator`. KI-Vereine übernehmen nach Auf- und Abstieg die
   Eintrittspreise ihrer neuen Spielklasse.
 - **Ligazahlen** (`finance.divisions.*.reference`): Erträge und Aufwand je Verein ohne Transfers, in den Kategorien
@@ -324,21 +324,21 @@ Im Vergleich mit dem DFL-Bericht (letzte Saison des Laufs, Spiel/Bericht in Mio.
 
 | Kategorie | 1. Liga | 2. Liga |
 |---|---|---|
-| Spielertrag | 28/33 | 13/15 |
-| Werbung | 68/64 | 13/12 |
-| Mediale Verwertung | 97/95 | 16/16 |
-| Merchandising | 19/16 | 7/5 |
-| Sonstiges | 22/29 | 8/10 |
-| Erträge gesamt | 234/236 | 56/58 |
-| Personal Spielbetrieb | 82/96 | 15/17 |
-| Verwaltung, Spielbetrieb, Sonstiges | 115/108 | 38/39 |
-| Nachwuchs | 17/14 | 4/4 |
-| Aufwand gesamt | 213/217 | 57/59 |
+| Spielertrag | 29/33 | 12/15 |
+| Werbung | 77/64 | 13/12 |
+| Mediale Verwertung | 93/95 | 16/16 |
+| Merchandising | 20/16 | 7/5 |
+| Sonstiges | 23/29 | 7/10 |
+| Erträge gesamt | 241/236 | 55/58 |
+| Personal Spielbetrieb (mit zweiter Mannschaft) | 86/96 | 15/17 |
+| Verwaltung, Spielbetrieb, Sonstiges | 119/108 | 37/39 |
+| Nachwuchs | 16/14 | 5/4 |
+| Aufwand gesamt | 220/217 | 57/59 |
 
 Darin sind die Budgets der Nachwuchsleistungszentren und die Europapokalprämien bereits enthalten.
 Absteiger geraten mit ihren Gehältern ins Minus. Es gibt keine Kettenpleiten. In der 2. Liga bekommen
 einige Vereine im Frühjahr Lizenzauflagen, Punktabzüge sind selten. Die Zahl der vereinslosen
-Spieler bleibt bei 100–130: Wer nach der Jugend nicht übernommen wird, geht meist in den
+Spieler steigt mit England im Lauf auf 400–650: Wer nach der Jugend nicht übernommen wird, geht meist in den
 Amateurfußball, und Vereine mit dünnem Kader verpflichten unter der Saison nach. Die Kennzahlen zeigt
 `fmh-calibrate --season --seasons 5` je Liga und Buchungsart an.
 
@@ -552,6 +552,14 @@ Ein Land beschreibt seine Pyramide als Ebenen mit Divisionen. Formate ändern si
   Endtabelle reiht die Gruppen hintereinander; Bewegungsregeln und Relegation gelten für sie.
 - **Zweite Mannschaften:** Vereine mit `reserveOf` (Schlüssel der ersten Mannschaft). `reserves` im Land regelt den
   Mindestabstand in Ebenen (`minLevelGap`), die Pokalteilnahme und das Spielrecht (`ageLimit`, `overAgePlayers`).
+  Sie haben keine eigene Kasse: Gehälter und Einnahmen bucht der Hauptverein, gekennzeichnet mit dem Namen der
+  zweiten Mannschaft. So zählen ihre Spieler zur Gehaltsliste und zum Personalaufwand des Vereins. Eine zweite
+  Mannschaft hat kein Transferbudget und ergänzt ihren Kader nur ablösefrei im Rahmen ihrer laufenden Gehälter. Muss
+  sie wegen des Abstands zur ersten Mannschaft absteigen, gilt das auch, wenn kein Verein aufsteigen darf; dann rückt
+  der bestplatzierte Verein der Ebene darunter ohne Aufstiegslizenz nach.
+- **Kadergröße:** `squadSize` je Spielklasse (Standard 25): Deutschland 1. Liga 29, 2. Liga 28, 3. Liga 26; England
+  Premier Division 30, First Division 28, Third Division 24. Danach richten sich Kaderaufbau, Nachverpflichtungen der
+  KI (bis drei unter der Kadergröße) und Vertragsverlängerungen.
 - **Gültigkeit:** `validFrom`/`validTo` je Formatversion; beim Saisonwechsel gilt die passende Version, Ligen und
   Staffeln werden umgebaut. Der Validator prüft für jede Version, dass Zu- und Abgänge je Ebene aufgehen, und
   beim Wechsel, dass die Teamzahlen nach den Übergangsregeln zur neuen Version passen.
@@ -595,8 +603,8 @@ TV-Grundbetrags eines Premier-Division-Vereins, nach nur einer Saison in der Pre
   Saison fehlen Vorjahresergebnisse, deshalb gehen die Amateurplätze im Pokal dann nach Ruf. Die fiktiven Ortsnamen sind
   zusammengesetzt; Übereinstimmungen mit kleinen realen Orten sind möglich, bekannte Vereinsorte sind ausgeschlossen.
 - **Wirtschaft:** Die 1. Liga erwirtschaftet im Schnitt +20 bis +43 Mio. je Saison (laut DFL ohne Transfers etwa
-  +19 Mio.), weil die KI Überschüsse nur teilweise ausgibt. Der Personalaufwand liegt rund 15 % unter dem
-  DFL-Wert, weil Kader im Spiel kleiner sind als real. Die Stadien der fiktiven Vereine wurden auf reale
+  +19 Mio.), weil die KI Überschüsse nur teilweise ausgibt. Der Personalaufwand liegt mit größeren Kadern und
+  den zweiten Mannschaften noch rund 10 % unter dem DFL-Wert. Die Stadien der fiktiven Vereine wurden auf reale
   Größenordnungen gebracht (2. Liga Ø rund 30.000 Plätze). Bauprojekte, Prämien des Vorstands und Strafen sind noch nicht an die
   neuen Größenordnungen angepasst. Ältere Spielstände behalten ihre gespeicherte Länderkonfiguration (ohne
   Betriebskosten, Sponsorenniveau 1,0) und ihre Gehälter, rechnen aber Sponsoren, Marktwerte und neue Verträge
