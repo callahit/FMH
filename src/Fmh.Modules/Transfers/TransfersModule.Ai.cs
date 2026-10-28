@@ -117,20 +117,24 @@ public sealed partial class TransfersModule
     public bool SignBestFreeAgent(Club club, Position pos, bool withinBudget = false)
     {
         var level = PlayerGenerator.ClubLevel(club.Reputation);
-        var best = FreeAgents
+        var candidates = FreeAgents
             .Where(p => p.MainPosition == pos || p.SuitabilityFor(pos) >= Suitability.Good)
             .Select(p => (p, r: Ratings.EffectiveRating(p, pos, Data.PositionProfiles)))
             .Where(x => x.r <= level + 2 && Negotiations.RefusalReason(x.p, club, World, Data) is null)
             .OrderByDescending(x => x.r)
-            .Select(x => x.p)
-            .FirstOrDefault();
-        if (best is null) return false;
-        var contract = Negotiations.SuggestContract(best, club, World, Data);
-        contract.Years = Math.Min(contract.Years, best.Age(World.Date) >= 30 ? 1 : 2);
-        if (withinBudget && Budgets.WageBill(club, World) + contract.WeeklyWage > club.Budget.WageBudget * 1.05) return false;
-        ExecuteTransfer(best, club, null, new ClubOffer(), contract);
-        club.Budget.WageBudget = Math.Max(club.Budget.WageBudget, Budgets.WageBill(club, World));
-        return true;
+            .Select(x => x.p);
+        var bill = Budgets.WageBill(club, World);
+        // Mit Budgetgrenze: der beste Spieler, dessen Gehalt noch passt (höchstens acht Verhandlungen).
+        foreach (var p in candidates.Take(withinBudget ? 8 : 1))
+        {
+            var contract = Negotiations.SuggestContract(p, club, World, Data);
+            contract.Years = Math.Min(contract.Years, p.Age(World.Date) >= 30 ? 1 : 2);
+            if (withinBudget && bill + contract.WeeklyWage > club.Budget.WageBudget * 1.05) continue;
+            ExecuteTransfer(p, club, null, new ClubOffer(), contract);
+            club.Budget.WageBudget = Math.Max(club.Budget.WageBudget, Budgets.WageBill(club, World));
+            return true;
+        }
+        return false;
     }
 
     /// <summary>KI hält den Kader in Grenzen: Überzählige auf die Transferliste, notfalls Vertrag auflösen.</summary>

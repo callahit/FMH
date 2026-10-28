@@ -23,7 +23,7 @@ public static class EconomyReport
     }
 
     private static readonly Dictionary<(int Season, string Country, int Level), Counts> Seasons = new();
-    private static readonly Dictionary<int, (bool Insolvent, LicenseStage Stage, LicenseOutcome Outcome)> Last = new();
+    private static readonly Dictionary<int, (bool Insolvent, int DaysBelow, LicenseStage Stage, LicenseOutcome Outcome)> Last = new();
 
     /// <summary>Nach jedem Tag aufrufen.</summary>
     public static void Observe(World w)
@@ -32,12 +32,15 @@ public static class EconomyReport
         {
             if (w.FindLeague(c.LeagueId) is not { } league) continue;
             var counts = Get(w.SeasonYear, league.CountryCode, league.Level);
-            var now = (c.Finance.Insolvent, c.License.Stage, c.License.Outcome);
+            var now = (c.Finance.Insolvent, DaysBelow: c.Finance.DaysBelowLimit, c.License.Stage, c.License.Outcome);
             if (Last.TryGetValue(c.Id, out var before))
             {
                 if (now.Insolvent && !before.Insolvent) counts.Insolvencies++;
                 if (now.Stage == LicenseStage.Decided && before.Stage != LicenseStage.Decided)
                 {
+                    // Die Lizenzentscheidung setzt Insolvent am selben Tag zurück: eine an diesem Tag ausgelöste Insolvenz
+                    // erkennt man am zurückgesetzten Unterschreitungszähler (zählt im Zweifel eher zu viel als zu wenig).
+                    if (!now.Insolvent && !before.Insolvent && before.DaysBelow >= 29 && now.DaysBelow == 0) counts.Insolvencies++;
                     if (now.Outcome == LicenseOutcome.PointDeduction) counts.Deductions++;
                     if (now.Outcome == LicenseOutcome.Refused) counts.Refusals++;
                 }
