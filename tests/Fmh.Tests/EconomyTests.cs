@@ -3,6 +3,7 @@ using Fmh.Core.Game;
 using Fmh.Core.Logic;
 using Fmh.Core.Model;
 using Fmh.Core.Persistence;
+using Fmh.MatchEngine;
 
 namespace Fmh.Tests;
 
@@ -121,8 +122,11 @@ public class EconomyTests
     {
         double Merch(double level)
         {
-            var s = TestData.NewSession(41);
-            s.World.Country("DE").Finance.Divisions["DE2"].MerchLevel = level;
+            // Eigene Datenkopie: Die Länderdaten der geteilten Testdaten nicht verändern, andere Tests laufen parallel.
+            var data = PackageLoader.Load(new[] { PackageLoader.FindDataRoot() }, enabledPackages: new[] { "base" });
+            data.Countries.Single(c => c.Code == "DE").Finance.Divisions["DE2"].MerchLevel = level;
+            var world = WorldGenerator.Create(data, new NewGameOptions { Seed = 41, ClubKey = "nordheide", ManagerName = "Test" });
+            var s = new GameSession(world, data, new TextMatchEngine());
             for (var i = 0; i < 40; i++)
             {
                 var r = s.Advance(1);
