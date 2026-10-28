@@ -32,6 +32,9 @@ public sealed class CountryConfig
     public FinanceConfig Finance { get; set; } = new();
     public EuropeConfig? Europe { get; set; }
     public ReserveRules Reserves { get; set; } = new();
+    /// <summary>Meldelisten je Liga bzw. Division (Id); ohne Eintrag gibt es keine Meldepflicht.</summary>
+    public Dictionary<string, RegistrationRules> Registration { get; set; } = new();
+    public FormativeShares Formative { get; set; } = new();
 
     public IEnumerable<DivisionConfig> Divisions => Levels.SelectMany(l => l.Divisions);
 

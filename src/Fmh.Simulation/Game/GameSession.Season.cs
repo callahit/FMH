@@ -11,4 +11,8 @@ public sealed partial class GameSession
 {
     public Position NeededPosition(Club club) => _season.NeededPosition(club);
     public bool IsTransferWindowOpen(Club? club = null) => _season.IsTransferWindowOpen(club);
+
+    /// <summary>Spieler des eigenen Vereins melden bzw. abmelden (nur bei offenem Transferfenster); Textschlüssel eines Fehlers oder null.</summary>
+    public string? SetRegistration(Player p, bool registered) =>
+        !IsTransferWindowOpen(HumanClub) ? "registration.error.window" : Registration.Set(World, HumanClub, p, registered);
 }
