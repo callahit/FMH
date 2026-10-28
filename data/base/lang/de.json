@@ -1347,6 +1347,7 @@
  "rumour.1": "Wie aus gut informierten Kreisen verlautet, soll {1} ein Auge auf {0} geworfen haben. Bei {2} gibt man sich gelassen.",
  "rumour.2": "Ein Scout von {1} wurde beim letzten Spiel auf der Tribüne gesichtet – angeblich wegen {0}.",
  "rumour.3": "Der Berater von {0} soll sich mit Verantwortlichen von {1} getroffen haben. {2} dementiert.",
+ "rumour.4": "Laut einem Bericht steht {0} auf der Wunschliste von {1}. Bei {2} will man von einem Angebot nichts wissen.",
  "interview.unhappy.subject": "{0} unzufrieden",
  "interview.unhappy.body": "Im Interview klagt {0} über zu wenig Einsatzzeit bei {1}: „So kann ich nicht weitermachen.“",
  "interview.happy.subject": "{0} schwärmt",
