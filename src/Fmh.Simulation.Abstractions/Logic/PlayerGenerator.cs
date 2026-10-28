@@ -153,12 +153,15 @@ public static class PlayerGenerator
         h.ImportantMatches = Personality();
 
         h.CurrentAbility = Ratings.CurrentAbility(p, profiles);
+        // Im Mittel holt ein junger Spieler nur den Altersabschlag auf (WorldGenerator.AgeLevelOffset, 1 Stärkepunkt ≈ 10,5 CA);
+        // die Streuung ergibt Talente und Stagnierer. Mehr Spielraum ließe jede Generation stärker werden (Review F-02).
         var headroom = age switch
         {
-            <= 19 => rng.Next(25, 70),
-            <= 21 => rng.Next(15, 50),
-            <= 24 => rng.Next(5, 30),
-            <= 27 => rng.Next(0, 12),
+            <= 18 => rng.Next(10, 45),
+            <= 20 => rng.Next(5, 30),
+            <= 22 => rng.Next(2, 14),
+            <= 24 => rng.Next(0, 8),
+            <= 27 => rng.Next(0, 4),
             _ => 0,
         };
         h.PotentialAbility = Math.Clamp(h.CurrentAbility + headroom, h.CurrentAbility, 200);
