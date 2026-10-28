@@ -35,13 +35,18 @@ public static class CupLogic
         for (var r = 0; r < sizes.Count; r++)
         {
             var dates = r < cfg.Dates.Count ? cfg.Dates[r].Split(',') : new[] { "06-01" };
+            var days = dates.Select(d => ToWeekday(ScheduleGenerator.ParseDate(d.Trim(), world.SeasonYear, country.Season.StartMonth), DayOfWeek.Wednesday)).ToList();
+            // Zwei Termine in derselben Woche fallen auf denselben Mittwoch: Die Folgerunde rückt dann um Wochen nach hinten,
+            // sonst läge sie beim Auslosen schon in der Vergangenheit und die Saison endete nie.
+            if (cup.Rounds.Count > 0 && cup.Rounds[^1].Dates[^1] is var last)
+                while (days[0] <= last) days = days.Select(d => d.AddDays(7)).ToList();
             cup.Rounds.Add(new CupRound
             {
                 Number = r + 1,
                 NameKey = RoundKey(sizes[r], r + 1),
                 Teams = sizes[r],
                 Entrants = entrants.TryGetValue(r + 1, out var ids) ? ids : new List<int>(),
-                Dates = dates.Select(d => ToWeekday(ScheduleGenerator.ParseDate(d.Trim(), world.SeasonYear, country.Season.StartMonth), DayOfWeek.Wednesday)).ToList(),
+                Dates = days,
             });
         }
         return cup;

@@ -72,6 +72,9 @@ public sealed partial class TrainingModule : GameModule, ITrainingService
             && Rng.Chance(Math.Max(0, 0.25 - Facilities.Effect(club, "training.winter") * 0.25 - (club.Stadium.UndersoilHeating ? 0.05 : 0)))) return;
         if (block == TrainingBlock.Tactics) AddFamiliarity(club, club.Tactic.FormationId, 0.8 * CoachFactor(club) * (1 + Facilities.Effect(club, "training.familiarity")));
         if (block == TrainingBlock.PracticeMatch) AddFamiliarity(club, club.Tactic.FormationId, 0.4);
+        // Personal einmal je Einheit statt je Spieler (die Suche läuft über das gesamte Personal der Welt).
+        var fitnessCoach = Staff.StaffAbility(club, StaffRole.FitnessCoach);
+        var goalkeepingCoach = Staff.StaffAbility(club, StaffRole.GoalkeepingCoach);
 
         foreach (var p in squad)
         {
@@ -85,12 +88,12 @@ public sealed partial class TrainingModule : GameModule, ITrainingService
             var gain = SessionGain(club, p, intensity);
             switch (effective)
             {
-                case TrainingBlock.Fitness: p.Training.Physical += gain * 1.2 * (1 + Facilities.Effect(club, "training.physical") + Staff.StaffAbility(club, StaffRole.FitnessCoach) * 0.01); break;
+                case TrainingBlock.Fitness: p.Training.Physical += gain * 1.2 * (1 + Facilities.Effect(club, "training.physical") + fitnessCoach * 0.01); break;
                 case TrainingBlock.Technique: p.Training.Technical += gain * (1 + Facilities.Effect(club, "training.technical")); break;
                 case TrainingBlock.Tactics: p.Training.Mental += gain; break;
                 case TrainingBlock.Finishing: p.Training.Technical += gain * 0.6; Raise(p, gain, Attr.Finishing, Attr.LongShots, Attr.Composure); break;
                 case TrainingBlock.SetPieces: p.Training.Technical += gain * 0.4; Raise(p, gain * (1 + Facilities.Effect(club, "training.setPieces")), Attr.FreeKicks, Attr.Corners, Attr.Penalties); break;
-                case TrainingBlock.Goalkeeping: if (gk) p.Training.Goalkeeping += gain * 1.2 * (1 + Facilities.Effect(club, "training.goalkeeping") + Staff.StaffAbility(club, StaffRole.GoalkeepingCoach) * 0.015); break;
+                case TrainingBlock.Goalkeeping: if (gk) p.Training.Goalkeeping += gain * 1.2 * (1 + Facilities.Effect(club, "training.goalkeeping") + goalkeepingCoach * 0.015); break;
                 case TrainingBlock.PracticeMatch: p.Training.Mental += gain * 0.5; p.Training.Technical += gain * 0.5; break;
             }
             if (p.Training.Focus is not null && effective is not (TrainingBlock.Recovery or TrainingBlock.Rest))
@@ -98,7 +101,7 @@ public sealed partial class TrainingModule : GameModule, ITrainingService
 
             ApplyProgress(p);
             Retrain(p);
-            TrainingInjury(club, p, block, intensity);
+            TrainingInjury(club, p, block, intensity, fitnessCoach);
         }
     }
 
@@ -180,12 +183,12 @@ public sealed partial class TrainingModule : GameModule, ITrainingService
         if (current + 1 == Suitability.Natural) p.Training.Retrain = null;
     }
 
-    private void TrainingInjury(Club club, Player p, TrainingBlock block, TrainingIntensity intensity)
+    private void TrainingInjury(Club club, Player p, TrainingBlock block, TrainingIntensity intensity, int fitnessCoach)
     {
         if (block is TrainingBlock.Recovery or TrainingBlock.Rest or TrainingBlock.Tactics or TrainingBlock.SetPieces) return;
         var risk = 0.00035 * IntensityFactor(intensity) * IntensityFactor(intensity) * (0.5 + p.Hidden.InjuryProneness / 20.0) * World.Rules.InjuryFrequency;
         if (p.State.Condition < 70) risk *= 2;
-        risk *= Math.Max(0.3, 1 - Facilities.Effect(club, "training.injury") - Staff.StaffAbility(club, StaffRole.FitnessCoach) * 0.01);
+        risk *= Math.Max(0.3, 1 - Facilities.Effect(club, "training.injury") - fitnessCoach * 0.01);
         if (!Rng.Chance(risk)) return;
         var light = Data.Injuries.OrderBy(i => i.MaxDays).Take(Math.Max(1, Data.Injuries.Count / 2)).ToList();
         var type = light[Rng.WeightedIndex(light.Select(i => i.Weight).ToList())];

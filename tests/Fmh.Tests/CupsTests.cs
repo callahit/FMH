@@ -140,4 +140,20 @@ public class CupsTests
         var europe = TestData.AllData.Countries.Single(c => c.Code == "ENG").Europe!;
         Assert.Equal(new[] { ("ENG-CUP", "UEL"), ("ENG-LC", "UECL") }, europe.AllCupPlaces.Select(p => (p.Cup, p.Competition)));
     }
+    /// <summary>
+    /// Pokalspiele liegen mittwochs: Fallen zwei Rundentermine in dieselbe Woche (Supercopa 2030: 7. und 11. Januar),
+    /// rückt die Folgerunde eine Woche nach hinten. Sonst läge das Finale beim Auslosen schon in der Vergangenheit.
+    /// </summary>
+    [Fact]
+    public void RoundsInTheSameWeekMoveBack()
+    {
+        var s = TestData.NewSession();
+        var w = s.World;
+        w.SeasonYear = 2029;
+        var country = w.Country("DE");
+        var cfg = new CupConfig { Id = "T-SC", Name = "Test", Participants = { "DE1" }, Teams = 4, LowerTierHome = false, Dates = { "01-07", "01-11" } };
+        var cup = CupLogic.CreateCup(w, country, cfg);
+        Assert.Equal(new DateOnly(2030, 1, 9), cup.Rounds[0].Dates[0]);
+        Assert.Equal(new DateOnly(2030, 1, 16), cup.Rounds[1].Dates[0]);
+    }
 }
