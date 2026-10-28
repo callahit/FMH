@@ -112,6 +112,8 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
         foreach (var club in World.Clubs.Values)
         {
             FillSquad(club);
+            // Meldeliste der neuen Saison; die Entscheidungen des Managers bleiben stehen, soweit die Regeln es erlauben.
+            Registration.Fill(World, club, Data, keep: IsHuman(club));
             club.Board.Goal = Board.ExpectedGoal(club);
             Finance.SetSeasonBudget(club);
             Board.UpdateFavourites(club);
@@ -206,6 +208,7 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
         {
             Development.ApplySeason(p, today, Data.PositionProfiles, Rng);
             if (p.SeasonStats.Appearances > 0) p.History.Add(p.SeasonStats);
+            Registration.CountSeason(p, World);
             p.SeasonStats = new PlayerSeasonStats { SeasonYear = World.SeasonYear, ClubId = club.Id };
             p.State.YellowCardsAccumulated = 0;
             p.State.Condition = Math.Max(p.State.Condition, 92);
@@ -277,6 +280,9 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
         p.Contract = Transfers.MakeContract(contract, World.Date, club);
         World.Players[p.Id] = p;
         club.PlayerIds.Add(p.Id);
+        // Notverpflichtung: Ausbildung meist im Amateurbereich des Landes, wird sofort nachgemeldet.
+        Registration.InitFormative(p, World, null, Rng);
+        p.Registration.ClubId = club.Id;
     }
 
     /// <summary>Position mit dem größten Bedarf nach der Kaderschablone.</summary>
@@ -305,7 +311,18 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
         }
         if (World.Date == ScheduleGenerator.ParseDate(tw.SummerEnd, World.SeasonYear, start).AddDays(1) ||
             World.Date == ScheduleGenerator.ParseDate(tw.WinterEnd, World.SeasonYear, start).AddDays(1))
+        {
             Notify(MessageType.Transfer, "msg.sender.assistant", TR("msg.windowClosed.subject"), TR("msg.windowClosed.body"));
+            // Meldeschluss: freie Plätze werden mit den Neuzugängen besetzt, bisherige Meldungen bleiben.
+            foreach (var club in World.Clubs.Values.OrderBy(c => c.Id)) Registration.Fill(World, club, Data, keep: true);
+            if (Registration.RulesFor(World, HumanClub) is { } rules)
+            {
+                var missing = World.SquadOf(HumanClub).Where(p => !Registration.IsEligible(p, World)).Select(p => (object?)p.Name).ToList();
+                if (missing.Count > 0)
+                    Notify(MessageType.Transfer, "msg.sender.assistant", TR("msg.unregistered.subject", missing.Count),
+                        TR("msg.unregistered.body", TextArg.Join(", ", missing), Registration.Capacity(World, HumanClub, rules)));
+            }
+        }
     }
 
     public bool IsTransferWindowOpen(Club? club = null)

@@ -44,7 +44,20 @@ public sealed class PlayerRow
         ContractOrder = p.Contract?.Until.DayNumber ?? 0;
         WageValue = p.Contract?.WeeklyWage ?? 0;
         Wage = p.Contract is { } c ? UiText.Wage(c.WeeklyWage, s.HumanManager.Profile, UiText.Currency(club)) : "–";
+        // Meldeliste: gemeldet, ausgenommen (zu jung) oder nicht gemeldet; dazu lokal bzw. im Verein ausgebildet.
+        if (Registration.RulesFor(s.World, club) is { } rules)
+        {
+            var exempt = Registration.IsExempt(p, s.World, rules);
+            var trained = Registration.IsClubTrained(p, club.Id) ? T["registration.club"] : Registration.IsLocal(p, s.World, club.CountryCode) ? T["registration.local"] : "";
+            RegistrationText = (exempt ? T.Format("registration.exempt", rules.ExemptAge) : p.Registration.ClubId == club.Id ? "✓" : "–")
+                               + (trained.Length > 0 ? " · " + trained : "");
+            RegistrationBrush = new SolidColorBrush(Registration.IsEligible(p, s.World) ? Palette.Current.Text : Palette.Current.Bad);
+        }
     }
+
+    private static Core.Data.Texts T => Data.Texts;
+    public string RegistrationText { get; } = "";
+    public IBrush RegistrationBrush { get; } = Brushes.Transparent;
 
     private static Core.Game.GameSession Session => AppState.Current.Session!;
     private static Core.Data.GameData Data => AppState.Current.Data;
@@ -120,6 +133,28 @@ public sealed partial class SquadPageViewModel : PageViewModel, IRefreshable
         var suspended = squad.Count(p => p.State.SuspendedMatches > 0);
         Summary = T.Format("squad.summary", squad.Count, Fmt.Num(squad.Average(p => p.Age(Session.World.Date)), "0.0"),
             UiText.Strength(Ratings.StrengthFromRating(AiTactics.TeamStrength(club, Session.World, Data))), injured, suspended);
+        var w = Session.World;
+        if (Registration.RulesFor(w, club) is { } r)
+        {
+            var listed = squad.Where(p => !Registration.IsExempt(p, w, r) && p.Registration.ClubId == club.Id).ToList();
+            RegistrationSummary = T.Format("squad.registration", listed.Count, Registration.Capacity(w, club, r),
+                listed.Count(p => Registration.IsLocal(p, w, club.CountryCode)), r.MinLocal,
+                listed.Count(p => Registration.IsClubTrained(p, club.Id)), r.MinClubTrained);
+        }
+        else RegistrationSummary = "";
+    }
+
+    [ObservableProperty] private string _registrationSummary = "";
+    [ObservableProperty] private string _registrationMessage = "";
+
+    /// <summary>Ausgewählten Spieler melden bzw. abmelden.</summary>
+    [RelayCommand]
+    private void ToggleRegistration()
+    {
+        if (Selected?.Player is not { } p) return;
+        var error = Session.SetRegistration(p, p.Registration.ClubId != Session.HumanClub.Id);
+        RegistrationMessage = error is null ? "" : T[error];
+        Refresh();
     }
 
     [RelayCommand]

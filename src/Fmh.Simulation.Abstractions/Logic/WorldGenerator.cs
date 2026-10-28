@@ -217,6 +217,7 @@ public static class WorldGenerator
                 p.ClubId = club.Id;
                 p.Contract!.WeeklyWage = ClubRules.LeagueWage(world, club, p.Contract.WeeklyWage);
                 ContractClauses.FillDefaults(p.Contract, world, club);
+                Registration.InitFormative(p, world, club, rng);
                 p.SeasonStats = new PlayerSeasonStats { SeasonYear = world.SeasonYear, ClubId = club.Id };
                 world.Players[p.Id] = p;
                 club.PlayerIds.Add(p.Id);

@@ -838,6 +838,26 @@
       "finePercent": 3
     }
   },
+  "registration": {
+    "DE1": {
+      "minLocal": 8,
+      "minClubTrained": 4,
+      "minNationals": 12
+    },
+    "DE2": {
+      "minLocal": 8,
+      "minClubTrained": 4,
+      "minNationals": 12
+    },
+    "DE3": {
+      "matchdayMinYoung": 4,
+      "matchdayYoungAge": 23
+    }
+  },
+  "formative": {
+    "club": 0.15,
+    "country": 0.45
+  },
   "reserves": {
     "minLevelGap": 2,
     "playInCups": false,

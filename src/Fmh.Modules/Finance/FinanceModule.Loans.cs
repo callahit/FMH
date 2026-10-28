@@ -152,7 +152,12 @@ public sealed partial class FinanceModule
             f.Insolvent = true;
             club.Budget.Balance = 0;
             f.DaysBelowLimit = 0;
-            if (World.FindLeague(club.LeagueId) is { } league) league.Deductions[club.Id] = league.Deductions.GetValueOrDefault(club.Id) + 9;
+            // Nach dem letzten Spieltag gilt der Abzug für die nächste Saison (die Abschlusstabelle steht, Play-offs laufen).
+            if (World.FindLeague(club.LeagueId) is { } league)
+            {
+                if (league.IsComplete) f.PendingDeduction += 9;
+                else league.Deductions[club.Id] = league.Deductions.GetValueOrDefault(club.Id) + 9;
+            }
             Notify(MessageType.Finance, "msg.sender.league", TR("msg.aiInsolvency.subject", club.Name), TR("msg.aiInsolvency.body", club.Name));
             return;
         }

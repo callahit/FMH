@@ -155,18 +155,25 @@ public class CareerTests
     [Fact]
     public void IncomingOfferBlocksUntilDecided()
     {
-        var s = TestData.NewSession(12);
-        var year = s.World.SeasonYear;
+        // Angebote für eigene Spieler sind Zufall: die erste Welt (Seed) nehmen, in der in der ersten Saison eines eintrifft.
+        GameSession? found = null;
         AdvanceResult? r = null;
-        bool HasOffer() => s.PendingDecisions.Any(m => m.Action == MessageAction.IncomingOffer);
-        for (var i = 0; i < 400 && !(r?.Reason == StopReason.Decision && HasOffer()); i++)
+        foreach (var seed in new ulong[] { 12, 13, 14, 15, 16 })
         {
-            // Andere Pflichtentscheidungen (Saisonziel, Presse, Ereignisse) delegieren.
-            if (s.PendingDecisions.Count > 0 && !HasOffer()) s.DelegateDecisions();
-            r = s.Advance();
-            if (r.Reason == StopReason.HumanMatch && r.Fixture is { } f) s.PlayInstant(f);
-            Assert.Equal(year, s.World.SeasonYear);
+            var t = TestData.NewSession(seed);
+            var year = t.World.SeasonYear;
+            bool Offer() => t.PendingDecisions.Any(m => m.Action == MessageAction.IncomingOffer);
+            r = null;
+            for (var i = 0; i < 400 && t.World.SeasonYear == year && !(r?.Reason == StopReason.Decision && Offer()); i++)
+            {
+                // Andere Pflichtentscheidungen (Saisonziel, Presse, Ereignisse) delegieren.
+                if (t.PendingDecisions.Count > 0 && !Offer()) t.DelegateDecisions();
+                r = t.Advance();
+                if (r.Reason == StopReason.HumanMatch && r.Fixture is { } f) t.PlayInstant(f);
+            }
+            if (t.World.SeasonYear == year && r?.Reason == StopReason.Decision && Offer()) { found = t; break; }
         }
+        var s = Assert.IsType<GameSession>(found);
         Assert.Equal(StopReason.Decision, r!.Reason);
         var date = s.World.Date;
         Assert.Equal(StopReason.Decision, s.Advance().Reason);
