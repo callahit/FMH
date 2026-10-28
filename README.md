@@ -262,7 +262,7 @@ Jedes Land hat beliebig viele Pokale (`cups` in `countries/*.json`). Ein Pokal n
 | | League Trophy | Second und Third Division |
 | Spanien | Supercopa (4) | Finalisten der Copa Nacional und die ersten zwei der Primera División (bei Überschneidung der Nächste), Halbfinale und Finale neutral; das Finale eine Woche nach dem Halbfinale (real am Wochenende danach) |
 | | Copa Nacional | 112 Vereine ab Runde 1 (Primera División bis Tercera Federación, ohne Filiales, Heimrecht für Unterklassige), die ersten vier der Primera División der Vorsaison ab Runde 3 (Runde der letzten 32, wie die Supercopa-Teilnehmer); Halbfinale mit Hin- und Rückspiel |
-| Italien | Supercoppa (4) | Die ersten zwei der Serie A und die Finalisten der Coppa (bei Überschneidung der Nächste), neutral |
+| Italien | Supercoppa (4) | Die Finalisten der Coppa und die ersten zwei der Serie A (bei Überschneidung der nächste der Serie A), neutral |
 | | Coppa Nazionale (44) | 4 Vereine der Serie B und 4 der Serie C in Runde 1, 12 der Serie A und 16 der Serie B ab Runde 2, die besten acht der Serie A ab dem Achtelfinale; Heimrecht für den höher eingestuften Verein, Halbfinale mit Hin- und Rückspiel |
 | Frankreich | Trophée des Champions | Meister gegen Sieger der Coupe (Doublesieger: gegen den Zweiten), neutral |
 | | Coupe Nationale | Ligue 3, National 1 und 2 ab Runde 1 (ohne zweite Mannschaften, Heimrecht für Unterklassige), Ligue 2 ab Runde 2, Ligue 1 ab der Runde der letzten 64 |

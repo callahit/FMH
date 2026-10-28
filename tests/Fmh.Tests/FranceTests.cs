@@ -69,4 +69,18 @@ public class FranceTests
         Assert.True(w.Clubs[winner].LeagueId == "FRA1" || !w.Clubs[winner].License.PromotionAllowed);
         Assert.Equal(2, w.Cups.Single(c => c.Id == "FRA-SC").ParticipantIds.Count);
     }
+
+    /// <summary>Trophée: Gewinnt der Meister auch die Coupe, spielt er gegen den Zweiten der Ligue 1, nicht gegen den Finalisten.</summary>
+    [Fact]
+    public void DoubleWinnerMeetsTheLeagueRunnerUp()
+    {
+        var w = NewFrance().World;
+        var league = w.League("FRA1").ClubIds;
+        int champion = league[0], runnerUp = league[1], finalist = league[5];
+        w.History.Add(new SeasonRecord { SeasonYear = w.SeasonYear - 1, LeagueId = "FRA1", FinalOrder = league.ToList() });
+        w.History.Add(new SeasonRecord { SeasonYear = w.SeasonYear - 1, LeagueId = "FRA-CUP", FinalOrder = new() { champion, finalist } });
+        var country = w.Country("FRA");
+        var entrants = CupEntries.Resolve(w, country, country.Cups.Single(c => c.Id == "FRA-SC"));
+        Assert.Equal(new[] { champion, runnerUp }, entrants[1]);
+    }
 }
