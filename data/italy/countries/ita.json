@@ -160,14 +160,14 @@
       "teams": 4,
       "entries": [
         {
+          "qualifiersOf": "ITA-CUP",
+          "count": 2
+        },
+        {
           "participants": [
             "ITA1"
           ],
           "previousSeason": true,
-          "count": 2
-        },
-        {
-          "qualifiersOf": "ITA-CUP",
           "count": 2
         }
       ],

@@ -1,0 +1,9 @@
+{
+  "id": "france",
+  "name": "Frankreich (fiktiv)",
+  "version": "0.1.0",
+  "dependsOn": [
+    "base"
+  ],
+  "defaultLanguage": "de"
+}
