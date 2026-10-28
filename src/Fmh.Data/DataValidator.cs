@@ -48,6 +48,14 @@ public static class DataValidator
                     errors.Add($"Ligazahlen '{div}': unbekannte Kategorie '{key}'.");
                 if (string.IsNullOrWhiteSpace(r.Source) || r.Income.Values.Concat(r.Expenses.Values).Any(v => v <= 0))
                     errors.Add($"Ligazahlen '{div}': Quelle fehlt oder Betrag nicht positiv.");
+                foreach (var (key, tol) in r.Tolerances)
+                {
+                    var parts = key.Split('.');
+                    var known = parts.Length == 2 && (parts[0] == "income" ? r.Income : parts[0] == "expenses" ? r.Expenses : null)?.ContainsKey(parts[1]) == true;
+                    if (!known || tol <= 0 || tol > 1) errors.Add($"Ligazahlen '{div}': Toleranz '{key}' ungültig.");
+                }
+                if (r.Tolerances.Count > 0 && string.IsNullOrWhiteSpace(r.ToleranceNote))
+                    errors.Add($"Ligazahlen '{div}': abweichende Toleranzen ohne Begründung.");
             }
             foreach (var (div, r) in country.Registration)
             {

@@ -330,8 +330,12 @@ im Monat, Spitze bis 6.500 €).
 - **Kalibrierung:** `fmh-calibrate --season --seasons 5 --strict` prüft je Spielklasse, dass das Ø-Jahresgehalt
   im Korridor ±30 % um das Ziel liegt; erlaubt ist eine Lohnentwicklung von 4 % je Saison (real etwa 4 % im
   Jahr laut DFL 2019/20–2024/25). Außerdem müssen die Ligazahlen im Durchschnitt aller ausgewerteten
-  Saisons passen: Summen ±25 %, einzelne Kategorien ±40 %. Die Werte jeder Saison werden mit ausgegeben; ein einzelner
-  reicher Absteiger verzerrt sonst die zweite Liga einer Saison.
+  Saisons passen: Summen ±10 %, einzelne Kategorien ±20 % (Review F-03). Abweichende Grenzen stehen je Liga in
+  `reference.tolerances` und brauchen eine Begründung in `reference.toleranceNote`. Die Werte jeder Saison werden mit
+  ausgegeben; ein einzelner reicher Absteiger verzerrt sonst die zweite Liga einer Saison.
+- **Insolvenzen und Lizenz-Punktabzüge:** Der Saisonlauf zählt beides je Land und Ebene. Im Mittel über alle Saisons
+  sind höchstens 2 % Insolvenzen je Saison (bezogen auf die Vereinszahl der Ebene) und höchstens ein Lizenz-Punktabzug
+  je Ebene und Saison erlaubt.
 
 Die Finanzsimulation über fünf Saisons ergibt folgende Werte je Verein:
 
@@ -463,7 +467,8 @@ Weitere Prüfungen:
   deshalb nicht in der CI (gemessen: 2,4 ms in der Cloud-Umgebung, davon etwa 0,4 ms Aufstellung und
   KI-Taktik, der Rest Engine).
 - `--season --seasons 5 --strict` prüft den Karrierelauf: Der langsamste Spieltag muss unter 5 s
-  liegen und alle Saisons müssen durchlaufen.
+  liegen, alle Saisons müssen durchlaufen, Gehälter und Ligazahlen müssen passen und Insolvenzen sowie
+  Lizenz-Punktabzüge unter den Grenzen bleiben (siehe Finanzen).
 - `--max-drift 0.05` prüft zusätzlich die Ligastärke-Drift.
 
 Die Gewichte stehen in `data/base/rules/engine.json`.

@@ -37,6 +37,24 @@ public class LeagueFiguresTests
         Assert.Contains(errors, e => e.Contains("'DE2'") && e.Contains("Quelle"));
     }
 
+    /// <summary>Abweichende Toleranzen der Kalibrierung brauchen eine bekannte Kennzahl und eine Begründung (Review F-03).</summary>
+    [Fact]
+    public void ToleranceExceptionsNeedAReason()
+    {
+        var de = System.Text.Json.JsonSerializer.Deserialize<CountryConfig>(
+            System.Text.Json.JsonSerializer.Serialize(TestData.Data.Countries.Single(c => c.Code == "DE"), Json.Compact), Json.Compact)!;
+        var r = de.Finance.Divisions["DE1"].Reference!;
+        r.Tolerances["income.media"] = 0.3;
+        r.Tolerances["income.catering"] = 0.3;
+        var errors = DataValidator.Validate(new GameData { Countries = new() { de }, Clubs = TestData.Data.Clubs, Names = TestData.Data.Names });
+        Assert.Contains(errors, e => e.Contains("'income.catering'"));
+        Assert.Contains(errors, e => e.Contains("'DE1'") && e.Contains("Begründung"));
+        r.Tolerances.Remove("income.catering");
+        r.ToleranceNote = "Test";
+        errors = DataValidator.Validate(new GameData { Countries = new() { de }, Clubs = TestData.Data.Clubs, Names = TestData.Data.Names });
+        Assert.DoesNotContain(errors, e => e.Contains("Toleranz"));
+    }
+
     /// <summary>Catering zählt wie im DFL-Bericht zu den sonstigen Erlösen; Transfers und Kredite bleiben außen vor.</summary>
     [Fact]
     public void TransactionsMapToReportCategories()
