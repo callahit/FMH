@@ -1,0 +1,705 @@
+{
+  "code": "ITA",
+  "name": "Italien",
+  "currency": "EUR",
+  "validFrom": 2026,
+  "activation": "Playable",
+  "season": {
+    "startMonth": 7,
+    "firstMatchday": "08-23",
+    "winterBreakStart": "12-30",
+    "winterBreakEnd": "01-03",
+    "matchDay": "Saturday",
+    "lastMatchday": "05-24",
+    "midweekDay": "Tuesday"
+  },
+  "squad": {
+    "maxSquad": 32,
+    "benchSize": 9,
+    "substitutions": 5
+  },
+  "discipline": {
+    "yellowCardsForSuspension": 5,
+    "redCardBanMin": 1,
+    "redCardBanMax": 3,
+    "secondYellowBan": 1
+  },
+  "levels": [
+    {
+      "level": 1,
+      "divisions": [
+        {
+          "id": "ITA1",
+          "name": "Serie A",
+          "teams": 20,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "HeadToHead",
+            "GoalDifference",
+            "GoalsFor",
+            "Wins"
+          ],
+          "movements": [
+            {
+              "positions": "18-20",
+              "to": "Down"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": 2,
+      "divisions": [
+        {
+          "id": "ITA2",
+          "name": "Serie B",
+          "teams": 20,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "HeadToHead",
+            "GoalDifference",
+            "GoalsFor",
+            "Wins"
+          ],
+          "movements": [
+            {
+              "positions": "1-2",
+              "to": "Up"
+            },
+            {
+              "positions": "18-20",
+              "to": "Down"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "level": 3,
+      "divisions": [
+        {
+          "id": "ITA3",
+          "name": "Serie C",
+          "teams": 20,
+          "rounds": 2,
+          "points": {
+            "win": 3,
+            "draw": 1,
+            "loss": 0
+          },
+          "tieBreakers": [
+            "HeadToHead",
+            "GoalDifference",
+            "GoalsFor",
+            "Wins"
+          ],
+          "movements": [
+            {
+              "positions": "1",
+              "to": "Up"
+            },
+            {
+              "positions": "18-20",
+              "to": "Down"
+            }
+          ],
+          "groups": [
+            {
+              "id": "ITA3A",
+              "name": "Serie C Girone A",
+              "regions": [
+                "Nord"
+              ]
+            },
+            {
+              "id": "ITA3B",
+              "name": "Serie C Girone B",
+              "regions": [
+                "Centro"
+              ]
+            },
+            {
+              "id": "ITA3C",
+              "name": "Serie C Girone C",
+              "regions": [
+                "Sud"
+              ]
+            }
+          ],
+          "assignment": "Fixed"
+        }
+      ]
+    }
+  ],
+  "pools": [
+    {
+      "id": "ITA-D",
+      "name": "Serie D",
+      "teams": 50,
+      "feeds": "ITA3"
+    }
+  ],
+  "cups": [
+    {
+      "id": "ITA-SC",
+      "name": "Supercoppa",
+      "participants": [
+        "ITA1"
+      ],
+      "teams": 4,
+      "entries": [
+        {
+          "participants": [
+            "ITA1"
+          ],
+          "previousSeason": true,
+          "count": 2
+        },
+        {
+          "qualifiersOf": "ITA-CUP",
+          "count": 2
+        }
+      ],
+      "lowerTierHome": false,
+      "legs": 1,
+      "dates": [
+        "12-10",
+        "12-17"
+      ],
+      "neutralFinal": true,
+      "prizes": [
+        2500000,
+        3500000
+      ],
+      "winnerPrize": 4500000
+    },
+    {
+      "id": "ITA-CUP",
+      "name": "Coppa Nazionale",
+      "participants": [
+        "ITA2",
+        "ITA3"
+      ],
+      "teams": 44,
+      "entries": [
+        {
+          "participants": [
+            "ITA1"
+          ],
+          "previousSeason": true,
+          "count": 8,
+          "round": 4
+        },
+        {
+          "participants": [
+            "ITA1",
+            "ITA2"
+          ],
+          "previousSeason": true,
+          "count": 28,
+          "round": 2
+        }
+      ],
+      "lowerTierHome": false,
+      "legs": 1,
+      "roundLegs": [
+        1,
+        1,
+        1,
+        1,
+        1,
+        2,
+        1
+      ],
+      "awayGoals": false,
+      "dates": [
+        "08-09",
+        "08-16",
+        "09-23",
+        "12-02",
+        "02-03",
+        "03-03,04-21",
+        "05-13"
+      ],
+      "neutralFinal": true
+    }
+  ],
+  "playoffs": [
+    {
+      "id": "ITA-PO2",
+      "name": "Play-off Serie B",
+      "upperDivision": "ITA1",
+      "lowerDivision": "ITA2",
+      "entrants": [
+        {
+          "division": "ITA2",
+          "position": 3
+        },
+        {
+          "division": "ITA2",
+          "position": 4
+        },
+        {
+          "division": "ITA2",
+          "position": 5
+        },
+        {
+          "division": "ITA2",
+          "position": 6
+        }
+      ],
+      "places": 1,
+      "legs": 2,
+      "finalLegs": 2,
+      "seeded": true,
+      "awayGoals": false,
+      "dates": [
+        "05-27,05-31",
+        "06-04,06-08"
+      ]
+    },
+    {
+      "id": "ITA-PL2",
+      "name": "Play-out Serie B",
+      "upperDivision": "ITA2",
+      "lowerDivision": "ITA3",
+      "entrants": [
+        {
+          "division": "ITA2",
+          "position": 16
+        },
+        {
+          "division": "ITA2",
+          "position": 17
+        }
+      ],
+      "places": 1,
+      "legs": 2,
+      "finalLegs": 2,
+      "seeded": true,
+      "awayGoals": false,
+      "dates": [
+        "05-28",
+        "06-01"
+      ]
+    },
+    {
+      "id": "ITA-PO3A",
+      "name": "Play-off Serie C",
+      "upperDivision": "ITA2",
+      "lowerDivision": "ITA3",
+      "entrants": [
+        {
+          "division": "ITA3A",
+          "position": 2
+        },
+        {
+          "division": "ITA3B",
+          "position": 2
+        },
+        {
+          "division": "ITA3C",
+          "position": 2
+        },
+        {
+          "division": "ITA3A",
+          "position": 3
+        }
+      ],
+      "places": 1,
+      "legs": 2,
+      "finalLegs": 2,
+      "seeded": false,
+      "awayGoals": false,
+      "dates": [
+        "05-27,05-31",
+        "06-04,06-08"
+      ],
+      "cycle": 3,
+      "cycleStart": 2026
+    },
+    {
+      "id": "ITA-PO3B",
+      "name": "Play-off Serie C",
+      "upperDivision": "ITA2",
+      "lowerDivision": "ITA3",
+      "entrants": [
+        {
+          "division": "ITA3A",
+          "position": 2
+        },
+        {
+          "division": "ITA3B",
+          "position": 2
+        },
+        {
+          "division": "ITA3C",
+          "position": 2
+        },
+        {
+          "division": "ITA3B",
+          "position": 3
+        }
+      ],
+      "places": 1,
+      "legs": 2,
+      "finalLegs": 2,
+      "seeded": false,
+      "awayGoals": false,
+      "dates": [
+        "05-27,05-31",
+        "06-04,06-08"
+      ],
+      "cycle": 3,
+      "cycleStart": 2027
+    },
+    {
+      "id": "ITA-PO3C",
+      "name": "Play-off Serie C",
+      "upperDivision": "ITA2",
+      "lowerDivision": "ITA3",
+      "entrants": [
+        {
+          "division": "ITA3A",
+          "position": 2
+        },
+        {
+          "division": "ITA3B",
+          "position": 2
+        },
+        {
+          "division": "ITA3C",
+          "position": 2
+        },
+        {
+          "division": "ITA3C",
+          "position": 3
+        }
+      ],
+      "places": 1,
+      "legs": 2,
+      "finalLegs": 2,
+      "seeded": false,
+      "awayGoals": false,
+      "dates": [
+        "05-27,05-31",
+        "06-04,06-08"
+      ],
+      "cycle": 3,
+      "cycleStart": 2028
+    }
+  ],
+  "transferWindows": {
+    "summerStart": "07-01",
+    "summerEnd": "09-01",
+    "winterStart": "01-02",
+    "winterEnd": "02-02",
+    "preContractFrom": "01-01"
+  },
+  "youth": {
+    "intakeMonth": 3,
+    "minPlayers": 4,
+    "maxPlayers": 9,
+    "proContractAge": 16,
+    "promoteAge": 16,
+    "intakeAge": 14,
+    "groupSize": 14,
+    "referenceBudget": 1000000
+  },
+  "registration": {
+    "ITA1": {
+      "maxPlayers": 25,
+      "exemptAge": 21,
+      "minLocal": 8,
+      "minClubTrained": 4
+    }
+  },
+  "formative": {
+    "club": 0.15,
+    "country": 0.45
+  },
+  "reserves": {
+    "minLevelGap": 2,
+    "playInCups": false,
+    "ageLimit": 23,
+    "overAgePlayers": 4
+  },
+  "finance": {
+    "cateringPerSpectator": 3,
+    "merchPerSpectator": 5,
+    "sponsorRelegationPercent": 40,
+    "sponsorPromotionPercent": 25,
+    "divisions": {
+      "ITA1": {
+        "tvPool": 1200000000,
+        "tvEqualShare": 0.5,
+        "standing": 22,
+        "seating": 32,
+        "box": 9000,
+        "floodlightRequired": 3,
+        "youthCenterRequired": 2,
+        "minEquity": -60000000,
+        "travelPerAwayMatch": 50000,
+        "wageLevel": 0.75,
+        "sponsorLevel": 0.4,
+        "academyBudgetFactor": 8.0,
+        "operatingCostShare": 0.55,
+        "maxAnnualWage": 20000000,
+        "targetAnnualWage": 3000000,
+        "relegationWagePercent": 50,
+        "parachuteShares": [
+          0.5
+        ],
+        "squadSize": 28,
+        "reference": {
+          "source": "Deloitte Annual Review of Football Finance 2026, Serie A, Saison 2024/25 (keine amtliche Ligazahl)",
+          "official": false,
+          "income": {
+            "matchday": 25000000,
+            "media": 75000000,
+            "total": 150000000
+          }
+        }
+      },
+      "ITA2": {
+        "tvPool": 60000000,
+        "tvEqualShare": 0.7,
+        "standing": 10,
+        "seating": 16,
+        "box": 2500,
+        "floodlightRequired": 2,
+        "youthCenterRequired": 1,
+        "minEquity": -12000000,
+        "travelPerAwayMatch": 20000,
+        "wageLevel": 0.55,
+        "sponsorLevel": 0.3,
+        "academyBudgetFactor": 5.0,
+        "operatingCostShare": 0.45,
+        "maxAnnualWage": 1500000,
+        "targetAnnualWage": 550000,
+        "relegationWagePercent": 50,
+        "promotionWagePercent": 60,
+        "squadSize": 27,
+        "reference": {
+          "source": "FIGC ReportCalcio 2025, Serie B, Saison 2023/24, Durchschnitt je Klub (Wert der Produktion ohne Spielerverkäufe geschätzt)",
+          "official": true,
+          "income": {
+            "total": 20800000
+          },
+          "expenses": {
+            "squad": 19700000
+          }
+        }
+      },
+      "ITA3": {
+        "tvPool": 10000000,
+        "tvEqualShare": 1.0,
+        "standing": 8,
+        "seating": 12,
+        "box": 600,
+        "floodlightRequired": 1,
+        "youthCenterRequired": 0,
+        "minEquity": -1500000,
+        "travelPerAwayMatch": 8000,
+        "wageLevel": 0.25,
+        "sponsorLevel": 0.25,
+        "operatingCostShare": 0.3,
+        "maxAnnualWage": 300000,
+        "targetAnnualWage": 110000,
+        "relegationWagePercent": 50,
+        "promotionWagePercent": 80,
+        "reference": {
+          "source": "FIGC ReportCalcio 2024, Serie C, Saison 2022/23, Durchschnitt je Klub",
+          "official": true,
+          "income": {
+            "total": 3600000
+          },
+          "expenses": {
+            "squad": 3200000
+          }
+        }
+      },
+      "ITA-D": {
+        "tvPool": 0,
+        "standing": 5,
+        "seating": 7,
+        "box": 250,
+        "floodlightRequired": 0,
+        "youthCenterRequired": 0,
+        "minEquity": -150000,
+        "travelPerAwayMatch": 2500,
+        "wageLevel": 0.05,
+        "sponsorLevel": 0.1,
+        "operatingCostShare": 0.25,
+        "maxAnnualWage": 30000,
+        "targetAnnualWage": 8000,
+        "promotionWagePercent": 60
+      }
+    },
+    "cupPrizes": [
+      50000,
+      100000,
+      200000,
+      400000,
+      800000,
+      1500000,
+      3000000
+    ],
+    "cupWinnerPrize": 4000000,
+    "playoffPrize": 300000,
+    "creditLimitPercent": 15,
+    "boardApprovalAbove": 10000000,
+    "permitAbove": 5000000,
+    "seasonTicketDeadline": "07-31",
+    "licenseApplication": "03-15",
+    "licenseDecision": "04-30",
+    "licenseDeadline": "05-31",
+    "conditionPenalty": 3,
+    "stadiumCostPerPlace": 2800,
+    "stadiumBaseCost": 18000000,
+    "stadiumCostPerBox": 180000,
+    "stadiumBuildDays": 720
+  },
+  "europe": {
+    "league": "ITA1",
+    "places": [
+      {
+        "competition": "UCL",
+        "from": 1,
+        "to": 4
+      },
+      {
+        "competition": "UEL",
+        "from": 5,
+        "to": 5
+      },
+      {
+        "competition": "UECL",
+        "from": 6,
+        "to": 6
+      }
+    ],
+    "cupWinner": "UEL",
+    "cup": "ITA-CUP",
+    "competitions": [
+      {
+        "id": "UCL",
+        "fieldStrength": 13.6,
+        "entryPrize": 18600000,
+        "stages": [
+          {
+            "key": "europe.stage.league",
+            "date": "01-31",
+            "prize": 6300000
+          },
+          {
+            "key": "europe.stage.r16",
+            "date": "03-15",
+            "prize": 11000000
+          },
+          {
+            "key": "europe.stage.qf",
+            "date": "04-15",
+            "prize": 12500000
+          },
+          {
+            "key": "europe.stage.sf",
+            "date": "05-05",
+            "prize": 15000000
+          },
+          {
+            "key": "europe.stage.final",
+            "date": "05-31",
+            "prize": 18500000
+          }
+        ]
+      },
+      {
+        "id": "UEL",
+        "fieldStrength": 12.6,
+        "entryPrize": 4300000,
+        "stages": [
+          {
+            "key": "europe.stage.league",
+            "date": "01-31",
+            "prize": 2000000
+          },
+          {
+            "key": "europe.stage.r16",
+            "date": "03-15",
+            "prize": 4000000
+          },
+          {
+            "key": "europe.stage.qf",
+            "date": "04-15",
+            "prize": 5000000
+          },
+          {
+            "key": "europe.stage.sf",
+            "date": "05-05",
+            "prize": 6000000
+          },
+          {
+            "key": "europe.stage.final",
+            "date": "05-28",
+            "prize": 7000000
+          }
+        ]
+      },
+      {
+        "id": "UECL",
+        "fieldStrength": 11.8,
+        "entryPrize": 3200000,
+        "stages": [
+          {
+            "key": "europe.stage.league",
+            "date": "01-31",
+            "prize": 1000000
+          },
+          {
+            "key": "europe.stage.r16",
+            "date": "03-15",
+            "prize": 2000000
+          },
+          {
+            "key": "europe.stage.qf",
+            "date": "04-15",
+            "prize": 2500000
+          },
+          {
+            "key": "europe.stage.sf",
+            "date": "05-05",
+            "prize": 4000000
+          },
+          {
+            "key": "europe.stage.final",
+            "date": "05-27",
+            "prize": 7000000
+          }
+        ]
+      }
+    ],
+    "license": {
+      "minSeats": 8000,
+      "floodlight": 3,
+      "academyStars": 1
+    },
+    "ffp": {
+      "acceptableDeviation": 60000000,
+      "severeDeviation": 90000000,
+      "squadCostRatio": 0.7,
+      "finePercent": 3
+    }
+  }
+}

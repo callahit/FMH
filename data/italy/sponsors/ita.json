@@ -1,0 +1,605 @@
+{
+  "country": "ITA",
+  "companies": [
+    {
+      "name": "Banca Adriatica",
+      "industry": "bank",
+      "size": 2,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Assicurazioni Tirrenica",
+      "industry": "insurance",
+      "size": 9,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Mobile Padana",
+      "industry": "telecom",
+      "size": 16,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Bevande Appennino",
+      "industry": "drinks",
+      "size": 4,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Birra Laguna",
+      "industry": "brewery",
+      "size": 11,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Energia Vesuvio Blu",
+      "industry": "energy",
+      "size": 18,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Magazzini Dolomia",
+      "industry": "retail",
+      "size": 6,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Motori Riviera",
+      "industry": "cars",
+      "size": 13,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Digitale Etruria",
+      "industry": "tech",
+      "size": 20,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Viaggi Sabina",
+      "industry": "travel",
+      "size": 8,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Trasporti Lucania",
+      "industry": "logistics",
+      "size": 15,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Costruzioni Marca",
+      "industry": "construction",
+      "size": 3,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Alimentari Langhe",
+      "industry": "food",
+      "size": 10,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Hotel Brianza",
+      "industry": "hotel",
+      "size": 17,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Scommesse Tavoliere",
+      "industry": "gaming",
+      "size": 5,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Capitale Cilento",
+      "industry": "finance",
+      "size": 12,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Banca Murgia",
+      "industry": "bank",
+      "size": 19,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Assicurazioni Maremma",
+      "industry": "insurance",
+      "size": 7,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Mobile Gargano",
+      "industry": "telecom",
+      "size": 14,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Bevande Sila",
+      "industry": "drinks",
+      "size": 2,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Birra Carso",
+      "industry": "brewery",
+      "size": 9,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Energia Polesine",
+      "industry": "energy",
+      "size": 16,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Magazzini Lunigiana",
+      "industry": "retail",
+      "size": 4,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Motori Irpinia",
+      "industry": "cars",
+      "size": 11,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Digitale Ciociaria",
+      "industry": "tech",
+      "size": 18,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Viaggi Valtellina",
+      "industry": "travel",
+      "size": 6,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Trasporti Romagna Sole",
+      "industry": "logistics",
+      "size": 13,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Costruzioni Salento",
+      "industry": "construction",
+      "size": 20,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Alimentari Barbagia",
+      "industry": "food",
+      "size": 8,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Hotel Monferrato",
+      "industry": "hotel",
+      "size": 15,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Scommesse Adriatica",
+      "industry": "gaming",
+      "size": 3,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Capitale Tirrenica",
+      "industry": "finance",
+      "size": 10,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Banca Padana",
+      "industry": "bank",
+      "size": 17,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Assicurazioni Appennino",
+      "industry": "insurance",
+      "size": 5,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Mobile Laguna",
+      "industry": "telecom",
+      "size": 12,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Bevande Vesuvio Blu",
+      "industry": "drinks",
+      "size": 19,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Birra Dolomia",
+      "industry": "brewery",
+      "size": 7,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Energia Riviera",
+      "industry": "energy",
+      "size": 14,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Magazzini Etruria",
+      "industry": "retail",
+      "size": 2,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Motori Sabina",
+      "industry": "cars",
+      "size": 9,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Digitale Lucania",
+      "industry": "tech",
+      "size": 16,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Viaggi Marca",
+      "industry": "travel",
+      "size": 4,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Trasporti Langhe",
+      "industry": "logistics",
+      "size": 11,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Costruzioni Brianza",
+      "industry": "construction",
+      "size": 18,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Alimentari Tavoliere",
+      "industry": "food",
+      "size": 6,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Hotel Cilento",
+      "industry": "hotel",
+      "size": 13,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Scommesse Murgia",
+      "industry": "gaming",
+      "size": 20,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Capitale Maremma",
+      "industry": "finance",
+      "size": 8,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Banca Gargano",
+      "industry": "bank",
+      "size": 15,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Assicurazioni Sila",
+      "industry": "insurance",
+      "size": 3,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Mobile Carso",
+      "industry": "telecom",
+      "size": 10,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Bevande Polesine",
+      "industry": "drinks",
+      "size": 17,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Birra Lunigiana",
+      "industry": "brewery",
+      "size": 5,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Energia Irpinia",
+      "industry": "energy",
+      "size": 12,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Magazzini Ciociaria",
+      "industry": "retail",
+      "size": 19,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Motori Valtellina",
+      "industry": "cars",
+      "size": 7,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Digitale Romagna Sole",
+      "industry": "tech",
+      "size": 14,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    },
+    {
+      "name": "Viaggi Salento",
+      "industry": "travel",
+      "size": 2,
+      "slots": [
+        "Board",
+        "Kit",
+        "Sleeve"
+      ]
+    },
+    {
+      "name": "Trasporti Barbagia",
+      "industry": "logistics",
+      "size": 9,
+      "slots": [
+        "Shirt",
+        "Sleeve",
+        "Board"
+      ]
+    },
+    {
+      "name": "Costruzioni Monferrato",
+      "industry": "construction",
+      "size": 16,
+      "slots": [
+        "Shirt",
+        "StadiumName",
+        "Board"
+      ]
+    }
+  ]
+}

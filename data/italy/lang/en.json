@@ -1,0 +1,17 @@
+{
+  "country.ITA": "Italy",
+  "competition.ITA1": "Serie A",
+  "competition.ITA2": "Serie B",
+  "competition.ITA3": "Serie C",
+  "competition.ITA-D": "Serie D",
+  "competition.ITA-CUP": "Coppa Nazionale",
+  "competition.ITA-SC": "Supercoppa",
+  "competition.ITA-PO2": "Play-off Serie B",
+  "competition.ITA-PL2": "Play-out Serie B",
+  "competition.ITA3A": "Serie C Girone A",
+  "competition.ITA-PO3A": "Play-off Serie C",
+  "competition.ITA3B": "Serie C Girone B",
+  "competition.ITA-PO3B": "Play-off Serie C",
+  "competition.ITA3C": "Serie C Girone C",
+  "competition.ITA-PO3C": "Play-off Serie C"
+}
