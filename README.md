@@ -150,7 +150,7 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
   - **Auf- und Abstiegsklauseln** in allen Verträgen. Wechselt der Verein die Spielklasse, gilt je Ebene:
     - Spieler: Gehalt nach der Klausel im Vertrag. Sie ist verhandelbar, ein höherer Abschlag als üblich kostet je
       Prozentpunkt 0,3 % mehr Grundgehalt.
-    - Personal: übliche Klausel der bisherigen Spielklasse.
+    - Personal und Manager: übliche Klausel der bisherigen Spielklasse.
     - Sponsoren: Zahlung und Bonus nach der Klausel im Sponsorenvertrag (Deutschland −40/+25 %, England −40/+30 %).
     - Übliche Werte stehen je Spielklasse in `relegationWagePercent`/`promotionWagePercent`, zum Beispiel
       Deutschland: 1. Liga −40 %, 2. Liga −50/+40 %, 3. Liga −70/+80 %, Regionalliga −50/+100 %, Oberliga +60 %.

@@ -75,12 +75,14 @@ public class GermanyTests
         var wages = w.SquadOf(down).Where(p => p.Loan is null && p.Contract is { Youth: false, YearlyRaisePercent: 0 } c && c.Until.Year > w.SeasonYear + 1)
             .ToDictionary(p => p.Id, p => p.Contract!.WeeklyWage);
         var deals = down.Sponsors.Where(d => d.UntilSeason > w.SeasonYear).ToDictionary(d => d.Id, d => d.PerSeason);
+        var managerWage = down.Board.ManagerWeeklyWage;
         TestData.PlayUntil(s, r => r.Reason == StopReason.NewSeason, 20_000);
         Assert.Equal("DE2", down.LeagueId);
         var max = s.DivisionFinance(down).MaxWeeklyWage;
         Assert.NotEmpty(wages);
         foreach (var (id, wage) in wages.Where(kv => w.Players[kv.Key].ClubId == down.Id))
             Assert.InRange(w.Players[id].Contract!.WeeklyWage, Math.Min(max, wage * 0.6) - 100, Math.Min(max, wage * 0.6) + 100);
+        if (managerWage > 0) Assert.InRange(down.Board.ManagerWeeklyWage, managerWage * 0.6 - 100, managerWage * 0.6 + 100);
         foreach (var d in down.Sponsors.Where(d => deals.ContainsKey(d.Id)))
             Assert.InRange(d.PerSeason, deals[d.Id] * 0.6 * 0.97, deals[d.Id] * 0.6 * 1.03);
 

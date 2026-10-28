@@ -871,7 +871,7 @@
  "neg.promotionPercent": "Wage rise if the club is promoted",
  "msg.clauses.relegation.subject": "Relegation clauses take effect",
  "msg.clauses.promotion.subject": "Promotion clauses take effect",
- "msg.clauses.body": "With the change of division the clauses in the contracts take effect. Player wages change by {0} a year, sponsor payments by {1} per season. Staff receive the usual adjustment of the previous division.",
+ "msg.clauses.body": "With the change of division the clauses in the contracts take effect. Player wages change by {0} a year, sponsor payments by {1} per season. Staff and manager receive the usual adjustment of the previous division.",
  "inbox.sponsorClause": "Clause: −{0} % on relegation, +{1} % on promotion",
  "neg.response": "Response",
  "neg.sellOn": "Sell-on (%)",
