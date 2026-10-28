@@ -76,6 +76,10 @@ public class SpainTests
         var groupPlayoffs = w.Cups.Where(c => c.Id.StartsWith("ES-PO3") || c.Id.StartsWith("ES-PO4")).ToList();
         Assert.Equal(7, groupPlayoffs.Count);
         Assert.All(groupPlayoffs, c => Assert.NotNull(c.WinnerId));
+        // Segunda Federación: Einzelspiele beim Besserplatzierten (2. gegen 5., 3. gegen 4.).
+        var group = LeagueTable.Compute(w.League("ES4A")).Select(r => r.ClubId).ToList();
+        Assert.Equal(new[] { (group[1], group[4]), (group[2], group[3]) }.Order(),
+            w.Cups.Single(c => c.Id == "ES-PO4A").Rounds[0].Ties.Select(t => (t.HomeId, t.AwayId)).Order());
         TestData.PlayUntil(s, r => r.Reason == StopReason.NewSeason, 30_000);
         foreach (var l in w.Leagues.Where(l => l.CountryCode == "ESP")) Assert.Equal(l.Format.Teams, l.ClubIds.Count);
         Assert.Equal(50, w.Clubs.Values.Count(c => c.LeagueId == "ES-TER"));

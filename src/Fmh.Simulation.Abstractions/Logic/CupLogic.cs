@@ -116,9 +116,12 @@ public static class CupLogic
                 Dates = dates.Select(d => ScheduleGenerator.ParseDate(d.Trim(), world.SeasonYear, country.Season.StartMonth)).ToList(),
             });
         }
+        // Gesetzt: Der Besserplatzierte hat im Rückspiel Heimrecht, bei nur einem Spiel in diesem Spiel.
+        var singleLeg = (rounds == 1 && cfg.FinalLegs is { } fl ? fl : cfg.Legs) == 1;
         if (cfg.Seeded && participants.Count == size)
             for (var i = 0; i < size / 2; i++)
-                AddTie(world, cup, cup.Rounds[0], participants[size - 1 - i], participants[i]);
+                if (singleLeg) AddTie(world, cup, cup.Rounds[0], participants[i], participants[size - 1 - i]);
+                else AddTie(world, cup, cup.Rounds[0], participants[size - 1 - i], participants[i]);
         else Draw(world, cup, cup.Rounds[0], participants, rng);
         return cup;
     }
