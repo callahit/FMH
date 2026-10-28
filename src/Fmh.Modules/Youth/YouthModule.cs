@@ -314,7 +314,7 @@ public sealed partial class YouthModule : GameModule, IYouthService
         p.Reputation = Math.Max(p.Reputation, 2);
         var wageLevel = ClubRules.DivisionFinance(World, club).WageLevel;
         var wage = (int)(Math.Round(MarketValue.FairWage(p, World, Data.PositionProfiles) * 0.6 * wageLevel / 100) * 100);
-        p.Contract = Transfers.MakeContract(new ContractOffer { Years = 3, WeeklyWage = Math.Max((int)(500 * wageLevel), wage), Status = SquadStatus.Prospect }, World.Date);
+        p.Contract = Transfers.MakeContract(new ContractOffer { Years = 3, WeeklyWage = Math.Max((int)(500 * wageLevel), wage), Status = SquadStatus.Prospect }, World.Date, club);
         if (!club.Academy.Graduates.Contains(p.Id))
         {
             club.Academy.Graduates.Add(p.Id);

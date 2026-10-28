@@ -75,8 +75,8 @@ Farbthemen: Klassik, Hell, Terminal.
   - Suche mit Filtern, Beobachtungsliste und Transferfenster.
   - Verhandlung in zwei Stufen mit höchstens drei Runden, danach 14 Tage Sperre:
     - mit dem Verein: Ablöse, Raten, Weiterverkaufsbeteiligung, Tauschspieler;
-    - mit dem Spieler: Laufzeit, Gehalt, Handgeld, Prämien, Ausstiegs- und Abstiegsklausel,
-      jährliche Erhöhung, Kaderstatus.
+    - mit dem Spieler: Laufzeit, Gehalt, Handgeld, Prämien, Ausstiegsklausel, Auf- und Abstiegsklausel
+      (Gehalt −% bei Abstieg, +% bei Aufstieg), jährliche Erhöhung, Kaderstatus.
   - Leihen mit Gehaltsanteil, Kaufoption oder -pflicht und Rückholklausel.
   - Vorverträge, ablösefreie Spieler, Vertragsverlängerungen und Beraterhonorar.
   - Verweigerungsgründe: Reputation, Liga, Konkurrenz, Vereinstreue.
@@ -146,8 +146,15 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
   - Ausgaben: Gehälter, Personal, Unterhalt, Reisen, Prämien, Zinsen und Betriebskosten (Verwaltung,
     Spielbetrieb, Personal außerhalb des Kaders) als Anteil der laufenden Einnahmen (`operatingCostShare`).
   - Gehälter (siehe „Wirtschaft“ unten): Marktgehalt nach Stärke, angepasst an das Gehaltsniveau der
-    Spielklasse (`wageLevel`) und begrenzt durch ihr Spitzengehalt (`maxAnnualWage`). Verträge sind
-    ligaabhängig: Nach Auf- oder Abstieg ändern sich die Gehälter im Verhältnis der Gehaltsniveaus.
+    Spielklasse (`wageLevel`) und begrenzt durch ihr Spitzengehalt (`maxAnnualWage`).
+  - **Auf- und Abstiegsklauseln** in allen Verträgen. Wechselt der Verein die Spielklasse, gilt je Ebene:
+    - Spieler: Gehalt nach der Klausel im Vertrag. Sie ist verhandelbar, ein höherer Abschlag als üblich kostet je
+      Prozentpunkt 0,3 % mehr Grundgehalt.
+    - Personal und Manager: übliche Klausel der bisherigen Spielklasse.
+    - Sponsoren: Zahlung und Bonus nach der Klausel im Sponsorenvertrag (Deutschland −40/+25 %, England −40/+30 %).
+    - Übliche Werte stehen je Spielklasse in `relegationWagePercent`/`promotionWagePercent`, zum Beispiel
+      Deutschland: 1. Liga −40 %, 2. Liga −50/+40 %, 3. Liga −70/+80 %, Regionalliga −50/+100 %, Oberliga +60 %.
+    - Verträge aus älteren Spielständen ohne Klausel folgen wie bisher dem Gehaltsniveau der neuen Spielklasse.
   - Bank: Kredite (3–12 % Zins je nach Verschuldung), Festgeld, Umschichten zwischen Transfer- und
     Gehaltsbudget (52:1), Eintrittspreise mit Fanreaktion.
   - Lizenzierung mit Stichtagen, jedes Jahr für die nächste Saison:

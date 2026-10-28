@@ -161,7 +161,7 @@ public static class Negotiations
         if (o.Years < minY || o.Years > maxY) demand *= 1.06;
         var expected = ExpectedStatus(p, buyer, world, data);
         if ((int)o.Status > (int)expected + 1) demand *= 1.1;
-        if (o.RelegationClause) demand *= 1.05;
+        demand *= ClauseFactor(o, buyer, world);
         if (o.ReleaseClause is not null) demand *= 0.97;
 
         var effective = o.WeeklyWage
@@ -189,6 +189,19 @@ public static class Negotiations
             Status = status,
             WeeklyWage = WageDemand(p, buyer, status, world, data),
             SigningFee = 0,
+            RelegationPercent = ContractClauses.Defaults(world, buyer).relegation,
+            PromotionPercent = ContractClauses.Defaults(world, buyer).promotion,
         };
+    }
+
+    /// <summary>
+    /// Wirkung der Auf-/Abstiegsklausel auf die Gehaltsforderung: Ein höherer Abschlag als in der Spielklasse üblich kostet je
+    /// Prozentpunkt 0,3 % mehr Grundgehalt, ein geringerer Aufstiegszuschlag je Punkt 0,1 %.
+    /// </summary>
+    public static double ClauseFactor(ContractOffer o, Club buyer, World world)
+    {
+        var (rel, pro) = ContractClauses.Defaults(world, buyer);
+        var factor = 1 + 0.003 * ((o.RelegationPercent ?? rel) - rel) - 0.001 * ((o.PromotionPercent ?? pro) - pro);
+        return Math.Clamp(factor, 0.85, 1.3);
     }
 }

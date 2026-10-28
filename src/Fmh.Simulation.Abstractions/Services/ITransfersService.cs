@@ -9,7 +9,8 @@ namespace Fmh.Core.Simulation;
 /// <summary>Dienst des Moduls „Transfers“ für andere Module.</summary>
 public interface ITransfersService
 {
-    Contract MakeContract(ContractOffer o, DateOnly start);
+    /// <summary>Vertrag aus einem Angebot; fehlende Auf-/Abstiegsklauseln nach der Spielklasse des Vereins.</summary>
+    Contract MakeContract(ContractOffer o, DateOnly start, Club club);
     /// <summary>Zum Saisonwechsel: Verträge enden, Vorverträge greifen, Leihen laufen aus.</summary>
     void ExpireContractsAndLoans();
     /// <summary>Vereinslose ohne Perspektive beenden ihre Laufbahn (auch freigegebene Jugendspieler unterhalb des Amateurniveaus).</summary>
