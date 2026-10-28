@@ -264,6 +264,32 @@ public class Phase3Tests
     }
 
     [Fact]
+    public void AiSignsTheBestFreeAgentWithinItsWageBudget()
+    {
+        var s = TestData.NewSession(28);
+        var w = s.World;
+        var club = w.Clubs[w.Leagues.First(l => l.Level == 1).ClubIds.First(id => id != s.HumanClub.Id)];
+        var level = Fmh.Core.Logic.PlayerGenerator.ClubLevel(club.Reputation);
+        Player FreeAgent(double l)
+        {
+            var p = Fmh.Core.Logic.PlayerGenerator.Create(w, s.Data, new Fmh.Core.Rng(5), Position.ST, l, 26, club.CountryCode);
+            p.Contract = null;
+            p.Hidden.Ambition = 10; // kein Ablehnen wegen Konkurrenz im Kader
+            w.Players[p.Id] = p;
+            return p;
+        }
+        var star = FreeAgent(level + 1.5);
+        var cheap = FreeAgent(level - 3);
+        var wage = (Player p) => Fmh.Core.Logic.Negotiations.SuggestContract(p, club, w, s.Data).WeeklyWage;
+        Assert.True(wage(star) > wage(cheap));
+        // Platz für den günstigen, nicht für den teuren Spieler.
+        club.Budget.WageBudget = (long)((Fmh.Core.Logic.Budgets.WageBill(club, w) + wage(cheap)) / 1.05) + 1;
+        Assert.True(s.SignBestFreeAgent(club, Position.ST, withinBudget: true));
+        Assert.Equal(club.Id, cheap.ClubId);
+        Assert.Null(star.ClubId);
+    }
+
+    [Fact]
     public void Phase3StateSurvivesSaveAndLoad()
     {
         var s = TestData.NewSession(27);
