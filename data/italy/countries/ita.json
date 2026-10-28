@@ -515,7 +515,7 @@
         "minEquity": -1500000,
         "travelPerAwayMatch": 8000,
         "wageLevel": 0.2,
-        "sponsorLevel": 0.35,
+        "sponsorLevel": 0.27,
         "operatingCostShare": 0.12,
         "maxAnnualWage": 300000,
         "targetAnnualWage": 110000,
