@@ -216,6 +216,7 @@ public static class WorldGenerator
                 var p = PlayerGenerator.Create(world, data, rng, pos, Math.Clamp(playerLevel, 3, 19), age, country);
                 p.ClubId = club.Id;
                 p.Contract!.WeeklyWage = ClubRules.LeagueWage(world, club, p.Contract.WeeklyWage);
+                ContractClauses.FillDefaults(p.Contract, world, club);
                 p.SeasonStats = new PlayerSeasonStats { SeasonYear = world.SeasonYear, ClubId = club.Id };
                 world.Players[p.Id] = p;
                 club.PlayerIds.Add(p.Id);

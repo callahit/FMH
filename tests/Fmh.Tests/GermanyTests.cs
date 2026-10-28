@@ -70,7 +70,19 @@ public class GermanyTests
         var winner = playoff.WinnerId!.Value;
         var bottom = Groups.SelectMany(g => tables[g].Skip(16)).ToList();
         var pool = w.Clubs.Values.Where(c => c.LeagueId == "DE-AMA").Select(c => c.Id).ToList();
+        // Abstiegsklauseln: Gehälter des Erstliga-Absteigers −40 %, Sponsorenzahlungen −40 % (Daten).
+        var down = w.Clubs[LeagueTable.Compute(w.League("DE1"))[^1].ClubId];
+        var wages = w.SquadOf(down).Where(p => p.Loan is null && p.Contract is { Youth: false, YearlyRaisePercent: 0 } c && c.Until.Year > w.SeasonYear + 1)
+            .ToDictionary(p => p.Id, p => p.Contract!.WeeklyWage);
+        var deals = down.Sponsors.Where(d => d.UntilSeason > w.SeasonYear).ToDictionary(d => d.Id, d => d.PerSeason);
         TestData.PlayUntil(s, r => r.Reason == StopReason.NewSeason, 20_000);
+        Assert.Equal("DE2", down.LeagueId);
+        var max = s.DivisionFinance(down).MaxWeeklyWage;
+        Assert.NotEmpty(wages);
+        foreach (var (id, wage) in wages.Where(kv => w.Players[kv.Key].ClubId == down.Id))
+            Assert.InRange(w.Players[id].Contract!.WeeklyWage, Math.Min(max, wage * 0.6) - 100, Math.Min(max, wage * 0.6) + 100);
+        foreach (var d in down.Sponsors.Where(d => deals.ContainsKey(d.Id)))
+            Assert.InRange(d.PerSeason, deals[d.Id] * 0.6 * 0.97, deals[d.Id] * 0.6 * 1.03);
 
         foreach (var l in w.Leagues) Assert.Equal(l.Format.Teams, l.ClubIds.Count);
         Assert.Equal(40, w.Clubs.Values.Count(c => c.LeagueId == "DE-AMA"));

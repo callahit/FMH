@@ -16,6 +16,9 @@ public sealed class SponsorDeal
     /// <summary>Erfolgsbonus bei Erreichen des Saisonziels.</summary>
     public long Bonus { get; set; }
     public int UntilSeason { get; set; }
+    /// <summary>Zahlung bei Abstieg −% bzw. Aufstieg +% des Vereins (Klausel im Sponsorenvertrag).</summary>
+    public int RelegationPercent { get; set; }
+    public int PromotionPercent { get; set; }
     /// <summary>Nur für Angebote: verfällt an diesem Tag.</summary>
     public DateOnly? Expires { get; set; }
 }

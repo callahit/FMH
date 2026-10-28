@@ -28,14 +28,14 @@ public sealed partial class TransfersModule
                 ExecuteTransfer(p, buyer, null, new ClubOffer(), n.Contract);
                 break;
             case DealType.PreContract:
-                p.PreContract = new PreContract { ClubId = buyer.Id, Contract = MakeContract(n.Contract, new DateOnly(World.SeasonYear + 1, 7, 1)) };
+                p.PreContract = new PreContract { ClubId = buyer.Id, Contract = MakeContract(n.Contract, new DateOnly(World.SeasonYear + 1, 7, 1), buyer) };
                 if (buyer.Id == HumanClub.Id || p.ClubId == HumanClub.Id)
                     Notify(MessageType.Transfer, "msg.sender.assistant", TR("msg.preContract.subject", p.Name),
                         TR("msg.preContract.body", p.Name, buyer.Name));
                 break;
             case DealType.Renewal:
                 var old = p.Contract;
-                p.Contract = MakeContract(n.Contract, World.Date);
+                p.Contract = MakeContract(n.Contract, World.Date, buyer);
                 if (old is not null) p.Contract.Start = old.Start;
                 if (buyer.Id == HumanClub.Id)
                     Notify(MessageType.Contract, "msg.sender.assistant", TR("msg.renewed.subject", p.Name),
@@ -44,10 +44,11 @@ public sealed partial class TransfersModule
         }
     }
 
-    public Contract MakeContract(ContractOffer o, DateOnly start)
+    public Contract MakeContract(ContractOffer o, DateOnly start, Club club)
     {
         // Verträge enden immer am 30. Juni.
         var endYear = start.Month >= 7 ? start.Year + o.Years : start.Year + o.Years - 1;
+        var (rel, pro) = ContractClauses.Defaults(World, club);
         return new Contract
         {
             WeeklyWage = o.WeeklyWage,
@@ -58,7 +59,8 @@ public sealed partial class TransfersModule
             GoalBonus = o.GoalBonus,
             ReleaseClause = o.ReleaseClause,
             YearlyRaisePercent = o.YearlyRaisePercent,
-            RelegationClause = o.RelegationClause,
+            RelegationPercent = o.RelegationPercent ?? rel,
+            PromotionPercent = o.PromotionPercent ?? pro,
             ExtensionOptionYears = o.ExtensionOptionYears,
             Status = o.Status,
         };
@@ -102,7 +104,7 @@ public sealed partial class TransfersModule
         p.Loan = null;
         p.PreContract = null;
         buyer.PlayerIds.Add(p.Id);
-        p.Contract = MakeContract(contract, World.Date);
+        p.Contract = MakeContract(contract, World.Date, buyer);
         p.Transfer.SellOnClubId = offer.SellOnPercent > 0 ? seller?.Id : null;
         p.Transfer.SellOnPercent = offer.SellOnPercent;
         p.State.Morale = (Morale)Math.Min(6, (int)p.State.Morale + 1);
@@ -207,7 +209,7 @@ public sealed partial class TransfersModule
             }
             if (oldClub is not null && !IsHuman(oldClub) && ShouldAiRenew(oldClub, p))
             {
-                p.Contract = MakeContract(new ContractOffer { Years = Rng.Next(1, 3), WeeklyWage = Negotiations.WageDemand(p, oldClub, p.Contract.Status, World, Data), Status = p.Contract.Status }, today);
+                p.Contract = MakeContract(new ContractOffer { Years = Rng.Next(1, 3), WeeklyWage = Negotiations.WageDemand(p, oldClub, p.Contract.Status, World, Data), Status = p.Contract.Status }, today, oldClub);
                 continue;
             }
             Season.RemoveFromClub(p);
