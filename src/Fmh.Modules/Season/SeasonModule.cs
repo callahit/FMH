@@ -258,7 +258,8 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
         while (club.PlayerIds.Count < target && guard++ < 20)
         {
             if (IsHuman(club) && club.PlayerIds.Count >= 16) break;
-            if (!IsHuman(club) && Transfers.SignBestFreeAgent(club, NeededPosition(club))) continue;
+            // Innerhalb des Lohnbudgets, solange ein Spieltagskader (Elf plus Bank) steht.
+            if (!IsHuman(club) && Transfers.SignBestFreeAgent(club, NeededPosition(club), withinBudget: club.PlayerIds.Count >= 11 + World.Country(club.CountryCode).Squad.BenchSize)) continue;
             if (club.PlayerIds.Count >= minimum) break;
             AddEmergencyPlayer(club);
         }
