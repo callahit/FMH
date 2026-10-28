@@ -630,7 +630,7 @@
         "youthCenterRequired": 0,
         "minEquity": -2000000,
         "travelPerAwayMatch": 12000,
-        "wageLevel": 0.4,
+        "wageLevel": 0.46,
         "sponsorLevel": 1.0,
         "targetAnnualWage": 165000,
         "operatingCostShare": 0.55,

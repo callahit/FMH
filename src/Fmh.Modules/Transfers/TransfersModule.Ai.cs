@@ -31,8 +31,11 @@ public sealed partial class TransfersModule
         foreach (var club in aiClubs)
         {
             ManageAiSquadSize(club);
-            // Dünne Kader: zuerst Vereinslose, sonst Talente aus der eigenen Jugend oder dem Umfeld.
-            if (club.PlayerIds.Count < Math.Max(22, Finance.DivisionFinance(club).SquadSize - 3) && !SignBestFreeAgent(club, Season.NeededPosition(club)) && club.PlayerIds.Count < 21) Season.AddEmergencyPlayer(club);
+            // Dünne Kader: zuerst Vereinslose (im Gehaltsbudget, außer der Spieltagskader ist nicht mehr voll), sonst Talente
+            // aus der eigenen Jugend oder dem Umfeld.
+            var critical = club.PlayerIds.Count < 11 + World.Country(club.CountryCode).Squad.BenchSize;
+            if (club.PlayerIds.Count < Math.Max(22, Finance.DivisionFinance(club).SquadSize - 3)
+                && !SignBestFreeAgent(club, Season.NeededPosition(club), withinBudget: !critical) && club.PlayerIds.Count < 21) Season.AddEmergencyPlayer(club);
             if (window && Rng.Chance(0.3)) TryAiSigning(club);
             // Neuzugänge im Fenster nachmelden, solange Plätze frei sind.
             if (window) Registration.Fill(World, club, Data, keep: true);
@@ -111,7 +114,7 @@ public sealed partial class TransfersModule
         ExecuteLoan(candidate, target, club, new ClubOffer { LoanMonths = 12, WageSharePercent = Rng.Pick(new[] { 50, 75, 100 }), RecallInWinter = Rng.Chance(0.3) });
     }
 
-    public bool SignBestFreeAgent(Club club, Position pos)
+    public bool SignBestFreeAgent(Club club, Position pos, bool withinBudget = false)
     {
         var level = PlayerGenerator.ClubLevel(club.Reputation);
         var best = FreeAgents
@@ -124,6 +127,7 @@ public sealed partial class TransfersModule
         if (best is null) return false;
         var contract = Negotiations.SuggestContract(best, club, World, Data);
         contract.Years = Math.Min(contract.Years, best.Age(World.Date) >= 30 ? 1 : 2);
+        if (withinBudget && Budgets.WageBill(club, World) + contract.WeeklyWage > club.Budget.WageBudget * 1.05) return false;
         ExecuteTransfer(best, club, null, new ClubOffer(), contract);
         club.Budget.WageBudget = Math.Max(club.Budget.WageBudget, Budgets.WageBill(club, World));
         return true;
@@ -136,6 +140,13 @@ public sealed partial class TransfersModule
         var ranked = World.SquadOf(club).Where(p => p.Loan is null).OrderBy(Rating).ToList();
         foreach (var p in ranked.Take(Math.Max(0, club.PlayerIds.Count - Finance.DivisionFinance(club).SquadSize - 1)))
             if (!p.Transfer.Listed) SetTransferListed(p, true, MarketValue.Round(ValueOf(p) * 0.8));
+        // Gehälter über dem Budget: den bestbezahlten Spieler außerhalb der ersten Elf abgeben (Review F-01).
+        if (Budgets.WageBill(club, World) > club.Budget.WageBudget * 1.1)
+        {
+            var costly = ranked.Take(Math.Max(0, ranked.Count - 11)).Where(p => !p.Transfer.Listed && p.Contract is not null)
+                .OrderByDescending(p => p.Contract!.WeeklyWage).FirstOrDefault();
+            if (costly is not null) SetTransferListed(costly, true, MarketValue.Round(ValueOf(costly) * 0.8));
+        }
         while (club.PlayerIds.Count > max && ranked.Count > 0)
         {
             var worst = ranked[0];

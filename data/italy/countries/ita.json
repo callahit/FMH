@@ -452,7 +452,7 @@
         "minEquity": -60000000,
         "travelPerAwayMatch": 50000,
         "wageLevel": 0.75,
-        "sponsorLevel": 0.4,
+        "sponsorLevel": 0.3,
         "academyBudgetFactor": 3.7,
         "operatingCostShare": 0.21,
         "maxAnnualWage": 20000000,
@@ -497,6 +497,10 @@
           },
           "expenses": {
             "squad": 19700000
+          },
+          "toleranceNote": "Real 82 % Personalkosten je Umsatz (ReportCalcio 2025), finanziert von den Eigentümern; ohne Kapitalzuschüsse im Spiel wären die Vereine insolvent.",
+          "tolerances": {
+            "expenses.squad": 0.4
           }
         }
       },
@@ -525,6 +529,10 @@
           },
           "expenses": {
             "squad": 3200000
+          },
+          "toleranceNote": "Real rund 90 % Gehälter je Umsatz und 2 Mio. Verlust je Klub (ReportCalcio 2024), gedeckt von den Eigentümern; ohne Kapitalzuschüsse im Spiel wären die Vereine insolvent.",
+          "tolerances": {
+            "expenses.squad": 0.4
           }
         }
       },
