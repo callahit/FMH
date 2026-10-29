@@ -4,5 +4,6 @@
   </PropertyGroup>
   <ItemGroup>
     <ProjectReference Include="..\Fmh.Domain\Fmh.Domain.csproj" />
+    <ProjectReference Include="..\Fmh.Rules\Fmh.Rules.csproj" />
   </ItemGroup>
 </Project>
