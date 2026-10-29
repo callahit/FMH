@@ -149,8 +149,9 @@ public static class Program
             Console.WriteLine($"{cup.Name}: Sieger {winner} ({string.Join(", ", final)})");
         }
         var season = w.Transfers.Where(t => t.SeasonYear == w.SeasonYear).ToList();
-        Console.WriteLine($"Transfers: {season.Count(t => !t.Loan && t.FromClubId is not null)} mit Ablöse ({season.Sum(t => t.Fee) / 1_000_000.0:F1} Mio.), " +
-                          $"{season.Count(t => t.FromClubId is null)} ablösefrei, {season.Count(t => t.Loan)} Leihen");
+        // Wechsel nach Vertragsende (Vorvertrag, ohne Ablöse) getrennt von Ablösetransfers zählen (Review F-07).
+        Console.WriteLine($"Transfers: {season.Count(t => !t.Loan && t.FromClubId is not null && t.Fee > 0)} mit Ablöse ({season.Sum(t => t.Fee) / 1_000_000.0:F1} Mio.), " +
+                          $"{season.Count(t => !t.Loan && t.FromClubId is not null && t.Fee == 0)} nach Vertragsende, {season.Count(t => t.FromClubId is null)} Vereinslose, {season.Count(t => t.Loan)} Leihen");
         var leagueClubs = w.Clubs.Values.Where(c => w.FindLeague(c.LeagueId) is not null).ToList();
         // Mindestkader (Review F-06): kein Verein darunter; die KI-Vereine und der eigene Verein (Autopilot) getrennt.
         var thin = leagueClubs.Where(c => c.PlayerIds.Count < ClubRules.DivisionFinance(w, c).MinSquad).ToList();
