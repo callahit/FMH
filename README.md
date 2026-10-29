@@ -500,10 +500,12 @@ src/
   Fmh.Domain/        Reine Datentypen (Model, Match-Modelle), Rng, Formatierung, Texte, Konfigurationstypen,
                      Aufstellungs- und Bewertungsregeln, die die Engine braucht; referenziert nichts
   Fmh.Data/          Datenpakete laden, überlagern und validieren
+  Fmh.Rules/         Regelbibliothek ohne Modulzustand: Tabellen, Weltgenerator, Spielergenerator, Entwicklung,
+                     Marktwerte, Verhandlungen, Pyramide, Pokale, Spielplan, Meldelisten …
   Fmh.Simulation.Abstractions/
                      Modulvertrag (IGameModule, ModuleContext, DayContext), Ereignisbus mit Ereignissen
-                     (DayStarted, MatchPlayed), Dienst-Schnittstellen der Module, gemeinsamer Kern
-                     (Spielstand, Zufall, Posteingang) und Regelbibliothek (Tabellen, Weltgenerator, Marktwerte …)
+                     (DayStarted, MatchPlayed), Dienst-Schnittstellen der Module und gemeinsamer Kern
+                     (Spielstand, Zufall, Posteingang); unter 600 Zeilen
   Fmh.Modules/       Je Fachgebiet ein Modul: Spielbetrieb, Saison, Pokale, Transfers, Training, Scouting,
                      Jugend, Finanzen, Wirtschaft, Gelände, Stadionpläne, Personal, Sponsoren, Vorstand,
                      Presse, Ereignisse, Lizenz
@@ -523,8 +525,9 @@ data/italy/          Länderpaket Italien (dependsOn base): Serie A–C, Serie D
 data/france/         Länderpaket Frankreich (dependsOn base): Ligue 1–3, National 1 in Gruppen, National 2 als Pool
 ```
 
-Regeln, die ein Architekturtest prüft: erlaubte Projektverweise (Konzept 4.1), keine Datei in
-`Fmh.Simulation`, `Fmh.Modules` oder `Fmh.MatchEngine` über 400 Zeilen, kein Modul verwendet die Klasse eines anderen.
+Regeln, die ein Architekturtest prüft: erlaubte Projektverweise (Konzept 4.1; `Fmh.Rules` nur auf `Fmh.Domain`),
+keine Datei in `Fmh.Simulation`, `Fmh.Modules`, `Fmh.MatchEngine` oder `Fmh.Rules` über 400 Zeilen,
+`Fmh.Simulation.Abstractions` ohne Spiellogik und unter 600 Zeilen, kein Modul verwendet die Klasse eines anderen.
 Ein Verein (`Club`) besitzt Mannschaften (`Team`, je eine Welt `men`/`women`); vereinsweite Daten liegen
 am Verein, Kader, Taktik, Training und Liga an der Mannschaft. Bis alle Module direkt mit Mannschaften
 arbeiten, leiten die gleichnamigen Vereinseigenschaften an die erste Mannschaft weiter.
