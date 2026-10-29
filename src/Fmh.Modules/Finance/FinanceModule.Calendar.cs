@@ -51,12 +51,15 @@ public sealed partial class FinanceModule
         upkeep = (long)(upkeep * (1 - reduction));
         if (upkeep > 0) Book(club, TransactionType.Upkeep, -upkeep, TR("tx.upkeep"));
 
-        // TV: Grundbetrag in 10 Monatsraten (August–Mai), Leistungsanteil zum Saisonende.
+        // TV: Grundbetrag und Leistungsanteil in 10 Monatsraten (August–Mai); der Leistungsanteil nach dem aktuellen
+        // Tabellenplatz. Bis 2026/10 floss er erst zum Saisonende, die Lücke trieb Vereine in die Insolvenz (Review F-01).
         var div = DivisionFinance(club);
         if (World.Date.Month is >= 8 or <= 5 && div.TvPool > 0 && World.FindLeague(club.LeagueId) is { } league)
         {
             var equal = div.TvPool * div.TvEqualShare / Math.Max(1, league.ClubIds.Count) / 10;
             Book(club, TransactionType.Tv, (long)equal, TR("tx.tv"));
+            if (PerformanceShares(league).TryGetValue(club.Id, out var share) && share.Amount > 0)
+                Book(club, TransactionType.Tv, share.Amount / 10, TR("tx.tvPerformance", share.Position));
         }
         if (World.Date.Month is >= 8 or <= 5) Parachute(club);
         // Sponsoren monatlich, Mitgliedsbeiträge.
@@ -164,12 +167,14 @@ public sealed partial class FinanceModule
         }
     }
 
-    /// <summary>Saisonende: TV-Leistungsanteil nach Abschlussplatz, Saisonstatistik übertragen.</summary>
-    public void SeasonEndFinances()
+    private (DateOnly Date, string League, Dictionary<int, (int Position, long Amount)> Shares) _performanceCache;
+
+    /// <summary>Leistungsanteile einer Liga am heutigen Tag (eine Tabellenberechnung je Liga und Monatsersten).</summary>
+    private Dictionary<int, (int Position, long Amount)> PerformanceShares(League league)
     {
-        foreach (var league in World.Leagues)
-            foreach (var (club, position, amount) in TvPerformanceShares(league))
-                Book(club, TransactionType.Tv, amount, TR("tx.tvPerformance", position));
+        if (_performanceCache.Date != World.Date || _performanceCache.League != league.Id)
+            _performanceCache = (World.Date, league.Id, TvPerformanceShares(league).ToDictionary(s => s.club.Id, s => (s.position, s.amount)));
+        return _performanceCache.Shares;
     }
 
     /// <summary>TV-Leistungsanteile nach aktuellem Tabellenplatz (zum Saisonende ausgezahlt).</summary>
@@ -184,14 +189,19 @@ public sealed partial class FinanceModule
             yield return (World.Clubs[table[i].ClubId], table[i].Position, (long)(pool * weights[i] / total));
     }
 
+    /// <summary>Monate der TV-Raten in Saisonreihenfolge.</summary>
+    private static readonly int[] TvMonths = { 8, 9, 10, 11, 12, 1, 2, 3, 4, 5 };
+
     /// <summary>
-    /// Eigenkapital für die Lizenzprüfung: Der TV-Leistungsanteil fließt erst zum Saisonende, steht dem Verein aber nach
-    /// aktuellem Tabellenplatz schon zu und zählt bis zur Auszahlung als Forderung mit.
+    /// Eigenkapital für die Lizenzprüfung: Die noch ausstehenden Raten des TV-Leistungsanteils stehen dem Verein nach
+    /// aktuellem Tabellenplatz schon zu und zählen bis zur Auszahlung als Forderung mit.
     /// </summary>
     public long LicenseEquity(Club club)
     {
-        var receivable = !World.SeasonFinished && World.FindLeague(club.LeagueId) is { } league
-            ? TvPerformanceShares(league).Where(s => s.club == club).Sum(s => s.amount) : 0;
+        var index = Array.IndexOf(TvMonths, World.Date.Month);
+        var open = index < 0 ? 0 : TvMonths.Length - 1 - index;
+        var receivable = !World.SeasonFinished && open > 0 && World.FindLeague(club.LeagueId) is { } league
+            ? TvPerformanceShares(league).Where(s => s.club == club).Sum(s => s.amount) / 10 * open : 0;
         return Equity(club) + receivable;
     }
 

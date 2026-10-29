@@ -161,7 +161,7 @@ public sealed partial class FinanceModule : GameModule, IFinanceService
         // Gebäudewirkungen auf Catering und Fanartikel wirken anteilig (Wert je Stufe x 20 %).
         var fin = World.Country(home.CountryCode).Finance;
         var catering = (long)(attendance * fin.CateringPerSpectator * (1 + Facilities.Effect(home, "income.catering") * 0.2) + boxes * 1_500 * (1 + Facilities.Effect(home, "income.box")));
-        var merch = (long)(attendance * fin.MerchPerSpectator * (1 + Facilities.Effect(home, "income.merch") * 0.2) * Math.Clamp(home.Fans.Mood / 60, 0.5, 1.4));
+        var merch = (long)(attendance * fin.MerchPerSpectator * DivisionFinance(home).MerchLevel * (1 + Facilities.Effect(home, "income.merch") * 0.2) * Math.Clamp(home.Fans.Mood / 60, 0.5, 1.4));
         var extra = (long)(Facilities.Effect(home, "income.matchday") + home.Stadium.Scoreboard * 6_000);
         var text = TR("tx.match", away.Name);
         if (f.Kind == CompetitionKind.League)

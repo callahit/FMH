@@ -58,8 +58,7 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
             TR("msg.seasonEnd.subject", Comp(ownLeague.Id), SeasonLabel(World.SeasonYear)),
             TR("msg.seasonEnd.body", champ.Name, row.Position, row.Points, TR(verdictKey, own.Name)));
 
-        // Phase 3: TV-Leistungsanteil, Vorstand, Sponsorenboni, Karriere, Lizenzierung.
-        Finance.SeasonEndFinances();
+        // Phase 3: Vorstand, Sponsorenboni, Karriere, Lizenzierung (der TV-Leistungsanteil fließt monatlich).
         foreach (var club in World.Clubs.Values.Where(c => Finance.HasFinances(c) && !IsHuman(c)))
         {
             var table = LeagueTable.Compute(World.LeagueOf(club));
@@ -259,7 +258,8 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
         while (club.PlayerIds.Count < target && guard++ < 20)
         {
             if (IsHuman(club) && club.PlayerIds.Count >= 16) break;
-            if (!IsHuman(club) && Transfers.SignBestFreeAgent(club, NeededPosition(club))) continue;
+            // Innerhalb des Lohnbudgets, solange ein Spieltagskader (Elf plus Bank) steht.
+            if (!IsHuman(club) && Transfers.SignBestFreeAgent(club, NeededPosition(club), withinBudget: club.PlayerIds.Count >= 11 + World.Country(club.CountryCode).Squad.BenchSize)) continue;
             if (club.PlayerIds.Count >= minimum) break;
             AddEmergencyPlayer(club);
         }
