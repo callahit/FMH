@@ -33,9 +33,15 @@ public sealed partial class TransfersModule
             ManageAiSquadSize(club);
             // Dünne Kader: zuerst Vereinslose (im Gehaltsbudget, außer der Spieltagskader ist nicht mehr voll), sonst Talente
             // aus der eigenen Jugend oder dem Umfeld.
-            var critical = club.PlayerIds.Count < 11 + World.Country(club.CountryCode).Squad.BenchSize;
-            if (club.PlayerIds.Count < Math.Max(22, Finance.DivisionFinance(club).SquadSize - 3)
-                && !SignBestFreeAgent(club, Season.NeededPosition(club), withinBudget: !critical) && club.PlayerIds.Count < 21) Season.AddEmergencyPlayer(club);
+            // Unter dem Mindestkader sofort bis zum Mindestkader, darüber eine Verpflichtung je Woche bis zur üblichen Größe.
+            var division = Finance.DivisionFinance(club);
+            for (var guard = 0; guard < 12 && club.PlayerIds.Count < Math.Max(division.MinSquad, division.SquadSize - 3); guard++)
+            {
+                var below = club.PlayerIds.Count < division.MinSquad;
+                var critical = club.PlayerIds.Count < 11 + World.Country(club.CountryCode).Squad.BenchSize;
+                if (!SignBestFreeAgent(club, Season.NeededPosition(club), withinBudget: !critical) && below) Season.AddEmergencyPlayer(club);
+                if (!below) break;
+            }
             if (window && Rng.Chance(0.3)) TryAiSigning(club);
             // Neuzugänge im Fenster nachmelden, solange Plätze frei sind.
             if (window) Registration.Fill(World, club, Data, keep: true);
