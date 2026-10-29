@@ -251,8 +251,8 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
     /// <summary>Sicherheitsnetz: KI-Vereine füllen den Kader mit vereinslosen Spielern oder eigenen Talenten auf.</summary>
     private void FillSquad(Club club)
     {
-        // KI füllt bis drei unter die übliche Kadergröße der Spielklasse auf (Vereinslose zuerst), Notverpflichtungen nur unter 22.
-        const int minimum = 22;
+        // KI füllt bis drei unter die übliche Kadergröße der Spielklasse auf (Vereinslose zuerst), Notverpflichtungen nur unter dem Mindestkader.
+        var minimum = Finance.DivisionFinance(club).MinSquad;
         var target = Math.Max(minimum, Finance.DivisionFinance(club).SquadSize - 3);
         var guard = 0;
         while (club.PlayerIds.Count < target && guard++ < 20)
