@@ -44,7 +44,8 @@ public class GoldenMasterTests
     [Fact]
     public void AllPackagesOverTwoSeasonsAreUnchanged()
     {
-        var data = TestData.AllData;
+        // Eigene Datenkopie: Andere Tests verändern die geteilten Länderdaten (z. B. TV-Anteile in England).
+        var data = TestData.LoadAll();
         var world = Fmh.Core.Logic.WorldGenerator.Create(data, new Fmh.Core.Logic.NewGameOptions { Seed = WorldSeed, ClubKey = "nordheide", ManagerName = "Test" });
         var s = new GameSession(world, data, new Fmh.MatchEngine.TextMatchEngine());
         var target = s.World.SeasonYear + 2;
