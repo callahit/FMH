@@ -71,6 +71,21 @@ public class AcademyLicenseTests
         Assert.Contains(s.Inbox, m => m.Action == MessageAction.YouthIntake);
     }
 
+    /// <summary>Amateurvereine (ohne Liga und Finanzen) nehmen ihren Jahrgang erst mit 16 auf, wie in der Startwelt (Review F-05).</summary>
+    [Fact]
+    public void AmateurClubsTakeTheirIntakeAtSixteen()
+    {
+        var s = TestData.NewSession(33);
+        var w = s.World;
+        var amateurs = w.Clubs.Values.Where(c => w.FindLeague(c.LeagueId) is null).ToList();
+        Assert.NotEmpty(amateurs);
+        var known = amateurs.SelectMany(c => c.YouthIds).ToHashSet();
+        AdvanceTo(s, Spring(s, 3, 16));
+        var fresh = amateurs.SelectMany(c => s.YouthOf(c)).Where(p => !known.Contains(p.Id)).ToList();
+        Assert.NotEmpty(fresh);
+        Assert.All(fresh, p => Assert.True(p.Age(w.Date) >= 16));
+    }
+
     [Fact]
     public void YouthCoachesAreAssignedToAgeGroups()
     {
