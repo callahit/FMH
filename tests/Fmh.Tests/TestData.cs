@@ -17,6 +17,10 @@ internal static class TestData
 
     public static GameData AllData => AllLazy.Value;
 
+    /// <summary>Eigene Kopie aller Pakete für Tests, die Länderdaten verändern oder unverändert brauchen (die geteilten
+    /// Daten nutzen parallel laufende Tests; Welt und Daten teilen sich die Länderkonfiguration).</summary>
+    public static GameData LoadAll() => PackageLoader.Load(PackageLoader.FindDataRoot());
+
     public static GameSession NewSession(ulong seed = 42, string club = "nordheide")
     {
         var world = WorldGenerator.Create(Data, new NewGameOptions { Seed = seed, ClubKey = club, ManagerName = "Test" });

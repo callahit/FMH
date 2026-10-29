@@ -12,9 +12,9 @@ namespace Fmh.Tests;
 /// </summary>
 public class EnglandTests
 {
-    private static GameSession NewEngland(ulong seed = 5)
+    private static GameSession NewEngland(ulong seed = 5, bool ownData = false)
     {
-        var data = TestData.AllData;
+        var data = ownData ? TestData.LoadAll() : TestData.AllData;
         var world = WorldGenerator.Create(data, new NewGameOptions
         {
             Seed = seed, ClubKey = data.Clubs.First(c => c.Division == "ENG2").Key, ManagerName = "Test",
@@ -56,7 +56,7 @@ public class EnglandTests
     [Fact]
     public void SeasonWithSeededPlayoffsAndNonLeaguePool()
     {
-        var s = NewEngland(7);
+        var s = NewEngland(7, ownData: true); // verändert die TV-Anteile der First Division
         var w = s.World;
         TestData.PlayUntil(s, r => r.Reason == StopReason.SeasonEnd, 20_000);
         var table = LeagueTable.Compute(w.League("ENG2")).Select(r => r.ClubId).ToList();
