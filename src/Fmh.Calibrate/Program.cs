@@ -157,14 +157,16 @@ public static class Program
         var thin = leagueClubs.Where(c => c.PlayerIds.Count < ClubRules.DivisionFinance(w, c).MinSquad).ToList();
         _squadOk &= thin.Count == 0;
         Console.WriteLine($"Unter dem Mindestkader: {thin.Count}" + (thin.Count > 0 ? $" ({string.Join(", ", thin.Take(5).Select(c => $"{c.Name} {c.PlayerIds.Count}{(c.Id == session.HumanClub.Id ? " eigener Verein" : "")}"))})" : ""));
-        // Größe der Spielwelt (Review F-05): aktive Spieler höchstens +10 % über den Lauf, Vereinslose höchstens 10 % der Profis.
+        // Größe der Spielwelt (Review F-05): aktive Spieler höchstens +10 % gegenüber dem ersten Saisonende (gleicher Zeitpunkt
+        // im Jahreslauf: Jugendjahrgang aufgenommen, 19-Jährige noch nicht freigegeben), Vereinslose vor den Karriereenden
+        // zum Saisonwechsel höchstens 12 % der Profis.
         var contracted = w.Players.Values.Count(p => !p.Retired && p.ClubId is not null && !p.IsYouth);
         var free = session.FreeAgents.Count();
         var active = w.Players.Values.Count(p => !p.Retired);
         if (_activeStart == 0) _activeStart = active;
         var growth = active / (double)_activeStart - 1;
         _worldOk &= growth <= MaxActiveGrowth && free <= contracted * MaxFreeShare;
-        Console.WriteLine($"Spielwelt: {active} aktive Spieler ({growth:+0.0%;-0.0%} seit Start, Grenze +{MaxActiveGrowth:P0}), {contracted} Profis, " +
+        Console.WriteLine($"Spielwelt: {active} aktive Spieler ({growth:+0.0%;-0.0%} seit dem ersten Saisonende, Grenze +{MaxActiveGrowth:P0}), {contracted} Profis, " +
                           $"{free} vereinslos ({free / (double)contracted:P1}, Grenze {MaxFreeShare:P0}), {w.Players.Count - active} im Ruhestand");
         Console.WriteLine($"Kader: Ø {leagueClubs.Average(c => c.PlayerIds.Count):F1} (min {leagueClubs.Min(c => c.PlayerIds.Count)}, max {leagueClubs.Max(c => c.PlayerIds.Count)}), " +
                           $"Jugend Ø {w.Clubs.Values.Average(c => c.YouthIds.Count):F1}, vereinslos {session.FreeAgents.Count()}, Spieler gesamt {w.Players.Count}");
@@ -188,7 +190,7 @@ public static class Program
     private static bool _worldOk = true;
     private static int _activeStart;
     private const double MaxActiveGrowth = 0.10;
-    private const double MaxFreeShare = 0.10;
+    private const double MaxFreeShare = 0.12;
 
     /// <summary>Erlaubte Lohnentwicklung je Saison (real rund 4 % im Jahr, DFL-Personalaufwand 2019/20–2024/25).</summary>
     private const double WageGrowth = 1.04;
@@ -266,7 +268,6 @@ public static class Program
         var targetSeason = world.SeasonYear + seasons;
         var topLeague = world.Leagues.OrderBy(l => l.Level).First();
         var strengthStart = TopEleven(session, topLeague);
-        _activeStart = world.Players.Values.Count(p => !p.Retired);
         Console.WriteLine("Start:");
         PrintWageStats(world);
         if (seasons == 0) return 0;
