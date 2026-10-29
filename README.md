@@ -528,9 +528,11 @@ Ein Verein (`Club`) besitzt Mannschaften (`Team`, je eine Welt `men`/`women`); v
 am Verein, Kader, Taktik, Training und Liga an der Mannschaft. Bis alle Module direkt mit Mannschaften
 arbeiten, leiten die gleichnamigen Vereinseigenschaften an die erste Mannschaft weiter.
 
-**Golden Master** (Konzept 4.5): `GoldenMasterTests` simuliert eine Welt mit Seed 4242 über drei Saisons
-und 10.000 Engine-Spiele und vergleicht Hashes je Bereich mit `tests/Fmh.Tests/GoldenMaster/golden.json`
-(ein Eintrag je Laufzeitumgebung). Neu gesetzt wird er nur in PRs, die eine Regeländerung ankündigen:
+**Golden Master** (Konzept 4.5): `GoldenMasterTests` simuliert die Grundwelt (Deutschland) mit Seed 4242 über drei
+Saisons, alle ausgelieferten Länderpakete über zwei Saisons und 10.000 Engine-Spiele und vergleicht Hashes je Bereich
+mit `tests/Fmh.Tests/GoldenMaster/golden.json` (ein Eintrag je Laufzeitumgebung). Gehasht werden alle Felder der Welt
+einschließlich der Länderdaten; ein Test prüft, dass neue Felder der Welt in den Fingerabdruck aufgenommen werden.
+Neu gesetzt wird er nur in PRs, die eine Regeländerung ankündigen und im PR-Text begründen:
 `FMH_GOLDEN_UPDATE=1 dotnet test --filter GoldenMaster`.
 
 Oberflächentests laufen ohne Bildschirm (Avalonia Headless). Mit `FMH_SHOTS=<ordner> dotnet test`
