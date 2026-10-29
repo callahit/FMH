@@ -32,6 +32,23 @@ internal sealed partial class MatchSimulation
         return Math.Max(1, v);
     }
 
+    private readonly Dictionary<MatchPlayer, double> _ownLevel = new();
+
+    /// <summary>
+    /// Effektiver Wert gemessen am eigenen Niveau des Spielers (10 = so hoch wie sein Feldspieler-Durchschnitt). Für Wesenszüge
+    /// wie Aggressivität: Ein Regionalligaspieler foult so oft wie ein Bundesligaspieler, auch wenn alle seine Werte
+    /// niedriger sind (Review F-11).
+    /// </summary>
+    private double RelEff(MatchPlayer mp, Attr a)
+    {
+        if (!_ownLevel.TryGetValue(mp, out var level))
+        {
+            var attrs = AttrInfo.Technical.Concat(AttrInfo.Mental).Concat(AttrInfo.Physical);
+            _ownLevel[mp] = level = attrs.Average(x => (double)mp.Player.Attributes[x]);
+        }
+        return Math.Clamp(Eff(mp, a) * 10 / Math.Max(1, level), 1, 20);
+    }
+
     private double Prob(Side attacking, double a, double d, double baseP)
     {
         if (!Setup.NeutralGround)
