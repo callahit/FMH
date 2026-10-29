@@ -458,11 +458,11 @@ des Umsetzungskonzepts:
 
 | Kennzahl | Ist | Ziel | Toleranz |
 |---|---|---|---|
-| Tore pro Spiel | 2,79 | 2,8 | ± 0,15 |
+| Tore pro Spiel | 2,78 | 2,8 | ± 0,15 |
 | Unentschieden | 23,6 % | 25 % | ± 2,5 Pp. |
-| Heimsiege | 44,8 % | 45 % | ± 2,5 Pp. |
-| Gelbe Karten pro Spiel | 3,76 | 3,8 | ± 0,3 |
-| Rote Karten pro Spiel | 0,19 | 0,2 | ± 0,05 |
+| Heimsiege | 44,7 % | 45 % | ± 2,5 Pp. |
+| Gelbe Karten pro Spiel | 3,94 | 3,8 | ± 0,3 |
+| Rote Karten pro Spiel | 0,20 | 0,2 | ± 0,05 |
 | Verletzungen pro Team und Spiel | 0,30 | 0,3 | ± 0,05 |
 
 Mit `--strict` endet das Programm mit Exitcode 1, wenn eine Kennzahl außerhalb liegt; die CI nutzt das.
@@ -716,9 +716,10 @@ Vergleich.
 - **Frankreich:** Die Barrage zwischen Ligue 1 und 2 trägt der Dritte der Ligue 2 statt des Siegers eines Play-offs
   3–5 aus. Es gibt keine Meldeliste (real höchstens vier Spieler ohne EU-Pass) und keine Hilfen für Absteiger. Die DNCG-Zahlen
   stammen aus Pressezusammenfassungen; geprüft werden Summe, Ticketing und Lohnsumme der Ligue 1 sowie die Summe der Ligue 2.
-- **Karten in unteren Ligen:** Über alle vier Ebenen zeigt die Engine 3,2 Gelbe und 0,13 Rote Karten je Spiel
-  (Ziel 3,8 bzw. 0,2), weil schwächere Spieler seltener in Zweikämpfe kommen. Die Kalibrierung prüft deshalb
-  Ebene 1–2 (`--max-level`); ob untere Ligen eigene Zielwerte bekommen, ist offen.
+- **Karten in unteren Ligen:** Aggressivität und Dribbling wirken bei Fouls relativ zum eigenen Niveau des Spielers,
+  sodass Unterklassige nicht seltener foulen. Über alle vier Ebenen liegen 3,58 Gelbe und 0,17 Rote Karten je Spiel im
+  Zielbereich; die dritte und vierte Ebene haben etwas weniger Zweikämpfe und damit weiter etwas weniger Fouls. Tore
+  über alle vier Ebenen 2,96 je Spiel (untere Ligen torreicher). Die Toleranzen gelten für Ebene 1–2.
 - **Zweite Mannschaften als eigene Vereine:** Eine zweite Mannschaft ist bisher ein eigener Verein mit Verweis
   `reserveOf` (eigener Kader, eigene Finanzen). Die Mannschaft eines Vereins (`Team`) übernimmt das, sobald
   Spiele Mannschaften statt Vereine referenzieren.
