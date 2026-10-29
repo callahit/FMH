@@ -161,6 +161,8 @@ public sealed class SquadRules
     public int MaxSquad { get; set; } = 30;
     public int BenchSize { get; set; } = 9;
     public int Substitutions { get; set; } = 5;
+    /// <summary>Vereinslose Spieler zum Spielstart je Verein einer Liga (Bestand nach dem Vertragsende im Sommer).</summary>
+    public double FreeAgentsPerClub { get; set; } = 1.0;
 }
 
 public sealed class DisciplineConfig

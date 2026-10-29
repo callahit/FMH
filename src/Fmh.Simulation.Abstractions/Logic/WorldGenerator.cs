@@ -55,6 +55,7 @@ public static class WorldGenerator
             club.Tactic.FormationId = AiTactics.BestFormation(club, world, data).Id;
             LineupSelector.PickBest(club, world, data, world.Country(club.CountryCode).Squad.BenchSize);
         }
+        CreateFreeAgents(world, data, rng);
         InitCareer(world, data, rng);
         MarketValue.UpdateMarketLevel(world, data.PositionProfiles);
 
@@ -119,6 +120,29 @@ public static class WorldGenerator
                 Pyramid.AssignGroups(world, groups, open, rng);
                 if (groups.Any(g => g.ClubIds.Count != div.Teams))
                     throw new InvalidDataException($"Liga '{div.Name}' braucht {div.Teams} Vereine je Staffel.");
+            }
+        }
+    }
+
+    /// <summary>
+    /// Vereinslose zum Spielstart: Das Spiel beginnt im Juli, nach dem Vertragsende am 30. Juni. Ohne diesen Bestand
+    /// gäbe es in der ersten Saison keine ablösefreien Wechsel (Review F-07). Je Verein einer Liga entstehen im Mittel
+    /// <see cref="SquadRules.FreeAgentsPerClub"/> Spieler auf dessen Niveau, ohne Vertrag.
+    /// </summary>
+    private static void CreateFreeAgents(World world, GameData data, Rng rng)
+    {
+        foreach (var club in world.Clubs.Values.Where(c => c.ReserveOf is null && world.FindLeague(c.LeagueId) is not null).ToList())
+        {
+            var share = world.Country(club.CountryCode).Squad.FreeAgentsPerClub;
+            for (var n = (int)share + (rng.NextDouble() < share - (int)share ? 1 : 0); n > 0; n--)
+            {
+                var pos = PlayerGenerator.SquadTemplate[rng.WeightedIndex(PlayerGenerator.SquadTemplate.Select(t => (double)t.count).ToList())].pos;
+                var age = Math.Clamp(PlayerGenerator.RandomAge(rng) + 1, 21, 34);
+                var level = PlayerGenerator.ClubLevel(club.Reputation) - 0.6 + rng.Normal(0, 1.2) + AgeLevelOffset(age);
+                var p = PlayerGenerator.Create(world, data, rng, pos, Math.Clamp(level, 3, 19), age, club.CountryCode);
+                p.Contract = null;
+                Registration.InitFormative(p, world, club, rng);
+                world.Players[p.Id] = p;
             }
         }
     }
