@@ -13,13 +13,13 @@ internal sealed partial class MatchSimulation
     {
         var di = def.Tactic.Instructions;
         var p = C.FoulPerDuel
-                * (0.55 + Eff(fouler, Attr.Aggression) / 20.0 * 0.9)
+                * (0.55 + RelEff(fouler, Attr.Aggression) / 20.0 * 0.9)
                 * di.Tackling switch { TacklingStyle.Hard => 1.45, TacklingStyle.Fair => 0.7, _ => 1.0 }
                 * (1.25 - fouler.Player.Hidden.Sportsmanship / 20.0 * 0.5)
                 * (def.Shout == Shout.CalmDown ? 0.7 : 1.0)
                 * (_counter ? 1.4 : 1.0)
                 * (fouler.Yellow ? 0.5 : 1.0)
-                * (0.8 + Eff(victim, Attr.Dribbling) / 20.0 * 0.4);
+                * (0.8 + RelEff(victim, Attr.Dribbling) / 20.0 * 0.4);
         if (!_rng.Chance(p)) return false;
         HandleFoul(att, def, victim, fouler);
         return true;
@@ -40,7 +40,7 @@ internal sealed partial class MatchSimulation
         var strict = 0.75 + Setup.RefereeStrictness / 20.0 * 0.5;
         var hard = di.Tackling switch { TacklingStyle.Hard => 1.3, TacklingStyle.Fair => 0.8, _ => 1.0 };
         var tactical = _counter || row >= 4 ? 1.25 : 1.0;
-        var pRed = C.RedPerFoul * strict * hard * (0.6 + Eff(fouler, Attr.Aggression) / 20.0 * 0.8);
+        var pRed = C.RedPerFoul * strict * hard * (0.6 + RelEff(fouler, Attr.Aggression) / 20.0 * 0.8);
         var pYellow = C.YellowPerFoul * strict * hard * tactical * (0.7 + fouler.Player.Hidden.Temperament / 20.0 * 0.6)
                       * (fouler.Yellow ? 0.6 : 1.0);
         var r = _rng.NextDouble();
