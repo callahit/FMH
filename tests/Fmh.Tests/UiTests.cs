@@ -408,14 +408,16 @@ public class UiTests
         var shell = StartGame(vm);
         var session = AppState.Current.Session!;
         bool HasOffer() => session.PendingDecisions.Any(m => m.Action == MessageAction.IncomingOffer);
-        for (var i = 0; i < 150 && !HasOffer(); i++)
+        for (var i = 0; i < 300 && !HasOffer(); i++)
         {
             if (session.PendingDecisions.Count > 0) session.DelegateDecisions();
             if (session.PendingHumanFixture is { } f) session.PlayInstant(f);
             shell.Continue();
         }
-        Assert.NotEmpty(session.PendingDecisions);
+        Assert.True(HasOffer());
         var inbox = Assert.IsType<InboxPageViewModel>(shell.Page);
+        // Liegen weitere Entscheidungen an, wählt der Spieler das Angebot selbst aus.
+        inbox.Selected = inbox.Messages.First(m => m.Message.Action == MessageAction.IncomingOffer && m.Open);
         Assert.True(inbox.IsOffer);
         Pump();
         AssertNoMissingTexts(w);
