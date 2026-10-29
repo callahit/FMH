@@ -700,9 +700,9 @@ Vergleich.
   der eigene Verein spart im Autopiloten der Kalibrierung weiter an, weil dort niemand Transfers tätigt. Der Personalaufwand liegt mit größeren Kadern und
   den zweiten Mannschaften noch rund 10 % unter dem DFL-Wert. Die Stadien der fiktiven Vereine wurden auf reale
   Größenordnungen gebracht (2. Liga Ø rund 30.000 Plätze). Bauprojekte, Prämien des Vorstands und Strafen sind noch nicht an die
-  neuen Größenordnungen angepasst. Ältere Spielstände behalten ihre gespeicherte Länderkonfiguration (ohne
-  Betriebskosten, Sponsorenniveau 1,0) und ihre Gehälter, rechnen aber Sponsoren, Marktwerte und neue Verträge
-  nach den neuen Formeln und werden dadurch reicher; eine Migration der Länderdaten im Spielstand ist offen.
+  neuen Größenordnungen angepasst. Beim Laden hebt die Sitzung die Finanz-, Kader- und Nachwuchsregeln
+  eines älteren Spielstands auf den aktuellen Datenstand (`CountryDataMigration`); Ligaaufbau, Pokale und Play-offs
+  bleiben wie gespeichert. Gehälter laufender Verträge bleiben, bis sie verlängert werden.
 - **England:** Der National Cup kennt keine Qualifikationsrunden; die National League steigt mit ihren 24 Vereinen
   in Runde 1 ein. Die League Trophy läuft ohne Gruppenphase und ohne U21-Teams. Beträge stehen in Euro.
   Lizenzierung läuft wie in Deutschland mit großzügigen Eigenkapitalgrenzen, statt der englischen PSR-Regeln.
