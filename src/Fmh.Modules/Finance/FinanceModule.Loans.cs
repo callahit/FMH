@@ -151,7 +151,7 @@ public sealed partial class FinanceModule
         if (f.DaysBelowLimit < 30 || f.Insolvent) return;
         if (!IsHuman(club))
         {
-            // KI-Vereine werden von einem Investor aufgefangen, steigen aber zwangsweise ab.
+            // KI-Vereine werden von einem Investor aufgefangen (Saldo auf 0), die Liga zieht neun Punkte ab; ein Zwangsabstieg folgt nur aus einer verweigerten Lizenz.
             f.Insolvent = true;
             club.Budget.Balance = 0;
             f.DaysBelowLimit = 0;
