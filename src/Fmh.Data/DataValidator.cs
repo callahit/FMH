@@ -57,6 +57,10 @@ public static class DataValidator
                 if (r.Tolerances.Count > 0 && string.IsNullOrWhiteSpace(r.ToleranceNote))
                     errors.Add($"Ligazahlen '{div}': abweichende Toleranzen ohne Begründung.");
             }
+            // Mindestkader: ein voller Spieltagskader, höchstens so groß wie der erlaubte Kader.
+            foreach (var (div, fin) in country.Finance.Divisions)
+                if (fin.MinSquad < 11 + country.Squad.BenchSize || fin.MinSquad > country.Squad.MaxSquad)
+                    errors.Add($"Mindestkader '{div}': {fin.MinSquad} liegt nicht zwischen {11 + country.Squad.BenchSize} und {country.Squad.MaxSquad}.");
             foreach (var (div, r) in country.Registration)
             {
                 if (!KnownDivision(div)) errors.Add($"Meldeliste: unbekannte Liga '{div}'.");
