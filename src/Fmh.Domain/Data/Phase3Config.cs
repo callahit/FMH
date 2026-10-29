@@ -143,6 +143,9 @@ public sealed class DivisionFinance
     /// <summary>Übliche Kadergröße der Spielklasse (Profis und Vertragsspieler); Grundlage für Kaderaufbau und Kaderplanung der KI.</summary>
     public int SquadSize { get; set; } = 25;
 
+    /// <summary>Mindestkader der Spielklasse: Darunter verpflichtet die KI sofort nach (Review F-06; Spieltag: 11 plus Bank).</summary>
+    public int MinSquad { get; set; } = 22;
+
     /// <summary>Kalibrierungsziel: durchschnittliches Jahresgehalt eines Kaderspielers (0 = ohne Ziel).</summary>
     public long TargetAnnualWage { get; set; }
 

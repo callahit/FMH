@@ -621,6 +621,10 @@ Ein Land beschreibt seine Pyramide als Ebenen mit Divisionen. Formate ändern si
 - **Kadergröße:** `squadSize` je Spielklasse (Standard 25): Deutschland 1. Liga 29, 2. Liga 28, 3. Liga 26; England
   Premier Division 30, First Division 28, Third Division 24; Spanien Primera División 27, Segunda División 26; Italien Serie A 28, Serie B 27. Danach richten sich Kaderaufbau, Nachverpflichtungen der
   KI (bis drei unter der Kadergröße) und Vertragsverlängerungen.
+- **Mindestkader:** `minSquad` je Spielklasse (Standard 22, mindestens ein Spieltagskader aus Elf und Bank). Fällt ein
+  KI-Verein darunter, verpflichtet er am nächsten Montag bis zum Mindestkader nach (Vereinslose, sonst Talente oder
+  Amateure). Die Kalibrierung zählt Vereine unter dem Mindestkader; im Autopiloten hält der eigene Verein ihn mit
+  Vereinslosen.
 - **Gültigkeit:** `validFrom`/`validTo` je Formatversion; beim Saisonwechsel gilt die passende Version, Ligen und
   Staffeln werden umgebaut. Der Validator prüft für jede Version, dass Zu- und Abgänge je Ebene aufgehen, und
   beim Wechsel, dass die Teamzahlen nach den Übergangsregeln zur neuen Version passen.
