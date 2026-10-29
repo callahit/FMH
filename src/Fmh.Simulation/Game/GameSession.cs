@@ -42,6 +42,8 @@ public sealed partial class GameSession
 
     public GameSession(World world, GameData data, IMatchEngine engine)
     {
+        // Ältere Spielstände spielen mit den aktuellen Wirtschaftsregeln weiter (neue Spiele: keine Änderung).
+        CountryDataMigration.Refresh(world, data);
         var rng = world.RngState.Length == 4 ? Rng.FromState(world.RngState) : new Rng(world.Seed);
         _kernel = new GameKernel(world, data, engine, rng);
         IGameModule[] modules = { _training, _matchday, _transfers, _scouting, _youth, _facilities, _finance, _license, _economy, _cups, _board, _press, _events, _sponsors, _staff, _stadiumPlans, _season };
