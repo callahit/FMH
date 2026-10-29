@@ -31,7 +31,7 @@ Voraussetzung: [.NET 10 SDK](https://dotnet.microsoft.com/download).
 ```bash
 dotnet build -c Release
 dotnet run -c Release --project src/Fmh.Desktop     # das Spiel (Fenster, Maus und Tastatur)
-dotnet test                                          # 74 Tests, davon 11 Oberflächentests ohne Bildschirm
+dotnet test                                          # 199 Tests, davon 14 Oberflächentests ohne Bildschirm
 dotnet run -c Release --project src/Fmh.Calibrate -- --matches 10000           # Engine-Kalibrierung
 dotnet run -c Release --project src/Fmh.Calibrate -- --season --seasons 8      # Karriere-Simulation
 ```
@@ -348,25 +348,25 @@ Die Finanzsimulation über fünf Saisons ergibt folgende Werte je Verein:
 
 | Liga | Ø Jahresgehalt (Ziel) | Kadergehälter | Einnahmen | Saldo pro Saison |
 |---|---|---|---|---|
-| 1. Liga | 2,9–3,5 Mio. (2,9 Mio.) | 73–80 Mio. | 220–251 Mio. | +20 bis +43 Mio. |
-| 2. Liga | 480–610 Tsd. (480 Tsd.) | 11–14 Mio. | 54–59 Mio. | −2 bis +3 Mio. |
-| 3. Liga | 150–192 Tsd. (165 Tsd.) | 3,8–4,4 Mio. | 13–15 Mio. | ±0 bis +2 Mio. |
-| Regionalliga | 25–35 Tsd. (25 Tsd.) | 0,6–0,8 Mio. | 2,8–3,2 Mio. | ±0 bis +0,6 Mio. |
+| 1. Liga | 2,8–3,2 Mio. (2,9 Mio.) | 78–84 Mio. | 218–241 Mio. | +7 bis +23 Mio. |
+| 2. Liga | 420–540 Tsd. (480 Tsd.) | 12–14 Mio. | 57–61 Mio. | ±0 bis +4 Mio. |
+| 3. Liga | 150–185 Tsd. (165 Tsd.) | 3,9–4,5 Mio. | 15–18 Mio. | +0,4 bis +2,7 Mio. |
+| Regionalliga | 24–35 Tsd. (25 Tsd.) | 0,6–0,8 Mio. | 2,7–2,9 Mio. | ±0 bis +0,7 Mio. |
 
-Im Vergleich mit dem DFL-Bericht (letzte Saison des Laufs, Spiel/Bericht in Mio. € je Klub):
+Im Vergleich mit dem DFL-Bericht (Mittel über fünf Saisons, Spiel/Bericht in Mio. € je Klub):
 
 | Kategorie | 1. Liga | 2. Liga |
 |---|---|---|
-| Spielertrag | 29/33 | 12/15 |
-| Werbung | 77/64 | 13/12 |
-| Mediale Verwertung | 93/95 | 16/16 |
-| Merchandising | 20/16 | 7/5 |
-| Sonstiges | 23/29 | 7/10 |
-| Erträge gesamt | 241/236 | 55/58 |
-| Personal Spielbetrieb (mit zweiter Mannschaft) | 86/96 | 15/17 |
-| Verwaltung, Spielbetrieb, Sonstiges | 119/108 | 37/39 |
+| Spielertrag | 29/33 | 15/15 |
+| Werbung | 65/64 | 13/12 |
+| Mediale Verwertung | 91/95 | 16/16 |
+| Merchandising | 14/16 | 5/5 |
+| Sonstiges | 28/29 | 9/10 |
+| Erträge gesamt | 227/236 | 57/58 |
+| Personal Spielbetrieb (mit zweiter Mannschaft) | 86/96 | 14/17 |
+| Verwaltung, Spielbetrieb, Sonstiges | 112/108 | 37/39 |
 | Nachwuchs | 16/14 | 5/4 |
-| Aufwand gesamt | 220/217 | 57/59 |
+| Aufwand gesamt | 214/217 | 56/59 |
 
 Darin sind die Budgets der Nachwuchsleistungszentren und die Europapokalprämien bereits enthalten.
 Absteiger geraten mit ihren Gehältern ins Minus. Es gibt keine Kettenpleiten. In der 2. Liga bekommen
@@ -494,7 +494,9 @@ Die Gewichte stehen in `data/base/rules/engine.json`.
 
 - Arbeit auf Feature-Branches, ein Arbeitspaket je Pull Request (siehe Umsetzungskonzept, Abschnitt 1).
 - CI (`.github/workflows/ci.yml`): Build und Tests auf Linux und Windows, Warnungen gelten als Fehler,
-  dazu ein Kalibrierungsjob mit Toleranzprüfung.
+  dazu ein Kalibrierungsjob mit Toleranzprüfung (Engine über 10.000 Spiele, Karriere über fünf Saisons mit
+  Ligazahlen, Insolvenzen, Mindestkader, Größe der Spielwelt und `--max-drift 0.05`).
+- Offene Punkte aus dem Code-Review vom 28.10.2026 stehen mit Status in `docs/review-2026-10-28.md`.
 - Keine Länder- oder Wettbewerbscodes im C#-Code; Regeln, Zahlen und Texte gehören in Datenpakete.
 
 ## Aufbau
@@ -702,7 +704,7 @@ Vergleich.
 - **Deutschland:** Es gibt fünf Verbandspokale (je Regionalliga-Region) statt der 21 Landespokale. In der ersten
   Saison fehlen Vorjahresergebnisse, deshalb gehen die Amateurplätze im Pokal dann nach Ruf. Die fiktiven Ortsnamen sind
   zusammengesetzt; Übereinstimmungen mit kleinen realen Orten sind möglich, bekannte Vereinsorte sind ausgeschlossen.
-- **Wirtschaft:** Die 1. Liga erwirtschaftet im Schnitt +20 bis +43 Mio. je Saison (laut DFL ohne Transfers etwa
+- **Wirtschaft:** Die 1. Liga erwirtschaftet im Schnitt +7 bis +23 Mio. je Saison (laut DFL ohne Transfers etwa
   +19 Mio.). KI-Vereine stecken ein Viertel ihrer Rücklagen über 25 % der Jahreseinnahmen in die Gehälter;
   der eigene Verein spart im Autopiloten der Kalibrierung weiter an, weil dort niemand Transfers tätigt. Der Personalaufwand liegt mit größeren Kadern und
   den zweiten Mannschaften noch rund 10 % unter dem DFL-Wert. Die Stadien der fiktiven Vereine wurden auf reale
