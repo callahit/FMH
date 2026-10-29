@@ -129,6 +129,9 @@ public sealed partial class FinanceModule
         if (fixedCosts == 0) fixedCosts = (long)(income * 0.22);
         var bill = Budgets.WageBill(club, World);
         var target = (long)(Math.Max(income * 0.3, income - fixedCosts) * share * goal / 52);
+        // KI: Rücklagen über einem Viertel der Jahreseinnahmen fließen zu einem Viertel in die Gehälter, statt sich
+        // Jahr für Jahr anzusammeln (Review F-02); der Rest bleibt Transferbudget und Reserve.
+        if (!IsHuman(club) && b.Balance > income / 4) target += (b.Balance - income / 4) / 4 / 52;
         // KI: Budget folgt den Einnahmen (im Minus sparsamer), sonst schaukeln sich die Gehälter jedes Jahr hoch.
         // Mensch: etwas Luft über den laufenden Gehältern, damit Verlängerungen und Neuzugänge möglich bleiben.
         b.WageBudget = IsHuman(club) ? Math.Max((long)(bill * 1.05), target) : b.Balance < 0 ? (long)(target * 0.9) : target;

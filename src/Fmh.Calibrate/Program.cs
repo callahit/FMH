@@ -302,7 +302,7 @@ public static class Program
         sw.Stop();
         Console.WriteLine($"{seasons} Saison(s) in {sw.Elapsed.TotalSeconds:F1} s, {matchdays} Spieltage des eigenen Vereins, langsamster Spieltag {slowest.TotalMilliseconds:F0} ms (Ziel < 5000 ms).");
         var drift = (TopEleven(session, topLeague) - strengthStart) / Math.Max(1, seasons);
-        Console.WriteLine($"Ligastärke-Drift {topLeague.Name}: {drift:+0.000;-0.000} je Saison" + (maxDrift is { } md ? $" (Grenze {md:0.000})" : " (Ziel ≤ 0,05, offener Punkt)"));
+        Console.WriteLine($"Ligastärke-Drift {topLeague.Name}: {drift:+0.000;-0.000} je Saison" + (maxDrift is { } md ? $" (Grenze {md:0.000})" : " (Ziel ≤ 0,05)"));
         var financeOk = ReferenceReport.MeansOk();
         var economyOk = EconomyReport.PrintSummary();
         var ok = slowest.TotalMilliseconds < 5000 && world.SeasonYear >= targetSeason && (maxDrift is not { } m || drift <= m) && _wagesOk && financeOk && economyOk;

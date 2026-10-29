@@ -5,7 +5,7 @@ namespace Fmh.Core.Logic;
 
 /// <summary>
 /// Spielerentwicklung zum Saisonende (Kapitel 4), ergänzt das tägliche Training um Spielpraxis und Alterung: Wachstum bis ca. 24, Plateau bis 29,
-/// Abbau physischer Werte ab 30, mentale Werte können bis 33 noch steigen.
+/// Abbau ab 30, zunehmend mit dem Alter; mentale Werte können bis 32 noch steigen.
 /// </summary>
 public static class Development
 {
@@ -27,9 +27,11 @@ public static class Development
                 change = headroom / 150.0 * practice * pro * rng.Range(0, 1) - 0.08;
             else
             {
-                if (group == AttrGroup.Physical) change = -rng.Range(0.3, 1.0) * (age - 29) * 0.35;
-                else if (group == AttrGroup.Mental && age <= 33) change = rng.Range(-0.1, 0.4);
-                else change = -rng.Range(0, 0.4);
+                // Der Abbau beschleunigt sich mit dem Alter, sonst bleiben Ü32-Spieler zu lange Stammkräfte (Review F-02).
+                if (group == AttrGroup.Physical) change = -rng.Range(0.3, 1.0) * (age - 29) * 0.45;
+                else if (group == AttrGroup.Mental && age <= 32) change = rng.Range(-0.1, 0.3);
+                else if (group == AttrGroup.Mental) change = -rng.Range(0, 0.4) - (age - 32) * 0.1;
+                else change = -rng.Range(0, 0.4) - (age - 30) * 0.08;
             }
 
             // Ganzzahlige Attribute: Bruchteile wirken als Wahrscheinlichkeit.

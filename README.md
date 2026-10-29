@@ -475,7 +475,10 @@ Weitere Prüfungen:
 - `--season --seasons 5 --strict` prüft den Karrierelauf: Der langsamste Spieltag muss unter 5 s
   liegen, alle Saisons müssen durchlaufen, Gehälter und Ligazahlen müssen passen und Insolvenzen sowie
   Lizenz-Punktabzüge unter den Grenzen bleiben (siehe Finanzen).
-- `--max-drift 0.05` prüft zusätzlich die Ligastärke-Drift.
+- `--max-drift 0.05` prüft zusätzlich die Ligastärke-Drift (Durchschnitt der besten elf je Verein der 1. Liga);
+  die CI ruft den Karrierelauf damit auf. Gemessen: +0,024 je Saison. Dafür holen junge Spieler im Mittel nur ihren
+  Altersabschlag auf, Akademietalente erreichen etwa die Stärke ihres Vereins, und der Abbau ab 30 nimmt mit dem
+  Alter zu.
 
 Die Gewichte stehen in `data/base/rules/engine.json`.
 
@@ -675,8 +678,6 @@ Vergleich.
 
 - **Lizenz:** Open Source ist gesetzt, die konkrete Lizenz klärt der Projektinhaber später (Vorschlag
   GPL-3.0 für Code, CC BY-SA 4.0 für Daten). Bis dahin gibt es keine Lizenzdatei.
-- **Spielstärke-Drift:** Die Stärke der 1. Liga (Durchschnitt der besten elf je Verein) steigt im
-  5-Saison-Lauf um etwa 0,14 je Saison; Ziel ist ≤ 0,05. Die CI prüft das noch nicht.
 - **Europapokal:** Die europäischen Wettbewerbe laufen vereinfacht ohne eigene Spiele und ohne
   ausländische Vereine. Echte Partien brauchen weitere Länder als Datenpakete.
 - **Saisonphasen:** Umgesetzt ist eine zweite Phase je Saison; mehrere Folgephasen (z. B. Play-offs um den Titel nach
@@ -685,7 +686,8 @@ Vergleich.
   Saison fehlen Vorjahresergebnisse, deshalb gehen die Amateurplätze im Pokal dann nach Ruf. Die fiktiven Ortsnamen sind
   zusammengesetzt; Übereinstimmungen mit kleinen realen Orten sind möglich, bekannte Vereinsorte sind ausgeschlossen.
 - **Wirtschaft:** Die 1. Liga erwirtschaftet im Schnitt +20 bis +43 Mio. je Saison (laut DFL ohne Transfers etwa
-  +19 Mio.), weil die KI Überschüsse nur teilweise ausgibt. Der Personalaufwand liegt mit größeren Kadern und
+  +19 Mio.). KI-Vereine stecken ein Viertel ihrer Rücklagen über 25 % der Jahreseinnahmen in die Gehälter;
+  der eigene Verein spart im Autopiloten der Kalibrierung weiter an, weil dort niemand Transfers tätigt. Der Personalaufwand liegt mit größeren Kadern und
   den zweiten Mannschaften noch rund 10 % unter dem DFL-Wert. Die Stadien der fiktiven Vereine wurden auf reale
   Größenordnungen gebracht (2. Liga Ø rund 30.000 Plätze). Bauprojekte, Prämien des Vorstands und Strafen sind noch nicht an die
   neuen Größenordnungen angepasst. Ältere Spielstände behalten ihre gespeicherte Länderkonfiguration (ohne

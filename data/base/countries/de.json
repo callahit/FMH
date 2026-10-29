@@ -556,7 +556,7 @@
         "minEquity": -20000000,
         "travelPerAwayMatch": 60000,
         "wageLevel": 1.0,
-        "sponsorLevel": 1.0,
+        "sponsorLevel": 0.92,
         "academyBudgetFactor": 9.0,
         "targetAnnualWage": 2900000,
         "operatingCostShare": 0.49,
