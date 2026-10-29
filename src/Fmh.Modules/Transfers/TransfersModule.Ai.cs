@@ -35,7 +35,7 @@ public sealed partial class TransfersModule
             // aus der eigenen Jugend oder dem Umfeld.
             // Unter dem Mindestkader sofort bis zum Mindestkader, darüber eine Verpflichtung je Woche bis zur üblichen Größe.
             var division = Finance.DivisionFinance(club);
-            for (var guard = 0; guard < 12 && club.PlayerIds.Count < Math.Max(division.MinSquad, division.SquadSize - 3); guard++)
+            for (var guard = 0; guard <= division.MinSquad && club.PlayerIds.Count < Math.Max(division.MinSquad, division.SquadSize - 3); guard++)
             {
                 var below = club.PlayerIds.Count < division.MinSquad;
                 var critical = club.PlayerIds.Count < 11 + World.Country(club.CountryCode).Squad.BenchSize;
