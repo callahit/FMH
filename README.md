@@ -326,7 +326,8 @@ im Monat, Spitze bis 6.500 €).
   Ligabericht; Ziel sind Deloittes Zahlen 2024/25 (3,0 Mrd. € Umsatz, davon 0,5 Spieltag und 1,5 TV einschließlich UEFA),
   als nicht amtlich gekennzeichnet. Serie B und C nach dem ReportCalcio der FIGC: Serie B 2023/24 Wert der Produktion
   483 Mio. € und Personalkosten 394 Mio. € (20 Klubs); ohne Spielerverkäufe (2022/23 rund 15 % des Werts) geschätzt
-  20,8 Mio. € je Klub. Serie C 2022/23 je Klub 3,6 Mio. €, Gehälter rund 90 % davon. Frankreich: amtliche Zahlen der DNCG
+  20,8 Mio. € je Klub. Serie C 2022/23 je Klub 3,6 Mio. €, Gehälter rund 90 % davon (im Spiel ohne Zuschüsse der Eigentümer niedriger,
+  Gehaltsziel 80 Tsd. statt real rund 120 Tsd.). Frankreich: amtliche Zahlen der DNCG
   für 2024/25 (laut Pressezusammenfassungen des Jahresberichts): Ligue 1 Erträge ohne Transfers 2.161 Mio. € für 18
   Klubs (120,1 je Klub), davon Ticketing 252 Mio. € (14,0 je Klub); Lohnsumme 51,7 % von 3.350 Mio. € Aufwand (96,2 je
   Klub). Ligue 2 Erträge 202 Mio. € (11,2 je Klub). Für die Federación-Ligen gibt es keinen Ligabericht.
