@@ -25,5 +25,5 @@ public sealed partial class GameSession
     public void ToggleShortlist(Player p) => _transfers.ToggleShortlist(p);
     public string? ExercisePurchaseOption(Player p) => _transfers.ExercisePurchaseOption(p);
     public string? RecallLoan(Player p) => _transfers.RecallLoan(p);
-    public bool SignBestFreeAgent(Club club, Position pos) => _transfers.SignBestFreeAgent(club, pos);
+    public bool SignBestFreeAgent(Club club, Position pos, bool withinBudget = false) => _transfers.SignBestFreeAgent(club, pos, withinBudget);
 }

@@ -452,15 +452,13 @@
         "minEquity": -60000000,
         "travelPerAwayMatch": 50000,
         "wageLevel": 0.75,
-        "sponsorLevel": 0.4,
-        "academyBudgetFactor": 8.0,
-        "operatingCostShare": 0.55,
+        "sponsorLevel": 0.3,
+        "academyBudgetFactor": 3.7,
+        "operatingCostShare": 0.21,
         "maxAnnualWage": 20000000,
         "targetAnnualWage": 3000000,
         "relegationWagePercent": 50,
-        "parachuteShares": [
-          0.5
-        ],
+        "parachuteShares": [0.5],
         "squadSize": 28,
         "reference": {
           "source": "Deloitte Annual Review of Football Finance 2026, Serie A, Saison 2024/25 (keine amtliche Ligazahl)",
@@ -482,10 +480,10 @@
         "youthCenterRequired": 1,
         "minEquity": -12000000,
         "travelPerAwayMatch": 20000,
-        "wageLevel": 0.55,
+        "wageLevel": 0.44,
         "sponsorLevel": 0.3,
-        "academyBudgetFactor": 5.0,
-        "operatingCostShare": 0.45,
+        "academyBudgetFactor": 1.0,
+        "operatingCostShare": 0.14,
         "maxAnnualWage": 1500000,
         "targetAnnualWage": 550000,
         "relegationWagePercent": 50,
@@ -499,6 +497,10 @@
           },
           "expenses": {
             "squad": 19700000
+          },
+          "toleranceNote": "Real 82 % Personalkosten je Umsatz (ReportCalcio 2025), finanziert von den Eigentümern; ohne Kapitalzuschüsse im Spiel wären die Vereine insolvent.",
+          "tolerances": {
+            "expenses.squad": 0.4
           }
         }
       },
@@ -512,9 +514,9 @@
         "youthCenterRequired": 0,
         "minEquity": -1500000,
         "travelPerAwayMatch": 8000,
-        "wageLevel": 0.25,
-        "sponsorLevel": 0.25,
-        "operatingCostShare": 0.3,
+        "wageLevel": 0.2,
+        "sponsorLevel": 0.27,
+        "operatingCostShare": 0.12,
         "maxAnnualWage": 300000,
         "targetAnnualWage": 110000,
         "relegationWagePercent": 50,
@@ -527,6 +529,10 @@
           },
           "expenses": {
             "squad": 3200000
+          },
+          "toleranceNote": "Real rund 90 % Gehälter je Umsatz und 2 Mio. Verlust je Klub (ReportCalcio 2024), gedeckt von den Eigentümern; ohne Kapitalzuschüsse im Spiel wären die Vereine insolvent.",
+          "tolerances": {
+            "expenses.squad": 0.4
           }
         }
       },
