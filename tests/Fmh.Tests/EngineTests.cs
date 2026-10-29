@@ -189,4 +189,32 @@ public class EngineTests
         foreach (var goal in sim.Events.Where(e => e.Type == MatchEventType.Goal))
             Assert.True(gen.Describe(goal, true)!.Highlight);
     }
+
+    /// <summary>Fouls hängen am Wesen des Spielers, nicht an seiner Stärke: Viertligisten foulen ähnlich oft wie Erstligisten (Review F-11).</summary>
+    [Fact]
+    public void LowerLeaguesFoulAboutAsOftenAsTheTop()
+    {
+        var s = TestData.NewSession(3);
+        var w = s.World;
+        var rng = new Fmh.Core.Rng(3);
+        double FoulsPerMatch(int level)
+        {
+            var leagues = w.Leagues.Where(l => l.Level == level).ToList();
+            var fouls = 0;
+            for (var i = 0; i < 300; i++)
+            {
+                var league = leagues[i % leagues.Count];
+                var home = league.ClubIds[rng.Next(league.ClubIds.Count)];
+                int away;
+                do away = league.ClubIds[rng.Next(league.ClubIds.Count)]; while (away == home);
+                var sim = s.StartMatch(new Fixture { Id = 900_000 + level * 1000 + i, CompetitionId = league.Id, HomeId = home, AwayId = away, Date = w.Date, RefereeId = w.Referees[0].Id }, humanControlled: false);
+                sim.RunToEnd();
+                fouls += sim.Home.Stats.Fouls + sim.Away.Stats.Fouls;
+            }
+            return fouls / 300.0;
+        }
+        var top = FoulsPerMatch(1);
+        var fourth = FoulsPerMatch(4);
+        Assert.True(fourth >= top * 0.75, $"Ebene 1: {top:F1}, Ebene 4: {fourth:F1} Fouls je Spiel");
+    }
 }
