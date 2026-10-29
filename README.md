@@ -141,9 +141,10 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
 
 - **Finanzen** (Kapitel 8):
   - Einnahmen: Zuschauer nach Preis, Stärke, Wetter, Derby und Fanstimmung; Dauerkarten bis Ende Juli;
-    Fernsehgelder in zehn Raten plus Leistungsanteil; Sponsoren; Catering, Fanartikel und Gelände;
+    Fernsehgelder in zehn Monatsraten (August–Mai), Grundbetrag und Leistungsanteil nach dem aktuellen Tabellenplatz;
+    Sponsoren; Catering, Fanartikel und Gelände;
     Pokal- und Relegationsprämien.
-  - Ausgaben: Gehälter, Personal, Unterhalt, Reisen, Prämien, Zinsen und Betriebskosten (Verwaltung,
+  - Ausgaben: Gehälter, Personal (Marktgehalt mal `wageLevel` der Spielklasse, wie bei Spielern), Unterhalt, Reisen, Prämien, Zinsen und Betriebskosten (Verwaltung,
     Spielbetrieb, Personal außerhalb des Kaders) als Anteil der laufenden Einnahmen (`operatingCostShare`).
   - Gehälter (siehe „Wirtschaft“ unten): Marktgehalt nach Stärke, angepasst an das Gehaltsniveau der
     Spielklasse (`wageLevel`) und begrenzt durch ihr Spitzengehalt (`maxAnnualWage`).
@@ -166,7 +167,11 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
     - Aufstiegskandidaten werden zusätzlich nach den Kriterien der höheren Liga geprüft.
       Fehlt das Geld, ist kein Aufstieg möglich; fehlende Infrastruktur kostet eine Geldstrafe.
   - Insolvenz nach 30 Tagen unter dem Kreditrahmen: KI-Vereine bekommen neun Punkte Abzug, der
-    Mensch wird entlassen.
+    Mensch wird entlassen. Vorher nimmt die KI zum Monatsersten einen Kredit, sobald der halbe Kreditrahmen verbraucht
+    ist und die Kreditlinie (1,5 Jahreseinnahmen abzüglich laufender Kredite) reicht.
+  - KI und Gehaltsbudget: Vereinslose verpflichtet die KI nur im Budget, außer der Spieltagskader ist nicht mehr voll.
+    Liegen die Gehälter mehr als 10 % über dem Budget, setzt sie den bestbezahlten Spieler außerhalb der ersten Elf auf
+    die Transferliste.
   - **Financial Fair Play:**
     - Prüfung zum Saisonstart für die Vereine der 1. Liga und alle Europapokalteilnehmer.
     - Regel 1: Das Break-even-Ergebnis über drei Spielzeiten darf höchstens 5 Mio. im Minus liegen.
@@ -291,8 +296,9 @@ im Monat, Spitze bis 6.500 €).
   Verein gemessen. Gehälter und Marktwerte richten sich nach dem Abstand dazu, damit stärker werdende Kader
   das Gehaltsgefüge nicht aufblähen (Spielstand: `market_levels`/`market_bases` in `meta`).
 - **Daten je Spielklasse** (`finance.divisions`): TV-Topf, Eintrittspreise, `wageLevel`, `maxAnnualWage`,
-  `sponsorLevel`, `operatingCostShare`, `academyBudgetFactor`, `squadSize` und `targetAnnualWage` als Kalibrierungsziel. Je Land
-  gelten `cateringPerSpectator` und `merchPerSpectator`. KI-Vereine übernehmen nach Auf- und Abstieg die
+  `sponsorLevel`, `merchLevel`, `operatingCostShare`, `academyBudgetFactor`, `squadSize` und `targetAnnualWage` als
+  Kalibrierungsziel. Je Land gelten `cateringPerSpectator` und `merchPerSpectator`; `merchLevel` (Standard 1,0) senkt
+  die Fanartikel je Zuschauer einer Spielklasse, z. B. in der Segunda División. KI-Vereine übernehmen nach Auf- und Abstieg die
   Eintrittspreise ihrer neuen Spielklasse.
 - **Ligazahlen** (`finance.divisions.*.reference`): Erträge und Aufwand je Verein ohne Transfers, in den Kategorien
   des DFL-Wirtschaftsreports, jeweils mit Quelle und Kennzeichen „amtlich“. Für 1. und 2. Liga stammen die Werte
@@ -324,14 +330,18 @@ im Monat, Spitze bis 6.500 €).
   für 2024/25 (laut Pressezusammenfassungen des Jahresberichts): Ligue 1 Erträge ohne Transfers 2.161 Mio. € für 18
   Klubs (120,1 je Klub), davon Ticketing 252 Mio. € (14,0 je Klub); Lohnsumme 51,7 % von 3.350 Mio. € Aufwand (96,2 je
   Klub). Ligue 2 Erträge 202 Mio. € (11,2 je Klub). Für die Federación-Ligen gibt es keinen Ligabericht.
-- **Lizenz und TV-Geld:** Der Leistungsanteil der TV-Gelder fließt erst zum Saisonende. Bei der Lizenzprüfung im
-  Frühjahr zählt er nach dem aktuellen Tabellenplatz als Forderung zum Eigenkapital. Vorher bekam ein Spitzenclub
-  mitten in der Saison wegen dieser Lücke Punktabzug oder keine Lizenz.
+- **Lizenz und TV-Geld:** Der Leistungsanteil der TV-Gelder fließt in zehn Monatsraten nach dem aktuellen
+  Tabellenplatz (bis Oktober 2026 erst zum Saisonende; die Lücke trieb vor allem in Spanien Vereine in die Insolvenz,
+  Review F-01). Bei der Lizenzprüfung zählen die noch ausstehenden Raten als Forderung zum Eigenkapital.
 - **Kalibrierung:** `fmh-calibrate --season --seasons 5 --strict` prüft je Spielklasse, dass das Ø-Jahresgehalt
   im Korridor ±30 % um das Ziel liegt; erlaubt ist eine Lohnentwicklung von 4 % je Saison (real etwa 4 % im
   Jahr laut DFL 2019/20–2024/25). Außerdem müssen die Ligazahlen im Durchschnitt aller ausgewerteten
-  Saisons passen: Summen ±25 %, einzelne Kategorien ±40 %. Die Werte jeder Saison werden mit ausgegeben; ein einzelner
-  reicher Absteiger verzerrt sonst die zweite Liga einer Saison.
+  Saisons passen: Summen ±10 %, einzelne Kategorien ±20 % (Review F-03). Abweichende Grenzen stehen je Liga in
+  `reference.tolerances` und brauchen eine Begründung in `reference.toleranceNote`. Die Werte jeder Saison werden mit
+  ausgegeben; ein einzelner reicher Absteiger verzerrt sonst die zweite Liga einer Saison.
+- **Insolvenzen und Lizenz-Punktabzüge:** Der Saisonlauf zählt beides je Land und Ebene. Im Mittel über alle Saisons
+  sind höchstens 2 % Insolvenzen je Saison (bezogen auf die Vereinszahl der Ebene) und höchstens ein Lizenz-Punktabzug
+  je Ebene und Saison erlaubt.
 
 Die Finanzsimulation über fünf Saisons ergibt folgende Werte je Verein:
 
@@ -463,7 +473,8 @@ Weitere Prüfungen:
   deshalb nicht in der CI (gemessen: 2,4 ms in der Cloud-Umgebung, davon etwa 0,4 ms Aufstellung und
   KI-Taktik, der Rest Engine).
 - `--season --seasons 5 --strict` prüft den Karrierelauf: Der langsamste Spieltag muss unter 5 s
-  liegen und alle Saisons müssen durchlaufen.
+  liegen, alle Saisons müssen durchlaufen, Gehälter und Ligazahlen müssen passen und Insolvenzen sowie
+  Lizenz-Punktabzüge unter den Grenzen bleiben (siehe Finanzen).
 - `--max-drift 0.05` prüft zusätzlich die Ligastärke-Drift.
 
 Die Gewichte stehen in `data/base/rules/engine.json`.

@@ -37,6 +37,24 @@ public class LeagueFiguresTests
         Assert.Contains(errors, e => e.Contains("'DE2'") && e.Contains("Quelle"));
     }
 
+    /// <summary>Abweichende Toleranzen der Kalibrierung brauchen eine bekannte Kennzahl und eine Begründung (Review F-03).</summary>
+    [Fact]
+    public void ToleranceExceptionsNeedAReason()
+    {
+        var de = System.Text.Json.JsonSerializer.Deserialize<CountryConfig>(
+            System.Text.Json.JsonSerializer.Serialize(TestData.Data.Countries.Single(c => c.Code == "DE"), Json.Compact), Json.Compact)!;
+        var r = de.Finance.Divisions["DE1"].Reference!;
+        r.Tolerances["income.media"] = 0.3;
+        r.Tolerances["income.catering"] = 0.3;
+        var errors = DataValidator.Validate(new GameData { Countries = new() { de }, Clubs = TestData.Data.Clubs, Names = TestData.Data.Names });
+        Assert.Contains(errors, e => e.Contains("'income.catering'"));
+        Assert.Contains(errors, e => e.Contains("'DE1'") && e.Contains("Begründung"));
+        r.Tolerances.Remove("income.catering");
+        r.ToleranceNote = "Test";
+        errors = DataValidator.Validate(new GameData { Countries = new() { de }, Clubs = TestData.Data.Clubs, Names = TestData.Data.Names });
+        Assert.DoesNotContain(errors, e => e.Contains("Toleranz"));
+    }
+
     /// <summary>Catering zählt wie im DFL-Bericht zu den sonstigen Erlösen; Transfers und Kredite bleiben außen vor.</summary>
     [Fact]
     public void TransactionsMapToReportCategories()
@@ -50,7 +68,7 @@ public class LeagueFiguresTests
         Assert.Null(FinanceReference.Category(TransactionType.LoanPayout));
     }
 
-    /// <summary>Der TV-Leistungsanteil fließt erst zum Saisonende; bis dahin zählt er bei der Lizenzprüfung als Forderung.</summary>
+    /// <summary>Der TV-Leistungsanteil fließt in Monatsraten; ausstehende Raten zählen bei der Lizenzprüfung als Forderung.</summary>
     [Fact]
     public void LicenseCountsTheOutstandingTvShare()
     {
@@ -58,9 +76,12 @@ public class LeagueFiguresTests
         var w = s.World;
         var league = w.Leagues.Single(l => l.Id == "DE1");
         var div = s.DivisionFinance(w.Clubs[league.ClubIds[0]]);
+        // Lizenzentscheidung Ende April: Die Mai-Rate des Leistungsanteils steht noch aus.
+        w.Date = new DateOnly(w.SeasonYear + 1, 4, 30);
         var receivables = league.ClubIds.Select(id => s.LicenseEquity(w.Clubs[id]) - s.Equity(w.Clubs[id])).ToList();
         Assert.All(receivables, r => Assert.True(r > 0));
-        Assert.InRange(receivables.Sum(), div.TvPool * (1 - div.TvEqualShare) * 0.99, div.TvPool * (1 - div.TvEqualShare));
+        var rate = div.TvPool * (1 - div.TvEqualShare) / 10;
+        Assert.InRange(receivables.Sum(), rate * 0.99, rate);
         w.SeasonFinished = true;
         Assert.All(league.ClubIds, id => Assert.Equal(s.Equity(w.Clubs[id]), s.LicenseEquity(w.Clubs[id])));
     }

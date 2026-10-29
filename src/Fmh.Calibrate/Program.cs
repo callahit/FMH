@@ -176,9 +176,6 @@ public static class Program
 
     private static int _startYear;
 
-    /// <summary>Erträge und Aufwand im Durchschnitt der ausgewerteten Saisons nahe an den Ligazahlen (<see cref="ReferenceReport"/>)?</summary>
-    private static bool _financeOk = true;
-
     /// <summary>Durchschnittliches Jahresgehalt der Kaderspieler je Division gegen das Kalibrierungsziel aus den Daten.</summary>
     private static void PrintWageStats(World w)
     {
@@ -206,7 +203,8 @@ public static class Program
         var w = session.World;
         static string M(double v) => (v / 1_000_000).ToString("F1", CultureInfo.InvariantCulture);
         PrintWageStats(w);
-        _financeOk = ReferenceReport.Print(w);
+        ReferenceReport.Print(w);
+        EconomyReport.PrintSeason(w);
         foreach (var league in w.Leagues)
         {
             var clubs = league.ClubIds.Select(id => w.Clubs[id]).ToList();
@@ -256,21 +254,10 @@ public static class Program
         Stopwatch? dayWatch = null;
         while (world.SeasonYear < targetSeason)
         {
-            var result = session.Advance();
+            // Tageweise, damit Insolvenzen und Lizenzentscheidungen je Tag gezählt werden (gleicher Spielverlauf).
+            var result = session.Advance(1);
+            EconomyReport.Observe(world);
             if (result.Reason == StopReason.Decision) session.DelegateDecisions();
-            if (session.AwaitingNewJob)
-            {
-                var reason = world.Messages.LastOrDefault(m => m.SubjectRef?.Key == "msg.sacked.subject")?.BodyText(data.Texts);
-                Console.WriteLine($"Entlassen am {world.Date:yyyy-MM-dd}: {reason}");
-                // Mit dem ersten Jobangebot weiter, damit die Kalibrierung nicht am Zufall einer Entlassung hängt.
-                if (session.HumanManager.Career.Offers.FirstOrDefault() is { } offer && session.AcceptJob(offer) is null)
-                {
-                    Console.WriteLine($"Neuer Verein: {session.HumanClub.Name}");
-                    continue;
-                }
-                PrintFinanceStats(session);
-                break;
-            }
             if (dayWatch is not null)
             {
                 // Spieltag gemessen vom eigenen Spiel bis alle übrigen Spiele des Tages berechnet sind.
@@ -297,12 +284,28 @@ public static class Program
                 }
                 PrintCareerStats(session);
             }
+            // Nach der Saisonauswertung, damit eine Entlassung am letzten Spieltag die Saison nicht überspringt.
+            if (session.AwaitingNewJob)
+            {
+                var reason = world.Messages.LastOrDefault(m => m.SubjectRef?.Key == "msg.sacked.subject")?.BodyText(data.Texts);
+                Console.WriteLine($"Entlassen am {world.Date:yyyy-MM-dd}: {reason}");
+                // Mit dem ersten Jobangebot weiter, damit die Kalibrierung nicht am Zufall einer Entlassung hängt.
+                if (session.HumanManager.Career.Offers.FirstOrDefault() is { } offer && session.AcceptJob(offer) is null)
+                {
+                    Console.WriteLine($"Neuer Verein: {session.HumanClub.Name}");
+                    continue;
+                }
+                PrintFinanceStats(session);
+                break;
+            }
         }
         sw.Stop();
         Console.WriteLine($"{seasons} Saison(s) in {sw.Elapsed.TotalSeconds:F1} s, {matchdays} Spieltage des eigenen Vereins, langsamster Spieltag {slowest.TotalMilliseconds:F0} ms (Ziel < 5000 ms).");
         var drift = (TopEleven(session, topLeague) - strengthStart) / Math.Max(1, seasons);
         Console.WriteLine($"Ligastärke-Drift {topLeague.Name}: {drift:+0.000;-0.000} je Saison" + (maxDrift is { } md ? $" (Grenze {md:0.000})" : " (Ziel ≤ 0,05, offener Punkt)"));
-        var ok = slowest.TotalMilliseconds < 5000 && world.SeasonYear >= targetSeason && (maxDrift is not { } m || drift <= m) && _wagesOk && _financeOk;
+        var financeOk = ReferenceReport.MeansOk();
+        var economyOk = EconomyReport.PrintSummary();
+        var ok = slowest.TotalMilliseconds < 5000 && world.SeasonYear >= targetSeason && (maxDrift is not { } m || drift <= m) && _wagesOk && financeOk && economyOk;
         if (!ok) Console.WriteLine("ACHTUNG: Saisonlauf außerhalb der Vorgaben.");
         return strict && !ok ? 1 : 0;
     }

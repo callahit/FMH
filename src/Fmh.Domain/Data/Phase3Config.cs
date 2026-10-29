@@ -127,6 +127,8 @@ public sealed class DivisionFinance
     public double WageLevel { get; set; } = 1.0;
     /// <summary>Sponsorenniveau der Spielklasse gegenüber der höchsten Liga (1,0).</summary>
     public double SponsorLevel { get; set; } = 1.0;
+    /// <summary>Fanartikel je Zuschauer gegenüber dem Landeswert (1,0); unterklassige Vereine verkaufen je Fan deutlich weniger.</summary>
+    public double MerchLevel { get; set; } = 1.0;
     /// <summary>
     /// Betriebskosten (Verwaltung, Spielbetrieb, Personal außerhalb des Kaders) als Anteil der laufenden Einnahmen;
     /// in der Bundesliga real rund 45 % (DFL-Wirtschaftsreport). 0 = keine.
@@ -183,6 +185,12 @@ public sealed class FinanceReference
     public Dictionary<string, long> Income { get; set; } = new();
     /// <summary>Aufwand je Kategorie: squad (Personal Spielbetrieb), operations (Verwaltung, Spielbetrieb, Sonstiges), youth und total.</summary>
     public Dictionary<string, long> Expenses { get; set; } = new();
+    /// <summary>
+    /// Abweichende Toleranzen der Kalibrierung je Kennzahl, z. B. „income.merchandising“: 0,4. Nur mit Begründung in
+    /// <see cref="ToleranceNote"/>, sonst gelten 10 % für Summen und 20 % für Kategorien.
+    /// </summary>
+    public Dictionary<string, double> Tolerances { get; set; } = new();
+    public string ToleranceNote { get; set; } = "";
 
     public static readonly string[] IncomeCategories = { "matchday", "advertising", "media", "merchandising", "other", "total" };
     public static readonly string[] ExpenseCategories = { "squad", "operations", "youth", "total" };
