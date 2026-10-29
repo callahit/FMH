@@ -76,39 +76,21 @@ public abstract class GameModule : IGameModule
 
     // ------------------------------------------------------------ Dienste der anderen Module
 
-    private IMatchdayService? _matchday;
-    private ISeasonService? _season;
-    private ICupsService? _cups;
-    private ITransfersService? _transfers;
-    private ITrainingService? _training;
-    private IScoutingService? _scouting;
-    private IYouthService? _youth;
-    private IFinanceService? _finance;
-    private IEconomyService? _economy;
-    private IFacilitiesService? _facilities;
-    private IStadiumPlansService? _stadiumPlans;
-    private IStaffService? _staff;
-    private ISponsorsService? _sponsors;
-    private IBoardService? _board;
-    private IPressService? _press;
-    private IEventsService? _events;
-    private ILicenseService? _license;
-
-    protected IMatchdayService Matchday => _matchday ??= Kernel.Services.Get<IMatchdayService>();
-    protected ISeasonService Season => _season ??= Kernel.Services.Get<ISeasonService>();
-    protected ICupsService Cups => _cups ??= Kernel.Services.Get<ICupsService>();
-    protected ITransfersService Transfers => _transfers ??= Kernel.Services.Get<ITransfersService>();
-    protected ITrainingService Training => _training ??= Kernel.Services.Get<ITrainingService>();
-    protected IScoutingService Scouting => _scouting ??= Kernel.Services.Get<IScoutingService>();
-    protected IYouthService Youth => _youth ??= Kernel.Services.Get<IYouthService>();
-    protected IFinanceService Finance => _finance ??= Kernel.Services.Get<IFinanceService>();
-    protected IEconomyService Economy => _economy ??= Kernel.Services.Get<IEconomyService>();
-    protected IFacilitiesService Facilities => _facilities ??= Kernel.Services.Get<IFacilitiesService>();
-    protected IStadiumPlansService StadiumPlans => _stadiumPlans ??= Kernel.Services.Get<IStadiumPlansService>();
-    protected IStaffService Staff => _staff ??= Kernel.Services.Get<IStaffService>();
-    protected ISponsorsService Sponsors => _sponsors ??= Kernel.Services.Get<ISponsorsService>();
-    protected IBoardService Board => _board ??= Kernel.Services.Get<IBoardService>();
-    protected IPressService Press => _press ??= Kernel.Services.Get<IPressService>();
-    protected IEventsService Events => _events ??= Kernel.Services.Get<IEventsService>();
-    protected ILicenseService License => _license ??= Kernel.Services.Get<ILicenseService>();
+    protected IMatchdayService Matchday => Kernel.Services.Get<IMatchdayService>();
+    protected ISeasonService Season => Kernel.Services.Get<ISeasonService>();
+    protected ICupsService Cups => Kernel.Services.Get<ICupsService>();
+    protected ITransfersService Transfers => Kernel.Services.Get<ITransfersService>();
+    protected ITrainingService Training => Kernel.Services.Get<ITrainingService>();
+    protected IScoutingService Scouting => Kernel.Services.Get<IScoutingService>();
+    protected IYouthService Youth => Kernel.Services.Get<IYouthService>();
+    protected IFinanceService Finance => Kernel.Services.Get<IFinanceService>();
+    protected IEconomyService Economy => Kernel.Services.Get<IEconomyService>();
+    protected IFacilitiesService Facilities => Kernel.Services.Get<IFacilitiesService>();
+    protected IStadiumPlansService StadiumPlans => Kernel.Services.Get<IStadiumPlansService>();
+    protected IStaffService Staff => Kernel.Services.Get<IStaffService>();
+    protected ISponsorsService Sponsors => Kernel.Services.Get<ISponsorsService>();
+    protected IBoardService Board => Kernel.Services.Get<IBoardService>();
+    protected IPressService Press => Kernel.Services.Get<IPressService>();
+    protected IEventsService Events => Kernel.Services.Get<IEventsService>();
+    protected ILicenseService License => Kernel.Services.Get<ILicenseService>();
 }

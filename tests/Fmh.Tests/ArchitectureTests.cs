@@ -12,10 +12,12 @@ public class ArchitectureTests
     {
         ["Fmh.Domain"] = Array.Empty<string>(),
         ["Fmh.Data"] = new[] { "Fmh.Domain" },
-        ["Fmh.Simulation.Abstractions"] = new[] { "Fmh.Domain" },
-        ["Fmh.Modules"] = new[] { "Fmh.Domain", "Fmh.Data", "Fmh.Simulation.Abstractions" },
-        ["Fmh.Simulation"] = new[] { "Fmh.Domain", "Fmh.Data", "Fmh.Simulation.Abstractions", "Fmh.Modules" },
-        ["Fmh.Persistence"] = new[] { "Fmh.Domain", "Fmh.Simulation.Abstractions" },
+        // Regelbibliothek (Spiellogik ohne Zustand der Module), Review F-09.
+        ["Fmh.Rules"] = new[] { "Fmh.Domain" },
+        ["Fmh.Simulation.Abstractions"] = new[] { "Fmh.Domain", "Fmh.Rules" },
+        ["Fmh.Modules"] = new[] { "Fmh.Domain", "Fmh.Data", "Fmh.Rules", "Fmh.Simulation.Abstractions" },
+        ["Fmh.Simulation"] = new[] { "Fmh.Domain", "Fmh.Data", "Fmh.Rules", "Fmh.Simulation.Abstractions", "Fmh.Modules" },
+        ["Fmh.Persistence"] = new[] { "Fmh.Domain", "Fmh.Rules", "Fmh.Simulation.Abstractions" },
         ["Fmh.MatchEngine"] = new[] { "Fmh.Domain" },
     };
 
@@ -48,6 +50,7 @@ public class ArchitectureTests
     [InlineData("Fmh.Simulation")]
     [InlineData("Fmh.Modules")]
     [InlineData("Fmh.MatchEngine")]
+    [InlineData("Fmh.Rules")]
     public void NoFileExceedsFourHundredLines(string project)
     {
         var tooLong = Directory.EnumerateFiles(Path.Combine(Src, project), "*.cs", SearchOption.AllDirectories)
@@ -55,6 +58,16 @@ public class ArchitectureTests
             .Select(f => (file: Path.GetFileName(f), lines: File.ReadLines(f).Count()))
             .Where(x => x.lines > 400).ToList();
         Assert.True(tooLong.Count == 0, string.Join(", ", tooLong.Select(x => $"{x.file}: {x.lines}")));
+    }
+
+    /// <summary>Die Abstraktionen enthalten nur Schnittstellen, Ereignisse und die Modulbasis; Spiellogik liegt in Fmh.Rules (Review F-09).</summary>
+    [Fact]
+    public void AbstractionsStaySmall()
+    {
+        var files = Directory.EnumerateFiles(Path.Combine(Src, "Fmh.Simulation.Abstractions"), "*.cs", SearchOption.AllDirectories)
+            .Where(f => !f.Contains($"{Path.DirectorySeparatorChar}obj{Path.DirectorySeparatorChar}") && !f.Contains($"{Path.DirectorySeparatorChar}bin{Path.DirectorySeparatorChar}")).ToList();
+        Assert.DoesNotContain(files, f => f.Contains($"{Path.DirectorySeparatorChar}Logic{Path.DirectorySeparatorChar}"));
+        Assert.True(files.Sum(f => File.ReadLines(f).Count()) < 600);
     }
 
     /// <summary>Module kennen einander nur über Dienst-Schnittstellen und Ereignisse, nie über die Klasse eines anderen Moduls.</summary>
