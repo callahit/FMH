@@ -39,6 +39,21 @@ public class GoldenMasterTests
         Check("world", WorldFingerprint.Sections(s.World));
     }
 
+    /// <summary>Alle ausgelieferten Länderpakete über zwei Saisons (Review F-04): Änderungen an England, Spanien, Italien
+    /// und Frankreich schlagen hier an, auch wenn die Grundwelt unverändert bleibt.</summary>
+    [Fact]
+    public void AllPackagesOverTwoSeasonsAreUnchanged()
+    {
+        // Eigene Datenkopie: Andere Tests verändern die geteilten Länderdaten (z. B. TV-Anteile in England).
+        var data = TestData.LoadAll();
+        var world = Fmh.Core.Logic.WorldGenerator.Create(data, new Fmh.Core.Logic.NewGameOptions { Seed = WorldSeed, ClubKey = "nordheide", ManagerName = "Test" });
+        var s = new GameSession(world, data, new Fmh.MatchEngine.TextMatchEngine());
+        var target = s.World.SeasonYear + 2;
+        TestData.PlayUntil(s, _ => s.World.SeasonYear >= target, 50_000);
+        s.SyncRng();
+        Check("allPackages", WorldFingerprint.Sections(s.World));
+    }
+
     [Fact]
     public void EngineOverTenThousandMatchesIsUnchanged()
     {
@@ -93,15 +108,32 @@ public class GoldenMasterTests
             $"Golden Master {key} (Referenz {reference.Item1}) weicht ab in: {string.Join(", ", diff)}; Ist: {JsonSerializer.Serialize(actual)}");
     }
 
+    /// <summary>Neue Felder der Welt müssen in den Fingerabdruck, sonst wären sie vom Golden Master nicht geschützt.</summary>
+    [Fact]
+    public void FingerprintCoversEveryWorldField()
+    {
+        var json = string.Concat(WorldFingerprintSource());
+        var missing = typeof(World).GetProperties().Where(p => p.CanWrite).Select(p => p.Name)
+            .Where(n => !WorldFingerprint.NotHashed.Contains(n) && !System.Text.RegularExpressions.Regex.IsMatch(json, $@"\bw\.{n}\b")).ToList();
+        Assert.True(missing.Count == 0, $"Nicht im Golden Master: {string.Join(", ", missing)}");
+    }
+
+    private static IEnumerable<string> WorldFingerprintSource() =>
+        File.ReadLines(Path.Combine(TestData.RepoRoot(), "tests", "Fmh.Tests", "GoldenMasterTests.cs"))
+            .SkipWhile(l => !l.Contains("public static Dictionary<string, string> Sections(World w)"));
+
     internal static string Hash(string text) => Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(text)))[..32];
 }
 
 /// <summary>
 /// Fachlicher Fingerabdruck des Spielzustands, nach Bereichen getrennt (damit eine Abweichung sofort zeigt, wo).
-/// Ändert ein Umbau nur die Ablage (z. B. Verein und Mannschaft getrennt), wird hier die alte Form wiederhergestellt.
+/// Alle Felder werden gehasht; neue Felder sind damit ab ihrem PR geschützt (Review F-04).
 /// </summary>
 internal static class WorldFingerprint
 {
+    /// <summary>Felder der Welt, die bewusst nicht in den Fingerabdruck eingehen (Verwaltung, keine Spielregel).</summary>
+    public static readonly string[] NotHashed = { nameof(World.SaveVersion), nameof(World.AutosaveCounter) };
+
     public static Dictionary<string, string> Sections(World w)
     {
         string J(object? o) => JsonSerializer.Serialize(o, Json.Compact);
@@ -110,39 +142,19 @@ internal static class WorldFingerprint
             ["calendar"] = J(new { w.Date, w.SeasonYear, w.SeasonFinished, w.RngState }),
             ["ids"] = J(new { w.NextPlayerId, w.NextFixtureId, w.NextMessageId, w.NextTieId, w.NextNegotiationId, w.NextScoutId, w.NextAssignmentId,
                 w.NextStaffId, w.NextBuildingId, w.NextProjectId, w.NextSponsorId, w.NextLoanId, w.NextEventId }),
-            ["managers"] = Legacy(w.Managers, null, "profile", ProfileFieldsSinceCurrency),
-            ["clubs"] = Legacy(w.Clubs.Values.OrderBy(c => c.Id), ClubFieldsSinceAp3, "format", null),
+            ["managers"] = J(w.Managers),
+            ["clubs"] = J(w.Clubs.Values.OrderBy(c => c.Id)),
             ["players"] = J(w.Players.Values.OrderBy(p => p.Id)),
-            ["leagues"] = Legacy(w.Leagues, null, "format", FormatFieldsSinceAp3),
-            ["cups"] = Legacy(w.Cups, null, "config", CupFieldsSinceAp4),
+            ["leagues"] = J(w.Leagues),
+            ["cups"] = J(w.Cups),
             ["messages"] = J(w.Messages),
             ["transfers"] = J(new { w.Transfers, w.Transactions, w.Installments, w.Negotiations, w.NegotiationLocks }),
             ["scouting"] = J(new { w.Scouts, w.ScoutAssignments, w.ScoutReports, w.Knowledge }),
             ["environment"] = J(new { w.Staff, w.Events, w.EventHistory, w.PendingPress, w.EuropeanEntries }),
             ["history"] = J(w.History),
+            // Länder- und Weltregeln im Spielstand: auch Datenänderungen ohne Wirkung im Testlauf schlagen an.
+            ["config"] = J(new { w.Seed, w.Packages, w.Countries, w.Rules, w.MarketLevels, w.MarketBases, w.Referees }),
         };
         return sections.ToDictionary(kv => kv.Key, kv => GoldenMasterTests.Hash(kv.Value));
-    }
-
-    /// <summary>Felder, die AP 3 ergänzt hat (zweite Mannschaften, Staffeln, Bewegungsregeln); für den Vergleich wird die alte Form hergestellt.</summary>
-    private static readonly string[] ClubFieldsSinceAp3 = { "reserveOf", "region", "latitude", "longitude" };
-    private static readonly string[] FormatFieldsSinceAp3 = { "groups", "assignment", "movements", "phases" };
-
-    /// <summary>Felder, die AP 4 an Pokalformaten ergänzt hat (eigene Spielzahl im Finale).</summary>
-    private static readonly string[] CupFieldsSinceAp4 = { "finalLegs" };
-
-    /// <summary>Anzeigewährung und eigene Kurse im Managerprofil (reine Anzeige, ohne Wirkung auf die Simulation).</summary>
-    private static readonly string[] ProfileFieldsSinceCurrency = { "displayCurrency", "exchangeRates" };
-
-    private static string Legacy<T>(IEnumerable<T> items, string[]? remove, string nested, string[]? removeFromNested)
-    {
-        var array = JsonSerializer.SerializeToNode(items, Json.Compact)!.AsArray();
-        foreach (var item in array.OfType<JsonObject>())
-        {
-            foreach (var key in remove ?? Array.Empty<string>()) item.Remove(key);
-            if (item[nested] is JsonObject inner)
-                foreach (var key in removeFromNested ?? Array.Empty<string>()) inner.Remove(key);
-        }
-        return array.ToJsonString(Json.Compact);
     }
 }
