@@ -290,6 +290,21 @@ public class Phase3Tests
     }
 
     [Fact]
+    public void AiPutsLargeReservesIntoWages()
+    {
+        var s = TestData.NewSession(29);
+        var club = s.World.Clubs[s.World.Leagues.First(l => l.Level == 1).ClubIds.First(id => id != s.HumanClub.Id)];
+        club.Budget.Balance = 0;
+        s.SetSeasonBudget(club);
+        var normal = club.Budget.WageBudget;
+        // Rücklagen von zwei Jahreseinnahmen: ein Viertel des Überschusses über 25 % geht in die Gehälter.
+        var income = s.ExpectedIncome(club);
+        club.Budget.Balance = 2 * income;
+        s.SetSeasonBudget(club);
+        Assert.InRange(club.Budget.WageBudget - normal, (2 * income - income / 4) / 4 / 52 * 0.9, (2 * income - income / 4) / 4 / 52 * 1.1);
+    }
+
+    [Fact]
     public void Phase3StateSurvivesSaveAndLoad()
     {
         var s = TestData.NewSession(27);

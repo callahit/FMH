@@ -240,7 +240,8 @@ public sealed partial class YouthModule : GameModule, IYouthService
         var pos = PlayerGenerator.SquadTemplate[Rng.WeightedIndex(PlayerGenerator.SquadTemplate.Select(t => (double)t.count).ToList())].pos;
         var p = PlayerGenerator.Create(World, Data, Rng, pos, Math.Clamp(level + Rng.Normal(0, 1.2), 1.5, 14), age, club.CountryCode);
         var bonus = (golden ? 25 : 0) + (int)(a.Recruitment / 20.0 * 10) + (int)(a.Reputation / 10) + Rng.Next(-6, 9) + (16 - age) * 3;
-        p.Hidden.PotentialAbility = Math.Clamp(p.Hidden.CurrentAbility + Rng.Next(15, 45) + bonus, p.Hidden.CurrentAbility, 200);
+        // Im Mittel erreicht ein Talent etwa die Stärke des Vereins; mehr Spielraum ließe jede Generation stärker werden (Review F-02).
+        p.Hidden.PotentialAbility = Math.Clamp(p.Hidden.CurrentAbility + Rng.Next(5, 35) + bonus, p.Hidden.CurrentAbility, 200);
         p.Hidden.Professionalism = Math.Clamp(p.Hidden.Professionalism + (int)Facilities.Effect(club, "youth.professionalism") + (int)Math.Round((a.Education - 10) / 3), 1, 20);
         p.IsYouth = true;
         p.Reputation = 1;
