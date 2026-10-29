@@ -113,7 +113,7 @@ public class GoldenMasterTests
     {
         var json = string.Concat(WorldFingerprintSource());
         var missing = typeof(World).GetProperties().Where(p => p.CanWrite).Select(p => p.Name)
-            .Where(n => !WorldFingerprint.NotHashed.Contains(n) && !json.Contains("w." + n)).ToList();
+            .Where(n => !WorldFingerprint.NotHashed.Contains(n) && !System.Text.RegularExpressions.Regex.IsMatch(json, $@"\bw\.{n}\b")).ToList();
         Assert.True(missing.Count == 0, $"Nicht im Golden Master: {string.Join(", ", missing)}");
     }
 
