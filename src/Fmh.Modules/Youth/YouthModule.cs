@@ -63,8 +63,9 @@ public sealed partial class YouthModule : GameModule, IYouthService
         {
             var y = country.Youth;
             if (World.Date.Month != y.IntakeMonth || World.Date.Day != 15) continue;
+            // Amateurvereine (ohne eigene Finanzen) führen keine U15; ihr Jahrgang kommt mit 16 wie in der Startwelt (Review F-05).
             foreach (var club in World.Clubs.Values.Where(c => c.CountryCode == country.Code))
-                YouthIntake(club, y.MinPlayers, y.MaxPlayers);
+                YouthIntake(club, y.MinPlayers, y.MaxPlayers, fixedAge: Finance.HasFinances(club) ? null : Math.Max(y.IntakeAge, 16));
         }
     }
 
@@ -265,7 +266,8 @@ public sealed partial class YouthModule : GameModule, IYouthService
             for (var age = y.IntakeAge; age <= 18; age++)
             {
                 if (!full && age < 16) continue;
-                var keep = age switch { <= 15 => 1.0, <= 17 => 0.75, _ => 0.5 };
+                // Ältere Jahrgänge sind durch Abbrecher und Aussortieren kleiner (etwa wie im laufenden Spiel).
+                var keep = age switch { <= 15 => 1.0, <= 16 => 0.9, <= 17 => 0.85, _ => 0.75 };
                 YouthIntake(club, (int)(y.MinPlayers * keep), (int)Math.Max(1, y.MaxPlayers * keep), initial: true, fixedAge: age);
             }
         }

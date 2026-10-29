@@ -370,10 +370,17 @@ Im Vergleich mit dem DFL-Bericht (letzte Saison des Laufs, Spiel/Bericht in Mio.
 
 Darin sind die Budgets der Nachwuchsleistungszentren und die Europapokalprämien bereits enthalten.
 Absteiger geraten mit ihren Gehältern ins Minus. Es gibt keine Kettenpleiten. In der 2. Liga bekommen
-einige Vereine im Frühjahr Lizenzauflagen, Punktabzüge sind selten. Die Zahl der vereinslosen
-Spieler steigt mit England im Lauf auf 400–650: Wer nach der Jugend nicht übernommen wird, geht meist in den
+einige Vereine im Frühjahr Lizenzauflagen, Punktabzüge sind selten. Zum Spielstart gibt es je Verein
+rund einen Vereinslosen; mit allen fünf Ländern liegen am Saisonende vor den Karriereenden 500–2.000 Spieler ohne
+Vertrag (höchstens rund 10 % der Profis): Wer nach der Jugend nicht übernommen wird, geht meist in den
 Amateurfußball, und Vereine mit dünnem Kader verpflichten unter der Saison nach. Die Kennzahlen zeigt
 `fmh-calibrate --season --seasons 5` je Liga und Buchungsart an.
+
+**Größe der Spielwelt** (alle Länder, Seed 1, 10 Saisons): Die aktiven Spieler (Profis, Jugend, Vereinslose) wachsen
+von 43.400 auf 45.900 (+5,7 %); Amateurvereine nehmen ihren Jugendjahrgang mit 16 auf, die Startjahrgänge entsprechen
+dem laufenden Spiel. Spieler im Ruhestand bleiben mit ihrer Laufbahn im Spielstand (nach 10 Saisons rund 54.000); der
+Spielstand wächst von 50 auf 112 MB (Ziel laut Konzept 6.2: unter 300 MB). Die Kalibrierung prüft je Saisonende:
+aktive Spieler höchstens +10 % gegenüber dem ersten Saisonende, Vereinslose höchstens 12 % der Profis.
 
 ## Umfang nach Kapiteln des Fachkonzepts
 
