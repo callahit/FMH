@@ -127,6 +127,8 @@ public sealed class DivisionFinance
     public double WageLevel { get; set; } = 1.0;
     /// <summary>Sponsorenniveau der Spielklasse gegenüber der höchsten Liga (1,0).</summary>
     public double SponsorLevel { get; set; } = 1.0;
+    /// <summary>Fanartikel je Zuschauer gegenüber dem Landeswert (1,0); unterklassige Vereine verkaufen je Fan deutlich weniger.</summary>
+    public double MerchLevel { get; set; } = 1.0;
     /// <summary>
     /// Betriebskosten (Verwaltung, Spielbetrieb, Personal außerhalb des Kaders) als Anteil der laufenden Einnahmen;
     /// in der Bundesliga real rund 45 % (DFL-Wirtschaftsreport). 0 = keine.

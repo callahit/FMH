@@ -605,7 +605,7 @@
     "sponsorPromotionPercent": 25,
     "divisions": {
       "ES1": {
-        "tvPool": 1287000000,
+        "tvPool": 1450000000,
         "tvEqualShare": 0.5,
         "standing": 30,
         "seating": 55,
@@ -616,8 +616,8 @@
         "travelPerAwayMatch": 55000,
         "wageLevel": 0.8,
         "sponsorLevel": 0.36,
-        "academyBudgetFactor": 9.0,
-        "operatingCostShare": 0.55,
+        "academyBudgetFactor": 3.4,
+        "operatingCostShare": 0.26,
         "maxAnnualWage": 25000000,
         "targetAnnualWage": 3500000,
         "relegationWagePercent": 50,
@@ -634,23 +634,27 @@
           },
           "expenses": {
             "squad": 106200000
+          },
+          "toleranceNote": "Fanartikel je Zuschauer gelten für das ganze Land; real konzentrieren sich die Shop-Umsätze der Primera auf die Großvereine (Segunda: 1,0 Mio. je Klub).",
+          "tolerances": {
+            "income.merchandising": 0.3
           }
         }
       },
       "ES2": {
         "tvPool": 142000000,
         "tvEqualShare": 0.5,
-        "standing": 8,
-        "seating": 14,
+        "standing": 7,
+        "seating": 12,
         "box": 3000,
         "floodlightRequired": 2,
         "youthCenterRequired": 1,
         "minEquity": -10000000,
         "travelPerAwayMatch": 25000,
-        "wageLevel": 0.43,
-        "sponsorLevel": 0.14,
-        "academyBudgetFactor": 6.0,
-        "operatingCostShare": 0.6,
+        "wageLevel": 0.36,
+        "sponsorLevel": 0.12,
+        "academyBudgetFactor": 1.1,
+        "operatingCostShare": 0.29,
         "maxAnnualWage": 1200000,
         "targetAnnualWage": 400000,
         "relegationWagePercent": 50,
@@ -668,7 +672,8 @@
           "expenses": {
             "squad": 10800000
           }
-        }
+        },
+        "merchLevel": 0.35
       },
       "ES3": {
         "tvPool": 20000000,
@@ -682,7 +687,7 @@
         "travelPerAwayMatch": 10000,
         "wageLevel": 0.2,
         "sponsorLevel": 0.35,
-        "operatingCostShare": 0.45,
+        "operatingCostShare": 0.4,
         "maxAnnualWage": 250000,
         "targetAnnualWage": 80000,
         "relegationWagePercent": 50,
@@ -698,8 +703,8 @@
         "minEquity": -300000,
         "travelPerAwayMatch": 4000,
         "wageLevel": 0.09,
-        "sponsorLevel": 0.2,
-        "operatingCostShare": 0.3,
+        "sponsorLevel": 0.3,
+        "operatingCostShare": 0.1,
         "maxAnnualWage": 70000,
         "targetAnnualWage": 22000,
         "relegationWagePercent": 50,

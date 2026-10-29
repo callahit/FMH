@@ -16,5 +16,6 @@ public interface ITransfersService
     /// <summary>Vereinslose ohne Perspektive beenden ihre Laufbahn (auch freigegebene Jugendspieler unterhalb des Amateurniveaus).</summary>
     void RetireFreeAgents();
     double Rating(Player p);
-    bool SignBestFreeAgent(Club club, Position pos);
+    /// <summary>Bester passender Vereinsloser; mit <paramref name="withinBudget"/> nur, wenn das Gehaltsbudget reicht.</summary>
+    bool SignBestFreeAgent(Club club, Position pos, bool withinBudget = false);
 }

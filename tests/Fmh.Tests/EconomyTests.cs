@@ -3,6 +3,7 @@ using Fmh.Core.Game;
 using Fmh.Core.Logic;
 using Fmh.Core.Model;
 using Fmh.Core.Persistence;
+using Fmh.MatchEngine;
 
 namespace Fmh.Tests;
 
@@ -113,5 +114,30 @@ public class EconomyTests
             Assert.Equal(w.MarketBases, loaded.MarketBases);
         }
         finally { File.Delete(path); }
+    }
+
+    /// <summary>Fanartikel je Zuschauer skalieren mit dem Fanartikel-Niveau der Spielklasse (Review F-01, Segunda División).</summary>
+    [Fact]
+    public void MerchandiseFollowsTheDivisionLevel()
+    {
+        double Merch(double level)
+        {
+            // Eigene Datenkopie: Die Länderdaten der geteilten Testdaten nicht verändern, andere Tests laufen parallel.
+            var data = PackageLoader.Load(new[] { PackageLoader.FindDataRoot() }, enabledPackages: new[] { "base" });
+            data.Countries.Single(c => c.Code == "DE").Finance.Divisions["DE2"].MerchLevel = level;
+            var world = WorldGenerator.Create(data, new NewGameOptions { Seed = 41, ClubKey = "nordheide", ManagerName = "Test" });
+            var s = new GameSession(world, data, new TextMatchEngine());
+            for (var i = 0; i < 40; i++)
+            {
+                var r = s.Advance(1);
+                if (r.Reason == StopReason.HumanMatch && r.Fixture is { } f) s.PlayInstant(f);
+                if (r.Reason == StopReason.Decision) s.DelegateDecisions();
+            }
+            return s.World.Leagues.Single(l => l.Id == "DE2").ClubIds
+                .Sum(id => (double)s.World.Clubs[id].Finance.Season.GetValueOrDefault(TransactionType.Merchandise));
+        }
+        var full = Merch(1.0);
+        Assert.True(full > 0);
+        Assert.InRange(Merch(0.5) / full, 0.45, 0.55);
     }
 }
