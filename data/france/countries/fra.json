@@ -348,7 +348,7 @@
         }
       },
       "FRA2": {
-        "tvPool": 75000000,
+        "tvPool": 70000000,
         "tvEqualShare": 0.8,
         "standing": 6,
         "seating": 11,
@@ -358,7 +358,7 @@
         "minEquity": -10000000,
         "travelPerAwayMatch": 18000,
         "wageLevel": 0.22,
-        "sponsorLevel": 0.15,
+        "sponsorLevel": 0.14,
         "academyBudgetFactor": 0.5,
         "operatingCostShare": 0.23,
         "maxAnnualWage": 1000000,
