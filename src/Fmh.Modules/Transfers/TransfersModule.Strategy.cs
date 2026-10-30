@@ -16,6 +16,16 @@ public sealed partial class TransfersModule
     /// <summary>Derzeit verliehene Spieler (für die Leihgrenzen; je Montag neu ermittelt, neue Leihen kommen hinzu).</summary>
     private List<Player>? _activeLoans;
 
+    /// <summary>Spieler bis 31 je Hauptposition mit ihrer Stärke (je Montag einmal ermittelt; Verein und Status prüft der Aufrufer).</summary>
+    private Dictionary<Position, List<(Player p, double r)>>? _market;
+
+    private List<(Player p, double r)> MarketOf(Position pos)
+    {
+        _market ??= World.Players.Values.Where(p => !p.Retired && !p.IsYouth && p.Age(World.Date) <= 31)
+            .GroupBy(p => p.MainPosition).ToDictionary(g => g.Key, g => g.Select(p => (p, Rating(p))).ToList());
+        return _market.TryGetValue(pos, out var list) ? list : new();
+    }
+
     /// <summary>Position mit dem größten Bedarf je Verein (je Montag zwischengespeichert, bei Kaderwechseln verworfen).</summary>
     private readonly Dictionary<int, Position> _needs = new();
 
