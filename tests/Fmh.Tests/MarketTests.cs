@@ -35,7 +35,7 @@ public class MarketTests
         var season = w.Transfers.Where(t => t.SeasonYear == w.SeasonYear).ToList();
         var de1 = w.League("DE1").ClubIds.ToHashSet();
         // Schon im ersten Sommer wird gekauft (Review F-07: Saison 1 war fast leer).
-        Assert.True(season.Count(t => !t.Loan && t.Fee > 0 && de1.Contains(t.ToClubId)) >= de1.Count / 2);
+        Assert.True(season.Count(t => !t.Loan && t.Fee > 0 && t.ToClubId is { } to && de1.Contains(to)) >= de1.Count / 2);
         Assert.True(season.Count(t => t.Loan) > 0);
 
         // Kein Verein überschreitet die Leihgrenzen (ausgenommene Spieler zählen nicht).

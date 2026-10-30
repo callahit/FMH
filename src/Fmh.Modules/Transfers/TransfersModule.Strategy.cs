@@ -31,7 +31,7 @@ public sealed partial class TransfersModule
 
     private string? CheckLoan(Player p, Club parent, Club borrower) => LoanLimits.Check(World, Data, p, parent, borrower, 12, ActiveLoans());
 
-    /// <summary>Spieler außerhalb der besten 14 ihres Kaders (oder zur Leihe freigegeben) bei KI-Vereinen der Profiligen.</summary>
+    /// <summary>Spieler außerhalb der besten 14 ihres Kaders (oder zur Leihe bzw. zum Verkauf freigegeben) bei KI-Vereinen der Profiligen.</summary>
     private List<(Player p, double rating, Club parent)> LoanPool()
     {
         if (_loanPool is not null) return _loanPool;
@@ -43,7 +43,8 @@ public sealed partial class TransfersModule
             for (var i = 0; i < ranked.Count; i++)
             {
                 var (p, r) = ranked[i];
-                if (i < 14 && !p.Transfer.LoanListed) continue;
+                // Auf der Transferliste stehende Spieler gibt der Verein auch leihweise ab (spart Gehalt).
+                if (i < 14 && !p.Transfer.LoanListed && !p.Transfer.Listed) continue;
                 if (p.IsYouth || p.PreContract is not null || p.Age(World.Date) < 17 || p.Contract is not { } c || c.Until < seasonEnd) continue;
                 pool.Add((p, r, club));
             }
