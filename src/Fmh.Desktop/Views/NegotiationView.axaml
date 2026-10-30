@@ -46,6 +46,8 @@
             <StackPanel Spacing="8" IsVisible="{Binding IsLoan}">
               <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.loanMonths}" VerticalAlignment="Center" />
                 <NumericUpDown Grid.Column="1" Value="{Binding LoanMonths}" Minimum="6" Maximum="12" Increment="6" /></Grid>
+              <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.loanFee}" VerticalAlignment="Center" />
+                <NumericUpDown Grid.Column="1" Value="{Binding LoanFee, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="50000" FormatString="N0" /></Grid>
               <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.wageShare}" VerticalAlignment="Center" />
                 <NumericUpDown Grid.Column="1" Value="{Binding WageShare}" Minimum="0" Maximum="100" Increment="10" /></Grid>
               <CheckBox Content="{s:L neg.purchaseOption}" IsChecked="{Binding HasPurchaseOption}" />

@@ -78,9 +78,10 @@ public static class Negotiations
         var minShare = p.Transfer.LoanListed ? 50 : p.Age(world.Date) <= 21 ? 60 : 80;
         // Eine Einsatzgarantie sichert dem Stammverein Spielpraxis zu; dafür trägt er mehr vom Gehalt.
         if (o.PlayingTimeGuarantee) minShare = Math.Max(0, minShare - TransferTerms.GuaranteeWageShareDiscount);
+        var covered = o.WageSharePercent + TransferTerms.WageShareFromLoanFee(o.LoanFee, MarketValue.Of(p, world, data.PositionProfiles));
         if (o.PurchaseFee is { } fee && fee < MarketValue.Of(p, world, data.PositionProfiles) * 0.9)
             return new NegotiationResponse(ResponseKind.Counter, "neg.loan.optionLow", MarketValue.Of(p, world, data.PositionProfiles));
-        if (o.WageSharePercent >= minShare) return new NegotiationResponse(ResponseKind.Accept, "neg.loan.accept");
+        if (covered >= minShare) return new NegotiationResponse(ResponseKind.Accept, "neg.loan.accept");
         if (n.ClubRounds >= MaxRounds) return new NegotiationResponse(ResponseKind.Reject, "neg.club.final");
         return new NegotiationResponse(ResponseKind.Counter, "neg.loan.wageShare", minShare, minShare);
     }
