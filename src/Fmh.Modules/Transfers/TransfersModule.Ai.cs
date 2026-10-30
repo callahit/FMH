@@ -22,12 +22,14 @@ public sealed partial class TransfersModule
         foreach (var lockKey in World.NegotiationLocks.Where(kv => kv.Value <= World.Date).Select(kv => kv.Key).ToList())
             World.NegotiationLocks.Remove(lockKey);
 
+        _activeLoans = null;
         var monday = World.Date.DayOfWeek == DayOfWeek.Monday;
         if (!monday) return;
 
         var aiClubs = World.Clubs.Values.Where(c => !IsHuman(c)).ToList();
         Rng.Shuffle(aiClubs);
-        var window = Season.IsTransferWindowOpen();
+        _loanPool = null;
+        _needs.Clear();
         foreach (var club in aiClubs)
         {
             ManageAiSquadSize(club);
@@ -42,12 +44,16 @@ public sealed partial class TransfersModule
                 if (!SignBestFreeAgent(club, Season.NeededPosition(club), withinBudget: !critical) && below) Season.AddEmergencyPlayer(club);
                 if (!below) break;
             }
-            if (window && Rng.Chance(0.3)) TryAiSigning(club);
+            // Das Transferfenster des eigenen Verbands entscheidet (die Fenster der Länder unterscheiden sich).
+            if (!Season.IsTransferWindowOpen(club)) continue;
+            var profile = Data.TransferRules.Profile(ClubStrategy.Of(World, Data, club));
+            if (Rng.Chance(profile.SigningChance)) TryAiSigning(club, profile);
+            if (Rng.Chance(Math.Min(1, profile.BorrowChance * ClubStrategy.Tendency(World, club).LoanAffinity))) TryAiBorrow(club);
+            if (profile.LendBeyondRank > 0 && Rng.Chance(0.25)) TryAiLoanOut(club, profile);
             // Neuzugänge im Fenster nachmelden, solange Plätze frei sind.
-            if (window) Registration.Fill(World, club, Data, keep: true);
+            Registration.Fill(World, club, Data, keep: true);
         }
-        if (window && Rng.Chance(0.3)) MakeIncomingOffer();
-        if (window) foreach (var club in aiClubs.Where(_ => Rng.Chance(0.15))) TryAiLoanOut(club);
+        if (Season.IsTransferWindowOpen() && Rng.Chance(0.3)) MakeIncomingOffer();
         if (World.Date.Month is >= 2 and <= 5 && World.Date.Day <= 7) AiPreContracts(aiClubs);
     }
 
@@ -59,65 +65,67 @@ public sealed partial class TransfersModule
 
     public double Rating(Player p) => Ratings.PositionRating(p, p.MainPosition, Data.PositionProfiles);
 
-    /// <summary>KI kauft gezielt für die Position mit dem größten Bedarf.</summary>
-    private void TryAiSigning(Club club)
+    /// <summary>
+    /// KI kauft gezielt für die Position mit dem größten Bedarf, und zwar nur Spieler, deren Marktwert ins Transferbudget passt.
+    /// Ausbildungsvereine bevorzugen junge Spieler mit Potenzial.
+    /// </summary>
+    private void TryAiSigning(Club club, StrategyProfile profile)
     {
-        var summer = World.Date.Month is 7 or 8;
-        if (TransfersThisWindow(club) >= (summer ? 3 : 1)) return;
-        var need = Season.NeededPosition(club);
+        var summer = World.Date.Month is >= 5 and <= 10;
+        if (TransfersThisWindow(club) >= (summer ? profile.MaxSummerSignings : profile.MaxWinterSignings)) return;
+        var need = NeedOf(club);
         var level = PlayerGenerator.ClubLevel(club.Reputation);
         var current = World.SquadOf(club).Where(p => p.MainPosition == need).Select(Rating).DefaultIfEmpty(0).Max();
         var minRating = Math.Max(current + 0.3, level - 1.0);
+        var youthAge = profile.YouthFocusAge;
+        double Score(Player p, double r) =>
+            youthAge > 0 && p.Age(World.Date) <= youthAge ? r + (p.Hidden.PotentialAbility - p.Hidden.CurrentAbility) / 20.0 : r;
+        var budget = club.Budget.TransferBudget;
         var candidates = World.Players.Values
             .Where(p => !p.Retired && !p.IsYouth && p.ClubId != club.Id && p.ClubId != HumanClub.Id && p.Loan is null && p.PreContract is null)
             .Where(p => p.MainPosition == need && p.Age(World.Date) <= 31)
             .Select(p => (p, r: Rating(p)))
             .Where(x => x.r >= minRating && x.r <= level + 3)
             .Where(x => x.p.ClubId is null || World.Clubs[x.p.ClubId.Value].Reputation <= club.Reputation + 3)
-            .OrderByDescending(x => x.r)
-            .Take(6)
+            // Grobe Vorauswahl nach Marktwert, damit nicht nur unbezahlbare Spieler in die engere Wahl kommen.
+            .Where(x => x.p.ClubId is null || ValueOf(x.p) <= budget)
+            .OrderByDescending(x => Score(x.p, x.r))
+            .Take(8)
             .ToList();
+        // Bei vollem Kader wird der schwächste Spieler der Position abgegeben; sein Gehalt steht dann für den Neuen zur Verfügung.
+        var replaced = club.PlayerIds.Count >= Finance.DivisionFinance(club).SquadSize
+            ? World.SquadOf(club).Where(p => p.MainPosition == need && p.Loan is null && !p.Transfer.Listed && p.Contract is not null).MinBy(Rating)
+            : null;
+        var freed = replaced?.Contract?.WeeklyWage ?? 0;
+        // Das Gehaltsbudget bleibt, wie es ist: Ein Kauf muss hineinpassen, sonst schaukeln sich die Gehälter über die Saison hoch.
+        void Done()
+        {
+            if (replaced is not null) SetTransferListed(replaced, true, MarketValue.Round(ValueOf(replaced) * 0.8));
+        }
+        var bill = WageBillOf(club);
         foreach (var (p, _) in candidates)
         {
             if (Negotiations.IsLocked(World, p.Id, club.Id) || Negotiations.RefusalReason(p, club, World, Data) is not null) continue;
             var contract = Negotiations.SuggestContract(p, club, World, Data);
-            if (Budgets.WageBill(club, World) + contract.WeeklyWage > club.Budget.WageBudget * 1.05) continue;
+            if (bill - freed + contract.WeeklyWage > club.Budget.WageBudget * 1.05) continue;
             if (p.ClubId is not { } sellerId)
             {
                 ExecuteTransfer(p, club, null, new ClubOffer(), contract);
-                club.Budget.WageBudget = Math.Max(club.Budget.WageBudget, Budgets.WageBill(club, World));
+                Done();
                 return;
             }
             var seller = World.Clubs[sellerId];
             var ask = Negotiations.AskingPrice(p, seller, World, Data);
-            if (ask > club.Budget.TransferBudget) continue;
+            if (ask > budget) continue;
             var n = new Negotiation { PlayerId = p.Id, BuyerId = club.Id, SellerId = sellerId, Type = DealType.Transfer, Offer = new ClubOffer { Fee = MarketValue.Round(ask * Rng.Range(0.85, 1.0)) } };
             var resp = Negotiations.EvaluateClubOffer(n, p, seller, World, Data);
-            if (resp.Kind == ResponseKind.Counter && resp.Amount <= club.Budget.TransferBudget) n.Offer.Fee = resp.Amount;
+            if (resp.Kind == ResponseKind.Counter && resp.Amount <= budget) n.Offer.Fee = resp.Amount;
             else if (resp.Kind != ResponseKind.Accept) continue;
             // Der Verkäufer füllt die Lücke später selbst wieder auf.
             ExecuteTransfer(p, club, seller, n.Offer, contract);
-            club.Budget.WageBudget = Math.Max(club.Budget.WageBudget, Budgets.WageBill(club, World));
+            Done();
             return;
         }
-    }
-
-    /// <summary>KI verleiht junge Ergänzungsspieler an schwächere Vereine, die auf der Position Bedarf haben.</summary>
-    private void TryAiLoanOut(Club club)
-    {
-        if (club.PlayerIds.Count <= 22) return;
-        var ranked = World.SquadOf(club).OrderByDescending(Rating).ToList();
-        var candidate = ranked.Skip(16).FirstOrDefault(p => p.Age(World.Date) <= 21 && p.Loan is null && p.PreContract is null
-                                                           && p.Hidden.PotentialAbility - p.Hidden.CurrentAbility >= 15);
-        if (candidate is null) return;
-        var target = World.Clubs.Values
-            .Where(c => c.Id != club.Id && !IsHuman(c) && c.Reputation < club.Reputation && c.PlayerIds.Count < 26)
-            .Where(c => Season.NeededPosition(c) == candidate.MainPosition)
-            .Where(c => Rating(candidate) >= PlayerGenerator.ClubLevel(c.Reputation) - 1)
-            .OrderByDescending(c => c.Reputation)
-            .FirstOrDefault();
-        if (target is null) return;
-        ExecuteLoan(candidate, target, club, new ClubOffer { LoanMonths = 12, WageSharePercent = Rng.Pick(new[] { 50, 75, 100 }), RecallInWinter = Rng.Chance(0.3) });
     }
 
     public bool SignBestFreeAgent(Club club, Position pos, bool withinBudget = false)
@@ -129,7 +137,7 @@ public sealed partial class TransfersModule
             .Where(x => x.r <= level + 2 && Negotiations.RefusalReason(x.p, club, World, Data) is null)
             .OrderByDescending(x => x.r)
             .Select(x => x.p);
-        var bill = Budgets.WageBill(club, World);
+        var bill = WageBillOf(club);
         // Mit Budgetgrenze: der beste Spieler, dessen Gehalt noch passt (höchstens acht Verhandlungen).
         foreach (var p in candidates.Take(withinBudget ? 8 : 1))
         {
@@ -137,7 +145,7 @@ public sealed partial class TransfersModule
             contract.Years = Math.Min(contract.Years, p.Age(World.Date) >= 30 ? 1 : 2);
             if (withinBudget && bill + contract.WeeklyWage > club.Budget.WageBudget * 1.05) continue;
             ExecuteTransfer(p, club, null, new ClubOffer(), contract);
-            club.Budget.WageBudget = Math.Max(club.Budget.WageBudget, Budgets.WageBill(club, World));
+            club.Budget.WageBudget = Math.Max(club.Budget.WageBudget, WageBillOf(club));
             return true;
         }
         return false;
@@ -151,7 +159,7 @@ public sealed partial class TransfersModule
         foreach (var p in ranked.Take(Math.Max(0, club.PlayerIds.Count - Finance.DivisionFinance(club).SquadSize - 1)))
             if (!p.Transfer.Listed) SetTransferListed(p, true, MarketValue.Round(ValueOf(p) * 0.8));
         // Gehälter über dem Budget: den bestbezahlten Spieler außerhalb der ersten Elf abgeben (Review F-01).
-        if (Budgets.WageBill(club, World) > club.Budget.WageBudget * 1.1)
+        if (WageBillOf(club) > club.Budget.WageBudget * 1.1)
         {
             var costly = ranked.Take(Math.Max(0, ranked.Count - 11)).Where(p => !p.Transfer.Listed && p.Contract is not null)
                 .OrderByDescending(p => p.Contract!.WeeklyWage).FirstOrDefault();

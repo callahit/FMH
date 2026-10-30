@@ -1,0 +1,59 @@
+{
+  "internationalLoans": {
+    "maxOut": 6,
+    "maxIn": 6,
+    "maxPerClub": 3,
+    "exemptAge": 21,
+    "ageCutoff": "SeasonEnd",
+    "exemptNeedsClubTrained": true,
+    "maxMonths": 12,
+    "source": "FIFA-Transferstatut (RSTP) Art. 10, Obergrenze 6 seit 1. Juli 2024; Erläuterungen der FIFA zu den Leihbestimmungen"
+  },
+  "professionalLevels": 3,
+  "strategies": {
+    "Elite": {
+      "signingChance": 0.55,
+      "maxSummerSignings": 5,
+      "maxWinterSignings": 2,
+      "borrowChance": 0.05,
+      "youthFocusAge": 0,
+      "lendBeyondRank": 18
+    },
+    "Developer": {
+      "signingChance": 0.5,
+      "maxSummerSignings": 5,
+      "maxWinterSignings": 2,
+      "borrowChance": 0.2,
+      "youthFocusAge": 23,
+      "lendBeyondRank": 20
+    },
+    "Borrower": {
+      "signingChance": 0.3,
+      "maxSummerSignings": 3,
+      "maxWinterSignings": 1,
+      "borrowChance": 0.35,
+      "youthFocusAge": 0,
+      "lendBeyondRank": 0
+    },
+    "Bargain": {
+      "signingChance": 0.15,
+      "maxSummerSignings": 2,
+      "maxWinterSignings": 1,
+      "borrowChance": 0.0,
+      "youthFocusAge": 0,
+      "lendBeyondRank": 0
+    }
+  },
+  "reference": {
+    "newSigningsPerClub": [
+      5.0,
+      13.0
+    ],
+    "feeSigningsPerClub": [
+      1.0,
+      8.0
+    ],
+    "seasonOneMinRatio": 0.5,
+    "source": "CIES Football Observatory: 31–42 % Neuzugänge je Saison (Monthly Report 34, Demographic Study), bei rund 26 Kaderspielern 8–11; Ablösetransfers als Schätzung (Transfers mit Ablöse sind die häufigste Art der Verpflichtung, CIES Monthly Report 18)"
+  }
+}
