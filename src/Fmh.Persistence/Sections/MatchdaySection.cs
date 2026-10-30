@@ -9,13 +9,23 @@ public sealed class MatchdaySection : SaveSection
 {
     public override string ModuleId => "matchday";
 
+    /// <summary>Version 6: Phasennummer an Ligaspielen (0 = Grunddurchgang oder ältere Folgephase ohne Nummer).</summary>
+    public override int Version => 6;
+
+    /// <summary>5 → 6: Spalte phase. Ältere Spiele bleiben 0 und gelten weiter als Grunddurchgang bzw. erste Folgephase.</summary>
+    public override void Migrate(SqliteConnection c, SqliteTransaction tx, int fromVersion)
+    {
+        if (fromVersion < BaseVersion || fromVersion > Version) base.Migrate(c, tx, fromVersion);
+        if (fromVersion <= 5) Exec(c, tx, "ALTER TABLE fixtures ADD COLUMN phase INTEGER NOT NULL DEFAULT 0");
+    }
+
     protected override string Schema => """
         CREATE TABLE fixtures (id INTEGER PRIMARY KEY, competition_id TEXT NOT NULL, matchday INTEGER NOT NULL, date TEXT NOT NULL,
             home_id INTEGER NOT NULL, away_id INTEGER NOT NULL, referee_id INTEGER NOT NULL,
             played INTEGER NOT NULL, home_goals INTEGER, away_goals INTEGER, ht_home INTEGER, ht_away INTEGER, attendance INTEGER,
             weather TEXT, home_xg REAL, away_xg REAL, home_possession INTEGER, home_shots INTEGER, away_shots INTEGER, potm INTEGER,
             kind TEXT NOT NULL DEFAULT 'League', tie_id INTEGER, leg INTEGER NOT NULL DEFAULT 0, extra_time INTEGER NOT NULL DEFAULT 0,
-            pens_home INTEGER, pens_away INTEGER);
+            pens_home INTEGER, pens_away INTEGER, phase INTEGER NOT NULL DEFAULT 0);
         CREATE INDEX fixtures_league ON fixtures (competition_id, matchday);
         CREATE TABLE goals (fixture_id INTEGER NOT NULL, ord INTEGER NOT NULL, minute INTEGER NOT NULL, home INTEGER NOT NULL,
             scorer_id INTEGER NOT NULL, assist_id INTEGER, penalty INTEGER NOT NULL, own_goal INTEGER NOT NULL);
@@ -25,7 +35,7 @@ public sealed class MatchdaySection : SaveSection
 
     public override void Save(SqliteConnection con, SqliteTransaction tx, World w)
     {
-        using var fx = Insert(con, tx, "fixtures", 26);
+        using var fx = Insert(con, tx, "fixtures", 27);
         using var gl = Insert(con, tx, "goals", 8);
         using var cd = Insert(con, tx, "cards", 6);
         foreach (var f in w.AllFixtures)
@@ -34,7 +44,7 @@ public sealed class MatchdaySection : SaveSection
             Run(fx, f.Id, f.CompetitionId, f.Matchday, D(f.Date), f.HomeId, f.AwayId, f.RefereeId, r is not null,
                 r?.HomeGoals, r?.AwayGoals, r?.HalfTimeHome, r?.HalfTimeAway, r?.Attendance, r?.Weather.ToString(),
                 r?.HomeXg, r?.AwayXg, r?.HomePossession, r?.HomeShots, r?.AwayShots, r?.PlayerOfTheMatchId,
-                f.Kind.ToString(), f.TieId, f.Leg, r?.ExtraTime ?? false, r?.PenaltiesHome, r?.PenaltiesAway);
+                f.Kind.ToString(), f.TieId, f.Leg, r?.ExtraTime ?? false, r?.PenaltiesHome, r?.PenaltiesAway, f.Phase);
             if (r is null) continue;
             for (var i = 0; i < r.Goals.Count; i++)
             {
@@ -62,6 +72,7 @@ public sealed class MatchdaySection : SaveSection
                 Id = r.GetInt32(0), CompetitionId = r.GetString(1), Matchday = r.GetInt32(2), Date = PD(r.GetString(3)),
                 HomeId = r.GetInt32(4), AwayId = r.GetInt32(5), RefereeId = r.GetInt32(6),
                 Kind = Enum.Parse<CompetitionKind>(r.GetString(20)), TieId = NInt(r, 21), Leg = r.GetInt32(22),
+                Phase = r.FieldCount > 26 && !r.IsDBNull(26) ? r.GetInt32(26) : 0,
             };
             if (r.GetInt32(7) == 1)
             {
