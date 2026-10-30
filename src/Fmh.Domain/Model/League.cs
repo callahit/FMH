@@ -20,12 +20,24 @@ public sealed class League
     [System.Text.Json.Serialization.JsonIgnore]
     public int RegularMatchdays => (ClubIds.Count % 2 == 0 ? ClubIds.Count - 1 : ClubIds.Count) * Format.Rounds;
 
-    /// <summary>Spiele der zweiten Saisonphase sind angesetzt.</summary>
+    /// <summary>Mindestens eine Folgephase ist angesetzt (auch Spielstände, deren Spiele noch keine Phasennummer tragen).</summary>
     [System.Text.Json.Serialization.JsonIgnore]
-    public bool PhaseScheduled => Fixtures.Any(f => f.Matchday > RegularMatchdays);
+    public bool PhaseScheduled => PhasesScheduled > 0;
 
-    /// <summary>Alle Spiele gespielt; mit Saisonphasen erst, wenn auch die zweite Phase angesetzt und beendet ist.</summary>
-    public bool IsComplete => Fixtures.Count > 0 && Fixtures.All(f => f.Result is not null) && (Format.Phases.Count == 0 || PhaseScheduled);
+    /// <summary>Anzahl angesetzter Folgephasen. Ältere Spielstände ohne Phasennummer zählen eine Phase, sobald es Spiele nach dem Grunddurchgang gibt.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public int PhasesScheduled
+    {
+        get
+        {
+            var tagged = Fixtures.Count == 0 ? 0 : Fixtures.Max(f => f.Phase);
+            if (tagged > 0) return tagged;
+            return Fixtures.Any(f => f.Matchday > RegularMatchdays) ? 1 : 0;
+        }
+    }
+
+    /// <summary>Alle Spiele gespielt; mit Saisonphasen erst, wenn jede Folgephase angesetzt und beendet ist.</summary>
+    public bool IsComplete => Fixtures.Count > 0 && Fixtures.All(f => f.Result is not null) && PhasesScheduled >= Format.Phases.Count;
 
     /// <summary>Letzter vollständig gespielter Spieltag (0 = noch keiner).</summary>
     public int CurrentMatchday =>
@@ -48,6 +60,9 @@ public sealed class Fixture
     public int Leg { get; set; } = 1;
     /// <summary>Spieltag (Liga) bzw. Runde (Pokal).</summary>
     public int Matchday { get; set; }
+    /// <summary>Folgephase (1, 2, …). 0 = Grunddurchgang oder Spielstand vor der Phasennummer; wird nicht geschrieben.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public int Phase { get; set; }
     public DateOnly Date { get; set; }
     public int HomeId { get; set; }
     public int AwayId { get; set; }
