@@ -83,10 +83,17 @@ public static class TransferTerms
         return ScheduleGenerator.ParseDate(country.TransferWindows.PreContractFrom, world.SeasonYear, country.Season.StartMonth).AddDays(-1);
     }
 
-    /// <summary>Option ziehbar: Vertrag mit Option endet in dieser Saison, Stichtag nicht überschritten, kein Vorvertrag, keine Leihe.</summary>
+    /// <summary>
+    /// Verein, dem der Vertrag gehört: bei einer Leihe der Stammverein, sonst der aktuelle Verein.
+    /// Die Verlängerungsoption steht diesem Verein zu, auch solange der Spieler verliehen ist.
+    /// </summary>
+    public static int? ContractingClubId(Player p) => p.Loan is { } loan ? loan.ParentClubId : p.ClubId;
+
+    /// <summary>Option ziehbar: Vertrag mit Option endet in dieser Saison, Stichtag nicht überschritten, kein Vorvertrag.</summary>
     public static bool CanExerciseOption(Player p, World world)
     {
-        if (p.Contract is not { ExtensionOptionYears: > 0, Youth: false } c || p.ClubId is not { } cid || p.Loan is not null || p.PreContract is not null) return false;
+        if (p.Contract is not { ExtensionOptionYears: > 0, Youth: false } c || ContractingClubId(p) is not { } cid || p.PreContract is not null) return false;
+        if (!world.Clubs.ContainsKey(cid)) return false;
         if (c.Until > new DateOnly(world.SeasonYear + 1, 6, 30)) return false;
         return world.Date <= OptionDeadline(world, world.Clubs[cid]);
     }

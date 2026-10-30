@@ -100,7 +100,7 @@ public sealed partial class TransfersModule
     }
 
     /// <summary>
-    /// Im Winterfenster des Stammvereins: Verfehlte Einsatzgaranties berechtigen zur Rückholung. KI-Vereine holen den Spieler
+    /// Im Winterfenster des Stammvereins: Eine verfehlte Einsatzgarantie berechtigt zur Rückholung. KI-Vereine holen den Spieler
     /// sofort zurück, der menschliche Manager wird informiert und kann ihn zurückholen.
     /// </summary>
     private void CheckLoanGuarantees()
@@ -129,7 +129,8 @@ public sealed partial class TransfersModule
     /// <summary>So viele Tage vor dem Stichtag erinnert der Assistent an offene Verlängerungsoptionen.</summary>
     private const int OptionReminderDays = 28;
 
-    public bool CanExerciseExtensionOption(Player p) => p.ClubId == HumanClub.Id && TransferTerms.CanExerciseOption(p, World);
+    public bool CanExerciseExtensionOption(Player p) =>
+        TransferTerms.ContractingClubId(p) == HumanClub.Id && TransferTerms.CanExerciseOption(p, World);
 
     /// <summary>Verlängerungsoption des Vereins ziehen: Vertrag läuft zu gleichen Bedingungen weiter, die Option ist verbraucht.</summary>
     public string? ExerciseExtensionOption(Player p)
@@ -158,9 +159,9 @@ public sealed partial class TransfersModule
             c.TransferWindows.PreContractFrom, World.SeasonYear, c.Season.StartMonth).AddDays(-1));
         if (!deadlines.Values.Any(d => d == World.Date || d.AddDays(-OptionReminderDays) == World.Date)) return;
         var reminders = new List<object?>();
-        foreach (var p in World.Players.Values.Where(p => p.Contract is { ExtensionOptionYears: > 0 } && p.ClubId is not null).OrderBy(p => p.Id).ToList())
+        foreach (var p in World.Players.Values.Where(p => p.Contract is { ExtensionOptionYears: > 0 }).OrderBy(p => p.Id).ToList())
         {
-            var club = World.Clubs[p.ClubId!.Value];
+            if (TransferTerms.ContractingClubId(p) is not { } clubId || !World.Clubs.TryGetValue(clubId, out var club)) continue;
             if (!TransferTerms.CanExerciseOption(p, World)) continue;
             var deadline = deadlines[club.CountryCode];
             if (IsHuman(club))
