@@ -257,7 +257,6 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
         return null;
     }
 
-    /// <summary>Verliehenen Spieler in der Winterpause zurückholen (Rückholklausel).</summary>
     /// <summary>Rückholung im Winterfenster: vertraglich vereinbart oder weil die Einsatzgarantie verfehlt wurde.</summary>
     public string? RecallLoan(Player p)
     {

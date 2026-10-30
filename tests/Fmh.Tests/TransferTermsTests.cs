@@ -190,6 +190,26 @@ public class TransferTermsTests
     }
 
     [Fact]
+    public void ExtensionOptionCanBeExercisedWhileThePlayerIsOnLoan()
+    {
+        var s = TestData.NewSession(27);
+        var own = s.World.SquadOf(s.HumanClub).First(x => x.Loan is null && !x.IsYouth);
+        own.Contract!.Until = new DateOnly(s.World.SeasonYear + 1, 6, 30);
+        own.Contract.ExtensionOptionYears = 1;
+        var other = s.World.Clubs.Values.First(c => c.Id != s.HumanClub.Id && s.World.FindLeague(c.LeagueId) is not null);
+        s.HumanClub.PlayerIds.Remove(own.Id);
+        other.PlayerIds.Add(own.Id);
+        own.ClubId = other.Id;
+        own.Loan = new Loan { ParentClubId = s.HumanClub.Id, Start = s.World.Date, Until = own.Contract.Until };
+        Assert.Equal(s.HumanClub.Id, TransferTerms.ContractingClubId(own));
+        Assert.True(s.CanExerciseExtensionOption(own));
+        Assert.Null(s.ExerciseExtensionOption(own));
+        Assert.Equal(new DateOnly(s.World.SeasonYear + 2, 6, 30), own.Contract.Until);
+        Assert.Equal(0, own.Contract.ExtensionOptionYears);
+        Assert.NotNull(own.Loan);
+    }
+
+    [Fact]
     public void ExtensionOptionCostsWageAndIsCapped()
     {
         var s = TestData.NewSession(25);
