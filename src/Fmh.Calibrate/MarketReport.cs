@@ -37,7 +37,7 @@ public static class MarketReport
         foreach (var g in w.Leagues.Where(l => l.Level == 1).GroupBy(l => l.CountryCode).OrderBy(g => g.Key))
         {
             var clubs = g.SelectMany(l => l.ClubIds).ToHashSet();
-            var incoming = season.Where(t => clubs.Contains(t.ToClubId)).ToList();
+            var incoming = season.Where(t => t.ToClubId is { } to && clubs.Contains(to)).ToList();
             var all = incoming.Count / (double)clubs.Count;
             var fee = incoming.Count(t => !t.Loan && t.FromClubId is not null && t.Fee > 0) / (double)clubs.Count;
             if (!TopSignings.TryGetValue(g.Key, out var list)) TopSignings[g.Key] = list = new();

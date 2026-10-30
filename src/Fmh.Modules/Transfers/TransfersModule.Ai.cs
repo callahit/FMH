@@ -92,9 +92,12 @@ public sealed partial class TransfersModule
             .OrderByDescending(x => Score(x.p, x.r))
             .Take(8)
             .ToList();
-        // Bei vollem Kader wird der schwächste Spieler der Position abgegeben; sein Gehalt steht dann für den Neuen zur Verfügung.
-        var replaced = club.PlayerIds.Count >= Finance.DivisionFinance(club).SquadSize
-            ? World.SquadOf(club).Where(p => p.MainPosition == need && p.Loan is null && !p.Transfer.Listed && p.Contract is not null).MinBy(Rating)
+        // Bei fast vollem Kader gibt der Verein für den Neuen einen Spieler ab: den schwächsten der Position oder, wenn teurer,
+        // einen Überzähligen außerhalb der besten 18. Sein Gehalt steht dann für den Neuen zur Verfügung.
+        var squad = World.SquadOf(club).Where(p => p.Loan is null && !p.Transfer.Listed && p.Contract is not null).OrderByDescending(Rating).ToList();
+        var replaced = club.PlayerIds.Count >= Finance.DivisionFinance(club).SquadSize - 1
+            ? new[] { squad.Where(p => p.MainPosition == need).LastOrDefault(), squad.Skip(18).MaxBy(p => p.Contract!.WeeklyWage) }
+                .Where(p => p is not null).MaxBy(p => p!.Contract!.WeeklyWage)
             : null;
         var freed = replaced?.Contract?.WeeklyWage ?? 0;
         // Das Gehaltsbudget bleibt, wie es ist: Ein Kauf muss hineinpassen, sonst schaukeln sich die Gehälter über die Saison hoch.
