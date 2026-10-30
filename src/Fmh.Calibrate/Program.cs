@@ -45,6 +45,7 @@ public static class Program
                 Packages = data.Packages, Countries = data.Countries, Clubs = data.Clubs, Names = data.Names,
                 Formations = data.Formations, PositionProfiles = data.PositionProfiles, Injuries = data.Injuries, Roles = data.Roles,
                 Languages = data.Languages, DefaultLanguage = data.DefaultLanguage, Engine = Json.Load<EngineConfig>(enginePath),
+                TransferRules = data.TransferRules,
             };
             data.UseLanguage(data.DefaultLanguage);
         }
@@ -152,6 +153,7 @@ public static class Program
         // Wechsel nach Vertragsende (Vorvertrag, ohne Ablöse) getrennt von Ablösetransfers zählen (Review F-07).
         Console.WriteLine($"Transfers: {season.Count(t => !t.Loan && t.FromClubId is not null && t.Fee > 0)} mit Ablöse ({season.Sum(t => t.Fee) / 1_000_000.0:F1} Mio.), " +
                           $"{season.Count(t => !t.Loan && t.FromClubId is not null && t.Fee == 0)} nach Vertragsende, {season.Count(t => t.FromClubId is null)} Vereinslose, {season.Count(t => t.Loan)} Leihen");
+        MarketReport.PrintSeason(w);
         var leagueClubs = w.Clubs.Values.Where(c => w.FindLeague(c.LeagueId) is not null).ToList();
         // Mindestkader (Review F-06): kein Verein darunter; die KI-Vereine und der eigene Verein (Autopilot) getrennt.
         var thin = leagueClubs.Where(c => c.PlayerIds.Count < ClubRules.DivisionFinance(w, c).MinSquad).ToList();
@@ -278,6 +280,7 @@ public static class Program
             // Tageweise, damit Insolvenzen und Lizenzentscheidungen je Tag gezählt werden (gleicher Spielverlauf).
             var result = session.Advance(1);
             EconomyReport.Observe(world);
+            MarketReport.Observe(world);
             // Autopilot: Der eigene Verein hält wie ein Manager den Mindestkader mit Vereinslosen (die KI tut das selbst).
             if (world.Date.DayOfWeek == DayOfWeek.Monday && !session.AwaitingNewJob)
                 for (var i = 0; i < 5 && session.HumanClub.PlayerIds.Count < ClubRules.DivisionFinance(world, session.HumanClub).MinSquad; i++)
@@ -330,7 +333,9 @@ public static class Program
         Console.WriteLine($"Ligastärke-Drift {topLeague.Name}: {drift:+0.000;-0.000} je Saison" + (maxDrift is { } md ? $" (Grenze {md:0.000})" : " (Ziel ≤ 0,05)"));
         var financeOk = ReferenceReport.MeansOk();
         var economyOk = EconomyReport.PrintSummary();
-        var ok = slowest.TotalMilliseconds < 5000 && world.SeasonYear >= targetSeason && (maxDrift is not { } m || drift <= m) && _wagesOk && _squadOk && _worldOk && financeOk && economyOk;
+        var marketOk = MarketReport.PrintSummary(world, data);
+        var ok = slowest.TotalMilliseconds < 5000 && world.SeasonYear >= targetSeason && (maxDrift is not { } m || drift <= m) && _wagesOk && _squadOk && _worldOk
+                 && financeOk && economyOk && marketOk;
         if (!ok) Console.WriteLine("ACHTUNG: Saisonlauf außerhalb der Vorgaben.");
         return strict && !ok ? 1 : 0;
     }
@@ -384,26 +389,4 @@ public static class Program
             Phases += sim.Events.Count(e => e.Type is MatchEventType.Attack or MatchEventType.Counter);
         }
     }
-}
-
-internal sealed class Args
-{
-    private readonly Dictionary<string, string?> _values = new();
-
-    public static Args Parse(string[] args)
-    {
-        var a = new Args();
-        for (var i = 0; i < args.Length; i++)
-        {
-            if (!args[i].StartsWith("--", StringComparison.Ordinal)) continue;
-            var key = args[i][2..];
-            string? value = null;
-            if (i + 1 < args.Length && !args[i + 1].StartsWith("--", StringComparison.Ordinal)) value = args[++i];
-            a._values[key] = value;
-        }
-        return a;
-    }
-
-    public bool Has(string key) => _values.ContainsKey(key);
-    public string? Get(string key) => _values.TryGetValue(key, out var v) ? v : null;
 }

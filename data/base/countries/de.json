@@ -858,6 +858,18 @@
     "club": 0.15,
     "country": 0.45
   },
+  "loans": {
+    "default": {
+      "maxOut": 6, "maxIn": 6, "maxPerClub": 3, "exemptAge": 21, "ageCutoff": "SeasonEnd", "exemptNeedsClubTrained": true, "maxMonths": 12,
+      "source": "DFL Lizenzordnung Spieler, Stand 05.12.2025: höchstens sechs Spieler an inländische Clubs verliehen bzw. von ihnen ausgeliehen, höchstens drei mit demselben Club; ausgenommen selbst ausgebildete Spieler bis zur Saison, in der sie 21 werden"
+    }
+  },
+  "market": {
+    "loanAffinity": 0.6,
+    "purchaseObligationShare": 0.05,
+    "loanShare": { "1": [3, 10], "2": [5, 15] },
+    "source": "CIES Football Observatory Monthly Report 83 (2023): Serie A 19,0 %, Serie B 22,8 %, Ligue 1 11,2 %, Ligue 2 11,0 % Leihspieler; Monthly Report 48: Leihspieler je Verein Serie A 4,9, LaLiga 3,9, Bundesliga mit 6,3 % der Einsatzminuten am wenigsten; Premier League durch die nationale Grenze von zwei Leihen niedrig"
+  },
   "reserves": {
     "minLevelGap": 2,
     "playInCups": false,
