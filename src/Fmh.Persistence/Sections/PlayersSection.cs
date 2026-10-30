@@ -10,14 +10,34 @@ public sealed class PlayersSection : SaveSection
 {
     public override string ModuleId => "players";
 
-    /// <summary>Version 6: Meldeliste und Ausbildungsjahre (Spalte registration).</summary>
-    public override int Version => 6;
+    /// <summary>Version 6: Meldeliste. Version 7: Fremdschlüssel von Positionen und Saisonzeilen auf den Spieler.</summary>
+    public override int Version => 7;
 
-    /// <summary>5 → 6: Spalte für Meldung und Ausbildungsjahre; ältere Spieler gelten beim Laden als für ihren Verein gemeldet.</summary>
+    /// <summary>
+    /// 5 → 6: Spalte für Meldung und Ausbildungsjahre. 6 → 7: <c>player_positions</c> und <c>player_seasons</c> verweisen auf
+    /// <c>players</c>. Die Daten werden übernommen; die Prüfung greift beim nächsten Speichern.
+    /// </summary>
     public override void Migrate(SqliteConnection c, SqliteTransaction tx, int fromVersion)
     {
         if (fromVersion < BaseVersion || fromVersion > Version) base.Migrate(c, tx, fromVersion);
         if (fromVersion <= 5) Exec(c, tx, "ALTER TABLE players ADD COLUMN registration TEXT");
+        if (fromVersion <= 6)
+        {
+            Exec(c, tx, """
+                CREATE TABLE player_positions_v7 (player_id INTEGER NOT NULL REFERENCES players(id), position TEXT NOT NULL, suitability TEXT NOT NULL,
+                    PRIMARY KEY (player_id, position));
+                INSERT INTO player_positions_v7 SELECT player_id, position, suitability FROM player_positions;
+                DROP TABLE player_positions;
+                ALTER TABLE player_positions_v7 RENAME TO player_positions;
+                CREATE TABLE player_seasons_v7 (player_id INTEGER NOT NULL REFERENCES players(id), current INTEGER NOT NULL, ord INTEGER NOT NULL,
+                    season_year INTEGER NOT NULL, club_id INTEGER, apps INTEGER NOT NULL, minutes INTEGER NOT NULL, goals INTEGER NOT NULL,
+                    assists INTEGER NOT NULL, yellow INTEGER NOT NULL, red INTEGER NOT NULL, graded INTEGER NOT NULL, grade_sum REAL NOT NULL);
+                INSERT INTO player_seasons_v7 SELECT player_id, current, ord, season_year, club_id, apps, minutes, goals, assists, yellow, red, graded, grade_sum FROM player_seasons;
+                DROP TABLE player_seasons;
+                ALTER TABLE player_seasons_v7 RENAME TO player_seasons;
+                CREATE INDEX player_seasons_player ON player_seasons (player_id);
+                """);
+        }
     }
 
     internal static string AttrCol(Attr a) => "a_" + a;
@@ -40,9 +60,9 @@ public sealed class PlayersSection : SaveSection
             contract TEXT, is_youth INTEGER NOT NULL DEFAULT 0, retired INTEGER NOT NULL DEFAULT 0, transfer_listed INTEGER NOT NULL DEFAULT 0,
             asking_price INTEGER, transfer TEXT, loan TEXT, training TEXT, pre_contract TEXT, registration TEXT);
         CREATE INDEX players_club ON players (club_id);
-        CREATE TABLE player_positions (player_id INTEGER NOT NULL, position TEXT NOT NULL, suitability TEXT NOT NULL,
+        CREATE TABLE player_positions (player_id INTEGER NOT NULL REFERENCES players(id), position TEXT NOT NULL, suitability TEXT NOT NULL,
             PRIMARY KEY (player_id, position));
-        CREATE TABLE player_seasons (player_id INTEGER NOT NULL, current INTEGER NOT NULL, ord INTEGER NOT NULL,
+        CREATE TABLE player_seasons (player_id INTEGER NOT NULL REFERENCES players(id), current INTEGER NOT NULL, ord INTEGER NOT NULL,
             season_year INTEGER NOT NULL, club_id INTEGER, apps INTEGER NOT NULL, minutes INTEGER NOT NULL, goals INTEGER NOT NULL,
             assists INTEGER NOT NULL, yellow INTEGER NOT NULL, red INTEGER NOT NULL, graded INTEGER NOT NULL, grade_sum REAL NOT NULL);
         CREATE INDEX player_seasons_player ON player_seasons (player_id);
