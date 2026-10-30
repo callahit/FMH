@@ -148,7 +148,7 @@ internal static class WorldFingerprint
             ["leagues"] = J(w.Leagues),
             ["cups"] = J(w.Cups),
             ["messages"] = J(w.Messages),
-            ["transfers"] = J(new { w.Transfers, w.Transactions, w.Installments, w.Negotiations, w.NegotiationLocks }),
+            ["transfers"] = J(new { w.Transfers, w.Transactions, w.Installments, w.TransferConditions, w.Negotiations, w.NegotiationLocks }),
             ["scouting"] = J(new { w.Scouts, w.ScoutAssignments, w.ScoutReports, w.Knowledge }),
             ["environment"] = J(new { w.Staff, w.Events, w.EventHistory, w.PendingPress, w.EuropeanEntries }),
             ["history"] = J(w.History),

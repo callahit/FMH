@@ -8,5 +8,6 @@ public sealed record DayStarted(DayContext Day) : IGameEvent;
 /// <summary>
 /// Ein Spiel ist ausgewertet (Tabelle, Statistik, Finanzen und Spielerzustände sind verbucht).
 /// <paramref name="HumanInvolved"/>: der menschliche Manager hat gespielt und sucht nicht gerade einen neuen Verein.
+/// <paramref name="Participants"/>: Spieler beider Mannschaften, die eingesetzt wurden (Startelf und Einwechslungen).
 /// </summary>
-public sealed record MatchPlayed(Fixture Fixture, bool HumanInvolved) : IGameEvent;
+public sealed record MatchPlayed(Fixture Fixture, bool HumanInvolved, IReadOnlySet<int>? Participants = null) : IGameEvent;
