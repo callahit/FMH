@@ -212,6 +212,7 @@ public sealed partial class PlayerPageViewModel : PageViewModel
             actions.Add(new(p.Transfer.Listed ? T["player.action.unlist"] : T["player.action.list"], new RelayCommand(() => { s.SetTransferListed(p, !p.Transfer.Listed); Load(); })));
             actions.Add(new(p.Transfer.LoanListed ? T["player.action.unlistLoan"] : T["player.action.listLoan"], new RelayCommand(() => { s.SetLoanListed(p, !p.Transfer.LoanListed); Load(); })));
             if (p.Loan is { PurchaseFee: not null }) actions.Add(new(T["player.action.buyOption"], new RelayCommand(() => Act(s.ExercisePurchaseOption(p)))));
+            if (s.CanExerciseExtensionOption(p)) actions.Add(new(T["player.action.extensionOption"], new RelayCommand(() => Act(s.ExerciseExtensionOption(p)))));
             if (p.Age(s.World.Date) <= 18 && p.Loan is null) actions.Add(new(T["player.action.toYouth"], new RelayCommand(() => Act(s.DemoteToYouth(p)))));
         }
         else if (!p.Retired)
@@ -223,7 +224,7 @@ public sealed partial class PlayerPageViewModel : PageViewModel
                 actions.Add(new(T["player.action.loan"], new RelayCommand(() => Negotiate(DealType.Loan))));
                 if (s.CanPreContract(p)) actions.Add(new(T["player.action.preContract"], new RelayCommand(() => Negotiate(DealType.PreContract))));
             }
-            if (p.Loan is { } l && l.ParentClubId == human.Id && l.RecallInWinter)
+            if (p.Loan is { } l && l.ParentClubId == human.Id && (l.RecallInWinter || TransferTerms.GuaranteeBreached(l)))
                 actions.Add(new(T["player.action.recall"], new RelayCommand(() => Act(s.RecallLoan(p)))));
             actions.Add(new(human.Shortlist.Contains(p.Id) ? T["player.action.unwatch"] : T["player.action.watch"], new RelayCommand(() => { s.ToggleShortlist(p); Load(); })));
             foreach (var scout in s.HumanScouts.Where(sc => s.AssignmentOf(sc) is null).Take(1))

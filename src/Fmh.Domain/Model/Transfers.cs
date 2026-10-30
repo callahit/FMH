@@ -18,13 +18,50 @@ public sealed class TransferStatus
 public sealed class Loan
 {
     public int ParentClubId { get; set; }
+    /// <summary>Beginn der Leihe; null bei Leihen aus älteren Spielständen (die Einsatzgarantie zählt dann ab Saisonbeginn).</summary>
+    public DateOnly? Start { get; set; }
     public DateOnly Until { get; set; }
     /// <summary>Anteil des Gehalts, den der ausleihende Verein zahlt (0–100 %).</summary>
     public int WageSharePercent { get; set; } = 100;
     public long? PurchaseFee { get; set; }
     public bool PurchaseObligation { get; set; }
     public bool RecallInWinter { get; set; }
+    /// <summary>
+    /// Einsatzgarantie: Der Spieler muss in mindestens der Hälfte der Pflichtspiele des ausleihenden Vereins eingesetzt
+    /// werden (Regel in <c>TransferTerms</c>). Wird sie verfehlt, darf der Stammverein ihn im Winter zurückholen.
+    /// </summary>
     public bool PlayingTimeGuarantee { get; set; }
+    /// <summary>Pflichtspiele des ausleihenden Vereins seit Beginn der Leihe (nur mit Einsatzgarantie gezählt).</summary>
+    public int ClubMatches { get; set; }
+    /// <summary>Davon Einsätze des Spielers.</summary>
+    public int Appearances { get; set; }
+    /// <summary>Der Stammverein wurde über die verfehlte Einsatzgarantie bereits informiert.</summary>
+    public bool GuaranteeBreachNotified { get; set; }
+}
+
+/// <summary>Art einer erfolgsabhängigen Zahlung an den abgebenden Verein.</summary>
+public enum TransferConditionKind { Appearance, Goal }
+
+/// <summary>
+/// Erfolgsabhängige Zahlung an den abgebenden Verein (Zusatzzahlung aus <see cref="ClubOffer.AppearanceBonus"/> bzw.
+/// <see cref="ClubOffer.GoalBonus"/>): je Einsatz bzw. Tor für den Käufer bis zum Ende des ersten Vertrags.
+/// </summary>
+public sealed class TransferCondition
+{
+    public int PlayerId { get; set; }
+    /// <summary>Käufer, der zahlt.</summary>
+    public int PayerId { get; set; }
+    /// <summary>Abgebender Verein, der die Zahlung erhält.</summary>
+    public int PayeeId { get; set; }
+    public TransferConditionKind Kind { get; set; }
+    /// <summary>Betrag je Einsatz bzw. Tor.</summary>
+    public long Amount { get; set; }
+    /// <summary>Letzter Tag, an dem die Bedingung zählt (Ende des ersten Vertrags beim Käufer).</summary>
+    public DateOnly Until { get; set; }
+    /// <summary>Bisher erfüllte Einsätze bzw. Tore.</summary>
+    public int Count { get; set; }
+    /// <summary>Bisher gezahlte Summe.</summary>
+    public long Paid { get; set; }
 }
 
 public sealed class ClubBudget
@@ -95,7 +132,9 @@ public sealed class ClubOffer
     public long Fee { get; set; }
     /// <summary>Ratenzahlung über 0–3 Jahre (0 = sofort).</summary>
     public int InstallmentYears { get; set; }
+    /// <summary>Zusatzzahlung an den abgebenden Verein je Pflichtspiel-Einsatz für den Käufer (bis Vertragsende).</summary>
     public long AppearanceBonus { get; set; }
+    /// <summary>Zusatzzahlung an den abgebenden Verein je Pflichtspiel-Tor für den Käufer (bis Vertragsende).</summary>
     public long GoalBonus { get; set; }
     /// <summary>Weiterverkaufsbeteiligung 0–50 %.</summary>
     public int SellOnPercent { get; set; }
@@ -125,6 +164,7 @@ public sealed class ContractOffer
     /// <summary>Gehalt bei Abstieg −% bzw. Aufstieg +%; null = übliche Klausel der Spielklasse.</summary>
     public int? RelegationPercent { get; set; }
     public int? PromotionPercent { get; set; }
+    /// <summary>Einseitige Verlängerungsoption des Vereins um 0–2 Jahre (siehe <see cref="Contract.ExtensionOptionYears"/>).</summary>
     public int ExtensionOptionYears { get; set; }
     public SquadStatus Status { get; set; } = SquadStatus.Rotation;
 

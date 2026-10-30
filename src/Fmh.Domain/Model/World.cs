@@ -37,6 +37,8 @@ public sealed class World
     public List<TransferRecord> Transfers { get; set; } = new();
     public List<Transaction> Transactions { get; set; } = new();
     public List<Installment> Installments { get; set; } = new();
+    /// <summary>Laufende erfolgsabhängige Zahlungen an abgebende Vereine.</summary>
+    public List<TransferCondition> TransferConditions { get; set; } = new();
     public List<Scout> Scouts { get; set; } = new();
     public List<ScoutAssignment> ScoutAssignments { get; set; } = new();
     public List<ScoutReport> ScoutReports { get; set; } = new();
