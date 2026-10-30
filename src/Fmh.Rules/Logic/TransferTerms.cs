@@ -21,6 +21,9 @@ public static class TransferTerms
     /// <summary>Höchstens so viele Jahre darf eine Verlängerungsoption des Vereins umfassen.</summary>
     public const int MaxExtensionOptionYears = 2;
 
+    /// <summary>Summe aller Weiterverkaufsrechte eines Spielers, in Prozent vom Bruttoerlös.</summary>
+    public const int MaxSellOnPercent = 50;
+
     /// <summary>Aufschlag auf die Gehaltsforderung je Optionsjahr (der Spieler gibt Freiheit auf).</summary>
     public const double ExtensionOptionWageFactor = 0.025;
 
@@ -96,5 +99,43 @@ public static class TransferTerms
         if (!world.Clubs.ContainsKey(cid)) return false;
         if (c.Until > new DateOnly(world.SeasonYear + 1, 6, 30)) return false;
         return world.Date <= OptionDeadline(world, world.Clubs[cid]);
+    }
+
+    // ------------------------------------------------------------------ Weiterverkauf und Leihgebühr
+
+    /// <summary>Wirksame Rechte: die Liste, sonst das einzelne Feld älterer Spielstände.</summary>
+    public static IReadOnlyList<SellOnRight> ActiveSellOns(TransferStatus status)
+    {
+        if (status.SellOns is { Count: > 0 }) return status.SellOns;
+        if (status.SellOnClubId is { } id && status.SellOnPercent > 0)
+            return new[] { new SellOnRight { ClubId = id, Percent = Math.Clamp(status.SellOnPercent, 0, MaxSellOnPercent) } };
+        return Array.Empty<SellOnRight>();
+    }
+
+    /// <summary>Übernimmt ein einzelnes Alt-Recht in die Liste, damit weitere Rechte daneben stehen können.</summary>
+    public static void MaterializeSellOns(TransferStatus status)
+    {
+        if (status.SellOns is { Count: > 0 }) return;
+        status.SellOns = new List<SellOnRight>();
+        if (status.SellOnClubId is { } id && status.SellOnPercent > 0)
+            status.SellOns.Add(new SellOnRight { ClubId = id, Percent = Math.Clamp(status.SellOnPercent, 0, MaxSellOnPercent) });
+    }
+
+    /// <summary>
+    /// Freier Anteil bis <see cref="MaxSellOnPercent"/>, wenn das Recht von <paramref name="clubId"/> neu gesetzt wird.
+    /// Ein bestehendes Recht desselben Vereins wird dabei ersetzt.
+    /// </summary>
+    public static int SellOnRoom(TransferStatus status, int clubId)
+    {
+        MaterializeSellOns(status);
+        var used = status.SellOns!.Where(r => r.ClubId != clubId).Sum(r => r.Percent);
+        return Math.Max(0, MaxSellOnPercent - used);
+    }
+
+    /// <summary>10 % des Marktwerts ersetzen 10 Prozentpunkte Gehaltsanteil, den der Stammverein bei einer Leihe verlangt.</summary>
+    public static int WageShareFromLoanFee(long loanFee, double marketValue)
+    {
+        if (loanFee <= 0 || marketValue <= 0) return 0;
+        return (int)Math.Min(100, loanFee * 100 / marketValue);
     }
 }

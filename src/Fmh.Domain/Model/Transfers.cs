@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Fmh.Core.Model;
 
 /// <summary>Spielerstatus im Vertrag (Kapitel 7); bestimmt die Erwartung an Spielzeit.</summary>
@@ -9,9 +11,25 @@ public sealed class TransferStatus
     public bool Listed { get; set; }
     public bool LoanListed { get; set; }
     public long? AskingPrice { get; set; }
-    /// <summary>Weiterverkaufsbeteiligung des früheren Vereins.</summary>
+    /// <summary>Weiterverkaufsbeteiligung des früheren Vereins (ein Recht, Spielstände vor mehreren Rechten).</summary>
     public int? SellOnClubId { get; set; }
     public int SellOnPercent { get; set; }
+    /// <summary>
+    /// Mehrere Weiterverkaufsrechte. Null, solange nur das einzelne ältere Feld gilt; wird beim nächsten Wechsel übernommen.
+    /// Leere Listen werden nicht geschrieben, damit ältere Spielstände unverändert bleiben.
+    /// </summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<SellOnRight>? SellOns { get; set; }
+}
+
+/// <summary>Weiterverkaufsrecht eines früheren Vereins am Bruttoerlös späterer Wechsel. Es bleibt bestehen, bis der Anteil entfällt.</summary>
+public sealed class SellOnRight
+{
+    public int ClubId { get; set; }
+    /// <summary>Anteil am Bruttoerlös, 1–50. Die Summe aller Rechte eines Spielers bleibt bei höchstens 50 %.</summary>
+    public int Percent { get; set; }
+    /// <summary>Deal, aus dem das Recht stammt; 0 bei Rechten aus älteren Spielständen.</summary>
+    public int OriginDealId { get; set; }
 }
 
 /// <summary>Leihe (Kapitel 7): Laufzeit 6–12 Monate, Gehaltsanteil, Kaufoption/-pflicht, Rückholklausel, Einsatzgarantie.</summary>
@@ -37,6 +55,9 @@ public sealed class Loan
     public int Appearances { get; set; }
     /// <summary>Der Stammverein wurde über die verfehlte Einsatzgarantie bereits informiert.</summary>
     public bool GuaranteeBreachNotified { get; set; }
+    /// <summary>Einmalige Leihgebühr an den Stammverein. 0 wird nicht geschrieben.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public long Fee { get; set; }
 }
 
 /// <summary>Art einer erfolgsabhängigen Zahlung an den abgebenden Verein.</summary>
@@ -62,6 +83,8 @@ public sealed class TransferCondition
     public int Count { get; set; }
     /// <summary>Bisher gezahlte Summe.</summary>
     public long Paid { get; set; }
+    /// <summary>Deal, zu dem die Bedingung gehört; 0 bei älteren Spielständen.</summary>
+    public int DealId { get; set; }
 }
 
 public sealed class ClubBudget
@@ -108,12 +131,34 @@ public sealed class Installment
     /// <summary>Wörtlicher Text aus Spielständen vor der Mehrsprachigkeit.</summary>
     public string Text { get; set; } = "";
     public Data.TextRef? TextRef { get; set; }
+    /// <summary>Deal, zu dem die Rate gehört; 0 bei älteren Spielständen.</summary>
+    public int DealId { get; set; }
 
     public string Display(Data.Texts t) => TextRef is { } r ? t.Render(r) : Text;
 }
 
+/// <summary>
+/// Ein Vertrag als eigener Datensatz: die laufende Fassung steht zusätzlich am Spieler, frühere Fassungen bleiben mit
+/// <see cref="SupersededBy"/> in der Historie. Verträge aus der Welterzeugung bekommen eine Id erst, wenn sie abgelöst werden.
+/// </summary>
+public sealed class ContractRecord
+{
+    public int Id { get; set; }
+    public int PlayerId { get; set; }
+    public int ClubId { get; set; }
+    /// <summary>Deal des Wechsels, 0 bei Verlängerung oder älteren Verträgen.</summary>
+    public int DealId { get; set; }
+    public DateOnly Start { get; set; }
+    public DateOnly End { get; set; }
+    public int WeeklyWage { get; set; }
+    public bool Current { get; set; }
+    public int? SupersededBy { get; set; }
+}
+
 public sealed class TransferRecord
 {
+    /// <summary>Deal dieses Wechsels; 0 bei Einträgen aus älteren Spielständen. Tausch und Hauptwechsel teilen sich die Id.</summary>
+    public int DealId { get; set; }
     public DateOnly Date { get; set; }
     public int PlayerId { get; set; }
     public int? FromClubId { get; set; }
@@ -147,6 +192,8 @@ public sealed class ClubOffer
     public bool PurchaseObligation { get; set; }
     public bool RecallInWinter { get; set; }
     public bool PlayingTimeGuarantee { get; set; }
+    /// <summary>Einmalige Leihgebühr an den Stammverein.</summary>
+    public long LoanFee { get; set; }
 
     public ClubOffer Clone() => (ClubOffer)MemberwiseClone();
 }
