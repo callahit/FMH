@@ -111,6 +111,11 @@ public sealed class StrategyProfile
     public double BorrowChance { get; set; }
     /// <summary>Kauft bevorzugt junge Spieler mit Potenzial (bis zu diesem Alter); 0 = nach aktueller Stärke.</summary>
     public int YouthFocusAge { get; set; }
+    /// <summary>
+    /// Kauft Spieler höchstens so viel stärker als das Niveau des Vereins (Ansehen). Größere Sprünge machen Vereine selten;
+    /// ohne Grenze wandern die Besten Jahr für Jahr nach oben und die Ligen werden stetig stärker (Review F-02).
+    /// </summary>
+    public double MaxAboveLevel { get; set; } = 1.5;
     /// <summary>Verleiht Spieler außerhalb der besten so vielen des Kaders, wenn sie jung sind; 0 = verleiht nicht aktiv.</summary>
     public int LendBeyondRank { get; set; }
 }
