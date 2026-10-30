@@ -29,6 +29,7 @@ public sealed partial class TransfersModule
         var aiClubs = World.Clubs.Values.Where(c => !IsHuman(c)).ToList();
         Rng.Shuffle(aiClubs);
         _loanPool = null;
+        _market = null;
         _needs.Clear();
         foreach (var club in aiClubs)
         {
@@ -83,10 +84,8 @@ public sealed partial class TransfersModule
         double Score(Player p, double r) =>
             youthAge > 0 && p.Age(World.Date) <= youthAge ? r + (p.Hidden.PotentialAbility - p.Hidden.CurrentAbility) / 20.0 : r;
         var budget = club.Budget.TransferBudget;
-        var candidates = World.Players.Values
-            .Where(p => !p.Retired && !p.IsYouth && p.ClubId != club.Id && p.ClubId != HumanClub.Id && p.Loan is null && p.PreContract is null)
-            .Where(p => p.MainPosition == need && p.Age(World.Date) <= 31)
-            .Select(p => (p, r: Rating(p)))
+        var candidates = MarketOf(need)
+            .Where(x => x.p.ClubId != club.Id && x.p.ClubId != HumanClub.Id && x.p.Loan is null && x.p.PreContract is null && !x.p.Retired && !x.p.IsYouth)
             .Where(x => x.r >= minRating && x.r <= level + profile.MaxAboveLevel)
             .Where(x => x.p.ClubId is null || World.Clubs[x.p.ClubId.Value].Reputation <= club.Reputation + 3)
             // Grobe Vorauswahl nach Marktwert, damit nicht nur unbezahlbare Spieler in die engere Wahl kommen.

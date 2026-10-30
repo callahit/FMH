@@ -16,22 +16,26 @@ public sealed partial class FinanceModule
     {
         var monday = World.Date.DayOfWeek == DayOfWeek.Monday;
         var firstOfMonth = World.Date.Day == 1;
+        // Verliehene Spieler einmal je Woche ermitteln, statt für jeden Verein alle Spieler zu durchsuchen.
+        var loans = monday ? World.Players.Values.Where(p => p.Loan is not null).ToList() : null;
+        var staff = monday ? World.Staff.Where(s => s.ClubId is not null).ToLookup(s => s.ClubId!.Value) : null;
+        var scouts = monday ? World.Scouts.ToLookup(s => s.ClubId) : null;
         foreach (var club in World.Clubs.Values)
         {
             if (!HasFinances(club)) continue;
-            if (monday) Weekly(club);
+            if (monday) Weekly(club, loans!, staff![club.Id], scouts![club.Id]);
             if (firstOfMonth) Monthly(club);
             CheckSolvency(club);
         }
         SeasonTicketSales();
     }
 
-    private void Weekly(Club club)
+    private void Weekly(Club club, List<Player> loans, IEnumerable<StaffMember> clubStaff, IEnumerable<Scout> clubScouts)
     {
-        var wages = Budgets.WageBill(club, World);
+        var wages = Budgets.WageBill(club, World, loans);
         if (wages > 0) Book(club, TransactionType.Wages, -wages, TR("tx.wages"));
-        var staff = World.Staff.Where(s => s.ClubId == club.Id).Sum(s => (long)s.WeeklyWage)
-                    + World.Scouts.Where(s => s.ClubId == club.Id).Sum(s => (long)ClubRules.ScoutWage(s))
+        var staff = clubStaff.Sum(s => (long)s.WeeklyWage)
+                    + clubScouts.Sum(s => (long)ClubRules.ScoutWage(s))
                     + (IsHuman(club) ? club.Board.ManagerWeeklyWage : (long)(club.Board.ManagerWeeklyWage > 0 ? club.Board.ManagerWeeklyWage : ClubRules.ManagerWage(club)));
         if (staff > 0) Book(club, TransactionType.StaffWages, -staff, TR("tx.staffWages"));
         var weekly = (Facilities.Effect(club, "income.weekly") + Facilities.Effect(club, "income.events") + Facilities.Effect(club, "income.patients")) * 0.5
