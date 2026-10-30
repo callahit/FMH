@@ -68,13 +68,17 @@ public sealed partial class TransfersModule
         foreach (var (p, _, parent) in candidates)
         {
             if (CheckLoan(p, parent, club) is not null) continue;
-            // Der ausleihende Verein zahlt so viel vom Gehalt, wie sein Budget hergibt, mindestens ein Viertel; den Rest trägt
-            // der abgebende Verein, der den Spieler sonst ohne Einsatz bezahlen müsste.
+            // Der ausleihende Verein zahlt so viel vom Gehalt, wie sein Budget hergibt und in seiner Spielklasse üblich ist
+            // (höchstens das Doppelte des Durchschnittsgehalts); den Rest trägt der abgebende Verein, der den Spieler sonst ohne
+            // Einsatz bezahlen müsste. Junge Spieler bis 23 verleiht er zur Ausbildung notfalls auch ganz auf eigene Kosten.
             var room = club.Budget.WageBudget * 1.05 - WageBillOf(club);
+            var target = Finance.DivisionFinance(club).TargetAnnualWage / 52.0;
+            var cap = target > 0 ? Math.Min(room, target * 2) : room;
             var wage = Math.Max(1, p.Contract?.WeeklyWage ?? 0);
-            var share = new[] { 100, 75, 50, 25 }.FirstOrDefault(s => wage * s / 100.0 <= room);
-            if (share == 0) continue;
-            var offer = new ClubOffer { LoanMonths = 12, WageSharePercent = share, RecallInWinter = Rng.Chance(0.2) };
+            var shares = p.Age(World.Date) <= 23 ? new[] { 100, 75, 50, 25, 0 } : new[] { 100, 75, 50, 25 };
+            var share = shares.Select(s => (int?)s).FirstOrDefault(s => wage * s!.Value / 100.0 <= cap);
+            if (share is not { } fits) continue;
+            var offer = new ClubOffer { LoanMonths = 12, WageSharePercent = fits, RecallInWinter = Rng.Chance(0.2) };
             var value = ValueOf(p);
             // Leihe mit Kaufpflicht (in Italien häufig), wenn der Marktwert ins Budget passt.
             if (value <= club.Budget.TransferBudget && Rng.Chance(tendency.PurchaseObligationShare))
