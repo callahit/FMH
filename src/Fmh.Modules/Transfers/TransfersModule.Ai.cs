@@ -76,7 +76,9 @@ public sealed partial class TransfersModule
         var need = NeedOf(club);
         var level = PlayerGenerator.ClubLevel(club.Reputation);
         var current = World.SquadOf(club).Where(p => p.MainPosition == need).Select(Rating).DefaultIfEmpty(0).Max();
-        var minRating = Math.Max(current + 0.3, level - 1.0);
+        // Verstärkung für die Stammelf; fehlt auf der Position ein zweiter Spieler, reicht ein Ergänzungsspieler.
+        var depth = World.SquadOf(club).Count(p => p.MainPosition == need) < 2;
+        var minRating = depth ? level - 1.5 : Math.Max(current + 0.3, level - 1.0);
         var youthAge = profile.YouthFocusAge;
         double Score(Player p, double r) =>
             youthAge > 0 && p.Age(World.Date) <= youthAge ? r + (p.Hidden.PotentialAbility - p.Hidden.CurrentAbility) / 20.0 : r;
