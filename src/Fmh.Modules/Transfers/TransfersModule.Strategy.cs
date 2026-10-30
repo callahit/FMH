@@ -91,7 +91,7 @@ public sealed partial class TransfersModule
             var offer = new ClubOffer { LoanMonths = 12, WageSharePercent = fits, RecallInWinter = Rng.Chance(0.2) };
             var value = ValueOf(p);
             // Leihe mit Kaufpflicht (in Italien häufig), wenn der Marktwert ins Budget passt.
-            if (value <= club.Budget.TransferBudget && Rng.Chance(tendency.PurchaseObligationShare))
+            if (value <= Math.Min(club.Budget.TransferBudget, Finance.Equity(club)) && Rng.Chance(tendency.PurchaseObligationShare))
             {
                 offer.PurchaseFee = value;
                 offer.PurchaseObligation = true;
