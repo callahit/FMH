@@ -69,6 +69,9 @@ public sealed partial class NegotiationViewModel : ViewModelBase
     [ObservableProperty] private decimal _purchaseFee;
     [ObservableProperty] private bool _purchaseObligation;
     [ObservableProperty] private bool _recallInWinter;
+    [ObservableProperty] private bool _playingTimeGuarantee;
+    [ObservableProperty] private decimal _sellerAppearanceAddOn;
+    [ObservableProperty] private decimal _sellerGoalAddOn;
 
     // Vertrag mit dem Spieler
     [ObservableProperty] private decimal _years = 3;
@@ -82,6 +85,7 @@ public sealed partial class NegotiationViewModel : ViewModelBase
     [ObservableProperty] private decimal _yearlyRaise;
     [ObservableProperty] private decimal _relegationPercent;
     [ObservableProperty] private decimal _promotionPercent;
+    [ObservableProperty] private decimal _extensionOptionYears;
 
     private void LoadOffer()
     {
@@ -95,6 +99,9 @@ public sealed partial class NegotiationViewModel : ViewModelBase
         PurchaseFee = o.PurchaseFee ?? Session.ValueOf(Player);
         PurchaseObligation = o.PurchaseObligation;
         RecallInWinter = o.RecallInWinter;
+        PlayingTimeGuarantee = o.PlayingTimeGuarantee;
+        SellerAppearanceAddOn = o.AppearanceBonus;
+        SellerGoalAddOn = o.GoalBonus;
     }
 
     private void LoadContract()
@@ -112,6 +119,7 @@ public sealed partial class NegotiationViewModel : ViewModelBase
         var (rel, pro) = ContractClauses.Defaults(Session.World, Session.World.Clubs[_n.BuyerId]);
         RelegationPercent = c.RelegationPercent ?? rel;
         PromotionPercent = c.PromotionPercent ?? pro;
+        ExtensionOptionYears = c.ExtensionOptionYears;
     }
 
     private void Update()
@@ -172,6 +180,9 @@ public sealed partial class NegotiationViewModel : ViewModelBase
                 PurchaseFee = HasPurchaseOption ? (long)PurchaseFee : null,
                 PurchaseObligation = HasPurchaseOption && PurchaseObligation,
                 RecallInWinter = RecallInWinter,
+                PlayingTimeGuarantee = IsLoan && PlayingTimeGuarantee,
+                AppearanceBonus = IsTransfer ? (long)SellerAppearanceAddOn : 0,
+                GoalBonus = IsTransfer ? (long)SellerGoalAddOn : 0,
             };
             r = Session.SubmitClubOffer(_n, offer);
             if (r.Kind == ResponseKind.Counter && _n.CounterFee is { } cf && IsTransfer) Fee = cf;
@@ -191,6 +202,7 @@ public sealed partial class NegotiationViewModel : ViewModelBase
                 YearlyRaisePercent = (int)YearlyRaise,
                 RelegationPercent = (int)RelegationPercent,
                 PromotionPercent = (int)PromotionPercent,
+                ExtensionOptionYears = (int)ExtensionOptionYears,
             };
             r = Session.SubmitContract(_n, contract);
             if (r.Kind == ResponseKind.Counter && _n.WageDemand is { } wd) WeeklyWage = wd;

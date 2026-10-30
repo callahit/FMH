@@ -95,6 +95,10 @@ public sealed class Contract
     /// </summary>
     public int? RelegationPercent { get; set; }
     public int? PromotionPercent { get; set; }
+    /// <summary>
+    /// Einseitige Verlängerungsoption des Vereins (Jahre, 0 = keine). Der Verein kann sie im letzten Vertragsjahr bis zum
+    /// Stichtag für Vorverträge ziehen; der Vertrag verlängert sich dann zu gleichen Bedingungen, die Option ist verbraucht.
+    /// </summary>
     public int ExtensionOptionYears { get; set; }
     public SquadStatus Status { get; set; } = SquadStatus.Rotation;
     /// <summary>Jugendvertrag (vor dem ersten Profivertrag).</summary>
