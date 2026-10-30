@@ -34,12 +34,13 @@ public sealed partial class TransfersModule
                         TR("msg.preContract.body", p.Name, buyer.Name));
                 break;
             case DealType.Renewal:
-                var old = p.Contract;
-                p.Contract = MakeContract(n.Contract, World.Date, buyer);
-                if (old is not null) p.Contract.Start = old.Start;
+                var oldStart = p.Contract?.Start ?? World.Date;
+                var renewed = MakeContract(n.Contract, World.Date, buyer);
+                renewed.Start = oldStart;
+                SetContract(p, renewed);
                 if (buyer.Id == HumanClub.Id)
                     Notify(MessageType.Contract, "msg.sender.assistant", TR("msg.renewed.subject", p.Name),
-                        TR("msg.renewed.body", p.Name, TextArg.OfDate(p.Contract.Until)));
+                        TR("msg.renewed.body", p.Name, TextArg.OfDate(renewed.Until)));
                 break;
         }
     }
@@ -71,6 +72,7 @@ public sealed partial class TransfersModule
 
     private void ExecuteTransfer(Player p, Club buyer, Club? seller, ClubOffer offer, ContractOffer contract)
     {
+        var dealId = World.NextDealId++;
         var fee = offer.Fee;
         if (seller is not null && fee > 0)
         {
@@ -78,17 +80,15 @@ public sealed partial class TransfersModule
             Finance.Book(buyer, TransactionType.TransferIn, -upfront, TR("tx.transferIn", p.Name));
             Finance.Book(seller, TransactionType.TransferOut, upfront, TR("tx.transferOut", p.Name));
             for (var k = 1; k <= offer.InstallmentYears; k++)
-                World.Installments.Add(new Installment { FromClubId = buyer.Id, ToClubId = seller.Id, Due = World.Date.AddDays(365 * k), Amount = (fee - upfront) / offer.InstallmentYears, TextRef = TR("tx.installment", p.Name) });
+                World.Installments.Add(new Installment
+                {
+                    FromClubId = buyer.Id, ToClubId = seller.Id, Due = World.Date.AddDays(365 * k), DealId = dealId,
+                    Amount = (fee - upfront) / offer.InstallmentYears, TextRef = TR("tx.installment", p.Name),
+                });
             // Budgets zweiter Mannschaften führt der Hauptverein (keine eigene Kasse).
             Budgeted(buyer).Budget.TransferBudget -= fee;
             Budgeted(seller).Budget.TransferBudget += fee / 2;
-            // Weiterverkaufsbeteiligung eines früheren Vereins.
-            if (p.Transfer.SellOnClubId is { } soc && soc != buyer.Id && World.Clubs.TryGetValue(soc, out var sellOnClub) && p.Transfer.SellOnPercent > 0)
-            {
-                var share = fee * p.Transfer.SellOnPercent / 100;
-                Finance.Book(seller, TransactionType.Other, -share, TR("tx.sellOnPaid", p.Name));
-                Finance.Book(sellOnClub, TransactionType.Other, share, TR("tx.sellOnReceived", p.Name));
-            }
+            PaySellOns(p, seller, buyer, fee);
             var agent = Negotiations.AgentFee(p, fee);
             Finance.Book(buyer, TransactionType.AgentFee, -agent, TR("tx.agentFee", p.Name));
         }
@@ -99,21 +99,21 @@ public sealed partial class TransfersModule
             Season.RemoveFromClub(swap);
             swap.ClubId = seller.Id;
             seller.PlayerIds.Add(swap.Id);
-            World.Transfers.Add(new TransferRecord { Date = World.Date, PlayerId = swap.Id, FromClubId = buyer.Id, ToClubId = seller.Id, SeasonYear = World.SeasonYear });
+            AddTransferRecord(dealId, swap.Id, buyer.Id, seller.Id, 0, loan: false);
         }
 
         var from = p.ClubId;
+        var carriedSellOns = TransferTerms.ActiveSellOns(p.Transfer).ToList();
         Season.RemoveFromClub(p);
         p.ClubId = buyer.Id;
         p.Loan = null;
         p.PreContract = null;
         buyer.PlayerIds.Add(p.Id);
-        p.Contract = MakeContract(contract, World.Date, buyer);
-        if (seller is not null) AddTransferConditions(p, buyer, seller, offer);
-        p.Transfer.SellOnClubId = offer.SellOnPercent > 0 ? seller?.Id : null;
-        p.Transfer.SellOnPercent = offer.SellOnPercent;
+        SetContract(p, MakeContract(contract, World.Date, buyer), previousClubId: from, dealId: dealId);
+        if (seller is not null) AddTransferConditions(p, buyer, seller, offer, dealId);
+        GrantSellOn(p, seller, offer.SellOnPercent, dealId, carriedSellOns);
         p.State.Morale = (Morale)Math.Min(6, (int)p.State.Morale + 1);
-        World.Transfers.Add(new TransferRecord { Date = World.Date, PlayerId = p.Id, FromClubId = from, ToClubId = buyer.Id, Fee = fee, SeasonYear = World.SeasonYear });
+        AddTransferRecord(dealId, p.Id, from, buyer.Id, fee, loan: false);
         if (buyer.Id == HumanClub.Id) World.Knowledge[p.Id] = 100;
         if (buyer.Id == HumanClub.Id && fee >= 5_000_000) Board.Achieve("recordSigning");
         // Verkauf eines Publikumslieblings verärgert die Fans.
@@ -143,12 +143,21 @@ public sealed partial class TransfersModule
         parent.Tactic.Bench.Remove(p.Id);
         buyer.PlayerIds.Add(p.Id);
         p.ClubId = buyer.Id;
+        var dealId = World.NextDealId++;
+        if (offer.LoanFee > 0)
+        {
+            Finance.Book(buyer, TransactionType.LoanFee, -offer.LoanFee, TR("tx.loanFeePaid", p.Name));
+            Finance.Book(parent, TransactionType.LoanFee, offer.LoanFee, TR("tx.loanFeeReceived", p.Name));
+            Budgeted(buyer).Budget.TransferBudget -= offer.LoanFee;
+            Budgeted(parent).Budget.TransferBudget += offer.LoanFee / 2;
+        }
         p.Loan = new Loan
         {
             ParentClubId = parent.Id, Start = World.Date, Until = until, WageSharePercent = offer.WageSharePercent, PurchaseFee = offer.PurchaseFee,
             PurchaseObligation = offer.PurchaseObligation, RecallInWinter = offer.RecallInWinter, PlayingTimeGuarantee = offer.PlayingTimeGuarantee,
+            Fee = offer.LoanFee,
         };
-        World.Transfers.Add(new TransferRecord { Date = World.Date, PlayerId = p.Id, FromClubId = parent.Id, ToClubId = buyer.Id, Loan = true, SeasonYear = World.SeasonYear });
+        AddTransferRecord(dealId, p.Id, parent.Id, buyer.Id, offer.LoanFee, loan: true);
         if (buyer.Id == HumanClub.Id) World.Knowledge[p.Id] = 100;
         if (buyer.Id == HumanClub.Id || parent.Id == HumanClub.Id)
             Notify(MessageType.Transfer, "msg.sender.assistant", TR("msg.loan.subject", p.Name),
@@ -206,19 +215,20 @@ public sealed partial class TransfersModule
                 Season.RemoveFromClub(p);
                 p.ClubId = target.Id;
                 target.PlayerIds.Add(p.Id);
-                p.Contract = pre.Contract;
+                var dealId = World.NextDealId++;
+                SetContract(p, pre.Contract, previousClubId: oldClub?.Id, dealId: dealId);
                 p.PreContract = null;
-                World.Transfers.Add(new TransferRecord { Date = today, PlayerId = p.Id, FromClubId = oldClub?.Id, ToClubId = target.Id, SeasonYear = World.SeasonYear });
+                AddTransferRecord(dealId, p.Id, oldClub?.Id, target.Id, 0, loan: false);
                 if (target.Id == HumanClub.Id) World.Knowledge[p.Id] = 100;
                 continue;
             }
             if (oldClub is not null && !IsHuman(oldClub) && ShouldAiRenew(oldClub, p))
             {
-                p.Contract = MakeContract(new ContractOffer { Years = Rng.Next(1, 3), WeeklyWage = Negotiations.WageDemand(p, oldClub, p.Contract.Status, World, Data), Status = p.Contract.Status }, today, oldClub);
+                SetContract(p, MakeContract(new ContractOffer { Years = Rng.Next(1, 3), WeeklyWage = Negotiations.WageDemand(p, oldClub, p.Contract.Status, World, Data), Status = p.Contract.Status }, today, oldClub));
                 continue;
             }
+            SetContract(p, null);
             Season.RemoveFromClub(p);
-            p.Contract = null;
             if (oldClub?.Id == HumanClub.Id)
                 Notify(MessageType.Contract, "msg.sender.assistant", TR("msg.contractEnded.subject", p.Name), TR("msg.contractEnded.body", p.Name));
         }

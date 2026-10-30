@@ -25,7 +25,7 @@ public sealed partial class TransfersModule
     // ================================================================== Zusatzzahlungen an den Verkäufer
 
     /// <summary>Legt die erfolgsabhängigen Zahlungen eines Transfers an (bis zum Ende des neuen Vertrags).</summary>
-    private void AddTransferConditions(Player p, Club buyer, Club seller, ClubOffer offer)
+    private void AddTransferConditions(Player p, Club buyer, Club seller, ClubOffer offer, int dealId)
     {
         if (p.Contract is not { } contract) return;
         void Add(TransferConditionKind kind, long amount)
@@ -33,7 +33,7 @@ public sealed partial class TransfersModule
             if (amount <= 0) return;
             World.TransferConditions.Add(new TransferCondition
             {
-                PlayerId = p.Id, PayerId = buyer.Id, PayeeId = seller.Id, Kind = kind, Amount = amount, Until = contract.Until,
+                PlayerId = p.Id, PayerId = buyer.Id, PayeeId = seller.Id, Kind = kind, Amount = amount, Until = contract.Until, DealId = dealId,
             });
         }
         Add(TransferConditionKind.Appearance, offer.AppearanceBonus);

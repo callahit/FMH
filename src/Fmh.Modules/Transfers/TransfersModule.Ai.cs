@@ -173,8 +173,8 @@ public sealed partial class TransfersModule
         {
             var worst = ranked[0];
             ranked.RemoveAt(0);
+            SetContract(worst, null);
             Season.RemoveFromClub(worst);
-            worst.Contract = null;
         }
     }
 
