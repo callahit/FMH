@@ -270,7 +270,8 @@ public static class Program
         var targetSeason = world.SeasonYear + seasons;
         var topLeague = world.Leagues.OrderBy(l => l.Level).First();
         var strengthStart = TopEleven(session, topLeague);
-        Console.WriteLine("Start:");
+        Console.WriteLine($"Start: Top-11 {topLeague.Name} Ø {strengthStart:F3}");
+        var seasonEnds = new List<double>();
         PrintWageStats(world);
         if (seasons == 0) return 0;
 
@@ -311,6 +312,7 @@ public static class Program
                     Console.WriteLine();
                 }
                 PrintCareerStats(session);
+                seasonEnds.Add(TopEleven(session, topLeague));
             }
             // Nach der Saisonauswertung, damit eine Entlassung am letzten Spieltag die Saison nicht überspringt.
             if (session.AwaitingNewJob)
@@ -329,8 +331,13 @@ public static class Program
         }
         sw.Stop();
         Console.WriteLine($"{seasons} Saison(s) in {sw.Elapsed.TotalSeconds:F1} s, {matchdays} Spieltage des eigenen Vereins, langsamster Spieltag {slowest.TotalMilliseconds:F0} ms (Ziel < 5000 ms).");
-        var drift = (TopEleven(session, topLeague) - strengthStart) / Math.Max(1, seasons);
-        Console.WriteLine($"Ligastärke-Drift {topLeague.Name}: {drift:+0.000;-0.000} je Saison" + (maxDrift is { } md ? $" (Grenze {md:0.000})" : " (Ziel ≤ 0,05)"));
+        // Drift von Saisonende zu Saisonende (gleicher Zeitpunkt im Jahreslauf, Review F-07): Die erzeugte Startwelt hat volle
+        // Kader, am ersten Tag nach einer Saison fehlen je nach Transferfenster noch die Neuzugänge. Mit nur einer Saison
+        // bleibt der Vergleich mit dem Start.
+        var fromStart = (TopEleven(session, topLeague) - strengthStart) / Math.Max(1, seasons);
+        var drift = seasonEnds.Count >= 2 ? (seasonEnds[^1] - seasonEnds[0]) / (seasonEnds.Count - 1) : fromStart;
+        Console.WriteLine($"Ligastärke-Drift {topLeague.Name}: {drift:+0.000;-0.000} je Saison von Saisonende zu Saisonende" +
+                          (maxDrift is { } md ? $" (Grenze {md:0.000})" : " (Ziel ≤ 0,05)") + $", ab Start {fromStart:+0.000;-0.000}");
         var financeOk = ReferenceReport.MeansOk();
         var economyOk = EconomyReport.PrintSummary();
         var marketOk = MarketReport.PrintSummary(world, data);
