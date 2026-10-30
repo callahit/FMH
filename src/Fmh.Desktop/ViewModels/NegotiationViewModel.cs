@@ -70,6 +70,7 @@ public sealed partial class NegotiationViewModel : ViewModelBase
     [ObservableProperty] private bool _purchaseObligation;
     [ObservableProperty] private bool _recallInWinter;
     [ObservableProperty] private bool _playingTimeGuarantee;
+    [ObservableProperty] private decimal _loanFee;
     [ObservableProperty] private decimal _sellerAppearanceAddOn;
     [ObservableProperty] private decimal _sellerGoalAddOn;
 
@@ -100,6 +101,7 @@ public sealed partial class NegotiationViewModel : ViewModelBase
         PurchaseObligation = o.PurchaseObligation;
         RecallInWinter = o.RecallInWinter;
         PlayingTimeGuarantee = o.PlayingTimeGuarantee;
+        LoanFee = o.LoanFee;
         SellerAppearanceAddOn = o.AppearanceBonus;
         SellerGoalAddOn = o.GoalBonus;
     }
@@ -181,6 +183,7 @@ public sealed partial class NegotiationViewModel : ViewModelBase
                 PurchaseObligation = HasPurchaseOption && PurchaseObligation,
                 RecallInWinter = RecallInWinter,
                 PlayingTimeGuarantee = IsLoan && PlayingTimeGuarantee,
+                LoanFee = IsLoan ? (long)LoanFee : 0,
                 AppearanceBonus = IsTransfer ? (long)SellerAppearanceAddOn : 0,
                 GoalBonus = IsTransfer ? (long)SellerGoalAddOn : 0,
             };
