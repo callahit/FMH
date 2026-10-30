@@ -496,7 +496,8 @@ Die Gewichte stehen in `data/base/rules/engine.json`.
 - CI (`.github/workflows/ci.yml`): Build und Tests auf Linux und Windows, Warnungen gelten als Fehler,
   dazu ein Kalibrierungsjob mit Toleranzprüfung (Engine über 10.000 Spiele, Karriere über fünf Saisons mit
   Ligazahlen, Insolvenzen, Mindestkader, Größe der Spielwelt und `--max-drift 0.05`).
-- Offene Punkte aus dem Code-Review vom 28.10.2026 stehen mit Status in `docs/review-2026-10-28.md`.
+- Offene Punkte aus den Code-Reviews: `docs/review-2026-10-28.md` (F-01–F-14) und
+  `docs/review-2026-10-30.md` (Nachprüfung, Genre-Abgleich N-/G-Findings).
 - Keine Länder- oder Wettbewerbscodes im C#-Code; Regeln, Zahlen und Texte gehören in Datenpakete.
 
 ## Aufbau
