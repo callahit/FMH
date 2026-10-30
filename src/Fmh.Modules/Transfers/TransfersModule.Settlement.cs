@@ -109,6 +109,7 @@ public sealed partial class TransfersModule
         p.PreContract = null;
         buyer.PlayerIds.Add(p.Id);
         p.Contract = MakeContract(contract, World.Date, buyer);
+        if (seller is not null) AddTransferConditions(p, buyer, seller, offer);
         p.Transfer.SellOnClubId = offer.SellOnPercent > 0 ? seller?.Id : null;
         p.Transfer.SellOnPercent = offer.SellOnPercent;
         p.State.Morale = (Morale)Math.Min(6, (int)p.State.Morale + 1);
@@ -144,7 +145,7 @@ public sealed partial class TransfersModule
         p.ClubId = buyer.Id;
         p.Loan = new Loan
         {
-            ParentClubId = parent.Id, Until = until, WageSharePercent = offer.WageSharePercent, PurchaseFee = offer.PurchaseFee,
+            ParentClubId = parent.Id, Start = World.Date, Until = until, WageSharePercent = offer.WageSharePercent, PurchaseFee = offer.PurchaseFee,
             PurchaseObligation = offer.PurchaseObligation, RecallInWinter = offer.RecallInWinter, PlayingTimeGuarantee = offer.PlayingTimeGuarantee,
         };
         World.Transfers.Add(new TransferRecord { Date = World.Date, PlayerId = p.Id, FromClubId = parent.Id, ToClubId = buyer.Id, Loan = true, SeasonYear = World.SeasonYear });
@@ -154,7 +155,7 @@ public sealed partial class TransfersModule
                 TR("msg.loan.body", p.Name, parent.Name, buyer.Name, TextArg.OfDate(until)));
     }
 
-    private void ReturnLoan(Player p)
+    private void ReturnLoan(Player p, bool notify = true)
     {
         if (p.Loan is not { } loan) return;
         var parent = World.Clubs[loan.ParentClubId];
@@ -169,7 +170,7 @@ public sealed partial class TransfersModule
         p.Loan = null;
         p.ClubId = parent.Id;
         parent.PlayerIds.Add(p.Id);
-        if (parent.Id == HumanClub.Id || current?.Id == HumanClub.Id)
+        if (notify && (parent.Id == HumanClub.Id || current?.Id == HumanClub.Id))
             Notify(MessageType.Transfer, "msg.sender.assistant", TR("msg.loanReturn.subject", p.Name), TR("msg.loanReturn.body", p.Name, parent.Name));
     }
 
