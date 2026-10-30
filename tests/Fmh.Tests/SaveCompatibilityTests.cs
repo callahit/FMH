@@ -143,6 +143,33 @@ public class SaveCompatibilityTests
         }
     }
 
+    /// <summary>Positionen und Saisonzeilen verweisen auf den Spieler; ein Spielstand der Version 5 lässt sich danach wieder speichern.</summary>
+    [Fact]
+    public void PlayerChildRowsReferenceThePlayerAndOldSavesStillSave()
+    {
+        var path = Fixture();
+        try
+        {
+            var world = SqliteStore.Load(path);
+            SqliteStore.Save(world, path);
+            Assert.Equal(world.Players.Count, SqliteStore.Load(path).Players.Count);
+            using var con = new SqliteConnection($"Data Source={path};Pooling=False");
+            con.Open();
+            foreach (var table in new[] { "player_positions", "player_seasons" })
+            {
+                using var cmd = con.CreateCommand();
+                cmd.CommandText = $"PRAGMA foreign_key_list({table})";
+                using var r = cmd.ExecuteReader();
+                Assert.True(r.Read(), table);
+                Assert.Equal("players", r.GetString(2));
+            }
+        }
+        finally
+        {
+            Cleanup(path);
+        }
+    }
+
     /// <summary>Weitere Mannschaften (z. B. Frauen, AP 15) werden vollständig gespeichert; die erste bleibt in den Vereinsspalten.</summary>
     [Fact]
     public void AdditionalTeamsRoundTrip()
