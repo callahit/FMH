@@ -12,7 +12,7 @@
   "professionalLevels": 3,
   "strategies": {
     "Elite": {
-      "signingChance": 0.55,
+      "signingChance": 0.7,
       "maxSummerSignings": 5,
       "maxWinterSignings": 2,
       "borrowChance": 0.05,
@@ -20,10 +20,10 @@
       "lendBeyondRank": 18
     },
     "Developer": {
-      "signingChance": 0.5,
+      "signingChance": 0.6,
       "maxSummerSignings": 5,
       "maxWinterSignings": 2,
-      "borrowChance": 0.2,
+      "borrowChance": 0.35,
       "youthFocusAge": 23,
       "lendBeyondRank": 20
     },
@@ -31,7 +31,7 @@
       "signingChance": 0.3,
       "maxSummerSignings": 3,
       "maxWinterSignings": 1,
-      "borrowChance": 0.35,
+      "borrowChance": 0.5,
       "youthFocusAge": 0,
       "lendBeyondRank": 0
     },
