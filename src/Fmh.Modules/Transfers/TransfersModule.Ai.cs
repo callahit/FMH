@@ -87,7 +87,7 @@ public sealed partial class TransfersModule
             .Where(p => !p.Retired && !p.IsYouth && p.ClubId != club.Id && p.ClubId != HumanClub.Id && p.Loan is null && p.PreContract is null)
             .Where(p => p.MainPosition == need && p.Age(World.Date) <= 31)
             .Select(p => (p, r: Rating(p)))
-            .Where(x => x.r >= minRating && x.r <= level + 3)
+            .Where(x => x.r >= minRating && x.r <= level + profile.MaxAboveLevel)
             .Where(x => x.p.ClubId is null || World.Clubs[x.p.ClubId.Value].Reputation <= club.Reputation + 3)
             // Grobe Vorauswahl nach Marktwert, damit nicht nur unbezahlbare Spieler in die engere Wahl kommen.
             .Where(x => x.p.ClubId is null || ValueOf(x.p) <= budget)

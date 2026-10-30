@@ -60,7 +60,7 @@ public sealed partial class TransfersModule
         var tendency = ClubStrategy.Tendency(World, club);
         var candidates = LoanPool()
             .Where(x => x.p.MainPosition == need && x.parent.Reputation > club.Reputation && x.p.ClubId == x.parent.Id)
-            .Where(x => x.rating >= level - 1.0 && x.rating <= level + 2.5 && x.p.Reputation < club.Reputation + 6)
+            .Where(x => x.rating >= level - 1.0 && x.rating <= level + 1.5 && x.p.Reputation < club.Reputation + 6)
             // Im eigenen Land ist der Weg kürzer: gleich starke Kandidaten aus dem Ausland kommen erst danach.
             .OrderByDescending(x => x.rating - (x.parent.CountryCode == club.CountryCode ? 0 : 0.5))
             .Take(5)

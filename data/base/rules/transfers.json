@@ -17,7 +17,8 @@
       "maxWinterSignings": 2,
       "borrowChance": 0.05,
       "youthFocusAge": 0,
-      "lendBeyondRank": 18
+      "lendBeyondRank": 18,
+      "maxAboveLevel": 2.0
     },
     "Developer": {
       "signingChance": 0.6,
@@ -25,7 +26,8 @@
       "maxWinterSignings": 2,
       "borrowChance": 0.35,
       "youthFocusAge": 23,
-      "lendBeyondRank": 20
+      "lendBeyondRank": 20,
+      "maxAboveLevel": 1.5
     },
     "Borrower": {
       "signingChance": 0.3,
@@ -33,7 +35,8 @@
       "maxWinterSignings": 1,
       "borrowChance": 0.5,
       "youthFocusAge": 0,
-      "lendBeyondRank": 0
+      "lendBeyondRank": 0,
+      "maxAboveLevel": 1.5
     },
     "Bargain": {
       "signingChance": 0.15,
@@ -41,7 +44,8 @@
       "maxWinterSignings": 1,
       "borrowChance": 0.0,
       "youthFocusAge": 0,
-      "lendBeyondRank": 0
+      "lendBeyondRank": 0,
+      "maxAboveLevel": 1.5
     }
   },
   "reference": {
