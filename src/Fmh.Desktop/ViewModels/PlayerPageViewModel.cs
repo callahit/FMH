@@ -188,10 +188,17 @@ public sealed partial class PlayerPageViewModel : PageViewModel
         if (!IsOwn) lines.Add(new(T["player.knowledge"], $"{Knowledge} %", new SolidColorBrush(Knowledge >= 70 ? P.Good : Knowledge >= 40 ? P.Warn : P.Muted)));
         if (p.Contract is { } c) lines.Add(new(T["neg.status"], T["squadStatus." + c.Status]));
         if (p.Contract?.ReleaseClause is { } rc) lines.Add(new(T["neg.releaseClause"], Fmt.Money(rc, currency)));
+        if (p.Contract is { ExtensionOptionYears: > 0 } option)
+            lines.Add(new(T["player.extensionOption"], T.Format("player.extensionOptionValue", option.ExtensionOptionYears)));
         if (p.Transfer.Listed) lines.Add(new(T["neg.listed"], p.Transfer.AskingPrice is { } ask ? Fmt.Money(ask, currency) : "–", new SolidColorBrush(P.Good)));
         if (p.Transfer.LoanListed) lines.Add(new(T["player.loanListed"], T["ui.yes"], new SolidColorBrush(P.Good)));
         if (p.Loan is { } loan)
+        {
             lines.Add(new(T["player.onLoan"], T.Format("player.onLoanValue", s.World.Clubs[loan.ParentClubId].Name, Fmt.Date(loan.Until))));
+            if (loan.PlayingTimeGuarantee)
+                lines.Add(new(T["player.guarantee"], T.Format("player.guaranteeValue", loan.Appearances, loan.ClubMatches),
+                    new SolidColorBrush(TransferTerms.GuaranteeBreached(loan) ? P.Bad : P.Good)));
+        }
         if (p.PreContract is { } pre) lines.Add(new(T["player.preContract"], s.World.Clubs[pre.ClubId].Name, new SolidColorBrush(P.Warn)));
         if (p.IsYouth) lines.Add(new(T["player.youth"], T["ui.yes"]));
         TransferLines = lines;
@@ -226,6 +233,8 @@ public sealed partial class PlayerPageViewModel : PageViewModel
             }
             if (p.Loan is { } l && l.ParentClubId == human.Id && (l.RecallInWinter || TransferTerms.GuaranteeBreached(l)))
                 actions.Add(new(T["player.action.recall"], new RelayCommand(() => Act(s.RecallLoan(p)))));
+            if (s.CanExerciseExtensionOption(p))
+                actions.Add(new(T["player.action.extensionOption"], new RelayCommand(() => Act(s.ExerciseExtensionOption(p)))));
             actions.Add(new(human.Shortlist.Contains(p.Id) ? T["player.action.unwatch"] : T["player.action.watch"], new RelayCommand(() => { s.ToggleShortlist(p); Load(); })));
             foreach (var scout in s.HumanScouts.Where(sc => s.AssignmentOf(sc) is null).Take(1))
                 actions.Add(new(T.Format("player.action.scout", scout.Name), new RelayCommand(() => Act(s.AssignScout(scout, ScoutTask.WatchPlayer, p.Id), "player.scoutSent"))));
