@@ -55,6 +55,10 @@ public sealed class World
     public PressConference? PendingPress { get; set; }
     /// <summary>Teilnehmer an europäischen Wettbewerben (laufende und kommende Saison).</summary>
     public List<EuropeanEntry> EuropeanEntries { get; set; } = new();
+    /// <summary>Länderkoeffizienten (Fünfjahresfenster, laufende Summe; AP 5).</summary>
+    public Dictionary<string, double> CountryCoefficients { get; set; } = new();
+    /// <summary>Vereinskoeffizienten für Setzliste und Einstieg (AP 5).</summary>
+    public Dictionary<int, double> ClubCoefficients { get; set; } = new();
 
     /// <summary>Alle Ligen der laufenden Saison sind beendet und ausgewertet; der Wechsel folgt zum Saisonstart.</summary>
     public bool SeasonFinished { get; set; }

@@ -10,5 +10,6 @@ namespace Fmh.Core.Game;
 public sealed partial class GameSession
 {
     public IReadOnlyList<EuropeanEntry> EuropeanEntriesOf(int seasonYear) => _license.EuropeanEntriesOf(seasonYear);
+    public EuropeCompetition? EuropeCompetitionOf(string id) => _license.EuropeCompetitionOf(id);
     public static EuropeCompetition? EuropeCompetitionOf(CountryConfig country, string id) => LicenseModule.EuropeCompetitionOf(country, id);
 }

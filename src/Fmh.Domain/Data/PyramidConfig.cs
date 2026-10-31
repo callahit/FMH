@@ -129,9 +129,9 @@ public static class FormatNormalizer
 public enum PointsRounding { Down, Up, Nearest }
 
 /// <summary>
-/// Zweite Saisonphase nach dem Grunddurchgang (Umsetzungskonzept 6.1), z. B. Meister- und Abstiegsrunde: Die Liga
-/// teilt sich nach Tabellenplätzen in Gruppen, die Punkte werden mit <see cref="PointsCarry"/> übernommen.
-/// Die Endtabelle reiht die Gruppen hintereinander; Bewegungsregeln gelten für diese Endtabelle.
+/// Folgephase nach dem Grunddurchgang oder einer früheren Phase (Umsetzungskonzept 6.1), z. B. Meister- und Abstiegsrunde.
+/// Die Liga teilt sich nach Tabellenplätzen in Gruppen, die Punkte werden mit <see cref="PointsCarry"/> übernommen.
+/// Mehrere Phasen laufen nacheinander. Die Endtabelle reiht die Gruppen der letzten Phase hintereinander.
 /// </summary>
 public sealed class PhaseConfig
 {
