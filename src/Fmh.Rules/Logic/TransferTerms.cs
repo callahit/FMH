@@ -21,8 +21,20 @@ public static class TransferTerms
     /// <summary>Höchstens so viele Jahre darf eine Verlängerungsoption des Vereins umfassen.</summary>
     public const int MaxExtensionOptionYears = 2;
 
-    /// <summary>Summe aller Weiterverkaufsrechte eines Spielers, in Prozent vom Bruttoerlös.</summary>
+    /// <summary>Summe aller Weiterverkaufsrechte eines Spielers, in Prozent.</summary>
     public const int MaxSellOnPercent = 50;
+
+    /// <summary>Höchstens so viele spätere Ablöseraten.</summary>
+    public const int MaxInstallments = 8;
+
+    /// <summary>Höchstens so viele Monate bis zur letzten Rate (vier Saisons).</summary>
+    public const int MaxInstallmentMonths = 48;
+
+    /// <summary>Erlaubte Leihdauern in Monaten.</summary>
+    public static readonly int[] LoanMonthOptions = { 6, 12, 18, 24 };
+
+    /// <summary>Abschlag je Jahr mittlerer Zahlungsverzögerung (Verkäufer bevorzugt Sofortzahlung).</summary>
+    public const double InstallmentYearDiscount = 0.04;
 
     /// <summary>Aufschlag auf die Gehaltsforderung je Optionsjahr (der Spieler gibt Freiheit auf).</summary>
     public const double ExtensionOptionWageFactor = 0.025;
@@ -138,4 +150,103 @@ public static class TransferTerms
         if (loanFee <= 0 || marketValue <= 0) return 0;
         return (int)Math.Min(100, loanFee * 100 / marketValue);
     }
+
+    // ------------------------------------------------------------------ Zahlungsplan
+
+    /// <summary>
+    /// Übernimmt ältere <see cref="ClubOffer.InstallmentYears"/> und begrenzt Anzahlung und Raten.
+    /// Bei Sofortzahlung ist die Anzahlung die volle Ablöse.
+    /// </summary>
+    public static void NormalizePaymentPlan(ClubOffer o, long fee)
+    {
+        fee = Math.Max(0, fee);
+        if (o.InstallmentCount <= 0 && o.DownPayment <= 0 && o.InstallmentYears > 0)
+        {
+            o.InstallmentCount = Math.Clamp(o.InstallmentYears, 0, MaxInstallments);
+            o.DownPayment = fee / (o.InstallmentYears + 1);
+        }
+        o.InstallmentYears = 0;
+        o.InstallmentCount = Math.Clamp(o.InstallmentCount, 0, MaxInstallments);
+        if (o.InstallmentCount == 0)
+        {
+            o.DownPayment = fee;
+            return;
+        }
+        if (o.DownPayment <= 0) o.DownPayment = fee / (o.InstallmentCount + 1);
+        o.DownPayment = Math.Clamp(o.DownPayment, 0, fee);
+        if (o.DownPayment == fee) o.InstallmentCount = 0;
+    }
+
+    /// <summary>Sofortzahlung ohne offene Raten (z. B. für Ausstiegsklauseln).</summary>
+    public static bool IsImmediatePayment(ClubOffer o) => o.InstallmentCount <= 0;
+
+    /// <summary>
+    /// Baut die späteren Raten: Restbetrag gleichmäßig aufgeteilt, Termine über höchstens
+    /// <see cref="MaxInstallmentMonths"/> Monate.
+    /// </summary>
+    public static IReadOnlyList<(DateOnly Due, long Amount)> BuildInstallmentSchedule(ClubOffer o, DateOnly today, long fee)
+    {
+        NormalizePaymentPlan(o, fee);
+        if (o.InstallmentCount <= 0) return Array.Empty<(DateOnly, long)>();
+        var remaining = fee - o.DownPayment;
+        if (remaining <= 0) return Array.Empty<(DateOnly, long)>();
+        var count = o.InstallmentCount;
+        var spanMonths = Math.Min(MaxInstallmentMonths, Math.Max(count, count * (MaxInstallmentMonths / MaxInstallments)));
+        var list = new List<(DateOnly, long)>(count);
+        long paid = 0;
+        for (var k = 1; k <= count; k++)
+        {
+            var amount = k == count ? remaining - paid : remaining / count;
+            paid += amount;
+            var months = (int)Math.Round(spanMonths * (k / (double)count));
+            list.Add((today.AddMonths(Math.Max(1, months)), amount));
+        }
+        return list;
+    }
+
+    /// <summary>Mittlere Zahlungsverzögerung in Jahren (Anzahlung sofort, Raten später) für die Verkäuferbewertung.</summary>
+    public static double AveragePaymentDelayYears(ClubOffer o, long fee)
+    {
+        NormalizePaymentPlan(o, fee);
+        if (fee <= 0 || o.InstallmentCount <= 0) return 0;
+        var schedule = BuildInstallmentSchedule(o, DateOnly.FromDayNumber(0), fee);
+        double weighted = 0;
+        foreach (var (due, amount) in schedule)
+            weighted += amount * (due.DayNumber / 365.25);
+        return weighted / fee;
+    }
+
+    /// <summary>Erlaubte Leihdauer: nächstliegende Option aus <see cref="LoanMonthOptions"/>.</summary>
+    public static int ClampLoanMonths(int months)
+    {
+        var best = LoanMonthOptions[0];
+        foreach (var opt in LoanMonthOptions)
+            if (Math.Abs(opt - months) < Math.Abs(best - months)) best = opt;
+        return best;
+    }
+
+    /// <summary>Kaufpflicht greift am Leihende, wenn die Bedingung erfüllt ist.</summary>
+    public static bool PurchaseObligationTriggered(Loan loan, World world, Club borrower)
+    {
+        if (!loan.PurchaseObligation || loan.PurchaseFee is null) return false;
+        return loan.PurchaseCondition switch
+        {
+            LoanBuyCondition.AppearancePercent =>
+                loan.ClubMatches > 0 && loan.Appearances * 100 >= loan.ClubMatches * Math.Clamp(loan.PurchaseConditionValue <= 0 ? 50 : loan.PurchaseConditionValue, 1, 100),
+            LoanBuyCondition.StayInDivision =>
+                DivisionLevel(world, borrower) <= (loan.StartDivisionLevel <= 0 ? DivisionLevel(world, borrower) : loan.StartDivisionLevel),
+            _ => true,
+        };
+    }
+
+    /// <summary>Spielklassenniveau 1 = höchste Liga; ohne Liga 99.</summary>
+    public static int DivisionLevel(World world, Club club)
+    {
+        var league = world.FindLeague(club.LeagueId);
+        return league?.Level ?? 99;
+    }
+
+    /// <summary>Bemessungsgrundlage für ein Weiterverkaufsrecht.</summary>
+    public static long SellOnBase(SellOnRight right, long fee) =>
+        right.Basis == SellOnBasis.Profit ? Math.Max(0, fee - right.CostBasis) : fee;
 }

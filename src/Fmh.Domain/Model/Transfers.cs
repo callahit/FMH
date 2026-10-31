@@ -22,17 +22,43 @@ public sealed class TransferStatus
     public List<SellOnRight>? SellOns { get; set; }
 }
 
-/// <summary>Weiterverkaufsrecht eines früheren Vereins am Bruttoerlös späterer Wechsel. Es bleibt bestehen, bis der Anteil entfällt.</summary>
+/// <summary>Bemessungsgrundlage einer Weiterverkaufsbeteiligung.</summary>
+public enum SellOnBasis
+{
+    /// <summary>Anteil vom Bruttoerlös.</summary>
+    Gross = 0,
+    /// <summary>Anteil vom Gewinn (Erlös minus ursprüngliche Ablöse).</summary>
+    Profit = 1,
+}
+
+/// <summary>Weiterverkaufsrecht eines früheren Vereins an späteren Wechseln. Es bleibt bestehen, bis der Anteil entfällt.</summary>
 public sealed class SellOnRight
 {
     public int ClubId { get; set; }
-    /// <summary>Anteil am Bruttoerlös, 1–50. Die Summe aller Rechte eines Spielers bleibt bei höchstens 50 %.</summary>
+    /// <summary>Anteil, 1–50. Die Summe aller Rechte eines Spielers bleibt bei höchstens 50 %.</summary>
     public int Percent { get; set; }
     /// <summary>Deal, aus dem das Recht stammt; 0 bei Rechten aus älteren Spielständen.</summary>
     public int OriginDealId { get; set; }
+    /// <summary>Brutto oder Gewinn; ältere Rechte ohne Feld gelten als Brutto.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public SellOnBasis Basis { get; set; }
+    /// <summary>Ursprüngliche Ablöse für die Gewinnbasis; 0 bei Bruttorechten oder älteren Spielständen.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public long CostBasis { get; set; }
 }
 
-/// <summary>Leihe (Kapitel 7): Laufzeit 6–12 Monate, Gehaltsanteil, Kaufoption/-pflicht, Rückholklausel, Einsatzgarantie.</summary>
+/// <summary>Bedingung einer Kaufpflicht am Ende einer Leihe.</summary>
+public enum LoanBuyCondition
+{
+    /// <summary>Immer kaufen (bisheriges Verhalten).</summary>
+    Always = 0,
+    /// <summary>Mindestanteil Einsätze an den Pflichtspielen des Leihvereins (<see cref="Loan.PurchaseConditionValue"/> %).</summary>
+    AppearancePercent = 1,
+    /// <summary>Leihverein hält die Spielklasse (kein Abstieg gegenüber dem Niveau zu Leihbeginn).</summary>
+    StayInDivision = 2,
+}
+
+/// <summary>Leihe (Kapitel 7): Laufzeit 6–24 Monate, Gehaltsanteil, Kaufoption/-pflicht, Rückholklausel, Einsatzgarantie.</summary>
 public sealed class Loan
 {
     public int ParentClubId { get; set; }
@@ -46,6 +72,15 @@ public sealed class Loan
     public int WageSharePercent { get; set; } = 100;
     public long? PurchaseFee { get; set; }
     public bool PurchaseObligation { get; set; }
+    /// <summary>Bedingung der Kaufpflicht; ohne Feld gilt <see cref="LoanBuyCondition.Always"/>.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public LoanBuyCondition PurchaseCondition { get; set; }
+    /// <summary>Parameter der Bedingung (z. B. Einsatzquote in %).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int PurchaseConditionValue { get; set; }
+    /// <summary>Spielklassenniveau des Leihvereins zu Beginn (für Klassenerhalt).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int StartDivisionLevel { get; set; }
     public bool RecallInWinter { get; set; }
     /// <summary>
     /// Einsatzgarantie: Der Spieler muss in mindestens der Hälfte der Pflichtspiele des ausleihenden Vereins eingesetzt
@@ -178,21 +213,34 @@ public enum NegotiationStage { ClubTalks, PlayerTalks, Completed, Failed, Withdr
 public sealed class ClubOffer
 {
     public long Fee { get; set; }
-    /// <summary>Ratenzahlung über 0–3 Jahre (0 = sofort).</summary>
+    /// <summary>
+    /// Ältere Ratenzahlung über 0–3 gleiche Jahresraten. Wird beim Einreichen auf
+    /// <see cref="DownPayment"/> / <see cref="InstallmentCount"/> abgebildet, wenn diese noch 0 sind.
+    /// </summary>
     public int InstallmentYears { get; set; }
+    /// <summary>Anzahlung; bei Sofortzahlung gleich der Ablöse. Belastet das Transferbudget sofort.</summary>
+    public long DownPayment { get; set; }
+    /// <summary>Anzahl späterer Raten (0–8), verteilt über höchstens vier Saisons.</summary>
+    public int InstallmentCount { get; set; }
     /// <summary>Zusatzzahlung an den abgebenden Verein je Pflichtspiel-Einsatz für den Käufer (bis Vertragsende).</summary>
     public long AppearanceBonus { get; set; }
     /// <summary>Zusatzzahlung an den abgebenden Verein je Pflichtspiel-Tor für den Käufer (bis Vertragsende).</summary>
     public long GoalBonus { get; set; }
     /// <summary>Weiterverkaufsbeteiligung 0–50 %.</summary>
     public int SellOnPercent { get; set; }
+    /// <summary>Bruttoerlös oder Gewinn als Bemessungsgrundlage der Weiterverkaufsbeteiligung.</summary>
+    public SellOnBasis SellOnBasis { get; set; }
     public int? SwapPlayerId { get; set; }
 
     // Leihe
+    /// <summary>Leihdauer in Monaten: 6, 12, 18 oder 24.</summary>
     public int LoanMonths { get; set; } = 12;
     public int WageSharePercent { get; set; } = 100;
     public long? PurchaseFee { get; set; }
     public bool PurchaseObligation { get; set; }
+    public LoanBuyCondition PurchaseCondition { get; set; }
+    /// <summary>Parameter der Kaufpflicht (z. B. 50 für 50 % Einsätze).</summary>
+    public int PurchaseConditionValue { get; set; } = 50;
     public bool RecallInWinter { get; set; }
     public bool PlayingTimeGuarantee { get; set; }
     /// <summary>Einmalige Leihgebühr an den Stammverein.</summary>

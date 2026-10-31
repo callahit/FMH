@@ -12,14 +12,15 @@ public sealed partial class TransfersModule
             DealId = dealId, Date = World.Date, PlayerId = playerId, FromClubId = from, ToClubId = to, Fee = fee, Loan = loan, SeasonYear = World.SeasonYear,
         });
 
-    /// <summary>Zahlt alle bestehenden Weiterverkaufsrechte aus dem Bruttoerlös. Der Käufer und der Verkäufer selbst sind ausgenommen.</summary>
+    /// <summary>Zahlt alle bestehenden Weiterverkaufsrechte. Der Käufer und der Verkäufer selbst sind ausgenommen.</summary>
     private void PaySellOns(Player p, Club seller, Club buyer, long fee)
     {
         foreach (var right in TransferTerms.ActiveSellOns(p.Transfer))
         {
             if (right.Percent <= 0 || right.ClubId == buyer.Id || right.ClubId == seller.Id) continue;
             if (!World.Clubs.TryGetValue(right.ClubId, out var beneficiary)) continue;
-            var share = fee * right.Percent / 100;
+            var basis = TransferTerms.SellOnBase(right, fee);
+            var share = basis * right.Percent / 100;
             if (share <= 0) continue;
             Finance.Book(seller, TransactionType.Other, -share, TR("tx.sellOnPaid", p.Name));
             Finance.Book(beneficiary, TransactionType.Other, share, TR("tx.sellOnReceived", p.Name));
@@ -31,16 +32,24 @@ public sealed partial class TransfersModule
     /// Ein Recht desselben Vereins wird ersetzt. Der Vereinswechsel leert den Transferstatus, deshalb müssen die Rechte
     /// vorher kopiert werden.
     /// </summary>
-    private void GrantSellOn(Player p, Club? seller, int percent, int dealId, IReadOnlyList<SellOnRight> carried)
+    private void GrantSellOn(Player p, Club? seller, int percent, int dealId, IReadOnlyList<SellOnRight> carried, long fee = 0, SellOnBasis basis = SellOnBasis.Gross)
     {
         if ((seller is null || percent <= 0) && carried.Count == 0) return;
-        var list = carried.Select(r => new SellOnRight { ClubId = r.ClubId, Percent = r.Percent, OriginDealId = r.OriginDealId }).ToList();
+        var list = carried.Select(r => new SellOnRight
+        {
+            ClubId = r.ClubId, Percent = r.Percent, OriginDealId = r.OriginDealId, Basis = r.Basis, CostBasis = r.CostBasis,
+        }).ToList();
         if (seller is not null && percent > 0)
         {
             var room = Math.Max(0, TransferTerms.MaxSellOnPercent - list.Where(r => r.ClubId != seller.Id).Sum(r => r.Percent));
             list.RemoveAll(r => r.ClubId == seller.Id);
             var granted = Math.Clamp(percent, 0, room);
-            if (granted > 0) list.Add(new SellOnRight { ClubId = seller.Id, Percent = granted, OriginDealId = dealId });
+            if (granted > 0)
+                list.Add(new SellOnRight
+                {
+                    ClubId = seller.Id, Percent = granted, OriginDealId = dealId, Basis = basis,
+                    CostBasis = basis == SellOnBasis.Profit ? fee : 0,
+                });
         }
         else if (seller is not null)
             list.RemoveAll(r => r.ClubId == seller.Id);
