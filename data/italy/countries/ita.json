@@ -429,6 +429,23 @@
     "club": 0.15,
     "country": 0.45
   },
+  "loans": {
+    "default": {
+      "maxOut": 8, "maxIn": 8, "maxPerClub": 3, "exemptAge": 22, "ageCutoff": "December31", "exemptNeedsClubTrained": false, "perClubCountsExempt": true, "maxMonths": 12,
+      "steps": [
+        { "fromSeason": 2025, "maxOut": 10, "maxIn": 10 },
+        { "fromSeason": 2026, "maxOut": 9, "maxIn": 9 },
+        { "fromSeason": 2027, "maxOut": 8, "maxIn": 8 }
+      ],
+      "source": "FIGC NOIF Art. 103/117 (C.U. 135/A vom 20.12.2024): höchstens eine Saison, 10/9/8 Leihen je Richtung (2025/26 bis 2027/28), drei mit demselben Verein unabhängig vom Alter; ausgenommen Spieler unter 23 am 31. Dezember"
+    }
+  },
+  "market": {
+    "loanAffinity": 2.8,
+    "purchaseObligationShare": 0.35,
+    "loanShare": { "1": [12, 24], "2": [14, 28] },
+    "source": "CIES Football Observatory Monthly Report 83 (2023): Serie A 19,0 %, Serie B 22,8 %, Ligue 1 11,2 %, Ligue 2 11,0 % Leihspieler; Monthly Report 48: Leihspieler je Verein Serie A 4,9, LaLiga 3,9, Bundesliga mit 6,3 % der Einsatzminuten am wenigsten; Premier League durch die nationale Grenze von zwei Leihen niedrig"
+  },
   "reserves": {
     "minLevelGap": 2,
     "playInCups": false,

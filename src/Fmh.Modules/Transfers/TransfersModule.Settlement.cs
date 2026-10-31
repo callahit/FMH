@@ -72,6 +72,8 @@ public sealed partial class TransfersModule
 
     private void ExecuteTransfer(Player p, Club buyer, Club? seller, ClubOffer offer, ContractOffer contract)
     {
+        _needs.Remove(buyer.Id);
+        if (seller is not null) _needs.Remove(seller.Id);
         var dealId = World.NextDealId++;
         var fee = offer.Fee;
         if (seller is not null && fee > 0)
@@ -107,6 +109,7 @@ public sealed partial class TransfersModule
         Season.RemoveFromClub(p);
         p.ClubId = buyer.Id;
         p.Loan = null;
+        _activeLoans = null;
         p.PreContract = null;
         buyer.PlayerIds.Add(p.Id);
         SetContract(p, MakeContract(contract, World.Date, buyer), previousClubId: from, dealId: dealId);
@@ -137,6 +140,8 @@ public sealed partial class TransfersModule
         var until = World.Date.AddMonths(offer.LoanMonths);
         var seasonEnd = new DateOnly(World.SeasonYear + 1, 6, 30);
         if (until > seasonEnd) until = seasonEnd;
+        _needs.Remove(buyer.Id);
+        _needs.Remove(parent.Id);
         parent.PlayerIds.Remove(p.Id);
         var slot = parent.Tactic.Lineup.IndexOf(p.Id);
         if (slot >= 0) parent.Tactic.Lineup[slot] = null;
@@ -158,6 +163,7 @@ public sealed partial class TransfersModule
             Fee = offer.LoanFee,
         };
         AddTransferRecord(dealId, p.Id, parent.Id, buyer.Id, offer.LoanFee, loan: true);
+        _activeLoans?.Add(p);
         if (buyer.Id == HumanClub.Id) World.Knowledge[p.Id] = 100;
         if (buyer.Id == HumanClub.Id || parent.Id == HumanClub.Id)
             Notify(MessageType.Transfer, "msg.sender.assistant", TR("msg.loan.subject", p.Name),
@@ -177,6 +183,7 @@ public sealed partial class TransfersModule
             current.Tactic.Bench.Remove(p.Id);
         }
         p.Loan = null;
+        _activeLoans = null;
         p.ClubId = parent.Id;
         parent.PlayerIds.Add(p.Id);
         if (notify && (parent.Id == HumanClub.Id || current?.Id == HumanClub.Id))
@@ -194,6 +201,7 @@ public sealed partial class TransfersModule
                 var buyer = World.Clubs[buyerId];
                 var parent = World.Clubs[p.Loan.ParentClubId];
                 p.Loan = null;
+                _activeLoans = null;
                 buyer.PlayerIds.Remove(p.Id);
                 parent.PlayerIds.Add(p.Id);
                 p.ClubId = parent.Id;

@@ -115,6 +115,11 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
             FillSquad(club);
             // Meldeliste der neuen Saison; die Entscheidungen des Managers bleiben stehen, soweit die Regeln es erlauben.
             Registration.Fill(World, club, Data, keep: IsHuman(club));
+        }
+        // Leihrückkehr und Jugendaufstieg können den Kader über die Höchstgrenze treiben.
+        Transfers.EnforceSquadLimits();
+        foreach (var club in World.Clubs.Values)
+        {
             club.Board.Goal = Board.ExpectedGoal(club);
             Finance.SetSeasonBudget(club);
             Board.UpdateFavourites(club);

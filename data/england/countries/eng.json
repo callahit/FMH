@@ -453,6 +453,24 @@
     "club": 0.15,
     "country": 0.45
   },
+  "loans": {
+    "default": {
+      "maxOut": 6, "maxIn": 5, "maxPerClub": 4, "exemptAge": 21, "ageCutoff": "SeasonEnd", "exemptNeedsClubTrained": true, "maxMonths": 12,
+      "source": "EFL: höchstens fünf Leihspieler im Spieltagskader, höchstens vier vom selben Verein (Stand der Quelle unsicher); Verleihgrenze nach FIFA-Vorgabe"
+    },
+    "divisions": {
+      "ENG1": {
+        "maxOut": 6, "maxIn": 2, "maxInPerSeason": 4, "maxPerClub": 1, "exemptAge": 21, "ageCutoff": "SeasonEnd", "exemptNeedsClubTrained": true, "maxMonths": 12,
+        "source": "Premier League Handbook, Abschnitt V: höchstens zwei Leihspieler von Premier-League-Vereinen gleichzeitig, vier je Saison, einer je Verein"
+      }
+    }
+  },
+  "market": {
+    "loanAffinity": 1.4,
+    "purchaseObligationShare": 0.1,
+    "loanShare": { "1": [1, 8], "2": [4, 15] },
+    "source": "CIES Football Observatory Monthly Report 83 (2023): Serie A 19,0 %, Serie B 22,8 %, Ligue 1 11,2 %, Ligue 2 11,0 % Leihspieler; Monthly Report 48: Leihspieler je Verein Serie A 4,9, LaLiga 3,9, Bundesliga mit 6,3 % der Einsatzminuten am wenigsten; Premier League durch die nationale Grenze von zwei Leihen niedrig"
+  },
   "finance": {
     "cateringPerSpectator": 4,
     "merchPerSpectator": 7,
