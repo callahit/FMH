@@ -11,7 +11,8 @@ public sealed partial class CupsModule
         base.Register(ctx);
         ctx.Bus.Subscribe<MatchPlayed>(e =>
         {
-            if (e.Fixture.Kind != CompetitionKind.League && World.FindCup(e.Fixture.CompetitionId) is { } cup)
+            if (e.Fixture.Kind is CompetitionKind.Cup or CompetitionKind.Playoff
+                && World.FindCup(e.Fixture.CompetitionId) is { } cup)
                 CupMatchPlayed(cup, e.Fixture);
         });
     }
