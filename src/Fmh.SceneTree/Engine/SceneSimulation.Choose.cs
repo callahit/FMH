@@ -12,12 +12,17 @@ public sealed partial class SceneSimulation
             EndShootout();
             return;
         }
-        if (_parent < 0 && !_shootout && _clock > 0 && ClockDone())
+        if (_parent < 0 && !_shootout)
         {
-            EndPeriod();
-            return;
+            var begun = BeginIncident();
+            if (begun == 1) return;
+            if (begun == 0 && _clock > 0 && ClockDone())
+            {
+                EndPeriod();
+                return;
+            }
+            if (begun == 0) OpenParent();
         }
-        if (_parent < 0) OpenParent();
         var parent = _tree.Nodes[_parent];
         if (parent.Children.Count == 0)
         {
@@ -46,12 +51,11 @@ public sealed partial class SceneSimulation
         _sceneMinutes = Minutes(category) * (0.85 + _rng.NextDouble() * 0.3);
         _follow.Clear();
         _followChain = 0;
-        _foulCounted = _offsideCounted = _cardRolled = _injuryRolled = false;
         _pendingCard = CardPending.None;
         _lastAttacker = _cardPlayer = _victim = _injuryPlayer = null;
-        _restartFor = null;
         _reason = 0;
         _injuryLabel = "Verletzung";
+        _incidentDriven = false;
     }
 
     private void Close()
@@ -61,21 +65,17 @@ public sealed partial class SceneSimulation
             EndKick();
             return;
         }
-        if (_follow.Count > 0 && _followChain < 8)
+        if (!_incidentDriven && _follow.Count > 0 && _followChain < 8)
         {
             _followChain++;
             var next = _follow.Dequeue();
             if (next >= 1 && next <= _tree.Categories.Count)
             {
-                if (_restartFor is { } side && next is >= 1 and <= 9)
-                {
-                    _attack = side;
-                    _restartFor = null;
-                }
                 _parent = _tree.Category(next).NodeIndex;
                 return;
             }
         }
+        _incidentDriven = false;
         Advance(_sceneMinutes);
         Drain(_sceneMinutes);
         _parent = -1;
@@ -152,7 +152,7 @@ public sealed partial class SceneSimulation
         Shootout = _shootout,
         AttackLead = Team(_attack).Goals - Team(_attack.Other()).Goals,
         DefenceOffsideTrap = Team(_attack.Other()).Tactic.Instructions.OffsideTrap,
-        EasterEgg = _easter,
+        EasterEgg = _opt.EasterEggs,
         Occupied = role => (role.Attacking ? att : def).Occupied(role.Code),
     };
 
@@ -213,8 +213,8 @@ public sealed partial class SceneSimulation
         var build = ins.PassingLength == PassingLength.Long ? 1.3 : 3.2;
         var longBall = (ins.PassingLength == PassingLength.Long ? 2.4 : 0.9)
                        + (ins.GoalkeeperDistribution == Distribution.Fast ? 0.6 : 0) + (ment < 0 ? 0.7 : 0);
-        var cats = new[] { 10, 11, 12, 15, 16, 17, 18, 19, 20, 21, 29 };
-        var weights = new[] { counter, through, 0.35, 0.28, 0.28, left, centre, right, build, longBall, _easter ? 0.15 : 0.04 };
+        var cats = new[] { 10, 11, 12, 17, 18, 19, 20, 21 };
+        var weights = new[] { counter, through, 0.35, left, centre, right, build, longBall };
         return cats[_rng.WeightedIndex(weights)];
     }
 

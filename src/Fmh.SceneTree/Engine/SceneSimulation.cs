@@ -24,16 +24,18 @@ public sealed partial class SceneSimulation : IMatchSimulation
     private int _period = 1;
     private double _clock;
     private int _stoppage = -1;
-    private bool _started, _halfTime, _finished, _shootout, _easter;
+    private bool _started, _halfTime, _finished, _shootout, _incidentDriven;
     private int _parent = -1;
     private int _steps, _followChain, _soHome, _soAway;
     private Side _attack = Side.Home;
     private Side _soSide = Side.Home;
     private double _sceneMinutes = 4;
-    private bool _foulCounted, _offsideCounted, _cardRolled, _injuryRolled, _kickScored;
+    private bool _kickScored;
     private CardPending _pendingCard;
     private MatchPlayer? _cardPlayer, _victim, _injuryPlayer, _lastAttacker;
-    private Side? _restartFor;
+    private double _extraStoppage;
+    private readonly List<PlannedIncident> _plan = new();
+    private readonly List<string> _rareTags = new();
     private byte _reason;
     private string _injuryLabel = "Verletzung";
     private int? _penHome, _penAway;
@@ -45,7 +47,6 @@ public sealed partial class SceneSimulation : IMatchSimulation
         _opt = options;
         _rng = new Rng(setup.Seed);
         _teams = new[] { Build(Side.Home, setup.Home), Build(Side.Away, setup.Away) };
-        _easter = _rng.Chance(0.08);
     }
 
     public MatchSetup Setup { get; }
@@ -59,6 +60,8 @@ public sealed partial class SceneSimulation : IMatchSimulation
     public int? PenaltiesHome => _penHome;
     public int? PenaltiesAway => _penAway;
     public int? PlayerOfTheMatchId { get; private set; }
+    /// <summary>Schlüssel der sonstigen Texte, die in dieser Partie vorkamen.</summary>
+    public IReadOnlyList<string> RareTags => _rareTags;
     public int MaxSubstitutions => Setup.Substitutions + (_period >= 3 || (_halfTime && _period == 2) ? 1 : 0);
 
     private double PeriodSeconds => _period <= 2 ? 45 * 60 : 15 * 60;
@@ -132,6 +135,7 @@ public sealed partial class SceneSimulation : IMatchSimulation
         _started = true;
         _attack = Side.Home;
         Emit(MatchEventType.KickOff, Side.Home, key: true);
+        PlanPeriod();
     }
 
     private void Resume()
@@ -143,6 +147,7 @@ public sealed partial class SceneSimulation : IMatchSimulation
         _parent = -1;
         _attack = _period % 2 == 0 ? Side.Away : Side.Home;
         Emit(_period == 2 ? MatchEventType.SecondHalfKickOff : MatchEventType.ExtraTimeStart, _attack, key: true);
+        PlanPeriod();
     }
 
     private void Advance(double minutes)
@@ -152,7 +157,7 @@ public sealed partial class SceneSimulation : IMatchSimulation
         if (_stoppage >= 0 || _clock < PeriodSeconds) return;
         var max = _period switch { 1 => 4, 2 => 6, 3 => 2, _ => 3 };
         var min = _period >= 3 ? 0 : 1;
-        _stoppage = (int)Math.Clamp(Math.Round(0.6 + _rng.Range(0, 1.4)), min, max);
+        _stoppage = (int)Math.Clamp(Math.Round(0.6 + _extraStoppage + _rng.Range(0, 1.4)), min, Math.Max(max, Math.Min(12, max + _extraStoppage)));
         if (_stoppage > 0) Emit(MatchEventType.Stoppage, _attack, value: _stoppage, key: true);
     }
 

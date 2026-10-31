@@ -91,17 +91,47 @@ public sealed class SceneWeightOptions
     /// <summary>Wie stark die Stimmungsbytes b8/b9 (Hypothese) das Gewicht dämpfen.</summary>
     public double MoodSlope { get; init; } = 0.06;
 
-    /// <summary>Minuten, die eine offene Szene auf der Uhr kostet. Folgeszenen (Ecke, Freistoß) kosten nichts extra.</summary>
-    public double MinutesPerScene { get; init; } = 6.4;
+    /// <summary>Minuten, die eine offene Szene auf der Uhr kostet. Die Ereignisschicht kostet keine Spielminute.</summary>
+    public double MinutesPerScene { get; init; } = 7.15;
 
-    /// <summary>Gelbe Karte je Foulknoten mit Täter, skaliert mit der Schiri-Strenge.</summary>
-    public double CardChance { get; init; } = 0.42;
+    /// <summary>Fouls je Spiel, beide Teams, bevor Taktik und Zweikampfhärte skalieren.</summary>
+    public double FoulsPerMatch { get; init; } = 30.4;
 
-    public double RedChance { get; init; } = 0.010;
-    public double SeriousRedChance { get; init; } = 0.045;
+    public double OffsidesPerMatch { get; init; } = 14.3;
+    public double CornersPerMatch { get; init; } = 15.5;
+    public double ThrowInsPerMatch { get; init; } = 16;
 
-    /// <summary>Verletzung, wenn ein Blatt die Verletzungsrolle trägt. Mal der Welthäufigkeit.</summary>
-    public double InjuryChance { get; init; } = 0.35;
+    /// <summary>Kurze Abschlüsse zusätzlich zu den Schüssen aus offenen Szenen und vollen Standards.</summary>
+    public double ShortShotsPerMatch { get; init; } = 27.5;
+
+    /// <summary>Anteil der kurzen Abschlüsse, die aufs Tor gehen.</summary>
+    public double ShortOnTarget { get; init; } = 0.30;
+
+    /// <summary>xG eines kurzen Abschlusses, daneben und aufs Tor.</summary>
+    public double ShortXgWide { get; init; } = 0.02;
+    public double ShortXgOnTarget { get; init; } = 0.055;
+
+    /// <summary>Anteil der Ecken, die den Eckball-Baum bis zum Ende spielen (die übrigen sind eine kurze Ansage).</summary>
+    public double CornerFullShare { get; init; } = 0.18;
+
+    /// <summary>Anteil der Fouls, die einen vollen Freistoß-Baum starten.</summary>
+    public double ShootingFkShare { get; init; } = 0.07;
+
+    /// <summary>Elfmeter je Foul.</summary>
+    public double PenaltyShare { get; init; } = 0.010;
+
+    /// <summary>Gelbe und rote Karte je Foul, skaliert mit Schiri und Zweikampfhärte.</summary>
+    public double YellowPerFoul { get; init; } = 0.140;
+    public double RedPerFoul { get; init; } = 0.0054;
+
+    /// <summary>Verletzung je Foul, mal der Welthäufigkeit und der Verletzungsanfälligkeit.</summary>
+    public double InjuryPerFoul { get; init; } = 0.029;
+
+    /// <summary>Sonstige Texte je Spiel, ohne Easter Eggs. Etwa eines alle drei bis vier Spiele.</summary>
+    public double RarePerMatch { get; init; } = 0.30;
+
+    /// <summary>Geburtstags- und Promi-Einlagen (Karim Saad, Marcel Kruse, Rolf, Gerald).</summary>
+    public bool EasterEggs { get; init; }
 
     /// <summary>Platzhaltertexte erzeugen. Die Kalibrierung schaltet das aus, die Statistik bleibt.</summary>
     public bool EmitNarrative { get; init; } = true;
