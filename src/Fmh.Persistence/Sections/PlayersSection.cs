@@ -10,12 +10,11 @@ public sealed class PlayersSection : SaveSection
 {
     public override string ModuleId => "players";
 
-    /// <summary>Version 6: Meldeliste. Version 7: Fremdschlüssel von Positionen und Saisonzeilen auf den Spieler.</summary>
-    public override int Version => 7;
+    /// <summary>Version 6: Meldeliste. Version 7: FK Positionen/Saison. Version 8: Nationalitäten-Tabelle (E6-S3).</summary>
+    public override int Version => 8;
 
     /// <summary>
-    /// 5 → 6: Spalte für Meldung und Ausbildungsjahre. 6 → 7: <c>player_positions</c> und <c>player_seasons</c> verweisen auf
-    /// <c>players</c>. Die Daten werden übernommen; die Prüfung greift beim nächsten Speichern.
+    /// 5 → 6: Meldeliste. 6 → 7: FK Kindtabellen. 7 → 8: <c>player_nationalities</c> aus der Kommaliste.
     /// </summary>
     public override void Migrate(SqliteConnection c, SqliteTransaction tx, int fromVersion)
     {
@@ -37,6 +36,20 @@ public sealed class PlayersSection : SaveSection
                 ALTER TABLE player_seasons_v7 RENAME TO player_seasons;
                 CREATE INDEX player_seasons_player ON player_seasons (player_id);
                 """);
+        }
+        if (fromVersion <= 7)
+        {
+            Exec(c, tx, """
+                CREATE TABLE player_nationalities (player_id INTEGER NOT NULL REFERENCES players(id), ord INTEGER NOT NULL, code TEXT NOT NULL,
+                    PRIMARY KEY (player_id, ord));
+                """);
+            foreach (var r in Rows(c, "SELECT id, nationalities FROM players"))
+            {
+                var id = r.GetInt32(0);
+                var codes = r.IsDBNull(1) ? Array.Empty<string>() : r.GetString(1).Split(',', StringSplitOptions.RemoveEmptyEntries);
+                for (var i = 0; i < codes.Length; i++)
+                    Exec(c, tx, "INSERT INTO player_nationalities (player_id, ord, code) VALUES (" + id + ", " + i + ", '" + codes[i].Replace("'", "''") + "')");
+            }
         }
     }
 
@@ -66,6 +79,8 @@ public sealed class PlayersSection : SaveSection
             season_year INTEGER NOT NULL, club_id INTEGER, apps INTEGER NOT NULL, minutes INTEGER NOT NULL, goals INTEGER NOT NULL,
             assists INTEGER NOT NULL, yellow INTEGER NOT NULL, red INTEGER NOT NULL, graded INTEGER NOT NULL, grade_sum REAL NOT NULL);
         CREATE INDEX player_seasons_player ON player_seasons (player_id);
+        CREATE TABLE player_nationalities (player_id INTEGER NOT NULL REFERENCES players(id), ord INTEGER NOT NULL, code TEXT NOT NULL,
+            PRIMARY KEY (player_id, ord));
         """;
 
     public override void Save(SqliteConnection con, SqliteTransaction tx, World w)
@@ -83,6 +98,7 @@ public sealed class PlayersSection : SaveSection
         using var cmd = Cmd(con, tx, $"INSERT INTO players ({string.Join(",", cols)}) VALUES ({string.Join(",", names)})", names);
         using var pos = Insert(con, tx, "player_positions", 3);
         using var sea = Insert(con, tx, "player_seasons", 13);
+        using var nat = Insert(con, tx, "player_nationalities", 3);
 
         foreach (var p in w.Players.Values)
         {
@@ -100,13 +116,15 @@ public sealed class PlayersSection : SaveSection
                 h.Sportsmanship, h.Adaptability, h.Controversy, h.Consistency, h.InjuryProneness, h.ImportantMatches,
                 st.Condition, st.MatchPractice, st.Morale.ToString(), JsonSerializer.Serialize(st.RecentGrades),
                 st.Injury?.Type, st.Injury?.DaysRemaining, st.Injury?.TotalDays, st.SuspendedMatches, st.YellowCardsAccumulated,
-                p.Contract is null ? null : J(p.Contract), p.IsYouth, p.Retired, p.Transfer.Listed, p.Transfer.AskingPrice,
+                // Must-now E6-S2: laufender Vertrag steht in contracts.terms; Spalte bleibt nur für Altspeicher.
+                null, p.IsYouth, p.Retired, p.Transfer.Listed, p.Transfer.AskingPrice,
                 J(p.Transfer), p.Loan is null ? null : J(p.Loan), J(p.Training), p.PreContract is null ? null : J(p.PreContract),
                 J(p.Registration),
             });
             Run(cmd, values.ToArray());
 
             foreach (var (position, suit) in p.Positions) Run(pos, p.Id, position.ToString(), suit.ToString());
+            for (var i = 0; i < p.Nationalities.Count; i++) Run(nat, p.Id, i, p.Nationalities[i]);
 
             void Season(PlayerSeasonStats s, bool current, int ord) =>
                 Run(sea, p.Id, current, ord, s.SeasonYear, s.ClubId, s.Appearances, s.Minutes, s.Goals, s.Assists,
@@ -140,9 +158,44 @@ public sealed class PlayersSection : SaveSection
             else p.History.Add(s);
         }
 
-        // Spielstände aus Version 1 kennen die Kaderreihenfolge nicht: aus der Spieler-Id rekonstruieren.
-        foreach (var club in w.Clubs.Values.Where(c => c.PlayerIds.Count == 0))
-            club.PlayerIds = w.Players.Values.Where(p => p.ClubId == club.Id && !p.IsYouth).Select(p => p.Id).Order().ToList();
+        try
+        {
+            var byPlayer = new Dictionary<int, List<string>>();
+            foreach (var r in Rows(con, "SELECT player_id, ord, code FROM player_nationalities ORDER BY player_id, ord"))
+            {
+                var id = r.GetInt32(0);
+                if (!byPlayer.TryGetValue(id, out var list)) byPlayer[id] = list = new List<string>();
+                list.Add(r.GetString(2));
+            }
+            foreach (var (id, codes) in byPlayer)
+                if (w.Players.TryGetValue(id, out var p) && codes.Count > 0) p.Nationalities = codes;
+        }
+        catch (SqliteException) { /* ältere Abschnitte ohne Tabelle */ }
+
+        // Must-now E6-S4: Kaderliste aus players.club_id aufbauen; Abweichungen werden überschrieben.
+        foreach (var club in w.Clubs.Values)
+        {
+            var fromClubId = w.Players.Values.Where(p => p.ClubId == club.Id && !p.IsYouth && !p.Retired).Select(p => p.Id).Order().ToList();
+            if (club.PlayerIds.Count == 0)
+                club.PlayerIds = fromClubId;
+            else if (!club.PlayerIds.Order().SequenceEqual(fromClubId))
+            {
+                // Integrität: club_id ist die Wahrheit; die Kaderliste folgt.
+                club.PlayerIds = fromClubId;
+            }
+        }
+
+        // Must-now E6-S5: Zweite Mannschaft als Team unter dem Hauptverein spiegeln.
+        // Spielplan-IDs bleiben die bisherigen Club-/Team-IDs (FirstTeam.Id == Club.Id, Reserve-Id == Team.Id).
+        foreach (var reserve in w.Clubs.Values.Where(c => c.ReserveOf is not null))
+        {
+            if (!w.Clubs.TryGetValue(reserve.ReserveOf!.Value, out var parent)) continue;
+            if (parent.Teams.Any(t => t.Id == reserve.Id)) continue;
+            var team = reserve.FirstTeam;
+            team.Id = reserve.Id;
+            team.ClubId = parent.Id;
+            parent.Teams.Add(team);
+        }
     }
 
     private static Player ReadPlayer(SqliteDataReader r)
