@@ -21,18 +21,24 @@ public sealed partial class TransfersModule
         }
         foreach (var lockKey in World.NegotiationLocks.Where(kv => kv.Value <= World.Date).Select(kv => kv.Key).ToList())
             World.NegotiationLocks.Remove(lockKey);
+        DropFinishedTransferConditions();
+        CheckExtensionOptions();
 
         _activeLoans = null;
         var monday = World.Date.DayOfWeek == DayOfWeek.Monday;
         if (!monday) return;
 
+        CheckLoanGuarantees();
         var aiClubs = World.Clubs.Values.Where(c => !IsHuman(c)).ToList();
         Rng.Shuffle(aiClubs);
         _loanPool = null;
         _market = null;
         _needs.Clear();
+        // Jedes Land hat eigene Wechselfristen: maßgeblich ist das Fenster des Vereins selbst, nicht das des Managers.
+        _openWindows = World.Clubs.Values.GroupBy(c => c.CountryCode).ToDictionary(g => g.Key, g => Season.IsTransferWindowOpen(g.First()));
         foreach (var club in aiClubs)
         {
+            var window = WindowOpen(club);
             ManageAiSquadSize(club);
             // Dünne Kader: zuerst Vereinslose (im Gehaltsbudget, außer der Spieltagskader ist nicht mehr voll), sonst Talente
             // aus der eigenen Jugend oder dem Umfeld.
@@ -46,7 +52,7 @@ public sealed partial class TransfersModule
                 if (!below) break;
             }
             // Das Transferfenster des eigenen Verbands entscheidet (die Fenster der Länder unterscheiden sich).
-            if (!Season.IsTransferWindowOpen(club)) continue;
+            if (!window) continue;
             var profile = Data.TransferRules.Profile(ClubStrategy.Of(World, Data, club));
             if (Rng.Chance(profile.SigningChance)) TryAiSigning(club, profile);
             if (Rng.Chance(Math.Min(1, profile.BorrowChance * ClubStrategy.Tendency(World, club).LoanAffinity))) TryAiBorrow(club);
@@ -54,9 +60,15 @@ public sealed partial class TransfersModule
             // Neuzugänge im Fenster nachmelden, solange Plätze frei sind.
             Registration.Fill(World, club, Data, keep: true);
         }
-        if (Season.IsTransferWindowOpen() && Rng.Chance(0.3)) MakeIncomingOffer();
+        if (WindowOpen(HumanClub) && Rng.Chance(0.3)) MakeIncomingOffer();
         if (World.Date.Month is >= 2 and <= 5 && World.Date.Day <= 7) AiPreContracts(aiClubs);
     }
+
+    private Dictionary<string, bool> _openWindows = new();
+
+    /// <summary>Wechselfenster im Land des Vereins offen (am Montag zwischengespeichert).</summary>
+    private bool WindowOpen(Club club) =>
+        _openWindows.TryGetValue(club.CountryCode, out var open) ? open : Season.IsTransferWindowOpen(club);
 
     private int TransfersThisWindow(Club club)
     {
@@ -89,6 +101,7 @@ public sealed partial class TransfersModule
             .Where(x => x.p.ClubId != club.Id && x.p.ClubId != HumanClub.Id && x.p.Loan is null && x.p.PreContract is null && !x.p.Retired && !x.p.IsYouth)
             .Where(x => x.r >= minRating && x.r <= level + profile.MaxAboveLevel)
             .Where(x => x.p.ClubId is null || World.Clubs[x.p.ClubId.Value].Reputation <= club.Reputation + 3)
+            .Where(x => x.p.ClubId is null || WindowOpen(World.Clubs[x.p.ClubId.Value]))
             // Grobe Vorauswahl nach Marktwert, damit nicht nur unbezahlbare Spieler in die engere Wahl kommen.
             .Where(x => x.p.ClubId is null || ValueOf(x.p) <= budget)
             .OrderByDescending(x => Score(x.p, x.r))
@@ -174,8 +187,8 @@ public sealed partial class TransfersModule
         {
             var worst = ranked[0];
             ranked.RemoveAt(0);
+            SetContract(worst, null);
             Season.RemoveFromClub(worst);
-            worst.Contract = null;
         }
     }
 
@@ -220,6 +233,7 @@ public sealed partial class TransfersModule
         var listed = squad.Where(p => p.Transfer.Listed).ToList();
         var target = listed.Count > 0 && Rng.Chance(0.7) ? Rng.Pick(listed) : Rng.Pick(squad.OrderByDescending(Rating).Take(14).ToList());
         var buyers = World.Clubs.Values.Where(c => !IsHuman(c) && c.Reputation >= human.Reputation - 4 && World.FindLeague(c.LeagueId) is not null)
+            .Where(WindowOpen)
             .Where(c => Season.NeededPosition(c) == target.MainPosition || Rng.Chance(0.15))
             .Where(c => c.Budget.TransferBudget >= ValueOf(target) * 0.8)
             .Where(c => Rating(target) >= PlayerGenerator.ClubLevel(c.Reputation) - 1)

@@ -29,7 +29,7 @@ public class LoanRulesTests
         parent.PlayerIds.Remove(p.Id);
         borrower.PlayerIds.Add(p.Id);
         p.ClubId = borrower.Id;
-        p.Loan = new Loan { ParentClubId = parent.Id, Since = w.Date, Until = new DateOnly(w.SeasonYear + 1, 6, 30) };
+        p.Loan = new Loan { ParentClubId = parent.Id, Start = w.Date, Until = new DateOnly(w.SeasonYear + 1, 6, 30) };
     }
 
     [Fact]
@@ -128,7 +128,7 @@ public class LoanRulesTests
     public void LoansFromOlderSavesHaveNoStartDate()
     {
         var loan = JsonSerializer.Deserialize<Loan>("{\"parentClubId\":3,\"until\":\"2027-06-30\",\"wageSharePercent\":50}", Json.Options)!;
-        Assert.Null(loan.Since);
+        Assert.Null(loan.Start);
         Assert.Equal(3, loan.ParentClubId);
     }
 
