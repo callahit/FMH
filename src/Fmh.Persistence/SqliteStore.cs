@@ -59,6 +59,9 @@ public static class SqliteStore
         }.ToString();
         var con = new SqliteConnection(cs);
         con.Open();
+        using var pragma = con.CreateCommand();
+        pragma.CommandText = "PRAGMA foreign_keys = ON;";
+        pragma.ExecuteNonQuery();
         return con;
     }
 
