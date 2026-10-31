@@ -60,6 +60,8 @@ public sealed partial class TransfersModule
             // Neuzugänge im Fenster nachmelden, solange Plätze frei sind.
             Registration.Fill(World, club, Data, keep: true);
         }
+        // Leihen und Käufe am selben Montag können den Kader über die Höchstgrenze treiben; danach wieder zurechtstutzen.
+        foreach (var club in aiClubs) ManageAiSquadSize(club);
         if (WindowOpen(HumanClub) && Rng.Chance(0.3)) MakeIncomingOffer();
         if (World.Date.Month is >= 2 and <= 5 && World.Date.Day <= 7) AiPreContracts(aiClubs);
     }
@@ -169,7 +171,7 @@ public sealed partial class TransfersModule
         return false;
     }
 
-    /// <summary>KI hält den Kader in Grenzen: Überzählige auf die Transferliste, notfalls Vertrag auflösen.</summary>
+    /// <summary>KI hält den Kader in Grenzen: Überzählige auf die Transferliste, notfalls Leihe beenden oder Vertrag auflösen.</summary>
     private void ManageAiSquadSize(Club club)
     {
         var max = World.Country(club.CountryCode).Squad.MaxSquad;
@@ -183,12 +185,32 @@ public sealed partial class TransfersModule
                 .OrderByDescending(p => p.Contract!.WeeklyWage).FirstOrDefault();
             if (costly is not null) SetTransferListed(costly, true, MarketValue.Round(ValueOf(costly) * 0.8));
         }
-        while (club.PlayerIds.Count > max && ranked.Count > 0)
+        while (club.PlayerIds.Count > max)
         {
-            var worst = ranked[0];
-            ranked.RemoveAt(0);
+            // Zurückgekehrte oder aufgenommene Leihspieler zuerst abgeben, sonst die eigenen Schwächsten freigeben.
+            var loaned = World.SquadOf(club).Where(p => p.Loan is not null).OrderBy(Rating).FirstOrDefault();
+            if (loaned is not null) { ReturnLoan(loaned, notify: false); continue; }
+            var worst = World.SquadOf(club).Where(p => p.Loan is null).OrderBy(Rating).FirstOrDefault();
+            if (worst is null) break;
             SetContract(worst, null);
             Season.RemoveFromClub(worst);
+        }
+    }
+
+    /// <summary>Nach Leihrückkehr, Jugendaufstieg und Kaderauffüllung die Höchstgrenzen der KI-Vereine wieder einhalten.</summary>
+    public void EnforceSquadLimits()
+    {
+        // Mehrere Durchgänge: zurückgegebene Leihspieler können den Stammverein erneut über die Grenze heben.
+        for (var pass = 0; pass < 8; pass++)
+        {
+            var changed = false;
+            foreach (var club in World.Clubs.Values.Where(c => !IsHuman(c)))
+            {
+                var before = club.PlayerIds.Count;
+                ManageAiSquadSize(club);
+                if (club.PlayerIds.Count != before) changed = true;
+            }
+            if (!changed) break;
         }
     }
 
