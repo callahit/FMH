@@ -35,6 +35,9 @@ public sealed class CountryConfig
     /// <summary>Meldelisten je Liga bzw. Division (Id); ohne Eintrag gibt es keine Meldepflicht.</summary>
     public Dictionary<string, RegistrationRules> Registration { get; set; } = new();
     public FormativeShares Formative { get; set; } = new();
+    /// <summary>Nationale Leihregeln (Leihen zwischen Vereinen dieses Landes).</summary>
+    public CountryLoanRules Loans { get; set; } = new();
+    public MarketTendency Market { get; set; } = new();
 
     public IEnumerable<DivisionConfig> Divisions => Levels.SelectMany(l => l.Divisions);
 
