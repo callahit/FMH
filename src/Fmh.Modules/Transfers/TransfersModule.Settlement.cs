@@ -140,9 +140,9 @@ public sealed partial class TransfersModule
     private void ExecuteLoan(Player p, Club buyer, Club parent, ClubOffer offer)
     {
         var months = TransferTerms.ClampLoanMonths(offer.LoanMonths);
-        // Leihen enden am 30. Juni: 6/12 Monate → aktuelles Saisonende, 18/24 → ein Jahr später.
-        var seasons = Math.Clamp((months + 11) / 12, 1, 2);
-        var until = new DateOnly(World.SeasonYear + seasons, 6, 30);
+        // Stichtag ist der 30. Juni: 6/12 Monate enden diese Saison, 18/24 die nächste (nicht am Jul-Monatswechsel vorbei).
+        var thisSeasonEnd = new DateOnly(World.SeasonYear + 1, 6, 30);
+        var until = months <= 12 ? thisSeasonEnd : thisSeasonEnd.AddYears(1);
         _needs.Remove(buyer.Id);
         _needs.Remove(parent.Id);
         parent.PlayerIds.Remove(p.Id);

@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Fmh.Core.Data;
 using Fmh.Core.Model;
 
@@ -62,6 +63,12 @@ public sealed class MatchSetup
     public int Substitutions { get; init; } = 5;
     public bool NeutralGround { get; init; }
     public KnockoutContext? Knockout { get; init; }
+    /// <summary>Angeschautes Spiel über den FM2002-Szenenbaum. Hintergrundspiele lassen das aus.</summary>
+    public bool UseSceneText { get; init; }
+    /// <summary>Platzhalter REF. Die schnelle Engine liest das Feld nicht.</summary>
+    public string? RefereeName { get; init; }
+    /// <summary>Annahme: November bis Februar unter Flutlicht. Die schnelle Engine liest das Feld nicht.</summary>
+    public bool Floodlit { get; init; }
 
     public TeamSetup Team(Side s) => s == Side.Home ? Home : Away;
 }
@@ -103,6 +110,9 @@ public sealed class MatchEvent
     public int Value { get; init; }
     /// <summary>Schlüsselszene für den Ticker-Modus.</summary>
     public bool Key { get; init; }
+    /// <summary>Fertiger Kommentar aus dem Szenenbaum. Die schnelle Engine lässt das leer; es geht nicht in den Golden Master.</summary>
+    [JsonIgnore]
+    public string? Narrative { get; init; }
 
     public string MinuteLabel => Stoppage > 0 ? $"{Minute}+{Stoppage}'" : $"{Minute}'";
 }

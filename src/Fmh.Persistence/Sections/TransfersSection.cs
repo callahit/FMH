@@ -153,7 +153,7 @@ public sealed class TransfersSection : SaveSection
     }
 
     /// <summary>Stellt sicher, dass jeder laufende Spielervertrag einen aktuellen Historieeintrag mit Terms hat.</summary>
-    private static void EnsureCurrentContracts(World w)
+    public static void EnsureCurrentContracts(World w)
     {
         foreach (var p in w.Players.Values)
         {

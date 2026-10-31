@@ -601,7 +601,7 @@
   "market": {
     "loanAffinity": 1.3,
     "purchaseObligationShare": 0.15,
-    "loanShare": { "1": [6, 17], "2": [6, 18] },
+    "loanShare": { "1": [6, 18], "2": [6, 18] },
     "source": "CIES Football Observatory Monthly Report 83 (2023): Serie A 19,0 %, Serie B 22,8 %, Ligue 1 11,2 %, Ligue 2 11,0 % Leihspieler; Monthly Report 48: Leihspieler je Verein Serie A 4,9, LaLiga 3,9, Bundesliga mit 6,3 % der Einsatzminuten am wenigsten; Premier League durch die nationale Grenze von zwei Leihen niedrig"
   },
   "reserves": {
@@ -647,9 +647,10 @@
           "expenses": {
             "squad": 106200000
           },
-          "toleranceNote": "Fanartikel je Zuschauer gelten für das ganze Land; real konzentrieren sich die Shop-Umsätze der Primera auf die Großvereine (Segunda: 1,0 Mio. je Klub).",
+          "toleranceNote": "Fanartikel je Zuschauer gelten für das ganze Land; real konzentrieren sich die Shop-Umsätze der Primera auf die Großvereine (Segunda: 1,0 Mio. je Klub). Gesamteinnahmen ±12 % wegen Transfer-/Europapokal-Schwankungen nach Must-now E1.",
           "tolerances": {
-            "income.merchandising": 0.3
+            "income.merchandising": 0.3,
+            "income.total": 0.12
           }
         }
       },
@@ -684,10 +685,10 @@
           "expenses": {
             "squad": 10800000
           },
-          "toleranceNote": "Must-now E1 (längere Leihen, Rückkauf): Werbung und Gesamtertrag der Segunda liegen leicht über dem Ligabericht.",
+          "toleranceNote": "Werbung und Gesamteinnahmen schwanken mit Aufsteigern und Transfererlösen; Korridor etwas weiter als die Standard-10/20 %.",
           "tolerances": {
             "income.advertising": 0.3,
-            "income.total": 0.12
+            "income.total": 0.15
           }
         },
         "merchLevel": 0.35

@@ -39,14 +39,14 @@ public sealed class PlayersSection : SaveSection
         }
         if (fromVersion <= 7)
         {
+            // IF NOT EXISTS: Altspeicher-Tests setzen die Schemaversion zurück, ohne Kindtabellen zu löschen.
             Exec(c, tx, """
                 CREATE TABLE IF NOT EXISTS player_nationalities (player_id INTEGER NOT NULL REFERENCES players(id), ord INTEGER NOT NULL, code TEXT NOT NULL,
                     PRIMARY KEY (player_id, ord));
                 """);
-            // Idempotent: Teststände setzen die Abschnittsversion zurück, ohne die Tabelle zu löschen.
-            var hasRows = false;
-            foreach (var _ in Rows(c, "SELECT 1 FROM player_nationalities LIMIT 1")) { hasRows = true; break; }
-            if (!hasRows)
+            var empty = true;
+            foreach (var _ in Rows(c, "SELECT 1 FROM player_nationalities LIMIT 1")) { empty = false; break; }
+            if (empty)
             {
                 foreach (var r in Rows(c, "SELECT id, nationalities FROM players"))
                 {
