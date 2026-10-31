@@ -43,13 +43,13 @@ public sealed class LicenseFile
     public bool PromotionAllowed { get; set; } = true;
 }
 
-/// <summary>Europäischer Wettbewerb der kommenden bzw. laufenden Saison (vereinfacht ohne eigene Spiele).</summary>
+/// <summary>Europäischer Wettbewerb der kommenden bzw. laufenden Saison (echte Spiele ab AP 5).</summary>
 public sealed class EuropeanEntry
 {
     public int ClubId { get; set; }
     public string CompetitionId { get; set; } = "";
     public int SeasonYear { get; set; }
-    /// <summary>Erreichte Runde (Index in der Rundenliste des Wettbewerbs), -1 vor dem Start.</summary>
+    /// <summary>Erreichte Runde (0-basierter Index in der Rundenliste des Wettbewerbs), -1 vor dem Start.</summary>
     public int Stage { get; set; } = -1;
     public bool Eliminated { get; set; }
     /// <summary>Nachgerückt, weil ein besser platzierter Verein keine Zulassung hatte.</summary>
