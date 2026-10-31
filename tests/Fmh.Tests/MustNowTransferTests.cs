@@ -41,30 +41,9 @@ public class MustNowTransferTests
     [Fact]
     public void SellOnProfitUsesFeeMinusCostBasis()
     {
-        var s = TestData.NewSession(42);
-        var p = BuyTarget(s);
-        var seller = s.World.Clubs[p.ClubId!.Value];
-        var earlier = s.World.Clubs.Values.First(c => c.Id != seller.Id && c.Id != s.HumanClub.Id);
-        p.Transfer.SellOns = new List<SellOnRight>
-        {
-            new() { ClubId = earlier.Id, Percent = 20, Basis = SellOnBasis.Profit, CostBasis = 1_000_000 },
-        };
-        var fee = 1_500_000L;
-        s.HumanClub.Budget.TransferBudget = Math.Max(s.HumanClub.Budget.TransferBudget, fee);
-        var earlierBefore = earlier.Budget.Balance;
-        var (n, error) = s.StartNegotiation(p, DealType.Transfer);
-        Assert.Null(error);
-        // Hohe Ablöse erzwingen Annahme
-        n!.Offer = new ClubOffer { Fee = fee * 10 };
-        Assert.Equal(ResponseKind.Accept, s.SubmitClubOffer(n, new ClubOffer { Fee = fee * 10 }).Kind);
-        // Direkt abwickeln mit bekannter Ablöse
-        n.Stage = NegotiationStage.ClubTalks;
-        // Settlement über vollständigen Weg: Angebot mit geringer Ablöse manuell
-        p.Transfer.SellOns = new List<SellOnRight>
-        {
-            new() { ClubId = earlier.Id, Percent = 20, Basis = SellOnBasis.Profit, CostBasis = 1_000_000 },
-        };
-        Assert.Equal(500_000, TransferTerms.SellOnBase(p.Transfer.SellOns![0], 1_500_000));
+        var profit = new SellOnRight { ClubId = 1, Percent = 20, Basis = SellOnBasis.Profit, CostBasis = 1_000_000 };
+        Assert.Equal(500_000, TransferTerms.SellOnBase(profit, 1_500_000));
+        Assert.Equal(0, TransferTerms.SellOnBase(profit, 800_000));
         Assert.Equal(1_500_000, TransferTerms.SellOnBase(new SellOnRight { Percent = 20, Basis = SellOnBasis.Gross }, 1_500_000));
     }
 
@@ -100,5 +79,73 @@ public class MustNowTransferTests
         Assert.Equal(4, lines.Count);
         Assert.Equal(s.World.SeasonYear, lines[0].SeasonYear);
         Assert.True(lines.Sum(l => l.Wages) > 0);
+    }
+
+    [Fact]
+    public void TransferWritesContractClausesAndSellerBuyBack()
+    {
+        var s = TestData.NewSession(45);
+        var p = BuyTarget(s);
+        var sellerId = p.ClubId!.Value;
+        var fee = Negotiations.AskingPrice(p, s.World.Clubs[sellerId], s.World, s.Data) * 2;
+        s.HumanClub.Budget.TransferBudget = Math.Max(s.HumanClub.Budget.TransferBudget, fee);
+        var (n, error) = s.StartNegotiation(p, DealType.Transfer);
+        Assert.Null(error);
+        Assert.Equal(ResponseKind.Accept, s.SubmitClubOffer(n!, new ClubOffer
+        {
+            Fee = fee, BuyBackFee = fee / 2, BuyBackYears = 2, PreemptionRight = true,
+        }).Kind);
+        n!.Contract.ReleaseClause = fee * 3;
+        n.Contract.YearlyRaisePercent = 5;
+        n.Contract.ExtensionOptionYears = 1;
+        Assert.Equal(ResponseKind.Accept, s.SubmitContract(n, n.Contract).Kind);
+        Assert.Contains(s.World.Clauses, c => c.Active && c.Kind == ClauseKind.BuyBack && c.PlayerId == p.Id && c.BeneficiaryClubId == sellerId);
+        Assert.Contains(s.World.Clauses, c => c.Active && c.Kind == ClauseKind.Preemption && c.PlayerId == p.Id && c.BeneficiaryClubId == sellerId);
+        Assert.Contains(s.World.Clauses, c => c.Active && c.Kind == ClauseKind.Release && c.PlayerId == p.Id);
+        Assert.Contains(s.World.Clauses, c => c.Active && c.Kind == ClauseKind.YearlyRaise && c.Percent == 5);
+        Assert.Contains(s.World.Clauses, c => c.Active && c.Kind == ClauseKind.ExtensionOption && c.Amount == 1);
+    }
+
+    [Fact]
+    public void HumanCanExerciseBuyBackAndMatchPreemption()
+    {
+        var s = TestData.NewSession(46);
+        var p = BuyTarget(s);
+        var fee = 1_000_000L;
+        s.World.Clauses.Add(new Clause
+        {
+            Id = s.World.NextClauseId++, PlayerId = p.Id, BeneficiaryClubId = s.HumanClub.Id,
+            Kind = ClauseKind.BuyBack, Amount = fee, Until = s.World.Date.AddYears(2), Active = true,
+        });
+        s.HumanClub.Budget.TransferBudget = Math.Max(s.HumanClub.Budget.TransferBudget, fee);
+        Assert.True(s.CanExerciseBuyBack(p));
+        Assert.Null(s.ExerciseBuyBack(p));
+        Assert.Equal(s.HumanClub.Id, p.ClubId);
+
+        var other = BuyTarget(s);
+        var clause = new Clause
+        {
+            Id = s.World.NextClauseId++, PlayerId = other.Id, BeneficiaryClubId = s.HumanClub.Id,
+            Kind = ClauseKind.Preemption, Active = true,
+        };
+        s.World.Clauses.Add(clause);
+        var third = s.World.Clubs.Values.First(c => c.Id != s.HumanClub.Id && c.Id != other.ClubId && !c.ReserveOf.HasValue);
+        var deal = new Negotiation
+        {
+            Id = s.World.NextNegotiationId++, PlayerId = other.Id, BuyerId = third.Id, SellerId = other.ClubId,
+            Type = DealType.Transfer, Stage = NegotiationStage.Pending, Started = s.World.Date,
+            Offer = new ClubOffer { Fee = fee },
+        };
+        s.World.Negotiations.Add(deal);
+        var pending = new PreemptionOffer
+        {
+            ClauseId = clause.Id, NegotiationId = deal.Id, PlayerId = other.Id,
+            BeneficiaryClubId = s.HumanClub.Id, Fee = fee, Expires = s.World.Date.AddDays(3),
+        };
+        s.World.PreemptionOffers.Add(pending);
+        s.HumanClub.Budget.TransferBudget = Math.Max(s.HumanClub.Budget.TransferBudget, fee);
+        Assert.Null(s.ResolvePreemption(pending, match: true));
+        Assert.Equal(s.HumanClub.Id, other.ClubId);
+        Assert.Empty(s.World.PreemptionOffers);
     }
 }
