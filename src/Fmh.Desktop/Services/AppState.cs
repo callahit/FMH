@@ -3,6 +3,7 @@ using Fmh.Core.Game;
 using Fmh.Core.Match;
 using Fmh.Core.Persistence;
 using Fmh.MatchEngine;
+using Fmh.SceneTree;
 
 namespace Fmh.Desktop.Services;
 
@@ -35,7 +36,7 @@ public sealed class AppState
 
     public GameData Data { get; }
     public Texts T => Data.Texts;
-    public IMatchEngine Engine { get; } = new TextMatchEngine();
+    public IMatchEngine Engine { get; } = new SceneRoutingEngine(new TextMatchEngine(), new SceneMatchEngine());
     public string SaveDirectory { get; }
     public string SettingsFile { get; }
     public AppSettings Settings { get; }
