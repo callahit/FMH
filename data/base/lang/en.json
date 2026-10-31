@@ -2541,6 +2541,7 @@
  "match.conferenceGoal": "GOAL! {0} {1} {2} ({3})",
  "match.liveTable": "Live table",
  "matchDisplay.Conference": "Conference",
+ "matchDisplay.Scene": "Text mode",
  "options.delegatePress": "Delegate press conferences",
  "options.difficulty": "Difficulty",
  "options.events": "Random events",

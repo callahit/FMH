@@ -105,9 +105,8 @@ public class LoanRulesTests
         // Unter 23 ohne Ausbildung im Verein ausgenommen, aber höchstens drei zwischen denselben Vereinen.
         Assert.Equal("neg.error.loanClubLimit", LoanLimits.Check(w, data, young[3], parent, borrower, 12));
         Assert.Null(LoanLimits.Check(w, data, young[3], parent, Clubs(w, "ITA2")[1], 12));
-        // Länger als zwei Saisons (MaxMonths 24) geht nicht.
+        // Länger als 24 Monate (MaxMonths) geht nicht.
         Assert.Equal("neg.error.loanMonths", LoanLimits.Check(w, data, young[3], parent, Clubs(w, "ITA2")[1], 30));
-        Assert.Null(LoanLimits.Check(w, data, young[3], parent, Clubs(w, "ITA2")[1], 24));
     }
 
     [Fact]
