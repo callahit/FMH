@@ -28,6 +28,8 @@ public sealed partial class NegotiationViewModel : ViewModelBase
         var profiles = Data.PositionProfiles;
         Currency = UiText.Currency(Session.HumanClub);
         StatusOptions = Enum.GetValues<SquadStatus>().Select(s => T["squadStatus." + s]).ToList();
+        SellOnBasisOptions = new[] { T["neg.sellOn.gross"], T["neg.sellOn.profit"] };
+        PurchaseConditionOptions = new[] { T["neg.buyCond.always"], T["neg.buyCond.apps"], T["neg.buyCond.stay"] };
         SwapOptions = new[] { new SwapOption(T["neg.noSwap"], null) }
             .Concat(Session.World.SquadOf(Session.HumanClub).Where(p => p.Loan is null)
                 .OrderByDescending(p => Ratings.Strength(p, profiles))
@@ -45,9 +47,13 @@ public sealed partial class NegotiationViewModel : ViewModelBase
     public string PlayerLine => $"{UiText.Position(Player.MainPosition)} · {T.Format("player.ageShort", Player.Age(Session.World.Date))} · " +
                                 (Player.ClubId is { } c ? Session.World.Clubs[c].Name : T["transfer.freeAgent"]);
     public IReadOnlyList<string> StatusOptions { get; }
+    public IReadOnlyList<string> SellOnBasisOptions { get; }
+    public IReadOnlyList<string> PurchaseConditionOptions { get; }
+    public IReadOnlyList<int> LoanMonthOptions { get; } = TransferTerms.LoanMonthOptions;
     public IReadOnlyList<SwapOption> SwapOptions { get; }
     public bool IsLoan => _n.Type == DealType.Loan;
     public bool IsTransfer => _n.Type == DealType.Transfer;
+    public bool ShowPurchaseCondition => HasPurchaseOption && PurchaseObligation;
 
     [ObservableProperty] private bool _clubStage;
     [ObservableProperty] private bool _playerStage;
@@ -60,19 +66,27 @@ public sealed partial class NegotiationViewModel : ViewModelBase
 
     // Angebot an den Verein
     [ObservableProperty] private decimal _fee;
-    [ObservableProperty] private decimal _installmentYears;
+    [ObservableProperty] private decimal _downPayment;
+    [ObservableProperty] private decimal _installmentCount;
     [ObservableProperty] private decimal _sellOnPercent;
+    [ObservableProperty] private int _sellOnBasisIndex;
     [ObservableProperty] private SwapOption _swap;
     [ObservableProperty] private decimal _loanMonths = 12;
     [ObservableProperty] private decimal _wageShare = 100;
     [ObservableProperty] private bool _hasPurchaseOption;
     [ObservableProperty] private decimal _purchaseFee;
     [ObservableProperty] private bool _purchaseObligation;
+    [ObservableProperty] private int _purchaseConditionIndex;
+    [ObservableProperty] private decimal _purchaseConditionValue = 50;
     [ObservableProperty] private bool _recallInWinter;
     [ObservableProperty] private bool _playingTimeGuarantee;
     [ObservableProperty] private decimal _loanFee;
     [ObservableProperty] private decimal _sellerAppearanceAddOn;
     [ObservableProperty] private decimal _sellerGoalAddOn;
+    [ObservableProperty] private bool _hasBuyBack;
+    [ObservableProperty] private decimal _buyBackFee;
+    [ObservableProperty] private decimal _buyBackYears = 2;
+    [ObservableProperty] private bool _preemptionRight;
 
     // Vertrag mit dem Spieler
     [ObservableProperty] private decimal _years = 3;
@@ -91,19 +105,35 @@ public sealed partial class NegotiationViewModel : ViewModelBase
     private void LoadOffer()
     {
         var o = _n.Offer;
+        TransferTerms.NormalizePaymentPlan(o, o.Fee);
         Fee = o.Fee;
-        InstallmentYears = o.InstallmentYears;
+        DownPayment = o.DownPayment > 0 ? o.DownPayment : o.Fee;
+        InstallmentCount = o.InstallmentCount;
         SellOnPercent = o.SellOnPercent;
-        LoanMonths = o.LoanMonths;
+        SellOnBasisIndex = (int)o.SellOnBasis;
+        LoanMonths = TransferTerms.ClampLoanMonths(o.LoanMonths);
         WageShare = o.WageSharePercent;
         HasPurchaseOption = o.PurchaseFee is not null;
         PurchaseFee = o.PurchaseFee ?? Session.ValueOf(Player);
         PurchaseObligation = o.PurchaseObligation;
+        PurchaseConditionIndex = (int)o.PurchaseCondition;
+        PurchaseConditionValue = o.PurchaseConditionValue <= 0 ? 50 : o.PurchaseConditionValue;
         RecallInWinter = o.RecallInWinter;
         PlayingTimeGuarantee = o.PlayingTimeGuarantee;
         LoanFee = o.LoanFee;
         SellerAppearanceAddOn = o.AppearanceBonus;
         SellerGoalAddOn = o.GoalBonus;
+        HasBuyBack = o.BuyBackFee is not null;
+        BuyBackFee = o.BuyBackFee ?? Session.ValueOf(Player);
+        BuyBackYears = o.BuyBackYears <= 0 ? 2 : o.BuyBackYears;
+        PreemptionRight = o.PreemptionRight;
+    }
+
+    partial void OnHasPurchaseOptionChanged(bool value) => OnPropertyChanged(nameof(ShowPurchaseCondition));
+    partial void OnPurchaseObligationChanged(bool value) => OnPropertyChanged(nameof(ShowPurchaseCondition));
+    partial void OnFeeChanged(decimal value)
+    {
+        if (InstallmentCount <= 0) DownPayment = value;
     }
 
     private void LoadContract()
@@ -174,18 +204,25 @@ public sealed partial class NegotiationViewModel : ViewModelBase
             var offer = new ClubOffer
             {
                 Fee = (long)Fee,
-                InstallmentYears = (int)InstallmentYears,
+                DownPayment = (long)DownPayment,
+                InstallmentCount = (int)InstallmentCount,
                 SellOnPercent = (int)SellOnPercent,
+                SellOnBasis = (SellOnBasis)SellOnBasisIndex,
                 SwapPlayerId = Swap.PlayerId,
-                LoanMonths = (int)LoanMonths,
+                LoanMonths = TransferTerms.ClampLoanMonths((int)LoanMonths),
                 WageSharePercent = (int)WageShare,
                 PurchaseFee = HasPurchaseOption ? (long)PurchaseFee : null,
                 PurchaseObligation = HasPurchaseOption && PurchaseObligation,
+                PurchaseCondition = (LoanBuyCondition)PurchaseConditionIndex,
+                PurchaseConditionValue = (int)PurchaseConditionValue,
                 RecallInWinter = RecallInWinter,
                 PlayingTimeGuarantee = IsLoan && PlayingTimeGuarantee,
                 LoanFee = IsLoan ? (long)LoanFee : 0,
                 AppearanceBonus = IsTransfer ? (long)SellerAppearanceAddOn : 0,
                 GoalBonus = IsTransfer ? (long)SellerGoalAddOn : 0,
+                BuyBackFee = IsTransfer && HasBuyBack ? (long)BuyBackFee : null,
+                BuyBackYears = (int)BuyBackYears,
+                PreemptionRight = IsTransfer && PreemptionRight,
             };
             r = Session.SubmitClubOffer(_n, offer);
             if (r.Kind == ResponseKind.Counter && _n.CounterFee is { } cf && IsTransfer) Fee = cf;
