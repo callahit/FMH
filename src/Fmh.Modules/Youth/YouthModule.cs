@@ -318,7 +318,7 @@ public sealed partial class YouthModule : GameModule, IYouthService
         p.Reputation = Math.Max(p.Reputation, 2);
         var wageLevel = ClubRules.DivisionFinance(World, club).WageLevel;
         var wage = (int)(Math.Round(MarketValue.FairWage(p, World, Data.PositionProfiles) * 0.6 * wageLevel / 100) * 100);
-        p.Contract = Transfers.MakeContract(new ContractOffer { Years = 3, WeeklyWage = Math.Max((int)(500 * wageLevel), wage), Status = SquadStatus.Prospect }, World.Date, club);
+        Transfers.SetContract(p, Transfers.MakeContract(new ContractOffer { Years = 3, WeeklyWage = Math.Max((int)(500 * wageLevel), wage), Status = SquadStatus.Prospect }, World.Date, club));
         if (!club.Academy.Graduates.Contains(p.Id))
         {
             club.Academy.Graduates.Add(p.Id);
@@ -328,9 +328,9 @@ public sealed partial class YouthModule : GameModule, IYouthService
 
     private void ReleaseYouthInternal(Player p)
     {
+        Transfers.SetContract(p, null);
         Season.RemoveFromClub(p);
         p.IsYouth = false;
-        p.Contract = null;
         // Wer es nicht in den Profibereich schafft, spielt meist im Amateurfußball weiter.
         if (Transfers.Rating(p) < PlayerGenerator.ClubLevel(1) - 2.5 && Rng.Chance(0.7)) p.Retired = true;
     }
