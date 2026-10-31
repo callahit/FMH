@@ -77,6 +77,9 @@ public sealed partial class TransfersModule
             .ToList();
         foreach (var (p, _, parent) in candidates)
         {
+            // Beide Verbände müssen ihr Wechselfenster offen haben (Leihe ist ein Wechsel für beide Seiten).
+            if (!WindowOpen(club) || !WindowOpen(parent)) continue;
+            if (club.PlayerIds.Count >= World.Country(club.CountryCode).Squad.MaxSquad) return;
             if (CheckLoan(p, parent, club) is not null) continue;
             // Der ausleihende Verein zahlt so viel vom Gehalt, wie sein Budget hergibt und in seiner Spielklasse üblich ist
             // (höchstens das Doppelte des Durchschnittsgehalts); den Rest trägt der abgebende Verein, der den Spieler sonst ohne
@@ -115,6 +118,7 @@ public sealed partial class TransfersModule
         var rating = Rating(candidate);
         var target = World.Clubs.Values
             .Where(c => c.Id != club.Id && !IsHuman(c) && c.Reputation < club.Reputation && c.PlayerIds.Count < Finance.DivisionFinance(c).SquadSize + 2)
+            .Where(c => WindowOpen(c) && c.PlayerIds.Count < World.Country(c.CountryCode).Squad.MaxSquad)
             .Where(c => World.FindLeague(c.LeagueId) is { } l && l.Level <= Data.TransferRules.ProfessionalLevels)
             .Where(c => rating >= PlayerGenerator.ClubLevel(c.Reputation) - 1)
             .OrderByDescending(c => c.CountryCode == club.CountryCode)

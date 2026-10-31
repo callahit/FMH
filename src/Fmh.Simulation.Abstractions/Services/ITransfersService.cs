@@ -15,7 +15,8 @@ public interface ITransfersService
     void SetContract(Player p, Contract? next, int? previousClubId = null, int dealId = 0);
     /// <summary>Zum Saisonwechsel: Verträge enden, Vorverträge greifen, Leihen laufen aus.</summary>
     void ExpireContractsAndLoans();
-    /// <summary>Vereinslose ohne Perspektive beenden ihre Laufbahn (auch freigegebene Jugendspieler unterhalb des Amateurniveaus).</summary>
+    void EnforceSquadLimits();
+    /// <summary>Vereinslose ohne Perspektive beenden ihre Laufbahn.</summary>
     void RetireFreeAgents();
     double Rating(Player p);
     /// <summary>Bester passender Vereinsloser; mit <paramref name="withinBudget"/> nur, wenn das Gehaltsbudget reicht.</summary>
