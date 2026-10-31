@@ -19,6 +19,7 @@ public class ArchitectureTests
         ["Fmh.Simulation"] = new[] { "Fmh.Domain", "Fmh.Data", "Fmh.Rules", "Fmh.Simulation.Abstractions", "Fmh.Modules" },
         ["Fmh.Persistence"] = new[] { "Fmh.Domain", "Fmh.Rules", "Fmh.Simulation.Abstractions" },
         ["Fmh.MatchEngine"] = new[] { "Fmh.Domain" },
+        ["Fmh.SceneTree"] = new[] { "Fmh.Domain" },
     };
 
     private static string Src => Path.Combine(TestData.RepoRoot(), "src");
@@ -50,6 +51,7 @@ public class ArchitectureTests
     [InlineData("Fmh.Simulation")]
     [InlineData("Fmh.Modules")]
     [InlineData("Fmh.MatchEngine")]
+    [InlineData("Fmh.SceneTree")]
     [InlineData("Fmh.Rules")]
     public void NoFileExceedsFourHundredLines(string project)
     {
