@@ -19,6 +19,7 @@
     <ProjectReference Include="..\..\src\Fmh.Persistence\Fmh.Persistence.csproj" />
     <ProjectReference Include="..\..\src\Fmh.Simulation\Fmh.Simulation.csproj" />
     <ProjectReference Include="..\..\src\Fmh.MatchEngine\Fmh.MatchEngine.csproj" />
+    <ProjectReference Include="..\..\src\Fmh.SceneTree\Fmh.SceneTree.csproj" />
     <ProjectReference Include="..\..\src\Fmh.Desktop\Fmh.Desktop.csproj" />
   </ItemGroup>
   <ItemGroup>
