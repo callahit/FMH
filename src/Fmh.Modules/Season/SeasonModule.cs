@@ -218,9 +218,9 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
 
         foreach (var p in squad.Where(p => Rng.Chance(Development.RetirementChance(p, today))).ToList())
         {
+            Transfers.SetContract(p, null);
             RemoveFromClub(p);
             p.Retired = true;
-            p.Contract = null;
             if (club.Id == HumanClub.Id)
                 Notify(MessageType.Info, "msg.sender.assistant",
                     TR("msg.retired.subject", p.Name), TR("msg.retired.body", p.Name, p.Age(today)));
@@ -278,7 +278,7 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
         p.SeasonStats = new PlayerSeasonStats { SeasonYear = World.SeasonYear, ClubId = club.Id };
         // Vertrag wie ein ablösefreier Neuzugang, damit der Spieler nicht sofort wieder geht.
         var contract = Negotiations.SuggestContract(p, club, World, Data);
-        p.Contract = Transfers.MakeContract(contract, World.Date, club);
+        Transfers.SetContract(p, Transfers.MakeContract(contract, World.Date, club));
         World.Players[p.Id] = p;
         club.PlayerIds.Add(p.Id);
         // Notverpflichtung: Ausbildung meist im Amateurbereich des Landes, wird sofort nachgemeldet.

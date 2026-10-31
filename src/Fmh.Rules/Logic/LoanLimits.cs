@@ -56,7 +56,7 @@ public static class LoanLimits
             var lender = world.Clubs[loan.ParentClubId];
             var holder = world.Clubs[holderId];
             if (!ReferenceEquals(RulesFor(world, data, lender, holder), rules)) continue;
-            var otherExempt = IsExempt(other, lender, rules, loan.Since ?? world.Date);
+            var otherExempt = IsExempt(other, lender, rules, loan.Start ?? world.Date);
             if (lender.Id == parent.Id && holder.Id == borrower.Id && (!otherExempt || rules.PerClubCountsExempt)) pairCount++;
             if (otherExempt) continue;
             if (lender.Id == parent.Id) outCount++;

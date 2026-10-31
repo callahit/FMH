@@ -46,7 +46,7 @@ public class MarketTests
             {
                 var (lender, holder) = pair(p);
                 var rules = LoanLimits.RulesFor(w, s.Data, lender, holder);
-                return ReferenceEquals(rules, w.Country(club.CountryCode).Loans.Default) && !LoanLimits.IsExempt(p, lender, rules, p.Loan!.Since ?? w.Date);
+                return ReferenceEquals(rules, w.Country(club.CountryCode).Loans.Default) && !LoanLimits.IsExempt(p, lender, rules, p.Loan!.Start ?? w.Date);
             });
             (Club, Club) Pair(Player p) => (w.Clubs[p.Loan!.ParentClubId], w.Clubs[p.ClubId!.Value]);
             var (maxOut, maxIn) = w.Country(club.CountryCode).Loans.Default.Limits(w.SeasonYear);

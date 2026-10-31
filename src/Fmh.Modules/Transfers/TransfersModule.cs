@@ -94,6 +94,10 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
         offer.SellOnPercent = Math.Clamp(offer.SellOnPercent, 0, 50);
         offer.LoanMonths = Math.Clamp(offer.LoanMonths, 6, 12);
         offer.WageSharePercent = Math.Clamp(offer.WageSharePercent, 0, 100);
+        offer.AppearanceBonus = Math.Max(0, offer.AppearanceBonus);
+        offer.GoalBonus = Math.Max(0, offer.GoalBonus);
+        offer.LoanFee = Math.Max(0, offer.LoanFee);
+        if (n.Type == DealType.Loan && offer.LoanFee > buyer.Budget.TransferBudget) return new(ResponseKind.Reject, "neg.error.budget");
         if (n.Type == DealType.Loan && LoanLimits.Check(World, Data, p, seller, buyer, offer.LoanMonths) is { } limit) return new(ResponseKind.Reject, limit);
 
         n.ClubRounds++;
@@ -132,6 +136,7 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
             return new(ResponseKind.Reject, "neg.error.wageBudget");
         if (offer.SigningFee > Math.Max(0, buyer.Budget.Balance)) return new(ResponseKind.Reject, "neg.error.balance");
 
+        offer.ExtensionOptionYears = Math.Clamp(offer.ExtensionOptionYears, 0, TransferTerms.MaxExtensionOptionYears);
         n.PlayerRounds++;
         n.Contract = offer.Clone();
         var resp = Negotiations.EvaluateContract(n, p, buyer, World, Data);
@@ -258,15 +263,12 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
         return null;
     }
 
-    /// <summary>Verliehenen Spieler in der Winterpause zurückholen (Rückholklausel).</summary>
+    /// <summary>Rückholung im Winterfenster: vertraglich vereinbart oder weil die Einsatzgarantie verfehlt wurde.</summary>
     public string? RecallLoan(Player p)
     {
-        if (p.Loan is not { RecallInWinter: true } loan || loan.ParentClubId != HumanClub.Id) return "neg.error.noRecall";
-        var country = World.Country(HumanClub.CountryCode);
-        var tw = country.TransferWindows;
-        var winterStart = ScheduleGenerator.ParseDate(tw.WinterStart, World.SeasonYear, country.Season.StartMonth);
-        var winterEnd = ScheduleGenerator.ParseDate(tw.WinterEnd, World.SeasonYear, country.Season.StartMonth);
-        if (World.Date < winterStart || World.Date > winterEnd) return "neg.error.window";
+        if (p.Loan is not { } loan || loan.ParentClubId != HumanClub.Id || !(loan.RecallInWinter || TransferTerms.GuaranteeBreached(loan)))
+            return "neg.error.noRecall";
+        if (!InWinterWindow(HumanClub)) return "neg.error.window";
         ReturnLoan(p);
         return null;
     }
