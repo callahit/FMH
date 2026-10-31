@@ -116,6 +116,7 @@ public sealed partial class TransfersModule
         SetContract(p, MakeContract(contract, World.Date, buyer), previousClubId: from, dealId: dealId);
         if (seller is not null) AddTransferConditions(p, buyer, seller, offer, dealId);
         GrantSellOn(p, seller, offer.SellOnPercent, dealId, carriedSellOns, fee, offer.SellOnBasis);
+        GrantDealClauses(p, seller, offer, dealId);
         p.State.Morale = (Morale)Math.Min(6, (int)p.State.Morale + 1);
         AddTransferRecord(dealId, p.Id, from, buyer.Id, fee, loan: false);
         if (buyer.Id == HumanClub.Id) World.Knowledge[p.Id] = 100;

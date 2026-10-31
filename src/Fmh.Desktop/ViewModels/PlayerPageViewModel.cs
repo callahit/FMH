@@ -212,6 +212,15 @@ public sealed partial class PlayerPageViewModel : PageViewModel
                     new SolidColorBrush(TransferTerms.GuaranteeBreached(loan) ? P.Bad : P.Good)));
         }
         if (p.PreContract is { } pre) lines.Add(new(T["player.preContract"], s.World.Clubs[pre.ClubId].Name, new SolidColorBrush(P.Warn)));
+        var buyBack = s.World.Clauses.FirstOrDefault(c => c.Active && c.Kind == ClauseKind.BuyBack && c.PlayerId == p.Id
+            && (c.Until is null || c.Until >= s.World.Date));
+        if (buyBack is not null)
+            lines.Add(new(T["neg.buyBack"], T.Format("player.buyBackValue",
+                s.World.Clubs.TryGetValue(buyBack.BeneficiaryClubId, out var bbClub) ? bbClub.ShortName : "?",
+                Fmt.Money(buyBack.Amount, currency),
+                buyBack.Until is { } until ? Fmt.Date(until) : "–"), new SolidColorBrush(P.Gold)));
+        if (s.World.Clauses.Any(c => c.Active && c.Kind == ClauseKind.Preemption && c.PlayerId == p.Id))
+            lines.Add(new(T["neg.preemption"], T["ui.yes"], new SolidColorBrush(P.Gold)));
         if (p.IsYouth) lines.Add(new(T["player.youth"], T["ui.yes"]));
         TransferLines = lines;
 
@@ -245,6 +254,8 @@ public sealed partial class PlayerPageViewModel : PageViewModel
             }
             if (p.Loan is { } l && l.ParentClubId == human.Id && (l.RecallInWinter || TransferTerms.GuaranteeBreached(l)))
                 actions.Add(new(T["player.action.recall"], new RelayCommand(() => Act(s.RecallLoan(p)))));
+            if (s.CanExerciseBuyBack(p))
+                actions.Add(new(T["player.action.buyBack"], new RelayCommand(() => Act(s.ExerciseBuyBack(p))), true));
             if (s.CanExerciseExtensionOption(p))
                 actions.Add(new(T["player.action.extensionOption"], new RelayCommand(() => Act(s.ExerciseExtensionOption(p)))));
             actions.Add(new(human.Shortlist.Contains(p.Id) ? T["player.action.unwatch"] : T["player.action.watch"], new RelayCommand(() => { s.ToggleShortlist(p); Load(); })));
