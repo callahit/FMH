@@ -179,6 +179,7 @@ public sealed partial class TransfersModule
             if (clause.Until is { } until && until < World.Date) { clause.Active = false; continue; }
             if (!World.Players.TryGetValue(clause.PlayerId, out var p)) continue;
             if (p.ClubId is not { } ownerId || ownerId == club.Id || p.Retired) continue;
+            if (!WindowOpen(World.Clubs[ownerId])) continue; // auch das Fenster des abgebenden Vereins
             if (clause.Amount > club.Budget.TransferBudget) continue;
             if (!IsTalent(p) && p.Age(World.Date) > 24) continue;
             if (Rating(p) < PlayerGenerator.ClubLevel(club.Reputation) - 1) continue;
