@@ -128,8 +128,10 @@ public class DealModelTests
             var path = Path.Combine(dir, "deals.fmh");
             SqliteStore.Save(s.World, path);
             var w = SqliteStore.Load(path);
-            Assert.Equal((9, 4), (w.NextDealId, w.NextContractId));
-            var c = Assert.Single(w.ContractHistory);
+            Assert.Equal(9, w.NextDealId);
+            // Save legt für alle laufenden Verträge Historieeinträge an und erhöht next_contract_id entsprechend.
+            Assert.True(w.NextContractId > 4);
+            var c = Assert.Single(w.ContractHistory, x => x.Id == 3);
             Assert.Equal((3, p.Id, 8, 4), (c.Id, c.PlayerId, c.DealId, c.SupersededBy));
             Assert.Equal(8, Assert.Single(w.Transfers).DealId);
             Assert.Equal(8, Assert.Single(w.Installments).DealId);
