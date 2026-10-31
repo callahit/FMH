@@ -15,7 +15,7 @@ public sealed record AttrItem(string Name, int Value, IBrush Brush, string Symbo
 public sealed record ActionButton(string Label, IRelayCommand Command, bool Primary = false);
 public sealed record ValueOption(string Label, object? Value);
 public sealed record AttrGroupVm(string Title, IReadOnlyList<AttrItem> Items);
-public sealed record InfoLine(string Label, string Value, IBrush? Brush = null)
+public sealed record InfoLine(string Label, string Value, IBrush? Brush = null, string? Tip = null)
 {
     public IBrush Fore => Brush ?? new SolidColorBrush(Palette.Current.Text);
 }
@@ -133,13 +133,22 @@ public sealed partial class PlayerPageViewModel : PageViewModel
         Condition = p.State.Condition;
         Practice = p.State.MatchPractice;
         ConditionBrush = new SolidColorBrush(P.ConditionColor(p.State.Condition));
+        Session.RecalculateSatisfaction(p);
+        var sat = Session.PlayerRelationsOf(p);
+        var satTip = sat.ReasonKeys.Count == 0
+            ? null
+            : string.Join("\n", sat.ReasonKeys.Select(k => T.Has(k) ? T[k] : k));
+        var satBrush = new SolidColorBrush(sat.Satisfaction < 30 ? P.Bad : sat.Satisfaction >= 70 ? P.Good : P.Warn);
         var state = new List<InfoLine>
         {
             new(T["player.condition"], $"{p.State.Condition:0} %", ConditionBrush),
+            new(T["player.satisfaction"], $"{sat.Satisfaction}", satBrush, satTip),
             new(T["player.morale"], UiText.Morale(p.State.Morale)),
             new(T["player.form"], $"{p.State.Form}/10"),
             new(T["player.practice"], $"{p.State.MatchPractice:0} %"),
         };
+        if (sat.WantsTransfer)
+            state.Add(new(T["player.wantsTransfer"], T["ui.yes"], new SolidColorBrush(P.Bad)));
         if (p.State.Injury is { } inj)
             state.Add(new(T["player.injury"], T.Format("player.injuryValue", T["injury." + inj.Type], inj.DaysRemaining), new SolidColorBrush(P.Bad)));
         if (p.State.SuspendedMatches > 0)
