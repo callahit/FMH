@@ -2508,6 +2508,7 @@
  "match.conferenceGoal": "TOR! {0} {1} {2} ({3})",
  "match.liveTable": "Live-Tabelle",
  "matchDisplay.Conference": "Konferenz",
+ "matchDisplay.Scene": "Textmodus",
  "options.delegatePress": "Pressekonferenzen delegieren",
  "options.difficulty": "Schwierigkeit",
  "options.events": "Zufallsereignisse",

@@ -109,7 +109,7 @@ public sealed class WorldRules
 
 public enum AttributeDisplay { Numbers, Bars, Stars, StrengthOnly }
 /// <summary>Spieldarstellung; Konferenz zeigt die übrigen Spiele des Tages parallel (Kapitel 6).</summary>
-public enum MatchDisplayMode { Commentary, Ticker, Instant, Conference }
+public enum MatchDisplayMode { Commentary, Ticker, Instant, Conference, Scene }
 public enum WageDisplay { Week, Month, Year }
 
 /// <summary>Persönliche Einstellungen eines menschlichen Managers (Kapitel 2).</summary>
