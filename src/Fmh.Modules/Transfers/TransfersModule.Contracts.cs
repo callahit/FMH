@@ -92,5 +92,6 @@ public sealed partial class TransfersModule
             previous.SupersededBy = newId;
         }
         p.Contract = next;
+        if (next is not null) Relations.RecordNegotiatedStatus(p, next.Status);
     }
 }

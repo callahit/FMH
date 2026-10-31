@@ -93,4 +93,5 @@ public abstract class GameModule : IGameModule
     protected IPressService Press => Kernel.Services.Get<IPressService>();
     protected IEventsService Events => Kernel.Services.Get<IEventsService>();
     protected ILicenseService License => Kernel.Services.Get<ILicenseService>();
+    protected IRelationsService Relations => Kernel.Services.Get<IRelationsService>();
 }

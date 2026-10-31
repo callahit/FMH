@@ -60,7 +60,11 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
             Knockout = cup is null ? null : CupLogic.KnockoutFor(cup, f),
             NeutralGround = isFinal && cup!.Config.NeutralFinal,
         };
-        return Engine.Create(setup);
+        var sim = Engine.Create(setup);
+        // Mannschaftsstimmung wirkt messbar auf Tagesform und Moral (Must-now E3-S6).
+        Relations.ApplyMatchMood(sim.Home);
+        Relations.ApplyMatchMood(sim.Away);
+        return sim;
     }
 
     /// <summary>Spiel, das der Mensch selbst bestreitet (nicht während er ohne Verein ist).</summary>
@@ -173,6 +177,14 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
         result.Attendance = standing + seating;
         f.Result = result;
         Finance.MatchdayFinances(f, result, standing, seating, boxes);
+
+        // Stimmungszeile aus dem vor dem Spiel geltenden Squad Mood; danach Zufriedenheit fortschreiben.
+        foreach (var club in new[] { home, away })
+        {
+            if (Relations.MoodReportKey(club) is { } moodKey)
+                result.NoteKeys.Add(moodKey);
+            Relations.RecalculateClub(club);
+        }
 
         ServeSuspensions(home);
         ServeSuspensions(away);

@@ -25,6 +25,7 @@ public static class SqliteStore
     {
         new WorldSection(), new PlayersSection(), new CupsSection(), new MatchdaySection(), new TransfersSection(),
         new FinanceSection(), new ScoutingSection(), new StaffSection(), new EventsSection(), new LicenseSection(),
+        new RelationsSection(),
     };
 
     // ------------------------------------------------------------------ Speichern
@@ -95,6 +96,7 @@ public static class SqliteStore
             ["next_event_id"] = w.NextEventId.ToString(Inv),
             ["next_deal_id"] = w.NextDealId.ToString(Inv),
             ["next_contract_id"] = w.NextContractId.ToString(Inv),
+            ["next_promise_id"] = w.NextPromiseId.ToString(Inv),
             ["pending_press"] = w.PendingPress is null ? "" : J(w.PendingPress),
             ["rules"] = JsonSerializer.Serialize(w.Rules, Json.Compact),
             ["packages"] = JsonSerializer.Serialize(w.Packages),
@@ -212,6 +214,7 @@ public static class SqliteStore
             NextEventId = Next("next_event_id"),
             NextDealId = Next("next_deal_id"),
             NextContractId = Next("next_contract_id"),
+            NextPromiseId = Next("next_promise_id"),
             PendingPress = meta.TryGetValue("pending_press", out var press) && press.Length > 0 ? PJ<PressConference>(press) : null,
             Rules = JsonSerializer.Deserialize<WorldRules>(meta["rules"], Json.Compact) ?? new WorldRules(),
             Packages = JsonSerializer.Deserialize<List<string>>(meta["packages"]) ?? new List<string>(),
