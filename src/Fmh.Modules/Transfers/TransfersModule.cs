@@ -288,8 +288,9 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
         if (ActiveBuyBack(p, HumanClub.Id) is not { } clause) return "neg.error.noBuyBack";
         if (!Season.IsTransferWindowOpen()) return "neg.error.window";
         if (p.ClubId is not { } ownerId || ownerId == HumanClub.Id) return "neg.error.own";
-        if (clause.Amount > HumanClub.Budget.TransferBudget) return "neg.error.budget";
         var owner = World.Clubs[ownerId];
+        if (!Season.IsTransferWindowOpen(owner)) return "neg.error.window";
+        if (clause.Amount > HumanClub.Budget.TransferBudget) return "neg.error.budget";
         var contract = Negotiations.SuggestContract(p, HumanClub, World, Data);
         clause.Active = false;
         foreach (var c in World.Clauses.Where(c => c.Active && c.PlayerId == p.Id && c.Kind == ClauseKind.Preemption && c.BeneficiaryClubId == HumanClub.Id))

@@ -104,8 +104,9 @@ public sealed partial class TransfersModule
         var youthAge = profile.YouthFocusAge;
         double Score(Player p, double r) =>
             youthAge > 0 && p.Age(World.Date) <= youthAge ? r + (p.Hidden.PotentialAbility - p.Hidden.CurrentAbility) / 20.0 : r;
-        // Ablösen nur aus echtem Vermögen: Mit Krediten im Rücken bleibt die Kasse zu (sonst Lizenzauflagen und Punktabzüge).
-        var budget = Math.Min(club.Budget.TransferBudget, Math.Max(0, Finance.Equity(club)));
+        // Ablösen vor allem aus Eigenkapital; ein Viertel des Transferbudgets bleibt nutzbar (mindert Ligastärke-Drift).
+        var equity = Math.Max(0, Finance.Equity(club));
+        var budget = Math.Min(club.Budget.TransferBudget, Math.Max(equity, club.Budget.TransferBudget / 4));
         var candidates = MarketOf(need)
             .Where(x => x.p.ClubId != club.Id && x.p.ClubId != HumanClub.Id && x.p.Loan is null && x.p.PreContract is null && !x.p.Retired && !x.p.IsYouth)
             .Where(x => x.r >= minRating && x.r <= level + profile.MaxAboveLevel)
@@ -179,6 +180,8 @@ public sealed partial class TransfersModule
             if (clause.Until is { } until && until < World.Date) { clause.Active = false; continue; }
             if (!World.Players.TryGetValue(clause.PlayerId, out var p)) continue;
             if (p.ClubId is not { } ownerId || ownerId == club.Id || p.Retired) continue;
+            // Internationaler Wechsel: Fenster beider Verbände müssen offen sein.
+            if (!WindowOpen(World.Clubs[ownerId])) continue;
             if (clause.Amount > club.Budget.TransferBudget) continue;
             if (!IsTalent(p) && p.Age(World.Date) > 24) continue;
             if (Rating(p) < PlayerGenerator.ClubLevel(club.Reputation) - 1) continue;
