@@ -48,6 +48,8 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
             if (Negotiations.IsLocked(World, p.Id, buyer.Id)) return (null, "neg.error.locked");
             if (p.PreContract is not null) return (null, "neg.error.preContractTaken");
             if (type != DealType.Loan && Negotiations.RefusalReason(p, buyer, World, Data) is { } refusal) return (null, refusal);
+            if (type == DealType.Loan && p.ClubId is { } owner && LoanLimits.Check(World, Data, p, World.Clubs[owner], buyer, 0) is { } limit)
+                return (null, limit);
         }
 
         var n = new Negotiation
@@ -92,6 +94,7 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
         offer.SellOnPercent = Math.Clamp(offer.SellOnPercent, 0, 50);
         offer.LoanMonths = Math.Clamp(offer.LoanMonths, 6, 12);
         offer.WageSharePercent = Math.Clamp(offer.WageSharePercent, 0, 100);
+        if (n.Type == DealType.Loan && LoanLimits.Check(World, Data, p, seller, buyer, offer.LoanMonths) is { } limit) return new(ResponseKind.Reject, limit);
 
         n.ClubRounds++;
         n.Offer = offer.Clone();
@@ -247,6 +250,7 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
         var parent = World.Clubs[loan.ParentClubId];
         var contract = p.Contract is { } c ? new ContractOffer { Years = Math.Max(1, (c.Until.Year - World.Date.Year)), WeeklyWage = c.WeeklyWage, Status = c.Status, RelegationPercent = c.RelegationPercent, PromotionPercent = c.PromotionPercent } : Negotiations.SuggestContract(p, HumanClub, World, Data);
         p.Loan = null;
+        _activeLoans = null;
         p.ClubId = parent.Id;
         HumanClub.PlayerIds.Remove(p.Id);
         parent.PlayerIds.Add(p.Id);

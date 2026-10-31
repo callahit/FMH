@@ -45,6 +45,7 @@ public static class Program
                 Packages = data.Packages, Countries = data.Countries, Clubs = data.Clubs, Names = data.Names,
                 Formations = data.Formations, PositionProfiles = data.PositionProfiles, Injuries = data.Injuries, Roles = data.Roles,
                 Languages = data.Languages, DefaultLanguage = data.DefaultLanguage, Engine = Json.Load<EngineConfig>(enginePath),
+                TransferRules = data.TransferRules,
             };
             data.UseLanguage(data.DefaultLanguage);
         }
@@ -152,6 +153,7 @@ public static class Program
         // Wechsel nach Vertragsende (Vorvertrag, ohne Ablöse) getrennt von Ablösetransfers zählen (Review F-07).
         Console.WriteLine($"Transfers: {season.Count(t => !t.Loan && t.FromClubId is not null && t.Fee > 0)} mit Ablöse ({season.Sum(t => t.Fee) / 1_000_000.0:F1} Mio.), " +
                           $"{season.Count(t => !t.Loan && t.FromClubId is not null && t.Fee == 0)} nach Vertragsende, {season.Count(t => t.FromClubId is null)} Vereinslose, {season.Count(t => t.Loan)} Leihen");
+        MarketReport.PrintSeason(w);
         var leagueClubs = w.Clubs.Values.Where(c => w.FindLeague(c.LeagueId) is not null).ToList();
         // Mindestkader (Review F-06): kein Verein darunter; die KI-Vereine und der eigene Verein (Autopilot) getrennt.
         var thin = leagueClubs.Where(c => c.PlayerIds.Count < ClubRules.DivisionFinance(w, c).MinSquad).ToList();
@@ -268,7 +270,8 @@ public static class Program
         var targetSeason = world.SeasonYear + seasons;
         var topLeague = world.Leagues.OrderBy(l => l.Level).First();
         var strengthStart = TopEleven(session, topLeague);
-        Console.WriteLine("Start:");
+        Console.WriteLine($"Start: Top-11 {topLeague.Name} Ø {strengthStart:F3}");
+        var seasonEnds = new List<double>();
         PrintWageStats(world);
         if (seasons == 0) return 0;
 
@@ -278,6 +281,7 @@ public static class Program
             // Tageweise, damit Insolvenzen und Lizenzentscheidungen je Tag gezählt werden (gleicher Spielverlauf).
             var result = session.Advance(1);
             EconomyReport.Observe(world);
+            MarketReport.Observe(world);
             // Autopilot: Der eigene Verein hält wie ein Manager den Mindestkader mit Vereinslosen (die KI tut das selbst).
             if (world.Date.DayOfWeek == DayOfWeek.Monday && !session.AwaitingNewJob)
                 for (var i = 0; i < 5 && session.HumanClub.PlayerIds.Count < ClubRules.DivisionFinance(world, session.HumanClub).MinSquad; i++)
@@ -308,6 +312,7 @@ public static class Program
                     Console.WriteLine();
                 }
                 PrintCareerStats(session);
+                seasonEnds.Add(TopEleven(session, topLeague));
             }
             // Nach der Saisonauswertung, damit eine Entlassung am letzten Spieltag die Saison nicht überspringt.
             if (session.AwaitingNewJob)
@@ -326,11 +331,18 @@ public static class Program
         }
         sw.Stop();
         Console.WriteLine($"{seasons} Saison(s) in {sw.Elapsed.TotalSeconds:F1} s, {matchdays} Spieltage des eigenen Vereins, langsamster Spieltag {slowest.TotalMilliseconds:F0} ms (Ziel < 5000 ms).");
-        var drift = (TopEleven(session, topLeague) - strengthStart) / Math.Max(1, seasons);
-        Console.WriteLine($"Ligastärke-Drift {topLeague.Name}: {drift:+0.000;-0.000} je Saison" + (maxDrift is { } md ? $" (Grenze {md:0.000})" : " (Ziel ≤ 0,05)"));
+        // Drift von Saisonende zu Saisonende (gleicher Zeitpunkt im Jahreslauf, Review F-07): Die erzeugte Startwelt hat volle
+        // Kader, am ersten Tag nach einer Saison fehlen je nach Transferfenster noch die Neuzugänge. Mit nur einer Saison
+        // bleibt der Vergleich mit dem Start.
+        var fromStart = (TopEleven(session, topLeague) - strengthStart) / Math.Max(1, seasons);
+        var drift = seasonEnds.Count >= 2 ? (seasonEnds[^1] - seasonEnds[0]) / (seasonEnds.Count - 1) : fromStart;
+        Console.WriteLine($"Ligastärke-Drift {topLeague.Name}: {drift:+0.000;-0.000} je Saison von Saisonende zu Saisonende" +
+                          (maxDrift is { } md ? $" (Grenze {md:0.000})" : " (Ziel ≤ 0,05)") + $", ab Start {fromStart:+0.000;-0.000}");
         var financeOk = ReferenceReport.MeansOk();
         var economyOk = EconomyReport.PrintSummary();
-        var ok = slowest.TotalMilliseconds < 5000 && world.SeasonYear >= targetSeason && (maxDrift is not { } m || drift <= m) && _wagesOk && _squadOk && _worldOk && financeOk && economyOk;
+        var marketOk = MarketReport.PrintSummary(world, data);
+        var ok = slowest.TotalMilliseconds < 5000 && world.SeasonYear >= targetSeason && (maxDrift is not { } m || drift <= m) && _wagesOk && _squadOk && _worldOk
+                 && financeOk && economyOk && marketOk;
         if (!ok) Console.WriteLine("ACHTUNG: Saisonlauf außerhalb der Vorgaben.");
         return strict && !ok ? 1 : 0;
     }
@@ -384,26 +396,4 @@ public static class Program
             Phases += sim.Events.Count(e => e.Type is MatchEventType.Attack or MatchEventType.Counter);
         }
     }
-}
-
-internal sealed class Args
-{
-    private readonly Dictionary<string, string?> _values = new();
-
-    public static Args Parse(string[] args)
-    {
-        var a = new Args();
-        for (var i = 0; i < args.Length; i++)
-        {
-            if (!args[i].StartsWith("--", StringComparison.Ordinal)) continue;
-            var key = args[i][2..];
-            string? value = null;
-            if (i + 1 < args.Length && !args[i + 1].StartsWith("--", StringComparison.Ordinal)) value = args[++i];
-            a._values[key] = value;
-        }
-        return a;
-    }
-
-    public bool Has(string key) => _values.ContainsKey(key);
-    public string? Get(string key) => _values.TryGetValue(key, out var v) ? v : null;
 }

@@ -18,6 +18,8 @@ public sealed class TransferStatus
 public sealed class Loan
 {
     public int ParentClubId { get; set; }
+    /// <summary>Beginn der Leihe (für die Ausnahme von den Leihgrenzen); fehlt in älteren Spielständen.</summary>
+    public DateOnly? Since { get; set; }
     public DateOnly Until { get; set; }
     /// <summary>Anteil des Gehalts, den der ausleihende Verein zahlt (0–100 %).</summary>
     public int WageSharePercent { get; set; } = 100;

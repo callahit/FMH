@@ -5,7 +5,7 @@ namespace Fmh.Core.Logic;
 
 /// <summary>
 /// Hebt die wirtschaftlichen Länderregeln eines geladenen Spielstands auf den aktuellen Datenstand (Review F-10):
-/// Finanzen (TV, Sponsoren, Betriebskosten, Gehaltsniveaus, Ligazahlen), Kaderregeln und Nachwuchs. Ligaaufbau,
+/// Finanzen (TV, Sponsoren, Betriebskosten, Gehaltsniveaus, Ligazahlen), Kaderregeln, Nachwuchs, Leihregeln und Marktverhalten. Ligaaufbau,
 /// Pokale und Play-offs bleiben wie gespeichert, weil ein Wechsel mitten im Spielstand die Saisonübergänge stören würde.
 /// </summary>
 public static class CountryDataMigration
@@ -19,11 +19,14 @@ public static class CountryDataMigration
             var current = data.Countries.Where(c => c.Code == country.Code && c.ValidIn(world.SeasonYear))
                 .OrderByDescending(c => c.ValidFrom).FirstOrDefault();
             if (current is null || ReferenceEquals(current, country)) continue;
-            var differs = !Same(country.Finance, current.Finance) || !Same(country.Squad, current.Squad) || !Same(country.Youth, current.Youth);
+            var differs = !Same(country.Finance, current.Finance) || !Same(country.Squad, current.Squad) || !Same(country.Youth, current.Youth)
+                          || !Same(country.Loans, current.Loans) || !Same(country.Market, current.Market);
             if (!differs) continue;
             country.Finance = current.Finance;
             country.Squad = current.Squad;
             country.Youth = current.Youth;
+            country.Loans = current.Loans;
+            country.Market = current.Market;
             changed.Add(country.Code);
         }
         return changed;
