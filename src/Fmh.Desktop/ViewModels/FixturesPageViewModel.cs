@@ -73,7 +73,7 @@ public sealed partial class FixturesPageViewModel : PageViewModel, IRefreshable
                 var g = home ? r.HomeGoals : r.AwayGoals;
                 var o = home ? r.AwayGoals : r.HomeGoals;
                 brush = g > o ? P.Good : g < o ? P.Bad : P.Warn;
-                detail = string.Join(", ", r.Goals.Where(x => x.Home == home).Select(x => world.Players[x.ScorerId].LastName + (x.Penalty ? " (E)" : "")));
+                detail = string.Join(", ", r.Goals.Where(x => x.Home == home).Select(x => world.Players[x.ScorerId].LastName + (x.OwnGoal ? " (ET)" : x.Penalty ? " (E)" : "")));
             }
             else
             {

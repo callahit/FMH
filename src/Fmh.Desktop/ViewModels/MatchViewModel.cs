@@ -218,9 +218,10 @@ public sealed partial class MatchViewModel : ViewModelBase
     {
         Editor = null;
         var instant = Profile.MatchDisplay == MatchDisplayMode.Instant;
-        _sim = Session.StartMatch(_fixture, humanControlled: !instant);
+        var scene = Profile.MatchDisplay == MatchDisplayMode.Scene;
+        _sim = Session.StartMatch(_fixture, humanControlled: !instant, sceneText: scene && !instant);
         _commentary = new CommentaryGenerator(Data, _sim);
-        TickerMode = Profile.MatchDisplay is MatchDisplayMode.Ticker or MatchDisplayMode.Conference;
+        TickerMode = scene || Profile.MatchDisplay is MatchDisplayMode.Ticker or MatchDisplayMode.Conference;
         _conference = Profile.MatchDisplay == MatchDisplayMode.Conference;
         // Konferenz: die übrigen Spiele werden vorab berechnet und minutengenau aufgedeckt.
         if (_conference) Session.PlayOtherFixturesToday();
@@ -337,17 +338,24 @@ public sealed partial class MatchViewModel : ViewModelBase
             }
             if (e.Type == MatchEventType.Goal) (e.Side == Side.Home ? _goalsHome : _goalsAway).Add(Math.Min(90, e.Minute));
 
-            if (_commentary!.Describe(e, ticker) is { } line)
+            var marker = e.Type switch
             {
-                var marker = e.Type switch
-                {
-                    MatchEventType.Goal => P.Gold,
-                    MatchEventType.YellowCard => Color.Parse("#F4D03F"),
-                    MatchEventType.RedCard or MatchEventType.SecondYellow => P.Bad,
-                    MatchEventType.Injury => P.Bad,
-                    MatchEventType.Substitution => P.Accent,
-                    _ => Colors.Transparent,
-                };
+                MatchEventType.Goal => P.Gold,
+                MatchEventType.YellowCard => Color.Parse("#F4D03F"),
+                MatchEventType.RedCard or MatchEventType.SecondYellow => P.Bad,
+                MatchEventType.Injury => P.Bad,
+                MatchEventType.Substitution => P.Accent,
+                _ => Colors.Transparent,
+            };
+            if (!string.IsNullOrEmpty(e.Narrative))
+            {
+                var goal = e.Type == MatchEventType.Goal;
+                Ticker.Insert(0, new TickerLine(e.MinuteLabel, e.Narrative,
+                    new SolidColorBrush(goal ? P.Gold : e.Key ? P.Text : P.Muted),
+                    new SolidColorBrush(marker), goal ? FontWeight.Bold : FontWeight.Normal));
+            }
+            else if (_commentary!.Describe(e, ticker) is { } line)
+            {
                 Ticker.Insert(0, new TickerLine(line.Minute, line.Text,
                     new SolidColorBrush(line.Highlight ? P.Gold : e.Key ? P.Text : P.Muted),
                     new SolidColorBrush(marker), line.Highlight ? FontWeight.Bold : FontWeight.Normal));
@@ -484,6 +492,11 @@ public sealed partial class MatchViewModel : ViewModelBase
     [RelayCommand]
     private void ToggleTicker()
     {
+        if (Profile.MatchDisplay == MatchDisplayMode.Scene)
+        {
+            TickerMode = true;
+            return;
+        }
         TickerMode = !TickerMode;
         if (!_conference) Profile.MatchDisplay = TickerMode ? MatchDisplayMode.Ticker : MatchDisplayMode.Commentary;
     }
