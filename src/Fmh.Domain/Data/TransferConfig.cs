@@ -32,7 +32,7 @@ public sealed class LoanRules
     /// <summary>Die Grenze je Partnerverein gilt auch für ausgenommene Spieler (FIGC).</summary>
     public bool PerClubCountsExempt { get; set; }
     /// <summary>Längste Leihdauer in Monaten.</summary>
-    public int MaxMonths { get; set; } = 12;
+    public int MaxMonths { get; set; } = 24;
     /// <summary>Abweichende Höchstzahlen ab einer Saison (stufenweise Einführung, z. B. FIGC 10 → 9 → 8).</summary>
     public List<LoanStep> Steps { get; set; } = new();
     /// <summary>Herkunft der Zahlen.</summary>

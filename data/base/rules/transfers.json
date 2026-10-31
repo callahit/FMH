@@ -6,7 +6,7 @@
     "exemptAge": 21,
     "ageCutoff": "SeasonEnd",
     "exemptNeedsClubTrained": true,
-    "maxMonths": 12,
+    "maxMonths": 24,
     "source": "FIFA-Transferstatut (RSTP) Art. 10, Obergrenze 6 seit 1. Juli 2024; Erläuterungen der FIFA zu den Leihbestimmungen"
   },
   "professionalLevels": 3,

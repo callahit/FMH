@@ -56,11 +56,12 @@ public class MustNowTransferTests
         p.BirthDate = s.World.Date.AddYears(-25);
         var (n, error) = s.StartNegotiation(p, DealType.Loan);
         Assert.Null(error);
-        Assert.Equal(ResponseKind.Accept, s.SubmitClubOffer(n!, new ClubOffer
+        var resp = s.SubmitClubOffer(n!, new ClubOffer
         {
             LoanMonths = 24, WageSharePercent = 100, PurchaseFee = s.ValueOf(p),
             PurchaseObligation = true, PurchaseCondition = LoanBuyCondition.AppearancePercent, PurchaseConditionValue = 50,
-        }).Kind);
+        });
+        Assert.True(resp.Kind == ResponseKind.Accept, resp.TextKey);
         Assert.NotNull(p.Loan);
         Assert.True(p.Loan!.Until >= s.World.Date.AddMonths(18));
         Assert.Equal(LoanBuyCondition.AppearancePercent, p.Loan.PurchaseCondition);
