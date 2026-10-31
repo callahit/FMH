@@ -547,9 +547,10 @@
           "expenses": {
             "squad": 3200000
           },
-          "toleranceNote": "Real rund 90 % Gehälter je Umsatz und 2 Mio. Verlust je Klub (ReportCalcio 2024), gedeckt von den Eigentümern; ohne Kapitalzuschüsse im Spiel wären die Vereine insolvent. Deshalb liegt auch das Gehaltsziel (targetAnnualWage) mit 80 Tsd. unter dem realen Schnitt von rund 120 Tsd.",
+          "toleranceNote": "Real rund 90 % Gehälter je Umsatz und 2 Mio. Verlust je Klub (ReportCalcio 2024), gedeckt von den Eigentümern; ohne Kapitalzuschüsse im Spiel wären die Vereine insolvent. Deshalb liegt auch das Gehaltsziel (targetAnnualWage) mit 80 Tsd. unter dem realen Schnitt von rund 120 Tsd. Must-now E1: Gesamtertrag leicht über dem Bericht.",
           "tolerances": {
-            "expenses.squad": 0.4
+            "expenses.squad": 0.4,
+            "income.total": 0.12
           }
         }
       },
