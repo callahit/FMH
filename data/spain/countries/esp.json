@@ -594,7 +594,7 @@
   },
   "loans": {
     "default": {
-      "maxOut": 6, "maxIn": 6, "maxPerClub": 3, "exemptAge": 21, "ageCutoff": "SeasonEnd", "exemptNeedsClubTrained": true, "maxMonths": 12,
+      "maxOut": 6, "maxIn": 6, "maxPerClub": 3, "exemptAge": 21, "ageCutoff": "SeasonEnd", "exemptNeedsClubTrained": true, "maxMonths": 24,
       "source": "RFEF Reglamento General Art. 81 (ab 2026/27): sechs Leihen je Richtung, drei mit demselben Verein; ausgenommen Eigengewächse bis zur Saison, in der sie 21 werden"
     }
   },

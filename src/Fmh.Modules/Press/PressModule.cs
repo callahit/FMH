@@ -206,10 +206,19 @@ public sealed partial class PressModule : GameModule, IPressService
                 if (Rng.Chance(0.3)) player.State.Morale = (Morale)Math.Max(0, (int)player.State.Morale - 1);
             }
         }
-        if (Rng.Chance(0.05))
+        // Unzufriedene Spieler (Zufriedenheit unter 30) melden sich häufiger zu Wort (Must-now E3-S4).
+        var unhappy = squad.Where(p => Relations.Of(p).Satisfaction < RelationsRules.UnhappyThreshold).ToList();
+        var pressChance = unhappy.Count > 0 ? 0.14 : 0.05;
+        if (Rng.Chance(pressChance))
         {
             var benched = squad.Where(p => p.Contract?.Status is SquadStatus.Star or SquadStatus.Regular && p.SeasonStats.Appearances * 3 < Math.Max(3, World.LeagueOf(club).CurrentMatchday)).ToList();
-            if (benched.Count > 0)
+            if (unhappy.Count > 0 && Rng.Chance(0.7))
+            {
+                var p = Rng.Pick(unhappy);
+                p.State.Morale = (Morale)Math.Max(0, (int)p.State.Morale - 1);
+                Notify(MessageType.Press, "msg.sender.newspaper", TR("sat.press.subject", p.Name), TR("sat.press.body", p.Name, club.Name));
+            }
+            else if (benched.Count > 0)
             {
                 var p = Rng.Pick(benched);
                 p.State.Morale = (Morale)Math.Max(0, (int)p.State.Morale - 1);

@@ -221,6 +221,22 @@ public sealed partial class InboxPageViewModel : PageViewModel, IRefreshable
                     Answers = answers,
                 }));
                 break;
+            case MessageAction.Preemption when !m.Resolved
+                && s.World.PreemptionOffers.FirstOrDefault(o => o.NegotiationId == m.ActionRefId) is { } preempt:
+                title = T["inbox.preemptionDecision"];
+                var preemptFee = Fmt.Money(preempt.Fee, currency);
+                options.Add(new DecisionOption(T["inbox.preemptionMatch"], T.Format("inbox.preemptionMatchDetail", preemptFee),
+                    new RelayCommand(() =>
+                    {
+                        var error = s.ResolvePreemption(preempt, match: true);
+                        Done(error is null ? T.Format("inbox.preemptionMatched", preemptFee) : T[error]);
+                    }), true));
+                options.Add(new DecisionOption(T["inbox.preemptionPass"], "", new RelayCommand(() =>
+                {
+                    s.ResolvePreemption(preempt, match: false);
+                    Done(T["inbox.preemptionPassed"]);
+                })));
+                break;
         }
         DecisionTitle = title;
         Decisions = options;

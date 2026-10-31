@@ -431,7 +431,7 @@
   },
   "loans": {
     "default": {
-      "maxOut": 8, "maxIn": 8, "maxPerClub": 3, "exemptAge": 22, "ageCutoff": "December31", "exemptNeedsClubTrained": false, "perClubCountsExempt": true, "maxMonths": 12,
+      "maxOut": 8, "maxIn": 8, "maxPerClub": 3, "exemptAge": 22, "ageCutoff": "December31", "exemptNeedsClubTrained": false, "perClubCountsExempt": true, "maxMonths": 24,
       "steps": [
         { "fromSeason": 2025, "maxOut": 10, "maxIn": 10 },
         { "fromSeason": 2026, "maxOut": 9, "maxIn": 9 },

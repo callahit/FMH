@@ -307,7 +307,7 @@
   },
   "loans": {
     "default": {
-      "maxOut": 6, "maxIn": 6, "maxPerClub": 3, "exemptAge": 21, "ageCutoff": "SeasonEnd", "exemptNeedsClubTrained": true, "maxMonths": 12,
+      "maxOut": 6, "maxIn": 6, "maxPerClub": 3, "exemptAge": 21, "ageCutoff": "SeasonEnd", "exemptNeedsClubTrained": true, "maxMonths": 24,
       "source": "LFP Règlement des compétitions: sechs Leihen je Richtung seit 2024/25, drei mit demselben Verein, kein Weiterverleihen"
     }
   },
