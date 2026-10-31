@@ -42,7 +42,8 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
         var country = World.Country(home.CountryCode);
         var referee = World.Referees.FirstOrDefault(r => r.Id == f.RefereeId);
         var cup = f.Kind == CompetitionKind.League ? null : World.FindCup(f.CompetitionId);
-        var isFinal = cup is not null && cup.Kind == CompetitionKind.Cup && f.Matchday == cup.Rounds.Count;
+        var isFinal = cup is not null && f.Matchday == cup.Rounds.Count
+                      && cup.Kind is CompetitionKind.Cup or CompetitionKind.Europe;
         var setup = new MatchSetup
         {
             Home = TeamSetupFor(home, humanControlled && home.Id == HumanClub.Id),

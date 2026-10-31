@@ -10,7 +10,7 @@ namespace Fmh.Core.Modules;
 /// Lizenzierung (Kapitel 8) mit festen Stichtagen: Antrag (15.03.), Entscheidung mit Auflagen (30.04.),
 /// Nachweis der Auflagen (31.05.). Verweigerte Lizenz bedeutet Zwangsabstieg. Dazu die Europa-Lizenz,
 /// Financial Fair Play (Break-even über drei Spielzeiten, Kaderkostenquote) und die Vergabe der Europapokalplätze
-/// mit Nachrücken. Die europäischen Wettbewerbe laufen vereinfacht (Rundenergebnisse nach Stärke, Prämien).
+/// mit Nachrücken. Die Spiele der Europapokale führt das Modul „europe“ (AP 5).
 /// </summary>
 public sealed partial class LicenseModule : GameModule, ILicenseService
 {
@@ -36,7 +36,6 @@ public sealed partial class LicenseModule : GameModule, ILicenseService
             if (World.Date == SeasonDate(fin.LicenseApplication)) LicenseApplication(country);
             if (World.Date == SeasonDate(fin.LicenseDecision)) LicenseDecision(country);
             if (World.Date == SeasonDate(fin.LicenseDeadline)) LicenseDeadline(country);
-            if (country.Europe is { } europe) EuropeDaily(europe);
         }
     }
 
@@ -320,62 +319,32 @@ public sealed partial class LicenseModule : GameModule, ILicenseService
 
     public IReadOnlyList<EuropeanEntry> EuropeanEntriesOf(int seasonYear) => World.EuropeanEntries.Where(e => e.SeasonYear == seasonYear).ToList();
 
-    public static EuropeCompetition? EuropeCompetitionOf(CountryConfig country, string id) => country.Europe?.Competitions.FirstOrDefault(c => c.Id == id);
+    /// <summary>Stufenbeschreibung für Anzeigen: gemeinsames Format (AP 5), sonst Legacy in den Länderdaten.</summary>
+    public EuropeCompetition? EuropeCompetitionOf(string id) =>
+        Data.Europe?.Competition(id) is { } f
+            ? new EuropeCompetition
+            {
+                Id = f.Id, EntryPrize = f.EntryPrize, FieldStrength = f.FieldStrength,
+                Stages = f.Stages.Select(s => new EuropeStage { Key = s.Key, Date = s.Dates.LastOrDefault() ?? "", Prize = s.Prize }).ToList(),
+            }
+            : World.Countries.Select(c => c.Europe?.Competitions.FirstOrDefault(x => x.Id == id)).FirstOrDefault(c => c is not null);
 
-    /// <summary>Saisonstart: Startprämie der Teilnehmer.</summary>
+    public static EuropeCompetition? EuropeCompetitionOf(CountryConfig country, string id) =>
+        country.Europe?.Competitions.FirstOrDefault(c => c.Id == id);
+
+    /// <summary>Saisonstart: Startprämien und echte Europapokal-Wettbewerbe (AP 5).</summary>
     public void EuropeSeasonStart()
     {
         foreach (var e in EuropeanEntriesOf(World.SeasonYear))
         {
             var club = World.Clubs[e.ClubId];
-            if (EuropeCompetitionOf(World.Country(club.CountryCode), e.CompetitionId) is not { } comp) continue;
-            Finance.Book(club, TransactionType.European, comp.EntryPrize, TR("tx.europeEntry", TR("europe." + comp.Id)));
+            var prize = EuropeLogic.EntryPrize(Data, World.Country(club.CountryCode), e.CompetitionId);
+            if (prize <= 0) continue;
+            Finance.Book(club, TransactionType.European, prize, TR("tx.europeEntry", TR("europe." + e.CompetitionId)));
             if (club.Id == HumanClub.Id && !Board.AwaitingNewJob)
-                Notify(MessageType.Season, "msg.sender.uefa", TR("msg.europeStart.subject", TR("europe." + comp.Id)),
-                    TR("msg.europeStart.body", club.Name, TR("europe." + comp.Id), TextArg.Money(comp.EntryPrize, Currency)));
+                Notify(MessageType.Season, "msg.sender.uefa", TR("msg.europeStart.subject", TR("europe." + e.CompetitionId)),
+                    TR("msg.europeStart.body", club.Name, TR("europe." + e.CompetitionId), TextArg.Money(prize, Currency)));
         }
-    }
-
-    /// <summary>An den Rundenterminen entscheidet die Stärke gegen das Teilnehmerfeld über das Weiterkommen.</summary>
-    private void EuropeDaily(EuropeConfig europe)
-    {
-        foreach (var comp in europe.Competitions)
-            for (var i = 0; i < comp.Stages.Count; i++)
-            {
-                if (World.Date != SeasonDate(comp.Stages[i].Date)) continue;
-                var stage = comp.Stages[i];
-                foreach (var e in EuropeanEntriesOf(World.SeasonYear).Where(e => e.CompetitionId == comp.Id && !e.Eliminated && e.Stage == i - 1))
-                {
-                    var club = World.Clubs[e.ClubId];
-                    var strength = AiTactics.TeamStrength(club, World, Data);
-                    var chance = 1 / (1 + Math.Exp(-(1.2 + (strength - comp.FieldStrength) * 1.4 - i * 0.5)));
-                    var human = club.Id == HumanClub.Id && !Board.AwaitingNewJob;
-                    if (Rng.Chance(chance))
-                    {
-                        e.Stage = i;
-                        Finance.Book(club, TransactionType.European, stage.Prize, TR("tx.europePrize", TR("europe." + comp.Id)));
-                        club.Fans.Mood = Math.Clamp(club.Fans.Mood + 3, 0, 100);
-                        if (i == comp.Stages.Count - 1)
-                        {
-                            e.Eliminated = true;
-                            if (Rng.Chance(0.5)) club.Reputation = Math.Min(20, club.Reputation + 1);
-                            World.History.Add(new SeasonRecord { SeasonYear = World.SeasonYear, LeagueId = comp.Id, LeagueName = comp.Id, ChampionId = club.Id, ChampionName = club.Name, FinalOrder = new List<int> { club.Id } });
-                        }
-                        if (human)
-                        {
-                            Board.ChangeTrust(club, 3);
-                            Notify(MessageType.Season, "msg.sender.uefa", TR("msg.europeStage.subject", TR("europe." + comp.Id), TR(stage.Key)),
-                                TR("msg.europeStage.body", club.Name, TR(stage.Key), TextArg.Money(stage.Prize, Currency)));
-                        }
-                    }
-                    else
-                    {
-                        e.Eliminated = true;
-                        if (human)
-                            Notify(MessageType.Season, "msg.sender.uefa", TR("msg.europeOut.subject", TR("europe." + comp.Id)),
-                                TR("msg.europeOut.body", club.Name, TR(stage.Key)));
-                    }
-                }
-            }
+        EuropeLogic.CreateSeason(World, Data, Rng);
     }
 }
