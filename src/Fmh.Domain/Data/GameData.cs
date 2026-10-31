@@ -26,6 +26,8 @@ public sealed class GameData
     public Dictionary<string, SponsorList> Sponsors { get; init; } = new();
     /// <summary>Anzeigekurse; gerechnet wird immer in Euro.</summary>
     public CurrencyConfig Currencies { get; init; } = new();
+    /// <summary>Gemeinsames Format UCL/UEL/UECL (AP 5); null in älteren Paketen ohne competitions/europe.json.</summary>
+    public EuropeFormat? Europe { get; set; }
 
     public BuildingDef? Building(string id) => Buildings.FirstOrDefault(b => b.Id == id);
     /// <summary>Alle verfügbaren Sprachen (Code → Texte und Kommentarbausteine).</summary>
