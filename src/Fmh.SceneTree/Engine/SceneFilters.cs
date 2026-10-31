@@ -26,8 +26,8 @@ public static class SceneFilters
         if ((c & SceneCondition.Floodlit) != 0 && !gate.Floodlit) return false;
         if ((c & SceneCondition.LivePlay) != 0 && gate.Shootout) return false;
         if ((c & SceneCondition.ClearLead) != 0 && gate.AttackLead < 2) return false;
-        // Bit 32 ist unklar und filtert nicht.
-        if (node.SpecialId != 0 && !gate.EasterEgg) return false;
+        // Bit 32 ist unklar und filtert nicht. Nur die Geburtstags-Sondertexte (b29 = 2 oder 4) sind Easter Eggs.
+        if (node.SpecialId is 2 or 4 && !gate.EasterEgg) return false;
         if (node.OffsideTrap && !gate.DefenceOffsideTrap) return false;
         return RolesFit(node, gate.Occupied);
     }

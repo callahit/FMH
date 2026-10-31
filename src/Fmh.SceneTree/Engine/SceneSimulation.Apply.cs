@@ -31,17 +31,6 @@ public sealed partial class SceneSimulation
         if (type is MatchEventType.YellowCard or MatchEventType.SecondYellow or MatchEventType.RedCard)
             _pendingCard = CardPending.None;
 
-        if (!_shootout && node.IsLeaf)
-        {
-            MaybeInjury(node, att, def);
-            MaybeCard(node, att, def);
-            if (node.FollowUp is { } next)
-            {
-                if (next is >= 1 and <= 9 && Offender(node, att, def) is { } fouler)
-                    _restartFor = _teamOf[fouler].Side.Other();
-                _follow.Enqueue(next);
-            }
-        }
     }
 
     private void ApplyStats(SceneNode node, RoleBook att, RoleBook def, ref MatchPlayer? scorer, ref MatchPlayer? assist, ref bool ownGoal, ref double xg)
@@ -104,20 +93,7 @@ public sealed partial class SceneSimulation
 
         if (touched is not null) _lastAttacker = touched;
 
-        if (node.Result.Foul && !_foulCounted)
-        {
-            _foulCounted = true;
-            var offender = Offender(node, att, def);
-            var team = offender is null ? defence : _teamOf[offender];
-            team.Stats.Fouls++;
-            if (offender is not null) offender.Fouls++;
-        }
-        if (node.Result.Corner) attack.Stats.Corners++;
-        if ((node.Pass & PassKind.Offside) != 0 && !_offsideCounted)
-        {
-            _offsideCounted = true;
-            attack.Stats.Offsides++;
-        }
+        // Fouls, Ecken und Abseits zählt die Ereignisschicht. Der Baum liefert dafür den Text.
         if ((node.Action & SceneAction.Pass) != 0)
         {
             attack.Stats.Passes++;
@@ -135,75 +111,12 @@ public sealed partial class SceneSimulation
         }
     }
 
-    private void MaybeCard(SceneNode node, RoleBook att, RoleBook def)
-    {
-        if (_cardRolled || node.CategoryNumber is >= 22 and <= 28) return;
-        if (node.OffenderPlay.IsEmpty && node.OffenderConduct.IsEmpty) return;
-        if (!node.Result.Foul && node.Referee == RefDecision.None && (node.Action & SceneAction.FoulWhistle) == 0) return;
-        _cardRolled = true;
-        var conduct = CardCatalog.Conduct(node.Reason) || (node.OffenderPlay.IsEmpty && !node.OffenderConduct.IsEmpty);
-        var role = conduct && !node.OffenderConduct.IsEmpty ? node.OffenderConduct : node.OffenderPlay;
-        if (role.IsEmpty) role = node.OffenderConduct;
-        var player = (role.Attacking ? att : def).Find(role, 0);
-        if (player is null || player.Red) return;
-
-        var strict = Math.Clamp(Setup.RefereeStrictness / 10.0, 0.55, 1.8);
-        var hard = _teamOf[player].Tactic.Instructions.Tackling == TacklingStyle.Hard ? 1.25 : _teamOf[player].Tactic.Instructions.Tackling == TacklingStyle.Fair ? 0.8 : 1;
-        var pRed = (CardCatalog.Serious(node.Reason) ? _opt.SeriousRedChance : _opt.RedChance) * strict * hard;
-        var pYellow = _opt.CardChance * strict * hard * (player.Yellow ? 0.7 : 1);
-        var roll = _rng.NextDouble();
-        if (roll >= pRed + pYellow) return;
-
-        var team = _teamOf[player];
-        if (roll < pRed || player.Yellow)
-        {
-            var second = player.Yellow && roll >= pRed;
-            player.Red = true;
-            team.Stats.RedCards++;
-            player.RatingScore -= 1.2;
-            _pendingCard = second ? CardPending.Second : CardPending.Red;
-            Remove(player);
-            if (player.Position == Position.GK || team.OnPitch.All(p => p.Position != Position.GK)) EnsureGoalkeeper(team);
-        }
-        else
-        {
-            player.Yellow = true;
-            team.Stats.YellowCards++;
-            player.RatingScore -= 0.15;
-            _pendingCard = CardPending.Yellow;
-        }
-        _cardPlayer = player;
-        _reason = node.Reason;
-        _victim ??= Victim(node, att, def);
-        _follow.Enqueue(CardCategory(conduct, _pendingCard));
-    }
-
     private static int CardCategory(bool conduct, CardPending kind) => kind switch
     {
         CardPending.Second => conduct ? 26 : 25,
         CardPending.Red => conduct ? 28 : 27,
         _ => conduct ? 24 : 23,
     };
-
-    private void MaybeInjury(SceneNode node, RoleBook att, RoleBook def)
-    {
-        if (_injuryRolled || node.CategoryNumber == 22 || node.Injured.IsEmpty) return;
-        _injuryRolled = true;
-        if (!_rng.Chance(_opt.InjuryChance * Math.Max(0.1, Setup.InjuryFrequency))) return;
-        var player = (node.Injured.Attacking ? att : def).Find(node.Injured, 0);
-        if (player is null || player.Injured) return;
-        var (key, days, label) = CardCatalog.Injury(node.InjuryTypeCode);
-        player.Injured = true;
-        player.InjuryType = key;
-        player.InjuryDays = Math.Max(1, (int)Math.Round(days * (0.85 + _rng.NextDouble() * 0.3)));
-        _teamOf[player].Stats.Injuries++;
-        player.RatingScore -= 0.2;
-        _injuryPlayer = player;
-        _injuryLabel = label;
-        _victim = player;
-        _follow.Enqueue(22);
-        if (!_teamOf[player].HumanControlled) AutoReplace(_teamOf[player], player);
-    }
 
     private MatchEventType EventType(SceneNode node)
     {
@@ -301,7 +214,7 @@ public sealed partial class SceneSimulation
         if (node.GoalType == SceneGoalType.Header) xg *= 0.82;
         if (node.GoalType == SceneGoalType.LongRange) xg *= 0.9;
         // Viele Abschlüsse haben kein Distanzbyte. Der Faktor hebt die Summe in die Nähe der Tore.
-        return Math.Clamp(xg * 1.6, 0.03, 0.86);
+        return Math.Clamp(xg * 1.35, 0.03, 0.82);
     }
 
     private static void Heat(MatchTeamState team, SceneNode node)
