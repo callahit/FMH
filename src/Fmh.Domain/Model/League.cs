@@ -92,6 +92,12 @@ public sealed class MatchResult
     public List<GoalRecord> Goals { get; set; } = new();
     public List<CardRecord> Cards { get; set; } = new();
     public int? PlayerOfTheMatchId { get; set; }
+    /// <summary>
+    /// Zusatzzeilen im Nachbericht als Sprachschlüssel (z. B. match.mood.motivated). Werden nicht in der DB gespeichert
+    /// und gelten nur für die laufende Anzeige nach dem Spiel.
+    /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public List<string> NoteKeys { get; set; } = new();
 }
 
 public sealed class GoalRecord

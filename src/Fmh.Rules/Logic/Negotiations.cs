@@ -114,6 +114,9 @@ public static class Negotiations
             _ => 1.0,
         };
         if (p.Hidden.Ambition >= 15) target *= 1.05;
+        // Unzufriedene Spieler fordern spürbar mehr Gehalt (Must-now E3-S4).
+        if (world.PlayerRelations.TryGetValue(p.Id, out var rel) && rel.Satisfaction < 30)
+            target *= 1.15 + (30 - rel.Satisfaction) * 0.005;
         var div = ClubRules.DivisionFinance(world, buyer);
         target *= div.WageLevel;
         var current = p.Contract?.WeeklyWage ?? 0;

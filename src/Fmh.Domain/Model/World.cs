@@ -60,6 +60,13 @@ public sealed class World
     /// <summary>Vereinskoeffizienten für Setzliste und Einstieg (AP 5).</summary>
     public Dictionary<int, double> ClubCoefficients { get; set; } = new();
 
+    /// <summary>Spielerzufriedenheit, Gespräche und Wechselwünsche (Must-now E3 / AP 7).</summary>
+    public Dictionary<int, PlayerRelations> PlayerRelations { get; set; } = new();
+    /// <summary>Offene und erledigte Versprechen an Spieler.</summary>
+    public List<PlayerPromise> Promises { get; set; } = new();
+    /// <summary>Führungsspieler, Mentoring und Mannschaftsstimmung je Verein.</summary>
+    public Dictionary<int, ClubRelations> ClubRelations { get; set; } = new();
+
     /// <summary>Alle Ligen der laufenden Saison sind beendet und ausgewertet; der Wechsel folgt zum Saisonstart.</summary>
     public bool SeasonFinished { get; set; }
     public int AutosaveCounter { get; set; }
@@ -79,6 +86,7 @@ public sealed class World
     public int NextEventId { get; set; } = 1;
     public int NextDealId { get; set; } = 1;
     public int NextContractId { get; set; } = 1;
+    public int NextPromiseId { get; set; } = 1;
 
     public League LeagueOf(Club club) => Leagues.First(l => l.Id == club.LeagueId);
 
