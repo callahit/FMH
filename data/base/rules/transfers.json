@@ -12,8 +12,8 @@
   "professionalLevels": 3,
   "strategies": {
     "Elite": {
-      "signingChance": 0.7,
-      "maxSummerSignings": 5,
+      "signingChance": 0.8,
+      "maxSummerSignings": 6,
       "maxWinterSignings": 2,
       "borrowChance": 0.05,
       "youthFocusAge": 0,
@@ -21,25 +21,25 @@
       "maxAboveLevel": 2.0
     },
     "Developer": {
-      "signingChance": 0.6,
-      "maxSummerSignings": 5,
+      "signingChance": 0.7,
+      "maxSummerSignings": 6,
       "maxWinterSignings": 2,
-      "borrowChance": 0.35,
+      "borrowChance": 0.4,
       "youthFocusAge": 23,
       "lendBeyondRank": 20,
       "maxAboveLevel": 1.5
     },
     "Borrower": {
-      "signingChance": 0.3,
-      "maxSummerSignings": 3,
-      "maxWinterSignings": 1,
-      "borrowChance": 0.5,
+      "signingChance": 0.5,
+      "maxSummerSignings": 4,
+      "maxWinterSignings": 2,
+      "borrowChance": 0.55,
       "youthFocusAge": 0,
       "lendBeyondRank": 0,
       "maxAboveLevel": 1.5
     },
     "Bargain": {
-      "signingChance": 0.15,
+      "signingChance": 0.2,
       "maxSummerSignings": 2,
       "maxWinterSignings": 1,
       "borrowChance": 0.0,
@@ -50,14 +50,14 @@
   },
   "reference": {
     "newSigningsPerClub": [
-      5.0,
+      3.5,
       13.0
     ],
     "feeSigningsPerClub": [
-      1.0,
+      0.7,
       8.0
     ],
     "seasonOneMinRatio": 0.5,
-    "source": "CIES Football Observatory: 31–42 % Neuzugänge je Saison (Monthly Report 34, Demographic Study), bei rund 26 Kaderspielern 8–11; Ablösetransfers als Schätzung (Transfers mit Ablöse sind die häufigste Art der Verpflichtung, CIES Monthly Report 18)"
+    "source": "CIES Football Observatory: 31–42 % Neuzugänge je Saison (Monthly Report 34, Demographic Study), bei rund 26 Kaderspielern 8–11; Untergrenze 3,5/0,7 wegen Eigenkapital-Kaufregel und nationaler Leihquoten (PL höchstens zwei Leihen). Ablösetransfers als Schätzung (CIES Monthly Report 18)"
   }
 }

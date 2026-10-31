@@ -466,9 +466,9 @@
     }
   },
   "market": {
-    "loanAffinity": 1.4,
+    "loanAffinity": 1.55,
     "purchaseObligationShare": 0.1,
-    "loanShare": { "1": [1, 8], "2": [4, 15] },
+    "loanShare": { "1": [1, 8], "2": [3, 15] },
     "source": "CIES Football Observatory Monthly Report 83 (2023): Serie A 19,0 %, Serie B 22,8 %, Ligue 1 11,2 %, Ligue 2 11,0 % Leihspieler; Monthly Report 48: Leihspieler je Verein Serie A 4,9, LaLiga 3,9, Bundesliga mit 6,3 % der Einsatzminuten am wenigsten; Premier League durch die nationale Grenze von zwei Leihen niedrig"
   },
   "finance": {
