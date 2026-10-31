@@ -50,11 +50,11 @@
   },
   "reference": {
     "newSigningsPerClub": [
-      5.0,
+      4.0,
       13.0
     ],
     "feeSigningsPerClub": [
-      1.0,
+      0.9,
       8.0
     ],
     "seasonOneMinRatio": 0.5,
