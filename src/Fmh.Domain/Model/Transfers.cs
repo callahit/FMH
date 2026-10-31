@@ -191,6 +191,9 @@ public sealed class ContractRecord
     public int WeeklyWage { get; set; }
     public bool Current { get; set; }
     public int? SupersededBy { get; set; }
+    /// <summary>Vollständige Vertragsbedingungen (Must-now E6-S2); null bei älteren Historienzeilen.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public Contract? Terms { get; set; }
 }
 
 public sealed class TransferRecord
@@ -245,6 +248,12 @@ public sealed class ClubOffer
     public bool PlayingTimeGuarantee { get; set; }
     /// <summary>Einmalige Leihgebühr an den Stammverein.</summary>
     public long LoanFee { get; set; }
+    /// <summary>Rückkaufklausel zugunsten des Verkäufers; null = keine.</summary>
+    public long? BuyBackFee { get; set; }
+    /// <summary>Jahre, in denen der Rückkauf möglich ist (1–3).</summary>
+    public int BuyBackYears { get; set; } = 2;
+    /// <summary>Vorkaufsrecht des Verkäufers bei späteren Drittangeboten.</summary>
+    public bool PreemptionRight { get; set; }
 
     public ClubOffer Clone() => (ClubOffer)MemberwiseClone();
 }

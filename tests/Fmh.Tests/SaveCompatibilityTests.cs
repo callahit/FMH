@@ -194,4 +194,51 @@ public class SaveCompatibilityTests
             Cleanup(path);
         }
     }
+
+    /// <summary>Must-now E6: Fremdschlüssel an Transfers/Raten/Bedingungen und Nationalitäten-Tabelle nach Migration.</summary>
+    [Fact]
+    public void MustNowForeignKeysAndNationalitiesExistAfterMigration()
+    {
+        var path = Fixture();
+        try
+        {
+            var world = SqliteStore.Load(path);
+            SqliteStore.Save(world, path);
+            using var con = new SqliteConnection($"Data Source={path};Pooling=False");
+            con.Open();
+            foreach (var (table, expected) in new[]
+                     {
+                         ("transfers", "players"), ("goals", "fixtures"), ("cards", "fixtures"),
+                         ("transactions", "clubs"), ("player_nationalities", "players"), ("clauses", "players"),
+                     })
+            {
+                using var cmd = con.CreateCommand();
+                cmd.CommandText = $"PRAGMA foreign_key_list({table})";
+                using var r = cmd.ExecuteReader();
+                var refs = new List<string>();
+                while (r.Read()) refs.Add(r.GetString(2));
+                Assert.Contains(expected, refs);
+            }
+            using (var cmd = con.CreateCommand())
+            {
+                cmd.CommandText = "SELECT COUNT(*) FROM player_nationalities";
+                Assert.True((long)cmd.ExecuteScalar()! > 0);
+            }
+            using (var cmd = con.CreateCommand())
+            {
+                cmd.CommandText = "SELECT COUNT(*) FROM contracts WHERE current = 1 AND terms IS NOT NULL";
+                Assert.True((long)cmd.ExecuteScalar()! > 0);
+            }
+            // Spieler-JSON-Vertrag ist leer; Terms stehen in contracts.
+            using (var cmd = con.CreateCommand())
+            {
+                cmd.CommandText = "SELECT COUNT(*) FROM players WHERE contract IS NOT NULL";
+                Assert.Equal(0L, (long)cmd.ExecuteScalar()!);
+            }
+        }
+        finally
+        {
+            Cleanup(path);
+        }
+    }
 }

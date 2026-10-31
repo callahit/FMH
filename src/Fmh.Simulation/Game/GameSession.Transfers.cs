@@ -27,5 +27,8 @@ public sealed partial class GameSession
     public string? RecallLoan(Player p) => _transfers.RecallLoan(p);
     public bool CanExerciseExtensionOption(Player p) => _transfers.CanExerciseExtensionOption(p);
     public string? ExerciseExtensionOption(Player p) => _transfers.ExerciseExtensionOption(p);
+    public bool CanExerciseBuyBack(Player p) => _transfers.CanExerciseBuyBack(p);
+    public string? ExerciseBuyBack(Player p) => _transfers.ExerciseBuyBack(p);
+    public string? ResolvePreemption(PreemptionOffer offer, bool match) => _transfers.ResolvePreemption(offer, match);
     public bool SignBestFreeAgent(Club club, Position pos, bool withinBudget = false) => _transfers.SignBestFreeAgent(club, pos, withinBudget);
 }

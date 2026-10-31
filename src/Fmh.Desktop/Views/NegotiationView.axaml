@@ -46,6 +46,12 @@
                 <ComboBox Grid.Column="1" ItemsSource="{Binding SwapOptions}" SelectedItem="{Binding Swap}" HorizontalAlignment="Stretch">
                   <ComboBox.ItemTemplate><DataTemplate x:DataType="vm:SwapOption"><TextBlock Text="{Binding Label}" /></DataTemplate></ComboBox.ItemTemplate>
                 </ComboBox></Grid>
+              <CheckBox Content="{s:L neg.buyBack}" IsChecked="{Binding HasBuyBack}" />
+              <Grid ColumnDefinitions="170,*" IsVisible="{Binding HasBuyBack}"><TextBlock Text="{s:L neg.buyBackFee}" VerticalAlignment="Center" />
+                <NumericUpDown Grid.Column="1" Value="{Binding BuyBackFee, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="50000" FormatString="N0" /></Grid>
+              <Grid ColumnDefinitions="170,*" IsVisible="{Binding HasBuyBack}"><TextBlock Text="{s:L neg.buyBackYears}" VerticalAlignment="Center" />
+                <NumericUpDown Grid.Column="1" Value="{Binding BuyBackYears}" Minimum="1" Maximum="3" Increment="1" /></Grid>
+              <CheckBox Content="{s:L neg.preemption}" IsChecked="{Binding PreemptionRight}" />
             </StackPanel>
             <StackPanel Spacing="8" IsVisible="{Binding IsLoan}">
               <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.loanMonths}" VerticalAlignment="Center" />
