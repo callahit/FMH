@@ -44,10 +44,13 @@ public static class Negotiations
     public static double EffectiveValue(ClubOffer o, Player p, World world, GameData data)
     {
         var value = MarketValue.Of(p, world, data.PositionProfiles);
-        var fee = o.Fee * (1 - 0.04 * Math.Clamp(o.InstallmentYears, 0, 3));
+        TransferTerms.NormalizePaymentPlan(o, o.Fee);
+        var fee = o.Fee * (1 - TransferTerms.InstallmentYearDiscount * TransferTerms.AveragePaymentDelayYears(o, o.Fee));
         // Zusatzzahlungen je Einsatz/Tor werden tatsächlich gebucht (TransferCondition) und nach erwarteter Wirkung bewertet.
         var bonus = TransferTerms.AddOnValue(o, p);
-        var sellOn = Math.Clamp(o.SellOnPercent, 0, 50) / 100.0 * value * 0.5;
+        // Gewinnbasis ist für den Verkäufer weniger wert als Brutto, weil der Gewinn kleiner oder null sein kann.
+        var sellOnFactor = o.SellOnBasis == SellOnBasis.Profit ? 0.25 : 0.5;
+        var sellOn = Math.Clamp(o.SellOnPercent, 0, 50) / 100.0 * value * sellOnFactor;
         var swap = o.SwapPlayerId is { } sid && world.Players.TryGetValue(sid, out var sp)
             ? MarketValue.Of(sp, world, data.PositionProfiles) * 0.8 : 0;
         return fee + bonus + sellOn + swap;
@@ -57,13 +60,15 @@ public static class Negotiations
     {
         var o = n.Offer;
         if (n.Type == DealType.Loan) return EvaluateLoan(n, p, seller, world, data);
-        if (p.Contract?.ReleaseClause is { } clause && o.Fee >= clause && o.InstallmentYears == 0)
+        TransferTerms.NormalizePaymentPlan(o, o.Fee);
+        if (p.Contract?.ReleaseClause is { } clause && o.Fee >= clause && TransferTerms.IsImmediatePayment(o))
             return new NegotiationResponse(ResponseKind.Accept, "neg.club.releaseClause");
 
         var ask = AskingPrice(p, seller, world, data);
         var eff = EffectiveValue(o, p, world, data);
         if (eff >= ask) return new NegotiationResponse(ResponseKind.Accept, "neg.club.accept");
-        var counter = MarketValue.Round(ask / (1 - 0.04 * Math.Clamp(o.InstallmentYears, 0, 3)));
+        var delay = Math.Max(0.01, 1 - TransferTerms.InstallmentYearDiscount * TransferTerms.AveragePaymentDelayYears(o, o.Fee));
+        var counter = MarketValue.Round(ask / delay);
         if (n.ClubRounds >= MaxRounds) return new NegotiationResponse(ResponseKind.Reject, "neg.club.final");
         if (eff >= ask * 0.7) return new NegotiationResponse(ResponseKind.Counter, "neg.club.counter", counter, counter);
         return new NegotiationResponse(ResponseKind.Counter, "neg.club.farOff", counter, counter);

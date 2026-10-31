@@ -86,7 +86,8 @@ public sealed partial class FinancesPageViewModel : PageViewModel, IRefreshable
         var f = club.Finance;
         string M(long v) => Fmt.Money(v, Currency);
         var bill = Budgets.WageBill(club, s.World);
-        Overview = new List<InfoLine>
+        var forecast = TransferForecast.ForClub(s.World, club);
+        var overview = new List<InfoLine>
         {
             new(T["transfer.balance"], M(b.Balance), new SolidColorBrush(b.Balance < 0 ? P.Bad : P.Text)),
             new(T["neg.transferBudget"], M(b.TransferBudget)),
@@ -98,7 +99,17 @@ public sealed partial class FinancesPageViewModel : PageViewModel, IRefreshable
             new(T["fin.license"], T["fin.license." + f.LastLicense]),
             new(T["fin.seasonTickets"], Fmt.Int(f.SeasonTickets)),
             new(T["fin.stadium"], $"{s.StadiumDisplayName(club)} ({Fmt.Int(club.Stadium.Capacity)})"),
+            new(T["fin.obligations"], M(forecast.Sum(x => x.TotalOut)), new SolidColorBrush(P.Warn)),
         };
+        foreach (var line in forecast)
+        {
+            overview.Add(new(
+                T.Format("fin.obligations.season", GameSession.SeasonLabel(line.SeasonYear)),
+                $"{T["fin.obligations.wages"]} {M(line.Wages)} · {T["fin.obligations.out"]} {M(line.InstalmentsOut)} · {T["fin.obligations.in"]} {M(line.InstalmentsIn)}",
+                new SolidColorBrush(P.Muted)));
+        }
+        overview.Add(new(T["fin.obligations.total"], M(forecast.Sum(x => x.TotalOut - x.TotalIn))));
+        Overview = overview;
 
         var types = f.Season.Keys.Concat(f.LastSeason.Keys).Distinct()
             .Where(t => t is not (TransactionType.LoanPayout or TransactionType.LoanRepayment or TransactionType.Deposit))

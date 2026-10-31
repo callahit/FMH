@@ -15,8 +15,13 @@ public sealed partial class TransfersModule
     {
         foreach (var inst in World.Installments.Where(i => i.Due == World.Date).ToList())
         {
-            Finance.Book(World.Clubs[inst.FromClubId], TransactionType.Installment, -inst.Amount, inst.TextRef ?? TextRef.Literal(inst.Text));
-            Finance.Book(World.Clubs[inst.ToClubId], TransactionType.Installment, inst.Amount, inst.TextRef ?? TextRef.Literal(inst.Text));
+            var from = World.Clubs[inst.FromClubId];
+            var to = World.Clubs[inst.ToClubId];
+            Finance.Book(from, TransactionType.Installment, -inst.Amount, inst.TextRef ?? TextRef.Literal(inst.Text));
+            Finance.Book(to, TransactionType.Installment, inst.Amount, inst.TextRef ?? TextRef.Literal(inst.Text));
+            // Spätere Raten belasten das Transferbudget erst bei Fälligkeit.
+            Budgeted(from).Budget.TransferBudget -= inst.Amount;
+            Budgeted(to).Budget.TransferBudget += inst.Amount / 2;
             World.Installments.Remove(inst);
         }
         foreach (var lockKey in World.NegotiationLocks.Where(kv => kv.Value <= World.Date).Select(kv => kv.Key).ToList())
