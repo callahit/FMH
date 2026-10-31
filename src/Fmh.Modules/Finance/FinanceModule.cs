@@ -168,6 +168,11 @@ public sealed partial class FinanceModule : GameModule, IFinanceService
         {
             if (gate > 0) Book(home, TransactionType.Tickets, gate, text);
         }
+        else if (f.Kind == CompetitionKind.Europe)
+        {
+            // Europapokal: Heim behält die Billetterie; zählt zu den UEFA-Erlösen (media), nicht zur Liga-Spieltagskategorie.
+            if (gate > 0) Book(home, TransactionType.European, gate, text);
+        }
         else
         {
             // Pokal: Zuschauereinnahmen werden geteilt.
