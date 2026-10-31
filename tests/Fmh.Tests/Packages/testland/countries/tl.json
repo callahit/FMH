@@ -327,6 +327,18 @@
     "stadiumCostPerBox": 60000,
     "stadiumBuildDays": 720
   },
+  "loans": {
+    "default": {
+      "maxOut": 6,
+      "maxIn": 6,
+      "maxPerClub": 3,
+      "exemptAge": 21,
+      "ageCutoff": "SeasonEnd",
+      "exemptNeedsClubTrained": true,
+      "maxMonths": 12,
+      "source": "Testland: vereinfachte DFL-Leihregeln für die Pyramiden-Tests"
+    }
+  },
   "reserves": {
     "minLevelGap": 2,
     "playInCups": false,

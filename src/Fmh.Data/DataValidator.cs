@@ -68,6 +68,14 @@ public static class DataValidator
                 if (r.MinLocal > cap || r.MinClubTrained > r.MinLocal || r.MinNationals > cap)
                     errors.Add($"Meldeliste '{div}': Mindestzahlen passen nicht zu {cap} Plätzen.");
             }
+            foreach (var (div, _) in country.Loans.Divisions.Where(kv => !KnownDivision(kv.Key)))
+                errors.Add($"Leihregeln: unbekannte Liga '{div}'.");
+            foreach (var (name, r) in country.Loans.Divisions.Prepend(new("default", country.Loans.Default)))
+                ValidateLoans($"Leihregeln {country.Code}/{name}", r, errors);
+            if (country.Market.LoanAffinity <= 0 || country.Market.PurchaseObligationShare is < 0 or > 1)
+                errors.Add($"Land '{country.Code}': Marktverhalten ungültig (Leihneigung > 0, Anteil Kaufpflicht 0–1).");
+            if (country.Market.LoanShare.Values.Any(r => !ValidRange(r, 100)) || country.Market.LoanShare.Count > 0 && string.IsNullOrWhiteSpace(country.Market.Source))
+                errors.Add($"Land '{country.Code}': Zielwerte für Leihspieler ungültig oder ohne Quelle.");
             foreach (var pool in country.Pools)
             {
                 var count = data.Clubs.Count(c => c.Division == pool.Id);
@@ -87,6 +95,11 @@ public static class DataValidator
             }
         }
 
+        ValidateLoans("Internationale Leihregeln", data.TransferRules.InternationalLoans, errors);
+        var reference = data.TransferRules.Reference;
+        if (!ValidRange(reference.NewSigningsPerClub, 40) || !ValidRange(reference.FeeSigningsPerClub, 40) || reference.SeasonOneMinRatio is < 0 or > 1)
+            errors.Add("Transfermarkt: Zielwerte ungültig.");
+
         foreach (var pos in PositionInfo.All.Where(p => !data.PositionProfiles.Weights.ContainsKey(p)))
             errors.Add($"Positionsprofil für '{pos}' fehlt.");
         foreach (var inj in data.Injuries.Where(i => i.MinDays <= 0 || i.MaxDays < i.MinDays))
@@ -99,5 +112,17 @@ public static class DataValidator
             errors.Add("Engine-Konfiguration: Aktionsgewichte brauchen 7 Reihen mit je 4 Werten.");
 
         return errors;
+    }
+
+    private static bool ValidRange(double[] r, double max) => r.Length == 2 && r[0] >= 0 && r[0] <= r[1] && r[1] <= max;
+
+    private static void ValidateLoans(string name, LoanRules r, List<string> errors)
+    {
+        var steps = r.Steps.Select(s => (s.MaxOut, s.MaxIn)).Append((r.MaxOut, r.MaxIn));
+        if (steps.Any(s => s.MaxOut < 0 || s.MaxIn < 0) || r.MaxPerClub < 0 || r.MaxInPerSeason < 0 || r.ExemptAge < 0)
+            errors.Add($"{name}: Grenzen dürfen nicht negativ sein.");
+        if (r.MaxMonths is < 1 or > 24) errors.Add($"{name}: Leihdauer {r.MaxMonths} Monate liegt nicht zwischen 1 und 24.");
+        if (r.Steps.Select(s => s.FromSeason).Distinct().Count() != r.Steps.Count) errors.Add($"{name}: Stufe mehrfach für dieselbe Saison.");
+        if (string.IsNullOrWhiteSpace(r.Source)) errors.Add($"{name}: Quelle fehlt.");
     }
 }

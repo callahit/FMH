@@ -36,7 +36,10 @@ public sealed class SellOnRight
 public sealed class Loan
 {
     public int ParentClubId { get; set; }
-    /// <summary>Beginn der Leihe; null bei Leihen aus älteren Spielständen (die Einsatzgarantie zählt dann ab Saisonbeginn).</summary>
+    /// <summary>
+    /// Beginn der Leihe; null bei Leihen aus älteren Spielständen (Einsatzgarantie zählt dann ab Saisonbeginn;
+    /// Leihgrenzen-Ausnahmen rechnen mit dem aktuellen Datum).
+    /// </summary>
     public DateOnly? Start { get; set; }
     public DateOnly Until { get; set; }
     /// <summary>Anteil des Gehalts, den der ausleihende Verein zahlt (0–100 %).</summary>

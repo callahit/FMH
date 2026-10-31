@@ -75,9 +75,10 @@ public static class Budgets
     /// Wöchentliche Gehaltssumme: eigener Kader (Leihspieler mit dem übernommenen Anteil) plus der Restanteil für
     /// verliehene Spieler, den der abgebende Verein weiter zahlt.
     /// </summary>
-    public static long WageBill(Club club, World world) =>
+    /// <param name="activeLoans">Alle derzeit verliehenen Spieler, falls schon ermittelt (spart den Lauf über alle Spieler).</param>
+    public static long WageBill(Club club, World world, IEnumerable<Player>? activeLoans = null) =>
         world.SquadOf(club).Sum(p => (long)(p.Contract?.WeeklyWage ?? 0) * (p.Loan is { } l ? l.WageSharePercent : 100) / 100)
-        + world.Players.Values.Where(p => p.Loan?.ParentClubId == club.Id && p.ClubId != club.Id)
+        + (activeLoans ?? world.Players.Values).Where(p => p.Loan?.ParentClubId == club.Id && p.ClubId != club.Id)
             .Sum(p => (long)(p.Contract?.WeeklyWage ?? 0) * (100 - p.Loan!.WageSharePercent) / 100);
 
     /// <summary>Budget für die neue Saison: Transferbudget aus dem Kontostand, Gehaltsbudget mit Spielraum.</summary>
