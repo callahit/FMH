@@ -3,7 +3,7 @@ using Fmh.Core.Data;
 namespace Fmh.Core.Model;
 
 /// <summary>
-/// K.-o.-Wettbewerb einer Saison: nationaler Pokal oder Relegation (Kapitel 3).
+/// K.-o.- oder Europapokal-Wettbewerb einer Saison (Kapitel 3, AP 5).
 /// Runden werden ausgelost, sobald die vorige Runde entschieden ist.
 /// </summary>
 public sealed class Cup
@@ -38,6 +38,13 @@ public sealed class CupRound
     /// <summary>Vereine, die erst in dieser Runde einsteigen (z. B. Erstligisten in der dritten Runde).</summary>
     public List<int> Entrants { get; set; } = new();
     public List<CupTie> Ties { get; set; } = new();
+    /// <summary>Stufen-Id aus dem Europa-Format (q1, league, sf …); leer bei nationalen Pokalen.</summary>
+    public string StageId { get; set; } = "";
+    /// <summary>knockout oder league; leer = knockout wie nationaler Pokal.</summary>
+    public string StageType { get; set; } = "";
+    public long Prize { get; set; }
+    /// <summary>Hin- und Rückspiele dieser Runde (Europapokal); 0 = wie CupConfig.</summary>
+    public int Legs { get; set; }
     public bool Drawn => Ties.Count > 0;
     public bool Complete => Drawn && Ties.All(t => t.WinnerId is not null);
 }

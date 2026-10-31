@@ -191,6 +191,9 @@ public sealed partial class PlayerPageViewModel : PageViewModel
         if (p.Contract is { ExtensionOptionYears: > 0 } option)
             lines.Add(new(T["player.extensionOption"], T.Format("player.extensionOptionValue", option.ExtensionOptionYears)));
         if (p.Transfer.Listed) lines.Add(new(T["neg.listed"], p.Transfer.AskingPrice is { } ask ? Fmt.Money(ask, currency) : "–", new SolidColorBrush(P.Good)));
+        var sellOns = TransferTerms.ActiveSellOns(p.Transfer);
+        if (sellOns.Count > 0)
+            lines.Add(new(T["neg.sellOn"], string.Join(", ", sellOns.Select(r => $"{(s.World.Clubs.TryGetValue(r.ClubId, out var club) ? club.ShortName : "?")} {r.Percent}%"))));
         if (p.Transfer.LoanListed) lines.Add(new(T["player.loanListed"], T["ui.yes"], new SolidColorBrush(P.Good)));
         if (p.Loan is { } loan)
         {

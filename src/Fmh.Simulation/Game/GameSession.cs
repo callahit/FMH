@@ -32,6 +32,7 @@ public sealed partial class GameSession
     private readonly LicenseModule _license = new();
     private readonly EconomyModule _economy = new();
     private readonly CupsModule _cups = new();
+    private readonly EuropeModule _europe = new();
     private readonly BoardModule _board = new();
     private readonly PressModule _press = new();
     private readonly EventsModule _events = new();
@@ -46,7 +47,7 @@ public sealed partial class GameSession
         CountryDataMigration.Refresh(world, data);
         var rng = world.RngState.Length == 4 ? Rng.FromState(world.RngState) : new Rng(world.Seed);
         _kernel = new GameKernel(world, data, engine, rng);
-        IGameModule[] modules = { _training, _matchday, _transfers, _scouting, _youth, _facilities, _finance, _license, _economy, _cups, _board, _press, _events, _sponsors, _staff, _stadiumPlans, _season };
+        IGameModule[] modules = { _training, _matchday, _transfers, _scouting, _youth, _facilities, _finance, _license, _economy, _cups, _europe, _board, _press, _events, _sponsors, _staff, _stadiumPlans, _season };
         var ctx = new ModuleContext(_kernel);
         foreach (var m in modules) m.Register(ctx);
         Modules = ModuleRegistry.Order(modules);
@@ -69,6 +70,10 @@ public sealed partial class GameSession
             _cups.CreateCups();
             _youth.InitialYouth();
         }
+        // Ältere Spielstände / Saison 2+: Europapokal-Spiele nachziehen, ohne Startprämien erneut zu buchen.
+        if (World.EuropeanEntries.Any(e => e.SeasonYear == World.SeasonYear)
+            && !World.Cups.Any(c => c.Kind == CompetitionKind.Europe))
+            EuropeLogic.CreateSeason(World, Data, _kernel.Rng);
         SyncRng();
     }
 
