@@ -138,19 +138,13 @@ public sealed partial class TransfersModule
 
     private void ExecuteLoan(Player p, Club buyer, Club parent, ClubOffer offer)
     {
-<<<<<<< HEAD
-        var until = World.Date.AddMonths(offer.LoanMonths);
-        var seasonEnd = new DateOnly(World.SeasonYear + 1, 6, 30);
-        if (until > seasonEnd) until = seasonEnd;
-        _needs.Remove(buyer.Id);
-        _needs.Remove(parent.Id);
-=======
         var months = TransferTerms.ClampLoanMonths(offer.LoanMonths);
         // Mehrjährige Leihen laufen über das Saisonende hinaus; der Stichtag bleibt der 30. Juni der Zielsaison.
         var until = World.Date.AddMonths(months);
         if (until.Month != 6 || until.Day != 30)
             until = new DateOnly(until.Month >= 7 ? until.Year + 1 : until.Year, 6, 30);
->>>>>>> e3476e6 (E1-S2/S5/S6/S7: freie Ablöseraten, Gewinn-Weiterverkauf, Leihe 24 Monate, Ratenvorschau)
+        _needs.Remove(buyer.Id);
+        _needs.Remove(parent.Id);
         parent.PlayerIds.Remove(p.Id);
         var slot = parent.Tactic.Lineup.IndexOf(p.Id);
         if (slot >= 0) parent.Tactic.Lineup[slot] = null;
