@@ -15,7 +15,7 @@ public sealed record AttrItem(string Name, int Value, IBrush Brush, string Symbo
 public sealed record ActionButton(string Label, IRelayCommand Command, bool Primary = false);
 public sealed record ValueOption(string Label, object? Value);
 public sealed record AttrGroupVm(string Title, IReadOnlyList<AttrItem> Items);
-public sealed record InfoLine(string Label, string Value, IBrush? Brush = null)
+public sealed record InfoLine(string Label, string Value, IBrush? Brush = null, string? Tip = null)
 {
     public IBrush Fore => Brush ?? new SolidColorBrush(Palette.Current.Text);
 }
@@ -133,13 +133,22 @@ public sealed partial class PlayerPageViewModel : PageViewModel
         Condition = p.State.Condition;
         Practice = p.State.MatchPractice;
         ConditionBrush = new SolidColorBrush(P.ConditionColor(p.State.Condition));
+        Session.RecalculateSatisfaction(p);
+        var sat = Session.PlayerRelationsOf(p);
+        var satTip = sat.ReasonKeys.Count == 0
+            ? null
+            : string.Join("\n", sat.ReasonKeys.Select(k => T.Has(k) ? T[k] : k));
+        var satBrush = new SolidColorBrush(sat.Satisfaction < 30 ? P.Bad : sat.Satisfaction >= 70 ? P.Good : P.Warn);
         var state = new List<InfoLine>
         {
             new(T["player.condition"], $"{p.State.Condition:0} %", ConditionBrush),
+            new(T["player.satisfaction"], $"{sat.Satisfaction}", satBrush, satTip),
             new(T["player.morale"], UiText.Morale(p.State.Morale)),
             new(T["player.form"], $"{p.State.Form}/10"),
             new(T["player.practice"], $"{p.State.MatchPractice:0} %"),
         };
+        if (sat.WantsTransfer)
+            state.Add(new(T["player.wantsTransfer"], T["ui.yes"], new SolidColorBrush(P.Bad)));
         if (p.State.Injury is { } inj)
             state.Add(new(T["player.injury"], T.Format("player.injuryValue", T["injury." + inj.Type], inj.DaysRemaining), new SolidColorBrush(P.Bad)));
         if (p.State.SuspendedMatches > 0)
@@ -203,6 +212,15 @@ public sealed partial class PlayerPageViewModel : PageViewModel
                     new SolidColorBrush(TransferTerms.GuaranteeBreached(loan) ? P.Bad : P.Good)));
         }
         if (p.PreContract is { } pre) lines.Add(new(T["player.preContract"], s.World.Clubs[pre.ClubId].Name, new SolidColorBrush(P.Warn)));
+        var buyBack = s.World.Clauses.FirstOrDefault(c => c.Active && c.Kind == ClauseKind.BuyBack && c.PlayerId == p.Id
+            && (c.Until is null || c.Until >= s.World.Date));
+        if (buyBack is not null)
+            lines.Add(new(T["neg.buyBack"], T.Format("player.buyBackValue",
+                s.World.Clubs.TryGetValue(buyBack.BeneficiaryClubId, out var bbClub) ? bbClub.ShortName : "?",
+                Fmt.Money(buyBack.Amount, currency),
+                buyBack.Until is { } until ? Fmt.Date(until) : "–"), new SolidColorBrush(P.Gold)));
+        if (s.World.Clauses.Any(c => c.Active && c.Kind == ClauseKind.Preemption && c.PlayerId == p.Id))
+            lines.Add(new(T["neg.preemption"], T["ui.yes"], new SolidColorBrush(P.Gold)));
         if (p.IsYouth) lines.Add(new(T["player.youth"], T["ui.yes"]));
         TransferLines = lines;
 
@@ -236,6 +254,8 @@ public sealed partial class PlayerPageViewModel : PageViewModel
             }
             if (p.Loan is { } l && l.ParentClubId == human.Id && (l.RecallInWinter || TransferTerms.GuaranteeBreached(l)))
                 actions.Add(new(T["player.action.recall"], new RelayCommand(() => Act(s.RecallLoan(p)))));
+            if (s.CanExerciseBuyBack(p))
+                actions.Add(new(T["player.action.buyBack"], new RelayCommand(() => Act(s.ExerciseBuyBack(p))), true));
             if (s.CanExerciseExtensionOption(p))
                 actions.Add(new(T["player.action.extensionOption"], new RelayCommand(() => Act(s.ExerciseExtensionOption(p)))));
             actions.Add(new(human.Shortlist.Contains(p.Id) ? T["player.action.unwatch"] : T["player.action.watch"], new RelayCommand(() => { s.ToggleShortlist(p); Load(); })));

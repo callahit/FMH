@@ -15,8 +15,13 @@ public sealed partial class TransfersModule
     {
         foreach (var inst in World.Installments.Where(i => i.Due == World.Date).ToList())
         {
-            Finance.Book(World.Clubs[inst.FromClubId], TransactionType.Installment, -inst.Amount, inst.TextRef ?? TextRef.Literal(inst.Text));
-            Finance.Book(World.Clubs[inst.ToClubId], TransactionType.Installment, inst.Amount, inst.TextRef ?? TextRef.Literal(inst.Text));
+            var from = World.Clubs[inst.FromClubId];
+            var to = World.Clubs[inst.ToClubId];
+            Finance.Book(from, TransactionType.Installment, -inst.Amount, inst.TextRef ?? TextRef.Literal(inst.Text));
+            Finance.Book(to, TransactionType.Installment, inst.Amount, inst.TextRef ?? TextRef.Literal(inst.Text));
+            // Spätere Raten belasten das Transferbudget erst bei Fälligkeit.
+            Budgeted(from).Budget.TransferBudget -= inst.Amount;
+            Budgeted(to).Budget.TransferBudget += inst.Amount / 2;
             World.Installments.Remove(inst);
         }
         foreach (var lockKey in World.NegotiationLocks.Where(kv => kv.Value <= World.Date).Select(kv => kv.Key).ToList())
@@ -29,6 +34,7 @@ public sealed partial class TransfersModule
         if (!monday) return;
 
         CheckLoanGuarantees();
+        ExpirePreemptionOffers();
         var aiClubs = World.Clubs.Values.Where(c => !IsHuman(c)).ToList();
         Rng.Shuffle(aiClubs);
         _loanPool = null;
@@ -39,6 +45,7 @@ public sealed partial class TransfersModule
         foreach (var club in aiClubs)
         {
             var window = WindowOpen(club);
+            if (window) AiExerciseBuyBacks(club);
             ManageAiSquadSize(club);
             // Dünne Kader: zuerst Vereinslose (im Gehaltsbudget, außer der Spieltagskader ist nicht mehr voll), sonst Talente
             // aus der eigenen Jugend oder dem Umfeld.
@@ -137,14 +144,68 @@ public sealed partial class TransfersModule
             var seller = World.Clubs[sellerId];
             var ask = Negotiations.AskingPrice(p, seller, World, Data);
             if (ask > budget) continue;
-            var n = new Negotiation { PlayerId = p.Id, BuyerId = club.Id, SellerId = sellerId, Type = DealType.Transfer, Offer = new ClubOffer { Fee = MarketValue.Round(ask * Rng.Range(0.85, 1.0)) } };
+            var offer = new ClubOffer { Fee = MarketValue.Round(ask * Rng.Range(0.85, 1.0)) };
+            // Verkäufer-KI sichert sich Talente mit Rückkauf und Vorkauf (Must-now E1-S4).
+            if (!IsHuman(seller) && IsTalent(p))
+            {
+                offer.BuyBackFee = MarketValue.Round(Math.Max(ask, ValueOf(p)) * Rng.Range(1.3, 1.6));
+                offer.BuyBackYears = 2;
+                offer.PreemptionRight = true;
+            }
+            var n = new Negotiation
+            {
+                Id = World.NextNegotiationId++, PlayerId = p.Id, BuyerId = club.Id, SellerId = sellerId,
+                Type = DealType.Transfer, Offer = offer, Stage = NegotiationStage.ClubTalks, Started = World.Date,
+            };
             var resp = Negotiations.EvaluateClubOffer(n, p, seller, World, Data);
             if (resp.Kind == ResponseKind.Counter && resp.Amount <= budget) n.Offer.Fee = resp.Amount;
             else if (resp.Kind != ResponseKind.Accept) continue;
+            World.Negotiations.Add(n);
+            if (HoldForPreemption(n, p, n.Offer)) return;
             // Der Verkäufer füllt die Lücke später selbst wieder auf.
             ExecuteTransfer(p, club, seller, n.Offer, contract);
             Done();
             return;
+        }
+    }
+
+    private bool IsTalent(Player p) => p.Age(World.Date) <= 23 && p.Hidden.PotentialAbility - p.Hidden.CurrentAbility >= 15;
+
+    /// <summary>KI zieht Rückkaufklauseln für eigene Talente, wenn Bedarf und Budget passen.</summary>
+    private void AiExerciseBuyBacks(Club club)
+    {
+        foreach (var clause in World.Clauses.Where(c => c.Active && c.Kind == ClauseKind.BuyBack && c.BeneficiaryClubId == club.Id).ToList())
+        {
+            if (clause.Until is { } until && until < World.Date) { clause.Active = false; continue; }
+            if (!World.Players.TryGetValue(clause.PlayerId, out var p)) continue;
+            if (p.ClubId is not { } ownerId || ownerId == club.Id || p.Retired) continue;
+            if (clause.Amount > club.Budget.TransferBudget) continue;
+            if (!IsTalent(p) && p.Age(World.Date) > 24) continue;
+            if (Rating(p) < PlayerGenerator.ClubLevel(club.Reputation) - 1) continue;
+            if (NeedOf(club) != p.MainPosition && !Rng.Chance(0.25)) continue;
+            clause.Active = false;
+            foreach (var c in World.Clauses.Where(c => c.Active && c.PlayerId == p.Id && c.Kind == ClauseKind.Preemption && c.BeneficiaryClubId == club.Id))
+                c.Active = false;
+            var contract = Negotiations.SuggestContract(p, club, World, Data);
+            ExecuteTransfer(p, club, World.Clubs[ownerId], new ClubOffer { Fee = clause.Amount }, contract);
+            club.Budget.WageBudget = Math.Max(club.Budget.WageBudget, WageBillOf(club));
+            return;
+        }
+    }
+
+    /// <summary>Abgelaufene Vorkaufsentscheidungen freigeben (Dritter darf fortsetzen).</summary>
+    private void ExpirePreemptionOffers()
+    {
+        foreach (var offer in World.PreemptionOffers.Where(o => o.Expires < World.Date).ToList())
+        {
+            World.PreemptionOffers.Remove(offer);
+            foreach (var m in World.Messages.Where(m => m.Action == MessageAction.Preemption && m.ActionRefId == offer.NegotiationId && !m.Resolved))
+                m.Resolved = true;
+            var n = World.Negotiations.FirstOrDefault(x => x.Id == offer.NegotiationId);
+            if (n is null || n.Stage != NegotiationStage.Pending || n.Incoming) continue;
+            var p = World.Players[offer.PlayerId];
+            n.Stage = NegotiationStage.PlayerTalks;
+            n.Contract = Negotiations.SuggestContract(p, World.Clubs[n.BuyerId], World, Data);
         }
     }
 

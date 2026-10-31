@@ -455,12 +455,12 @@
   },
   "loans": {
     "default": {
-      "maxOut": 6, "maxIn": 5, "maxPerClub": 4, "exemptAge": 21, "ageCutoff": "SeasonEnd", "exemptNeedsClubTrained": true, "maxMonths": 12,
+      "maxOut": 6, "maxIn": 5, "maxPerClub": 4, "exemptAge": 21, "ageCutoff": "SeasonEnd", "exemptNeedsClubTrained": true, "maxMonths": 24,
       "source": "EFL: höchstens fünf Leihspieler im Spieltagskader, höchstens vier vom selben Verein (Stand der Quelle unsicher); Verleihgrenze nach FIFA-Vorgabe"
     },
     "divisions": {
       "ENG1": {
-        "maxOut": 6, "maxIn": 2, "maxInPerSeason": 4, "maxPerClub": 1, "exemptAge": 21, "ageCutoff": "SeasonEnd", "exemptNeedsClubTrained": true, "maxMonths": 12,
+        "maxOut": 6, "maxIn": 2, "maxInPerSeason": 4, "maxPerClub": 1, "exemptAge": 21, "ageCutoff": "SeasonEnd", "exemptNeedsClubTrained": true, "maxMonths": 24,
         "source": "Premier League Handbook, Abschnitt V: höchstens zwei Leihspieler von Premier-League-Vereinen gleichzeitig, vier je Saison, einer je Verein"
       }
     }

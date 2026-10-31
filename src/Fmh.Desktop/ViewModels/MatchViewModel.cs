@@ -608,6 +608,8 @@ public sealed partial class MatchViewModel : ViewModelBase
         var referee = Session.World.Referees.FirstOrDefault(r => r.Id == _fixture.RefereeId);
         PostInfo = T.Format("match.postInfo", Fmt.Int(result.Attendance), T["weather." + result.Weather], referee?.Name ?? "–")
                    + " · " + T.Format("match.halfTimeScore", result.HalfTimeHome, result.HalfTimeAway);
+        if (result.NoteKeys.Count > 0)
+            PostInfo += " · " + string.Join(" · ", result.NoteKeys.Select(k => T[k]));
         Heat = sim.Team(_side).Stats.Heat.ToList();
 
         var league = Session.World.LeagueOf(Session.HumanClub);
