@@ -1,0 +1,24 @@
+-= OFFIZIELLES TEXTMODUS-UPDATE III für den FM2002 =-
+
+Datei: textmodus3.zip
+Enthält: Textm.sav, Textm.txt
+Datum: 2. November 2001
+
+
+Aenderungen in Textmodous Update III:
+
+- 1000 weitere Textzeilen
+
+Aenderungen in Textmodous Update II:
+ 
+- 1000 neue Textzeilen
+- Wichtigste Neuheiten sind verschiedene neue Angriffsvarianten, etwas stärkere Außenstürmer und die deutliche Reduzierung der Schien- und Wadenbeinbrüche.
+
+
+
+Installation:
+
+Bitte alle Dateien in den Ordner "database" im FM2002-Verzeichnis entpacken. Bitte vergewissere dich, das beide Dateien (Textm.sav und Textm.txt) wirklich im richtigen Ordner landen, und die vorhandenen Dateien &uuml;berschrieben werden. Achte dabei auch auf die Einstellungen deines Zip-Tools.
+
+
+EASPORTS DEVELOPMENT GERMANY / nsalomon@ea.com

@@ -20,6 +20,7 @@
     <ProjectReference Include="..\Fmh.Persistence\Fmh.Persistence.csproj" />
     <ProjectReference Include="..\Fmh.Simulation\Fmh.Simulation.csproj" />
     <ProjectReference Include="..\Fmh.MatchEngine\Fmh.MatchEngine.csproj" />
+    <ProjectReference Include="..\Fmh.SceneTree\Fmh.SceneTree.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\data\**\*" LinkBase="data" CopyToOutputDirectory="PreserveNewest" />

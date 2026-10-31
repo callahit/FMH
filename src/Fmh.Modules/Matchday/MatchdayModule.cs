@@ -32,7 +32,7 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
     }
 
     /// <summary>Bereitet Aufstellungen vor und erzeugt die Simulation. Gleicher Seed + gleiche Eingaben = gleiches Spiel.</summary>
-    public IMatchSimulation StartMatch(Fixture f, bool humanControlled)
+    public IMatchSimulation StartMatch(Fixture f, bool humanControlled, bool sceneText = false)
     {
         var home = World.Clubs[f.HomeId];
         var away = World.Clubs[f.AwayId];
@@ -59,6 +59,9 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
             Substitutions = country.Squad.Substitutions,
             Knockout = cup is null ? null : CupLogic.KnockoutFor(cup, f),
             NeutralGround = isFinal && cup!.Config.NeutralFinal,
+            UseSceneText = sceneText,
+            RefereeName = referee?.Name,
+            Floodlit = f.Date.Month is 11 or 12 or 1 or 2,
         };
         var sim = Engine.Create(setup);
         // Mannschaftsstimmung wirkt messbar auf Tagesform und Moral (Must-now E3-S6).
@@ -168,7 +171,7 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
         foreach (var e in sim.Events)
         {
             if (e.Type == MatchEventType.Goal && e.PlayerId is { } scorer)
-                result.Goals.Add(new GoalRecord { Minute = e.Minute + e.Stoppage, Home = e.Side == Side.Home, ScorerId = scorer, AssistId = e.OtherPlayerId, Penalty = e.Kind == ShotKind.Penalty });
+                result.Goals.Add(new GoalRecord { Minute = e.Minute + e.Stoppage, Home = e.Side == Side.Home, ScorerId = scorer, AssistId = e.OtherPlayerId, Penalty = e.Kind == ShotKind.Penalty, OwnGoal = e.Value == 1 });
             if (e.Type is MatchEventType.YellowCard or MatchEventType.SecondYellow or MatchEventType.RedCard && e.PlayerId is { } carded)
                 result.Cards.Add(new CardRecord { Minute = e.Minute + e.Stoppage, Home = e.Side == Side.Home, PlayerId = carded, Red = e.Type != MatchEventType.YellowCard });
         }
