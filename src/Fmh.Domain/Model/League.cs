@@ -35,7 +35,7 @@ public sealed class League
 public enum Weather { Sunny, Cloudy, Rain, Snow, Wind }
 
 /// <summary>Art des Wettbewerbs eines Spiels.</summary>
-public enum CompetitionKind { League, Cup, Playoff }
+public enum CompetitionKind { League, Cup, Playoff, Europe }
 
 public sealed class Fixture
 {

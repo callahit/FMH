@@ -1,0 +1,256 @@
+{
+  "access": {
+    "windowYears": 5,
+    "win": 2.0,
+    "draw": 1.0,
+    "bonusQualifyingWin": 0.5,
+    "bonusLeaguePhase": 4.0,
+    "bonusRoundOf16": 1.0,
+    "bonusQuarter": 1.0,
+    "bonusSemi": 1.0,
+    "bonusFinal": 1.5,
+    "bonusTitle": 1.5,
+    "defaultCountryScore": 12.0,
+    "entryByRank": [
+      {
+        "maxRank": 2,
+        "uclChampion": "league",
+        "uclOther": "po",
+        "uel": "league",
+        "uecl": "po"
+      },
+      {
+        "maxRank": 4,
+        "uclChampion": "po",
+        "uclOther": "q3",
+        "uel": "po",
+        "uecl": "q2"
+      },
+      {
+        "maxRank": 99,
+        "uclChampion": "q3",
+        "uclOther": "q2",
+        "uel": "q2",
+        "uecl": "q1"
+      }
+    ]
+  },
+  "competitions": [
+    {
+      "id": "UCL",
+      "entryPrize": 18600000,
+      "fieldStrength": 13.6,
+      "targetLeagueSize": 8,
+      "knockoutFrom": 4,
+      "dropTo": "UEL",
+      "stages": [
+        {
+          "id": "q1",
+          "type": "knockout",
+          "key": "europe.stage.q1",
+          "legs": 2,
+          "dates": ["07-09", "07-16"],
+          "prize": 500000,
+          "weekday": "Tuesday"
+        },
+        {
+          "id": "q2",
+          "type": "knockout",
+          "key": "europe.stage.q2",
+          "legs": 2,
+          "dates": ["07-23", "07-30"],
+          "prize": 750000,
+          "weekday": "Tuesday"
+        },
+        {
+          "id": "q3",
+          "type": "knockout",
+          "key": "europe.stage.q3",
+          "legs": 2,
+          "dates": ["08-06", "08-13"],
+          "prize": 1000000,
+          "weekday": "Tuesday"
+        },
+        {
+          "id": "po",
+          "type": "knockout",
+          "key": "europe.stage.po",
+          "legs": 2,
+          "dates": ["08-20", "08-27"],
+          "prize": 1500000,
+          "weekday": "Wednesday"
+        },
+        {
+          "id": "league",
+          "type": "league",
+          "key": "europe.stage.league",
+          "dates": ["09-17", "10-01", "10-22", "11-05", "11-26", "12-10", "01-21", "01-29"],
+          "prize": 6300000,
+          "weekday": "Wednesday"
+        },
+        {
+          "id": "sf",
+          "type": "knockout",
+          "key": "europe.stage.sf",
+          "legs": 2,
+          "dates": ["04-15", "04-22"],
+          "prize": 15000000,
+          "weekday": "Tuesday"
+        },
+        {
+          "id": "final",
+          "type": "knockout",
+          "key": "europe.stage.final",
+          "legs": 1,
+          "dates": ["05-31"],
+          "prize": 18500000,
+          "weekday": "Saturday"
+        }
+      ]
+    },
+    {
+      "id": "UEL",
+      "entryPrize": 4300000,
+      "fieldStrength": 12.6,
+      "targetLeagueSize": 8,
+      "knockoutFrom": 4,
+      "dropTo": "UECL",
+      "stages": [
+        {
+          "id": "q1",
+          "type": "knockout",
+          "key": "europe.stage.q1",
+          "legs": 2,
+          "dates": ["07-10", "07-17"],
+          "prize": 200000,
+          "weekday": "Thursday"
+        },
+        {
+          "id": "q2",
+          "type": "knockout",
+          "key": "europe.stage.q2",
+          "legs": 2,
+          "dates": ["07-24", "07-31"],
+          "prize": 300000,
+          "weekday": "Thursday"
+        },
+        {
+          "id": "q3",
+          "type": "knockout",
+          "key": "europe.stage.q3",
+          "legs": 2,
+          "dates": ["08-07", "08-14"],
+          "prize": 400000,
+          "weekday": "Thursday"
+        },
+        {
+          "id": "po",
+          "type": "knockout",
+          "key": "europe.stage.po",
+          "legs": 2,
+          "dates": ["08-21", "08-28"],
+          "prize": 500000,
+          "weekday": "Thursday"
+        },
+        {
+          "id": "league",
+          "type": "league",
+          "key": "europe.stage.league",
+          "dates": ["09-18", "10-02", "10-23", "11-06", "11-27", "12-11", "01-22", "01-30"],
+          "prize": 2000000,
+          "weekday": "Thursday"
+        },
+        {
+          "id": "sf",
+          "type": "knockout",
+          "key": "europe.stage.sf",
+          "legs": 2,
+          "dates": ["04-16", "04-23"],
+          "prize": 6000000,
+          "weekday": "Thursday"
+        },
+        {
+          "id": "final",
+          "type": "knockout",
+          "key": "europe.stage.final",
+          "legs": 1,
+          "dates": ["05-28"],
+          "prize": 7000000,
+          "weekday": "Wednesday"
+        }
+      ]
+    },
+    {
+      "id": "UECL",
+      "entryPrize": 3200000,
+      "fieldStrength": 11.8,
+      "targetLeagueSize": 8,
+      "knockoutFrom": 4,
+      "dropTo": "",
+      "stages": [
+        {
+          "id": "q1",
+          "type": "knockout",
+          "key": "europe.stage.q1",
+          "legs": 2,
+          "dates": ["07-10", "07-17"],
+          "prize": 150000,
+          "weekday": "Thursday"
+        },
+        {
+          "id": "q2",
+          "type": "knockout",
+          "key": "europe.stage.q2",
+          "legs": 2,
+          "dates": ["07-24", "07-31"],
+          "prize": 200000,
+          "weekday": "Thursday"
+        },
+        {
+          "id": "q3",
+          "type": "knockout",
+          "key": "europe.stage.q3",
+          "legs": 2,
+          "dates": ["08-07", "08-14"],
+          "prize": 250000,
+          "weekday": "Thursday"
+        },
+        {
+          "id": "po",
+          "type": "knockout",
+          "key": "europe.stage.po",
+          "legs": 2,
+          "dates": ["08-21", "08-28"],
+          "prize": 350000,
+          "weekday": "Thursday"
+        },
+        {
+          "id": "league",
+          "type": "league",
+          "key": "europe.stage.league",
+          "dates": ["09-18", "10-02", "10-23", "11-06", "11-27", "12-11", "01-22", "01-30"],
+          "prize": 1000000,
+          "weekday": "Thursday"
+        },
+        {
+          "id": "sf",
+          "type": "knockout",
+          "key": "europe.stage.sf",
+          "legs": 2,
+          "dates": ["04-17", "04-24"],
+          "prize": 4000000,
+          "weekday": "Thursday"
+        },
+        {
+          "id": "final",
+          "type": "knockout",
+          "key": "europe.stage.final",
+          "legs": 1,
+          "dates": ["05-27"],
+          "prize": 5000000,
+          "weekday": "Wednesday"
+        }
+      ]
+    }
+  ]
+}

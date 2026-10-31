@@ -81,6 +81,7 @@ public static class PackageLoader
             Sponsors = PathsUnder("sponsors").Select(Json.Load<SponsorList>).ToDictionary(s => s.Country),
             Engine = Path1("rules/engine.json") is { } e ? Json.Load<EngineConfig>(e) : new(),
             Currencies = Path1("rules/currencies.json") is { } cu ? Json.Load<CurrencyConfig>(cu) : new(),
+            Europe = Path1("competitions/europe.json") is { } eu ? Json.Load<EuropeFormat>(eu) : null,
             Languages = languages,
             DefaultLanguage = defaultLanguage,
         };
