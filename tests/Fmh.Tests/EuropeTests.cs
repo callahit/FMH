@@ -99,4 +99,29 @@ public class EuropeTests
         TestData.PlayUntil(s, _ => cup.Fixtures.Any(f => f.Result is not null), 20_000);
         Assert.True(cup.Fixtures.Count(f => f.Result is not null) > before);
     }
+
+    /// <summary>
+    /// Europapokal-Heimspiele buchen die Billetterie unter European (UEFA/media), nicht unter Tickets/matchday —
+    /// sonst verzerren echte Europapokaltermine die Ligazahlen-Kalibrierung (DNCG/DFL Spieltag).
+    /// </summary>
+    [Fact]
+    public void EuropeHomeGateBooksAsEuropeanNotLeagueMatchday()
+    {
+        var s = TestData.NewSession(53);
+        var home = s.HumanClub;
+        var away = s.World.Clubs.Values.First(c => c.Id != home.Id);
+        home.Finance.SeasonTickets = 0;
+        var f = new Fixture
+        {
+            Id = 9_000_001, CompetitionId = "UCL", Kind = CompetitionKind.Europe,
+            HomeId = home.Id, AwayId = away.Id, Date = s.World.Date,
+            RefereeId = s.World.Referees[0].Id,
+        };
+        s.PlayInstant(f);
+        var gate = s.World.Transactions.Where(t =>
+            t.ClubId == home.Id && t.Date == s.World.Date && t.Amount > 0
+            && t.Type is TransactionType.Tickets or TransactionType.European).ToList();
+        Assert.Contains(gate, t => t.Type == TransactionType.European);
+        Assert.DoesNotContain(gate, t => t.Type == TransactionType.Tickets);
+    }
 }
