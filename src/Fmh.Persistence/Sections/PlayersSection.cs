@@ -40,15 +40,21 @@ public sealed class PlayersSection : SaveSection
         if (fromVersion <= 7)
         {
             Exec(c, tx, """
-                CREATE TABLE player_nationalities (player_id INTEGER NOT NULL REFERENCES players(id), ord INTEGER NOT NULL, code TEXT NOT NULL,
+                CREATE TABLE IF NOT EXISTS player_nationalities (player_id INTEGER NOT NULL REFERENCES players(id), ord INTEGER NOT NULL, code TEXT NOT NULL,
                     PRIMARY KEY (player_id, ord));
                 """);
-            foreach (var r in Rows(c, "SELECT id, nationalities FROM players"))
+            // Idempotent: Teststände setzen die Abschnittsversion zurück, ohne die Tabelle zu löschen.
+            var hasRows = false;
+            foreach (var _ in Rows(c, "SELECT 1 FROM player_nationalities LIMIT 1")) { hasRows = true; break; }
+            if (!hasRows)
             {
-                var id = r.GetInt32(0);
-                var codes = r.IsDBNull(1) ? Array.Empty<string>() : r.GetString(1).Split(',', StringSplitOptions.RemoveEmptyEntries);
-                for (var i = 0; i < codes.Length; i++)
-                    Exec(c, tx, "INSERT INTO player_nationalities (player_id, ord, code) VALUES (" + id + ", " + i + ", '" + codes[i].Replace("'", "''") + "')");
+                foreach (var r in Rows(c, "SELECT id, nationalities FROM players"))
+                {
+                    var id = r.GetInt32(0);
+                    var codes = r.IsDBNull(1) ? Array.Empty<string>() : r.GetString(1).Split(',', StringSplitOptions.RemoveEmptyEntries);
+                    for (var i = 0; i < codes.Length; i++)
+                        Exec(c, tx, "INSERT INTO player_nationalities (player_id, ord, code) VALUES (" + id + ", " + i + ", '" + codes[i].Replace("'", "''") + "')");
+                }
             }
         }
     }
