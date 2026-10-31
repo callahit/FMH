@@ -182,7 +182,8 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
         Training.AddFamiliarity(home, home.Tactic.FormationId, 2.5);
         Training.AddFamiliarity(away, away.Tactic.FormationId, 2.5);
 
-        Bus.Publish(new MatchPlayed(f, f.Involves(HumanClub.Id) && !Board.AwaitingNewJob));
+        var participants = sim.Home.Participants.Concat(sim.Away.Participants).Select(mp => mp.Player.Id).ToHashSet();
+        Bus.Publish(new MatchPlayed(f, f.Involves(HumanClub.Id) && !Board.AwaitingNewJob, participants));
     }
 
     private void ServeSuspensions(Club club)

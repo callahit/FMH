@@ -45,7 +45,8 @@ public static class Negotiations
     {
         var value = MarketValue.Of(p, world, data.PositionProfiles);
         var fee = o.Fee * (1 - 0.04 * Math.Clamp(o.InstallmentYears, 0, 3));
-        var bonus = (o.AppearanceBonus + o.GoalBonus) * 0.3;
+        // Zusatzzahlungen je Einsatz/Tor werden tatsächlich gebucht (TransferCondition) und nach erwarteter Wirkung bewertet.
+        var bonus = TransferTerms.AddOnValue(o, p);
         var sellOn = Math.Clamp(o.SellOnPercent, 0, 50) / 100.0 * value * 0.5;
         var swap = o.SwapPlayerId is { } sid && world.Players.TryGetValue(sid, out var sp)
             ? MarketValue.Of(sp, world, data.PositionProfiles) * 0.8 : 0;
@@ -75,9 +76,12 @@ public static class Negotiations
         var key = squad.IndexOf(p) is >= 0 and < 11;
         if (key && !p.Transfer.LoanListed) return new NegotiationResponse(ResponseKind.Reject, "neg.loan.keyPlayer");
         var minShare = p.Transfer.LoanListed ? 50 : p.Age(world.Date) <= 21 ? 60 : 80;
+        // Eine Einsatzgarantie sichert dem Stammverein Spielpraxis zu; dafür trägt er mehr vom Gehalt.
+        if (o.PlayingTimeGuarantee) minShare = Math.Max(0, minShare - TransferTerms.GuaranteeWageShareDiscount);
+        var covered = o.WageSharePercent + TransferTerms.WageShareFromLoanFee(o.LoanFee, MarketValue.Of(p, world, data.PositionProfiles));
         if (o.PurchaseFee is { } fee && fee < MarketValue.Of(p, world, data.PositionProfiles) * 0.9)
             return new NegotiationResponse(ResponseKind.Counter, "neg.loan.optionLow", MarketValue.Of(p, world, data.PositionProfiles));
-        if (o.WageSharePercent >= minShare) return new NegotiationResponse(ResponseKind.Accept, "neg.loan.accept");
+        if (covered >= minShare) return new NegotiationResponse(ResponseKind.Accept, "neg.loan.accept");
         if (n.ClubRounds >= MaxRounds) return new NegotiationResponse(ResponseKind.Reject, "neg.club.final");
         return new NegotiationResponse(ResponseKind.Counter, "neg.loan.wageShare", minShare, minShare);
     }
@@ -162,6 +166,8 @@ public static class Negotiations
         var expected = ExpectedStatus(p, buyer, world, data);
         if ((int)o.Status > (int)expected + 1) demand *= 1.1;
         demand *= ClauseFactor(o, buyer, world);
+        // Eine Verlängerungsoption des Vereins kostet den Spieler Freiheit und wird mit Gehalt aufgewogen.
+        demand *= 1 + TransferTerms.ExtensionOptionWageFactor * Math.Clamp(o.ExtensionOptionYears, 0, TransferTerms.MaxExtensionOptionYears);
         if (o.ReleaseClause is not null) demand *= 0.97;
 
         var effective = o.WeeklyWage
