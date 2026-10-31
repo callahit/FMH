@@ -9,28 +9,50 @@ public sealed class MatchdaySection : SaveSection
 {
     public override string ModuleId => "matchday";
 
-    /// <summary>Version 6: Phasennummer an Ligaspielen (0 = Grunddurchgang oder ältere Folgephase ohne Nummer).</summary>
-    public override int Version => 6;
+    /// <summary>Version 6: Phasennummer. Version 7: Fremdschlüssel an Spielen, Toren und Karten (Must-now E6-S1).</summary>
+    public override int Version => 7;
 
-    /// <summary>5 → 6: Spalte phase. Ältere Spiele bleiben 0 und gelten weiter als Grunddurchgang bzw. erste Folgephase.</summary>
+    /// <summary>5 → 6: Spalte phase. 6 → 7: Fremdschlüssel.</summary>
     public override void Migrate(SqliteConnection c, SqliteTransaction tx, int fromVersion)
     {
         if (fromVersion < BaseVersion || fromVersion > Version) base.Migrate(c, tx, fromVersion);
         if (fromVersion <= 5) Exec(c, tx, "ALTER TABLE fixtures ADD COLUMN phase INTEGER NOT NULL DEFAULT 0");
+        if (fromVersion <= 6)
+        {
+            Exec(c, tx, """
+                CREATE TABLE fixtures_v7 (id INTEGER PRIMARY KEY, competition_id TEXT NOT NULL, matchday INTEGER NOT NULL, date TEXT NOT NULL,
+                    home_id INTEGER NOT NULL REFERENCES clubs(id), away_id INTEGER NOT NULL REFERENCES clubs(id), referee_id INTEGER NOT NULL,
+                    played INTEGER NOT NULL, home_goals INTEGER, away_goals INTEGER, ht_home INTEGER, ht_away INTEGER, attendance INTEGER,
+                    weather TEXT, home_xg REAL, away_xg REAL, home_possession INTEGER, home_shots INTEGER, away_shots INTEGER, potm INTEGER,
+                    kind TEXT NOT NULL DEFAULT 'League', tie_id INTEGER, leg INTEGER NOT NULL DEFAULT 0, extra_time INTEGER NOT NULL DEFAULT 0,
+                    pens_home INTEGER, pens_away INTEGER, phase INTEGER NOT NULL DEFAULT 0);
+                INSERT INTO fixtures_v7 SELECT * FROM fixtures;
+                DROP TABLE fixtures; ALTER TABLE fixtures_v7 RENAME TO fixtures;
+                CREATE INDEX fixtures_league ON fixtures (competition_id, matchday);
+                CREATE TABLE goals_v7 (fixture_id INTEGER NOT NULL REFERENCES fixtures(id), ord INTEGER NOT NULL, minute INTEGER NOT NULL, home INTEGER NOT NULL,
+                    scorer_id INTEGER NOT NULL REFERENCES players(id), assist_id INTEGER REFERENCES players(id), penalty INTEGER NOT NULL, own_goal INTEGER NOT NULL);
+                INSERT INTO goals_v7 SELECT * FROM goals;
+                DROP TABLE goals; ALTER TABLE goals_v7 RENAME TO goals;
+                CREATE TABLE cards_v7 (fixture_id INTEGER NOT NULL REFERENCES fixtures(id), ord INTEGER NOT NULL, minute INTEGER NOT NULL, home INTEGER NOT NULL,
+                    player_id INTEGER NOT NULL REFERENCES players(id), red INTEGER NOT NULL);
+                INSERT INTO cards_v7 SELECT * FROM cards;
+                DROP TABLE cards; ALTER TABLE cards_v7 RENAME TO cards;
+                """);
+        }
     }
 
     protected override string Schema => """
         CREATE TABLE fixtures (id INTEGER PRIMARY KEY, competition_id TEXT NOT NULL, matchday INTEGER NOT NULL, date TEXT NOT NULL,
-            home_id INTEGER NOT NULL, away_id INTEGER NOT NULL, referee_id INTEGER NOT NULL,
+            home_id INTEGER NOT NULL REFERENCES clubs(id), away_id INTEGER NOT NULL REFERENCES clubs(id), referee_id INTEGER NOT NULL,
             played INTEGER NOT NULL, home_goals INTEGER, away_goals INTEGER, ht_home INTEGER, ht_away INTEGER, attendance INTEGER,
             weather TEXT, home_xg REAL, away_xg REAL, home_possession INTEGER, home_shots INTEGER, away_shots INTEGER, potm INTEGER,
             kind TEXT NOT NULL DEFAULT 'League', tie_id INTEGER, leg INTEGER NOT NULL DEFAULT 0, extra_time INTEGER NOT NULL DEFAULT 0,
             pens_home INTEGER, pens_away INTEGER, phase INTEGER NOT NULL DEFAULT 0);
         CREATE INDEX fixtures_league ON fixtures (competition_id, matchday);
-        CREATE TABLE goals (fixture_id INTEGER NOT NULL, ord INTEGER NOT NULL, minute INTEGER NOT NULL, home INTEGER NOT NULL,
-            scorer_id INTEGER NOT NULL, assist_id INTEGER, penalty INTEGER NOT NULL, own_goal INTEGER NOT NULL);
-        CREATE TABLE cards (fixture_id INTEGER NOT NULL, ord INTEGER NOT NULL, minute INTEGER NOT NULL, home INTEGER NOT NULL,
-            player_id INTEGER NOT NULL, red INTEGER NOT NULL);
+        CREATE TABLE goals (fixture_id INTEGER NOT NULL REFERENCES fixtures(id), ord INTEGER NOT NULL, minute INTEGER NOT NULL, home INTEGER NOT NULL,
+            scorer_id INTEGER NOT NULL REFERENCES players(id), assist_id INTEGER REFERENCES players(id), penalty INTEGER NOT NULL, own_goal INTEGER NOT NULL);
+        CREATE TABLE cards (fixture_id INTEGER NOT NULL REFERENCES fixtures(id), ord INTEGER NOT NULL, minute INTEGER NOT NULL, home INTEGER NOT NULL,
+            player_id INTEGER NOT NULL REFERENCES players(id), red INTEGER NOT NULL);
         """;
 
     public override void Save(SqliteConnection con, SqliteTransaction tx, World w)

@@ -111,6 +111,8 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
         switch (resp.Kind)
         {
             case ResponseKind.Accept:
+                if (n.Type == DealType.Transfer && HoldForPreemption(n, p, offer))
+                    return resp;
                 n.Stage = NegotiationStage.PlayerTalks;
                 if (n.Type == DealType.Loan)
                 {
@@ -275,4 +277,97 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
         ReturnLoan(p);
         return null;
     }
+
+    /// <summary>Rückkaufklausel ziehen (Must-now E1-S4), wenn das Wechselfenster offen ist.</summary>
+    public string? ExerciseBuyBack(Player p)
+    {
+        if (ActiveBuyBack(p, HumanClub.Id) is not { } clause) return "neg.error.noBuyBack";
+        if (!Season.IsTransferWindowOpen()) return "neg.error.window";
+        if (p.ClubId is not { } ownerId || ownerId == HumanClub.Id) return "neg.error.own";
+        if (clause.Amount > HumanClub.Budget.TransferBudget) return "neg.error.budget";
+        var owner = World.Clubs[ownerId];
+        var contract = Negotiations.SuggestContract(p, HumanClub, World, Data);
+        clause.Active = false;
+        foreach (var c in World.Clauses.Where(c => c.Active && c.PlayerId == p.Id && c.Kind == ClauseKind.Preemption && c.BeneficiaryClubId == HumanClub.Id))
+            c.Active = false;
+        ExecuteTransfer(p, HumanClub, owner, new ClubOffer { Fee = clause.Amount }, contract);
+        return null;
+    }
+
+    public bool CanExerciseBuyBack(Player p) =>
+        ActiveBuyBack(p, HumanClub.Id) is not null && Season.IsTransferWindowOpen()
+        && p.ClubId is { } oid && oid != HumanClub.Id;
+
+    /// <summary>Vorkaufsrecht: Mitbieten oder verzichten (Must-now E1-S4).</summary>
+    public string? ResolvePreemption(PreemptionOffer offer, bool match)
+    {
+        if (!World.PreemptionOffers.Contains(offer) || offer.BeneficiaryClubId != HumanClub.Id) return "neg.error.stage";
+        if (match && offer.Fee > HumanClub.Budget.TransferBudget) return "neg.error.budget";
+        World.PreemptionOffers.Remove(offer);
+        foreach (var m in World.Messages.Where(m => m.Action == MessageAction.Preemption && m.ActionRefId == offer.NegotiationId))
+            m.Resolved = true;
+        var n = World.Negotiations.FirstOrDefault(x => x.Id == offer.NegotiationId);
+        var p = World.Players[offer.PlayerId];
+        if (match)
+        {
+            if (ActivePreemption(p) is { } clause) clause.Active = false;
+            if (n is not null) n.Stage = NegotiationStage.Withdrawn;
+            var seller = p.ClubId is { } sid ? World.Clubs[sid] : null;
+            if (seller is null) return "neg.error.stage";
+            ExecuteTransfer(p, HumanClub, seller, new ClubOffer { Fee = offer.Fee }, Negotiations.SuggestContract(p, HumanClub, World, Data));
+            return null;
+        }
+        // Dritter darf fortsetzen.
+        if (n is not null && n.Stage == NegotiationStage.Pending && !n.Incoming)
+        {
+            n.Stage = NegotiationStage.PlayerTalks;
+            n.Contract = Negotiations.SuggestContract(p, World.Clubs[n.BuyerId], World, Data);
+        }
+        return null;
+    }
+
+    /// <summary>
+    /// Hält einen akzeptierten Vereinsdeal an, wenn ein Vorkaufsrecht greift.
+    /// Mensch: Pflicht-Entscheidung (3 Tage). KI: entscheidet sofort.
+    /// </summary>
+    private bool HoldForPreemption(Negotiation n, Player p, ClubOffer offer)
+    {
+        if (ActivePreemption(p) is not { } clause) return false;
+        if (clause.BeneficiaryClubId == n.BuyerId) return false;
+        if (World.PreemptionOffers.Any(o => o.PlayerId == p.Id && o.BeneficiaryClubId == clause.BeneficiaryClubId)) return true;
+
+        var pending = new PreemptionOffer
+        {
+            ClauseId = clause.Id, NegotiationId = n.Id, PlayerId = p.Id,
+            BeneficiaryClubId = clause.BeneficiaryClubId, Fee = offer.Fee,
+            Expires = World.Date.AddDays(3),
+        };
+
+        if (clause.BeneficiaryClubId == HumanClub.Id)
+        {
+            World.PreemptionOffers.Add(pending);
+            n.Stage = NegotiationStage.Pending;
+            Notify(MessageType.Transfer, "msg.sender.assistant", TR("msg.preemption.subject", p.Name),
+                TR("msg.preemption.body", p.Name, TextArg.Money(offer.Fee, Currency)),
+                MessageAction.Preemption, n.Id, required: true);
+            return true;
+        }
+
+        // KI-Begünstigter: Talente mit genug Budget mitbieten, sonst freigeben.
+        var beneficiary = World.Clubs[clause.BeneficiaryClubId];
+        if (AiWantsPreemption(beneficiary, p, offer.Fee))
+        {
+            clause.Active = false;
+            n.Stage = NegotiationStage.Withdrawn;
+            ExecuteTransfer(p, beneficiary, World.Clubs[n.SellerId ?? p.ClubId!.Value], new ClubOffer { Fee = offer.Fee },
+                Negotiations.SuggestContract(p, beneficiary, World, Data));
+            return true;
+        }
+        return false;
+    }
+
+    private bool AiWantsPreemption(Club club, Player p, long fee) =>
+        !IsHuman(club) && fee <= club.Budget.TransferBudget
+        && p.Age(World.Date) <= 24 && p.Hidden.PotentialAbility - p.Hidden.CurrentAbility >= 12
+        && Rating(p) >= PlayerGenerator.ClubLevel(club.Reputation) - 1;
 }

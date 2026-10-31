@@ -41,6 +41,10 @@ public sealed class World
     public List<TransferCondition> TransferConditions { get; set; } = new();
     /// <summary>Verträge mit Id und Historie (laufend und abgelöst). Der Spieler trägt zusätzlich den aktuellen Vertrag.</summary>
     public List<ContractRecord> ContractHistory { get; set; } = new();
+    /// <summary>Vertrags- und Deal-Klauseln als eigene Datensätze (Must-now E1-S3/S4).</summary>
+    public List<Clause> Clauses { get; set; } = new();
+    /// <summary>Offene Vorkaufsentscheidungen.</summary>
+    public List<PreemptionOffer> PreemptionOffers { get; set; } = new();
     public List<Scout> Scouts { get; set; } = new();
     public List<ScoutAssignment> ScoutAssignments { get; set; } = new();
     public List<ScoutReport> ScoutReports { get; set; } = new();
@@ -86,6 +90,7 @@ public sealed class World
     public int NextEventId { get; set; } = 1;
     public int NextDealId { get; set; } = 1;
     public int NextContractId { get; set; } = 1;
+    public int NextClauseId { get; set; } = 1;
     public int NextPromiseId { get; set; } = 1;
 
     public League LeagueOf(Club club) => Leagues.First(l => l.Id == club.LeagueId);
@@ -156,7 +161,7 @@ public sealed class Manager
 public enum MessageType { Info, Board, Medical, Discipline, Result, Season, Transfer, Contract, Scouting, Youth, Training, Cup, Finance, Stadium, Fans, Press, Event, Career }
 
 /// <summary>Aktion, die eine Nachricht auslöst (z. B. Transferangebot annehmen oder ablehnen).</summary>
-public enum MessageAction { None, IncomingOffer, ContractExpiring, ScoutReport, Negotiation, YouthIntake, Event, SponsorOffer, PressConference, SeasonGoal, JobOffer, Construction, Academy, License }
+public enum MessageAction { None, IncomingOffer, ContractExpiring, ScoutReport, Negotiation, YouthIntake, Event, SponsorOffer, PressConference, SeasonGoal, JobOffer, Construction, Academy, License, Preemption }
 
 public sealed class Message
 {

@@ -83,6 +83,10 @@ public sealed partial class NegotiationViewModel : ViewModelBase
     [ObservableProperty] private decimal _loanFee;
     [ObservableProperty] private decimal _sellerAppearanceAddOn;
     [ObservableProperty] private decimal _sellerGoalAddOn;
+    [ObservableProperty] private bool _hasBuyBack;
+    [ObservableProperty] private decimal _buyBackFee;
+    [ObservableProperty] private decimal _buyBackYears = 2;
+    [ObservableProperty] private bool _preemptionRight;
 
     // Vertrag mit dem Spieler
     [ObservableProperty] private decimal _years = 3;
@@ -119,6 +123,10 @@ public sealed partial class NegotiationViewModel : ViewModelBase
         LoanFee = o.LoanFee;
         SellerAppearanceAddOn = o.AppearanceBonus;
         SellerGoalAddOn = o.GoalBonus;
+        HasBuyBack = o.BuyBackFee is not null;
+        BuyBackFee = o.BuyBackFee ?? Session.ValueOf(Player);
+        BuyBackYears = o.BuyBackYears <= 0 ? 2 : o.BuyBackYears;
+        PreemptionRight = o.PreemptionRight;
     }
 
     partial void OnHasPurchaseOptionChanged(bool value) => OnPropertyChanged(nameof(ShowPurchaseCondition));
@@ -212,6 +220,9 @@ public sealed partial class NegotiationViewModel : ViewModelBase
                 LoanFee = IsLoan ? (long)LoanFee : 0,
                 AppearanceBonus = IsTransfer ? (long)SellerAppearanceAddOn : 0,
                 GoalBonus = IsTransfer ? (long)SellerGoalAddOn : 0,
+                BuyBackFee = IsTransfer && HasBuyBack ? (long)BuyBackFee : null,
+                BuyBackYears = (int)BuyBackYears,
+                PreemptionRight = IsTransfer && PreemptionRight,
             };
             r = Session.SubmitClubOffer(_n, offer);
             if (r.Kind == ResponseKind.Counter && _n.CounterFee is { } cf && IsTransfer) Fee = cf;
