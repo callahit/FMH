@@ -97,8 +97,9 @@ public sealed partial class TransfersModule
         var youthAge = profile.YouthFocusAge;
         double Score(Player p, double r) =>
             youthAge > 0 && p.Age(World.Date) <= youthAge ? r + (p.Hidden.PotentialAbility - p.Hidden.CurrentAbility) / 20.0 : r;
-        // Ablösen nur aus echtem Vermögen: Mit Krediten im Rücken bleibt die Kasse zu (sonst Lizenzauflagen und Punktabzüge).
-        var budget = Math.Min(club.Budget.TransferBudget, Math.Max(0, Finance.Equity(club)));
+        // Ablösen vor allem aus Eigenkapital; ein Viertel des Transferbudgets bleibt nutzbar, damit der Markt nicht austrocknet.
+        var equity = Math.Max(0, Finance.Equity(club));
+        var budget = Math.Min(club.Budget.TransferBudget, Math.Max(equity, club.Budget.TransferBudget / 4));
         var candidates = MarketOf(need)
             .Where(x => x.p.ClubId != club.Id && x.p.ClubId != HumanClub.Id && x.p.Loan is null && x.p.PreContract is null && !x.p.Retired && !x.p.IsYouth)
             .Where(x => x.r >= minRating && x.r <= level + profile.MaxAboveLevel)
