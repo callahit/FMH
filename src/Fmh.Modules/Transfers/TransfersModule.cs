@@ -86,15 +86,22 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
         var buyer = World.Clubs[n.BuyerId];
         if (n.Stage != NegotiationStage.ClubTalks || n.SellerId is not { } sellerId) return new(ResponseKind.Reject, "neg.error.stage");
         var seller = World.Clubs[sellerId];
-        if (n.Type == DealType.Transfer && offer.Fee > buyer.Budget.TransferBudget) return new(ResponseKind.Reject, "neg.error.budget");
         if (offer.SwapPlayerId is { } swap && World.Players[swap].ClubId != buyer.Id) return new(ResponseKind.Reject, "neg.error.swap");
         offer.InstallmentYears = Math.Clamp(offer.InstallmentYears, 0, 3);
+        offer.InstallmentCount = Math.Clamp(offer.InstallmentCount, 0, TransferTerms.MaxInstallments);
+        offer.DownPayment = Math.Max(0, offer.DownPayment);
+        if (n.Type == DealType.Transfer)
+        {
+            TransferTerms.NormalizePaymentPlan(offer, offer.Fee);
+            if (offer.DownPayment > buyer.Budget.TransferBudget) return new(ResponseKind.Reject, "neg.error.budget");
+        }
         offer.SellOnPercent = Math.Clamp(offer.SellOnPercent, 0, 50);
-        offer.LoanMonths = Math.Clamp(offer.LoanMonths, 6, 12);
+        offer.LoanMonths = TransferTerms.ClampLoanMonths(offer.LoanMonths);
         offer.WageSharePercent = Math.Clamp(offer.WageSharePercent, 0, 100);
         offer.AppearanceBonus = Math.Max(0, offer.AppearanceBonus);
         offer.GoalBonus = Math.Max(0, offer.GoalBonus);
         offer.LoanFee = Math.Max(0, offer.LoanFee);
+        offer.PurchaseConditionValue = Math.Clamp(offer.PurchaseConditionValue <= 0 ? 50 : offer.PurchaseConditionValue, 1, 100);
         if (n.Type == DealType.Loan && offer.LoanFee > buyer.Budget.TransferBudget) return new(ResponseKind.Reject, "neg.error.budget");
 
         n.ClubRounds++;
