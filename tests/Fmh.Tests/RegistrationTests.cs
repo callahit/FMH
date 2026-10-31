@@ -158,7 +158,7 @@ public class RegistrationTests
             }
             var old = SqliteStore.Load(path);
             Assert.All(old.Players.Values.Where(x => x.ClubId is not null), x => Assert.Equal(x.ClubId, x.Registration.ClubId));
-            Assert.Equal("7", SqliteStore.ReadMetaTable(path)["schema.players"]);
+            Assert.Equal("8", SqliteStore.ReadMetaTable(path)["schema.players"]);
             // Die Sitzung ergänzt die Ausbildungsjahre.
             var session = new GameSession(old, TestData.Data, new TextMatchEngine());
             Assert.Contains(session.World.Players.Values, x => x.Registration.Formative.Count > 0);
