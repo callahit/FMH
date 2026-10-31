@@ -94,6 +94,8 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
         offer.WageSharePercent = Math.Clamp(offer.WageSharePercent, 0, 100);
         offer.AppearanceBonus = Math.Max(0, offer.AppearanceBonus);
         offer.GoalBonus = Math.Max(0, offer.GoalBonus);
+        offer.LoanFee = Math.Max(0, offer.LoanFee);
+        if (n.Type == DealType.Loan && offer.LoanFee > buyer.Budget.TransferBudget) return new(ResponseKind.Reject, "neg.error.budget");
 
         n.ClubRounds++;
         n.Offer = offer.Clone();

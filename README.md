@@ -189,9 +189,11 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
       League Cup statt an den Sechsten (`europe.cupPlaces`). Spanien, Italien und Frankreich: Platz 1–4, 5 und 6 wie in Deutschland.
     - Ohne Zulassung rückt der nächste Verein nach. Ist ein Pokalsieger schon qualifiziert oder ohne
       Lizenz, geht sein Platz an den nächsten Ligaplatz.
-    - Die Wettbewerbe laufen vereinfacht ohne eigene Spiele: An fünf Terminen entscheidet die
-      Mannschaftsstärke gegen das Teilnehmerfeld über das Weiterkommen. Es gibt Start- und
-      Rundenprämien, Fanstimmung und Vereinsruf steigen.
+    - Die Wettbewerbe (Champions-, Europa-, Conference-Pokal) laufen mit echten Spielen (AP 5):
+      Qualifikationsrunden (Hin und Rück), Ligaphase und K.-o. bis zum Finale. Format in
+      `data/base/competitions/europe.json`. Teilnehmer aus allen geladenen Ländern; Einstieg nach
+      Länderkoeffizient. Termine Di–Do, ohne Kollision mit Ligaspielen. Start- und Rundenprämien,
+      Fanstimmung und Vereinsruf steigen.
   - Ansicht unter Finanzen → Lizenz und Europa.
   - Saisonbilanz, Monatsverlauf als Diagramm.
 - **Stadion:** vier Tribünen mit Steh- und Sitzplätzen, Dach und Logen; Flutlicht, Rasenheizung,
@@ -387,7 +389,7 @@ aktive Spieler höchstens +10 % gegenüber dem ersten Saisonende, Vereinslose h�
 | Kapitel | Umgesetzt | Folgt laut Roadmap |
 |---|---|---|
 | 2 Spielmodi und Spielstart | Karriere mit neuem Spiel (Name, Werdegang, Verein, Seed, Weltregeln), Managerprofil, Speichern, Autosave vor jedem Spieltag in 3 rotierenden Slots, optional Ironman | Schnellsaison, Hot-Seat, Herausforderungen (Phase 4) |
-| 3 Spielwelt, Wettbewerbe | Tagesgenauer Kalender, Ligen als Daten, Deutschland bis zur 4. Liga (Regionalliga in fünf Staffeln) mit Oberliga als Pool, England mit vier Profiligen und National League als Pool, **mehrere Pokale je Land (Verbandspokale, Supercup, Ligapokal)**, **Relegation**, Transferfenster, Pflicht-Entscheidungen, **Ligapyramiden mit Staffeln, Bewegungsregeln, Aufstiegsrunden, zweiten Mannschaften und Formatversionen** | Europapokal, weitere Länder (Phase 3) |
+| 3 Spielwelt, Wettbewerbe | Tagesgenauer Kalender, Ligen als Daten, DE/EN/ES/IT/FR bis zur 4. Liga, **nationale Pokale und Relegation**, **echte Europapokale (UCL/UEL/UECL) mit Qualifikation, Ligaphase und K.-o.**, Transferfenster, Pflicht-Entscheidungen, **Ligapyramiden** | Hintergrundländer / EuropeOnly (Welle 3), weitere Länder |
 | 4 Spielerdatenmodell | 44 Attribute, versteckte Werte, Kondition, Form, Moral, Spielpraxis, Positionseignung, Entwicklung durch **Training** und Saisonwechsel, Karriereende, Dauerschäden | Zufriedenheit, Tutor-System |
 | 5 Kader, Training, Taktik | Kader, Profil, **Training**, **Trainingslager**, 25 Formationen, **Rollen und Aufgaben**, **Spieleranweisungen**, **freie Positionierung**, **Taktikvertrautheit**, **3 Taktikvarianten**, Standardvarianten, Co-Trainer | – |
 | 6 Spieltag und Matchengine | Vorbericht, Kabinenansprache, Kommentar/Ticker/Sofort/**Konferenz**, Wechsel, Taktik und Zurufe live, Nachbericht mit Noten und Statistik, **Verlängerung und Elfmeterschießen**, Hin- und Rückspiel, **Pressekonferenzen** | – |
@@ -496,7 +498,8 @@ Die Gewichte stehen in `data/base/rules/engine.json`.
 - CI (`.github/workflows/ci.yml`): Build und Tests auf Linux und Windows, Warnungen gelten als Fehler,
   dazu ein Kalibrierungsjob mit Toleranzprüfung (Engine über 10.000 Spiele, Karriere über fünf Saisons mit
   Ligazahlen, Insolvenzen, Mindestkader, Größe der Spielwelt und `--max-drift 0.05`).
-- Offene Punkte aus dem Code-Review vom 28.10.2026 stehen mit Status in `docs/review-2026-10-28.md`.
+- Offene Punkte aus den Code-Reviews: `docs/review-2026-10-28.md` (F-01–F-14) und
+  `docs/review-2026-10-30.md` (Nachprüfung, Genre-Abgleich N-/G-Findings).
 - Keine Länder- oder Wettbewerbscodes im C#-Code; Regeln, Zahlen und Texte gehören in Datenpakete.
 
 ## Aufbau
@@ -515,9 +518,9 @@ src/
                      Modulvertrag (IGameModule, ModuleContext, DayContext), Ereignisbus mit Ereignissen
                      (DayStarted, MatchPlayed), Dienst-Schnittstellen der Module und gemeinsamer Kern
                      (Spielstand, Zufall, Posteingang); unter 600 Zeilen
-  Fmh.Modules/       Je Fachgebiet ein Modul: Spielbetrieb, Saison, Pokale, Transfers, Training, Scouting,
-                     Jugend, Finanzen, Wirtschaft, Gelände, Stadionpläne, Personal, Sponsoren, Vorstand,
-                     Presse, Ereignisse, Lizenz
+  Fmh.Modules/       Je Fachgebiet ein Modul: Spielbetrieb, Saison, Pokale, Europapokal, Transfers, Training,
+                     Scouting, Jugend, Finanzen, Wirtschaft, Gelände, Stadionpläne, Personal, Sponsoren,
+                     Vorstand, Presse, Ereignisse, Lizenz
   Fmh.Simulation/    Fassade GameSession: Tagesschleife, Modul-Registry (Reihenfolge aus DependsOn)
   Fmh.Persistence/   SQLite-Spielstand: Speicherabschnitte je Modul mit eigener Version, Altmigrationen bis Version 5
   Fmh.MatchEngine/   Text-Matchengine (Phasen, 5x7-Zonen, Duelle, Rollen, Verlängerung, Elfmeterschießen)
@@ -697,8 +700,9 @@ Vergleich.
 
 - **Lizenz:** Open Source ist gesetzt, die konkrete Lizenz klärt der Projektinhaber später (Vorschlag
   GPL-3.0 für Code, CC BY-SA 4.0 für Daten). Bis dahin gibt es keine Lizenzdatei.
-- **Europapokal:** Die europäischen Wettbewerbe laufen vereinfacht ohne eigene Spiele und ohne
-  ausländische Vereine. Echte Partien brauchen weitere Länder als Datenpakete.
+- **Europapokal:** Echte Spiele zwischen geladenen Ländern sind umgesetzt (AP 5). Offene Punkte:
+  Hintergrundvereine für volle 36er-Ligaphasen, Koeffizienten-Bonusplätze und UEFA-Drop-Ins
+  (UCL-Quali-Verlierer → UEL) feiner kalibrieren.
 - **Saisonphasen:** Umgesetzt ist eine zweite Phase je Saison; mehrere Folgephasen (z. B. Play-offs um den Titel nach
   der Meisterrunde) folgen, wenn ein Land sie braucht.
 - **Deutschland:** Es gibt fünf Verbandspokale (je Regionalliga-Region) statt der 21 Landespokale. In der ersten

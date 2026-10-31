@@ -39,6 +39,8 @@ public sealed class World
     public List<Installment> Installments { get; set; } = new();
     /// <summary>Laufende erfolgsabhängige Zahlungen an abgebende Vereine.</summary>
     public List<TransferCondition> TransferConditions { get; set; } = new();
+    /// <summary>Verträge mit Id und Historie (laufend und abgelöst). Der Spieler trägt zusätzlich den aktuellen Vertrag.</summary>
+    public List<ContractRecord> ContractHistory { get; set; } = new();
     public List<Scout> Scouts { get; set; } = new();
     public List<ScoutAssignment> ScoutAssignments { get; set; } = new();
     public List<ScoutReport> ScoutReports { get; set; } = new();
@@ -53,6 +55,10 @@ public sealed class World
     public PressConference? PendingPress { get; set; }
     /// <summary>Teilnehmer an europäischen Wettbewerben (laufende und kommende Saison).</summary>
     public List<EuropeanEntry> EuropeanEntries { get; set; } = new();
+    /// <summary>Länderkoeffizienten (Fünfjahresfenster, laufende Summe; AP 5).</summary>
+    public Dictionary<string, double> CountryCoefficients { get; set; } = new();
+    /// <summary>Vereinskoeffizienten für Setzliste und Einstieg (AP 5).</summary>
+    public Dictionary<int, double> ClubCoefficients { get; set; } = new();
 
     /// <summary>Alle Ligen der laufenden Saison sind beendet und ausgewertet; der Wechsel folgt zum Saisonstart.</summary>
     public bool SeasonFinished { get; set; }
@@ -71,6 +77,8 @@ public sealed class World
     public int NextSponsorId { get; set; } = 1;
     public int NextLoanId { get; set; } = 1;
     public int NextEventId { get; set; } = 1;
+    public int NextDealId { get; set; } = 1;
+    public int NextContractId { get; set; } = 1;
 
     public League LeagueOf(Club club) => Leagues.First(l => l.Id == club.LeagueId);
 

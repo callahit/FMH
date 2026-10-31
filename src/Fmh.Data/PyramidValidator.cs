@@ -118,10 +118,9 @@ public static class PyramidValidator
         d.MovementsOf(id).Where(m => m.Kind == MovementKind.Direct && m.To == to && Applies(m, season, transition))
             .SelectMany(m => m.PositionList()).Distinct().Count());
 
-    /// <summary>Saisonphasen: höchstens eine zweite Phase; ihre Gruppen decken alle Plätze genau einmal ab.</summary>
+    /// <summary>Saisonphasen: jede Folgephase deckt alle Plätze der vorherigen Tabelle genau einmal ab.</summary>
     private static void ValidatePhases(DivisionConfig div, List<string> errors)
     {
-        if (div.Phases.Count > 1) errors.Add($"Liga '{div.Name}': mehr als eine zweite Saisonphase ist nicht umgesetzt.");
         foreach (var phase in div.Phases)
         {
             var positions = phase.Groups.SelectMany(g => g.PositionList()).ToList();

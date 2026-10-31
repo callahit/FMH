@@ -190,8 +190,9 @@ public sealed partial class FinancesPageViewModel : PageViewModel, IRefreshable
             foreach (var e in s.EuropeanEntriesOf(year))
             {
                 var stage = e.Stage < 0 ? T["europe.notStarted"]
-                    : GameSession.EuropeCompetitionOf(s.World.Country(s.World.Clubs[e.ClubId].CountryCode), e.CompetitionId) is { } comp ? T[comp.Stages[e.Stage].Key] : "";
-                if (e.Eliminated && e.Stage < 4) stage += " · " + T["europe.out"];
+                    : s.EuropeCompetitionOf(e.CompetitionId) is { } comp && e.Stage < comp.Stages.Count ? T[comp.Stages[e.Stage].Key]
+                    : s.World.FindCup(e.CompetitionId)?.Rounds.ElementAtOrDefault(e.Stage) is { NameKey: { Length: > 0 } key } ? T[key] : "";
+                if (e.Eliminated) stage += " · " + T["europe.out"];
                 europe.Add(new InfoLine($"{GameSession.SeasonLabel(year)} · {T["europe." + e.CompetitionId]}", $"{s.World.Clubs[e.ClubId].Name} – {stage}",
                     e.ClubId == club.Id ? new SolidColorBrush(P.Gold) : null));
             }

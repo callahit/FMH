@@ -59,6 +59,9 @@ public static class SqliteStore
         }.ToString();
         var con = new SqliteConnection(cs);
         con.Open();
+        using var pragma = con.CreateCommand();
+        pragma.CommandText = "PRAGMA foreign_keys = ON;";
+        pragma.ExecuteNonQuery();
         return con;
     }
 
@@ -90,6 +93,8 @@ public static class SqliteStore
             ["next_sponsor_id"] = w.NextSponsorId.ToString(Inv),
             ["next_loan_id"] = w.NextLoanId.ToString(Inv),
             ["next_event_id"] = w.NextEventId.ToString(Inv),
+            ["next_deal_id"] = w.NextDealId.ToString(Inv),
+            ["next_contract_id"] = w.NextContractId.ToString(Inv),
             ["pending_press"] = w.PendingPress is null ? "" : J(w.PendingPress),
             ["rules"] = JsonSerializer.Serialize(w.Rules, Json.Compact),
             ["packages"] = JsonSerializer.Serialize(w.Packages),
@@ -205,6 +210,8 @@ public static class SqliteStore
             NextSponsorId = Next("next_sponsor_id"),
             NextLoanId = Next("next_loan_id"),
             NextEventId = Next("next_event_id"),
+            NextDealId = Next("next_deal_id"),
+            NextContractId = Next("next_contract_id"),
             PendingPress = meta.TryGetValue("pending_press", out var press) && press.Length > 0 ? PJ<PressConference>(press) : null,
             Rules = JsonSerializer.Deserialize<WorldRules>(meta["rules"], Json.Compact) ?? new WorldRules(),
             Packages = JsonSerializer.Deserialize<List<string>>(meta["packages"]) ?? new List<string>(),

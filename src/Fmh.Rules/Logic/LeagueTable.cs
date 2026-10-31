@@ -28,8 +28,17 @@ public static class LeagueTable
 {
     public static List<TableRow> Compute(League league, int? upToMatchday = null)
     {
-        if (league.Format.Phases.Count > 0 && league.PhaseScheduled && (upToMatchday is null || upToMatchday > league.RegularMatchdays))
-            return ComputeWithPhase(league, league.Format.Phases[0], upToMatchday);
+        if (league.Format.Phases.Count > 0 && league.PhasesScheduled > 0 && (upToMatchday is null || upToMatchday > league.RegularMatchdays))
+        {
+            var table = Compute(league, league.RegularMatchdays);
+            for (var i = 0; i < league.PhasesScheduled && i < league.Format.Phases.Count; i++)
+            {
+                if (!league.Fixtures.Any(f => InPhase(f, league, i + 1))) break;
+                if (upToMatchday is not null && !league.Fixtures.Any(f => InPhase(f, league, i + 1) && f.Matchday <= upToMatchday)) break;
+                table = ApplyPhase(league, league.Format.Phases[i], i + 1, table, upToMatchday);
+            }
+            return table;
+        }
         var played = league.Fixtures
             .Where(f => f.Result is not null && (upToMatchday is null || f.Matchday <= upToMatchday))
             .OrderBy(f => f.Matchday)
@@ -42,13 +51,16 @@ public static class LeagueTable
         return sorted;
     }
 
+    /// <summary>Spiel der Folgephase <paramref name="phaseNumber"/> (1 = erste). Ältere Spielstände ohne Nummer zählen als Phase 1.</summary>
+    private static bool InPhase(Fixture f, League league, int phaseNumber) =>
+        f.Phase == phaseNumber || (phaseNumber == 1 && f.Phase == 0 && f.Matchday > league.RegularMatchdays);
+
     /// <summary>
-    /// Endtabelle mit zweiter Phase: Die Gruppen stehen nach ihren Plätzen im Grunddurchgang hintereinander. Je Gruppe zählen
-    /// die übernommenen Punkte plus die Punkte der zweiten Phase; Tore und Bilanz laufen über die ganze Saison.
+    /// Eine Folgephase: Die Gruppen stehen nach ihren Plätzen der vorherigen Tabelle hintereinander. Je Gruppe zählen die
+    /// übernommenen Punkte plus die Punkte dieser Phase; Tore und Bilanz laufen über alle bisherigen Spiele.
     /// </summary>
-    private static List<TableRow> ComputeWithPhase(League league, PhaseConfig phase, int? upToMatchday)
+    private static List<TableRow> ApplyPhase(League league, PhaseConfig phase, int phaseNumber, List<TableRow> basis, int? upToMatchday)
     {
-        var regular = Compute(league, league.RegularMatchdays);
         var played = league.Fixtures
             .Where(f => f.Result is not null && (upToMatchday is null || f.Matchday <= upToMatchday))
             .OrderBy(f => f.Matchday)
@@ -57,19 +69,18 @@ public static class LeagueTable
         var result = new List<TableRow>();
         foreach (var group in phase.Groups)
         {
-            var ids = group.PositionList().Where(p => p <= regular.Count).Select(p => regular[p - 1].ClubId).ToList();
+            var ids = group.PositionList().Where(p => p <= basis.Count).Select(p => basis[p - 1].ClubId).ToList();
             var idSet = ids.ToHashSet();
-            var phaseFixtures = played.Where(f => f.Matchday > league.RegularMatchdays && idSet.Contains(f.HomeId) && idSet.Contains(f.AwayId)).ToList();
+            var phaseFixtures = played.Where(f => InPhase(f, league, phaseNumber) && idSet.Contains(f.HomeId) && idSet.Contains(f.AwayId)).ToList();
             var phasePoints = Accumulate(ids, phaseFixtures, league.Format.Points);
-            var rows = ids.Select(id => season[id]).ToList();
             foreach (var id in ids)
             {
                 var row = season[id];
-                var before = regular.First(r => r.ClubId == id);
+                var before = basis.First(r => r.ClubId == id);
                 row.Points = phase.Carry(before.Points) + phasePoints[id].Points;
                 row.Deducted = before.Deducted;
             }
-            result.AddRange(Sort(rows, played, league.Format));
+            result.AddRange(Sort(ids.Select(id => season[id]).ToList(), played, league.Format));
         }
         for (var i = 0; i < result.Count; i++) result[i].Position = i + 1;
         return result;
