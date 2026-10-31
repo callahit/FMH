@@ -860,7 +860,7 @@
   },
   "loans": {
     "default": {
-      "maxOut": 6, "maxIn": 6, "maxPerClub": 3, "exemptAge": 21, "ageCutoff": "SeasonEnd", "exemptNeedsClubTrained": true, "maxMonths": 12,
+      "maxOut": 6, "maxIn": 6, "maxPerClub": 3, "exemptAge": 21, "ageCutoff": "SeasonEnd", "exemptNeedsClubTrained": true, "maxMonths": 24,
       "source": "DFL Lizenzordnung Spieler, Stand 05.12.2025: höchstens sechs Spieler an inländische Clubs verliehen bzw. von ihnen ausgeliehen, höchstens drei mit demselben Club; ausgenommen selbst ausgebildete Spieler bis zur Saison, in der sie 21 werden"
     }
   },
