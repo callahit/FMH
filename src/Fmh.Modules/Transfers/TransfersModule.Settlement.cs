@@ -78,18 +78,19 @@ public sealed partial class TransfersModule
         var fee = offer.Fee;
         if (seller is not null && fee > 0)
         {
-            var upfront = offer.InstallmentYears > 0 ? fee / (offer.InstallmentYears + 1) : fee;
+            TransferTerms.NormalizePaymentPlan(offer, fee);
+            var upfront = offer.DownPayment;
             Finance.Book(buyer, TransactionType.TransferIn, -upfront, TR("tx.transferIn", p.Name));
             Finance.Book(seller, TransactionType.TransferOut, upfront, TR("tx.transferOut", p.Name));
-            for (var k = 1; k <= offer.InstallmentYears; k++)
+            foreach (var (due, amount) in TransferTerms.BuildInstallmentSchedule(offer, World.Date, fee))
                 World.Installments.Add(new Installment
                 {
-                    FromClubId = buyer.Id, ToClubId = seller.Id, Due = World.Date.AddDays(365 * k), DealId = dealId,
-                    Amount = (fee - upfront) / offer.InstallmentYears, TextRef = TR("tx.installment", p.Name),
+                    FromClubId = buyer.Id, ToClubId = seller.Id, Due = due, DealId = dealId,
+                    Amount = amount, TextRef = TR("tx.installment", p.Name),
                 });
-            // Budgets zweiter Mannschaften führt der Hauptverein (keine eigene Kasse).
-            Budgeted(buyer).Budget.TransferBudget -= fee;
-            Budgeted(seller).Budget.TransferBudget += fee / 2;
+            // Nur die Anzahlung belastet das Transferbudget sofort; spätere Raten beim Fälligkeitstag.
+            Budgeted(buyer).Budget.TransferBudget -= upfront;
+            Budgeted(seller).Budget.TransferBudget += upfront / 2;
             PaySellOns(p, seller, buyer, fee);
             var agent = Negotiations.AgentFee(p, fee);
             Finance.Book(buyer, TransactionType.AgentFee, -agent, TR("tx.agentFee", p.Name));
@@ -114,7 +115,7 @@ public sealed partial class TransfersModule
         buyer.PlayerIds.Add(p.Id);
         SetContract(p, MakeContract(contract, World.Date, buyer), previousClubId: from, dealId: dealId);
         if (seller is not null) AddTransferConditions(p, buyer, seller, offer, dealId);
-        GrantSellOn(p, seller, offer.SellOnPercent, dealId, carriedSellOns);
+        GrantSellOn(p, seller, offer.SellOnPercent, dealId, carriedSellOns, fee, offer.SellOnBasis);
         p.State.Morale = (Morale)Math.Min(6, (int)p.State.Morale + 1);
         AddTransferRecord(dealId, p.Id, from, buyer.Id, fee, loan: false);
         if (buyer.Id == HumanClub.Id) World.Knowledge[p.Id] = 100;
@@ -137,11 +138,19 @@ public sealed partial class TransfersModule
 
     private void ExecuteLoan(Player p, Club buyer, Club parent, ClubOffer offer)
     {
+<<<<<<< HEAD
         var until = World.Date.AddMonths(offer.LoanMonths);
         var seasonEnd = new DateOnly(World.SeasonYear + 1, 6, 30);
         if (until > seasonEnd) until = seasonEnd;
         _needs.Remove(buyer.Id);
         _needs.Remove(parent.Id);
+=======
+        var months = TransferTerms.ClampLoanMonths(offer.LoanMonths);
+        // Mehrjährige Leihen laufen über das Saisonende hinaus; der Stichtag bleibt der 30. Juni der Zielsaison.
+        var until = World.Date.AddMonths(months);
+        if (until.Month != 6 || until.Day != 30)
+            until = new DateOnly(until.Month >= 7 ? until.Year + 1 : until.Year, 6, 30);
+>>>>>>> e3476e6 (E1-S2/S5/S6/S7: freie Ablöseraten, Gewinn-Weiterverkauf, Leihe 24 Monate, Ratenvorschau)
         parent.PlayerIds.Remove(p.Id);
         var slot = parent.Tactic.Lineup.IndexOf(p.Id);
         if (slot >= 0) parent.Tactic.Lineup[slot] = null;
@@ -159,7 +168,10 @@ public sealed partial class TransfersModule
         p.Loan = new Loan
         {
             ParentClubId = parent.Id, Start = World.Date, Until = until, WageSharePercent = offer.WageSharePercent, PurchaseFee = offer.PurchaseFee,
-            PurchaseObligation = offer.PurchaseObligation, RecallInWinter = offer.RecallInWinter, PlayingTimeGuarantee = offer.PlayingTimeGuarantee,
+            PurchaseObligation = offer.PurchaseObligation, PurchaseCondition = offer.PurchaseCondition,
+            PurchaseConditionValue = offer.PurchaseConditionValue <= 0 ? 50 : offer.PurchaseConditionValue,
+            StartDivisionLevel = TransferTerms.DivisionLevel(World, buyer),
+            RecallInWinter = offer.RecallInWinter, PlayingTimeGuarantee = offer.PlayingTimeGuarantee,
             Fee = offer.LoanFee,
         };
         AddTransferRecord(dealId, p.Id, parent.Id, buyer.Id, offer.LoanFee, loan: true);
@@ -196,10 +208,11 @@ public sealed partial class TransfersModule
         var today = World.Date;
         foreach (var p in World.Players.Values.Where(p => p.Loan is not null && p.Loan.Until < today).ToList())
         {
-            if (p.Loan!.PurchaseObligation && p.Loan.PurchaseFee is { } fee && p.ClubId is { } buyerId)
+            var loan = p.Loan!;
+            if (p.ClubId is { } buyerId && TransferTerms.PurchaseObligationTriggered(loan, World, World.Clubs[buyerId]) && loan.PurchaseFee is { } fee)
             {
                 var buyer = World.Clubs[buyerId];
-                var parent = World.Clubs[p.Loan.ParentClubId];
+                var parent = World.Clubs[loan.ParentClubId];
                 p.Loan = null;
                 _activeLoans = null;
                 buyer.PlayerIds.Remove(p.Id);

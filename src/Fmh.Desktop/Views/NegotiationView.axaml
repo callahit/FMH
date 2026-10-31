@@ -31,10 +31,14 @@
             <StackPanel Spacing="8" IsVisible="{Binding IsTransfer}">
               <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.fee}" VerticalAlignment="Center" />
                 <NumericUpDown Grid.Column="1" Value="{Binding Fee, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="50000" FormatString="N0" /></Grid>
-              <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.installments}" VerticalAlignment="Center" />
-                <NumericUpDown Grid.Column="1" Value="{Binding InstallmentYears}" Minimum="0" Maximum="3" Increment="1" /></Grid>
+              <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.downPayment}" VerticalAlignment="Center" />
+                <NumericUpDown Grid.Column="1" Value="{Binding DownPayment, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="50000" FormatString="N0" /></Grid>
+              <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.installmentCount}" VerticalAlignment="Center" />
+                <NumericUpDown Grid.Column="1" Value="{Binding InstallmentCount}" Minimum="0" Maximum="8" Increment="1" /></Grid>
               <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.sellOn}" VerticalAlignment="Center" />
                 <NumericUpDown Grid.Column="1" Value="{Binding SellOnPercent}" Minimum="0" Maximum="50" Increment="5" /></Grid>
+              <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.sellOnBasis}" VerticalAlignment="Center" />
+                <ComboBox Grid.Column="1" ItemsSource="{Binding SellOnBasisOptions}" SelectedIndex="{Binding SellOnBasisIndex}" HorizontalAlignment="Stretch" /></Grid>
               <Grid ColumnDefinitions="170,*,*" ColumnSpacing="8"><TextBlock Text="{s:L neg.addOns}" VerticalAlignment="Center" />
                 <NumericUpDown Grid.Column="1" Value="{Binding SellerAppearanceAddOn, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="10000" FormatString="N0" ToolTip.Tip="{s:L neg.appearanceAddOn}" />
                 <NumericUpDown Grid.Column="2" Value="{Binding SellerGoalAddOn, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="10000" FormatString="N0" ToolTip.Tip="{s:L neg.goalAddOn}" /></Grid>
@@ -45,7 +49,7 @@
             </StackPanel>
             <StackPanel Spacing="8" IsVisible="{Binding IsLoan}">
               <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.loanMonths}" VerticalAlignment="Center" />
-                <NumericUpDown Grid.Column="1" Value="{Binding LoanMonths}" Minimum="6" Maximum="12" Increment="6" /></Grid>
+                <NumericUpDown Grid.Column="1" Value="{Binding LoanMonths}" Minimum="6" Maximum="24" Increment="6" /></Grid>
               <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.loanFee}" VerticalAlignment="Center" />
                 <NumericUpDown Grid.Column="1" Value="{Binding LoanFee, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="50000" FormatString="N0" /></Grid>
               <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.wageShare}" VerticalAlignment="Center" />
@@ -54,6 +58,10 @@
               <Grid ColumnDefinitions="170,*" IsVisible="{Binding HasPurchaseOption}"><TextBlock Text="{s:L neg.purchaseFee}" VerticalAlignment="Center" />
                 <NumericUpDown Grid.Column="1" Value="{Binding PurchaseFee, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="50000" FormatString="N0" /></Grid>
               <CheckBox Content="{s:L neg.purchaseObligation}" IsChecked="{Binding PurchaseObligation}" IsVisible="{Binding HasPurchaseOption}" />
+              <Grid ColumnDefinitions="170,*" IsVisible="{Binding ShowPurchaseCondition}"><TextBlock Text="{s:L neg.buyCond}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                <ComboBox Grid.Column="1" ItemsSource="{Binding PurchaseConditionOptions}" SelectedIndex="{Binding PurchaseConditionIndex}" HorizontalAlignment="Stretch" /></Grid>
+              <Grid ColumnDefinitions="170,*" IsVisible="{Binding ShowPurchaseCondition}"><TextBlock Text="{s:L neg.buyCondValue}" VerticalAlignment="Center" TextWrapping="Wrap" />
+                <NumericUpDown Grid.Column="1" Value="{Binding PurchaseConditionValue}" Minimum="1" Maximum="100" Increment="5" /></Grid>
               <CheckBox Content="{s:L neg.recall}" IsChecked="{Binding RecallInWinter}" />
               <CheckBox Content="{s:L neg.guarantee}" IsChecked="{Binding PlayingTimeGuarantee}" />
             </StackPanel>
