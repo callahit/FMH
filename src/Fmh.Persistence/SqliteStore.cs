@@ -42,6 +42,8 @@ public static class SqliteStore
             using var tx = con.BeginTransaction();
             Exec(con, tx, "CREATE TABLE meta (key TEXT PRIMARY KEY, value TEXT NOT NULL);");
             foreach (var s in Sections) s.CreateSchema(con, tx);
+            // Verträge materialisieren, bevor next_contract_id in meta geschrieben wird.
+            TransfersSection.EnsureCurrentContracts(world);
             WriteMeta(con, tx, world);
             foreach (var s in Sections) s.Save(con, tx, world);
             tx.Commit();
