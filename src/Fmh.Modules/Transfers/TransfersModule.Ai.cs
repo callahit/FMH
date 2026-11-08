@@ -85,7 +85,8 @@ public sealed partial class TransfersModule
             youthAge > 0 && p.Age(World.Date) <= youthAge ? r + (p.Hidden.PotentialAbility - p.Hidden.CurrentAbility) / 20.0 : r;
         // Kleinere Vereine zahlen Ablösen nur aus echtem Vermögen; mit Krediten im Rücken bleibt die Kasse zu (sonst
         // Lizenzauflagen und Punktabzüge).
-        var budget = profile.EquityOnly ? Math.Min(club.Budget.TransferBudget, Math.Max(0, Finance.Equity(club))) : club.Budget.TransferBudget;
+        // Fällige Kaufpflichten aus Leihen sind schon vergeben.
+        var budget = (profile.EquityOnly ? Math.Min(club.Budget.TransferBudget, Math.Max(0, Finance.Equity(club))) : club.Budget.TransferBudget) - Committed(club);
         var candidates = MarketOf(need)
             .Where(x => x.p.ClubId != club.Id && x.p.ClubId != HumanClub.Id && x.p.Loan is null && x.p.PreContract is null && !x.p.Retired && !x.p.IsYouth)
             .Where(x => x.r >= minRating && x.r <= level + profile.MaxAboveLevel)

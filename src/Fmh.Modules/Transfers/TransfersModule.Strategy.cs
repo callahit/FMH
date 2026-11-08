@@ -78,20 +78,11 @@ public sealed partial class TransfersModule
         foreach (var (p, _, parent) in candidates)
         {
             if (CheckLoan(p, parent, club) is not null) continue;
-            // Der ausleihende Verein zahlt so viel vom Gehalt, wie sein Budget hergibt und in seiner Spielklasse üblich ist
-            // (höchstens das Doppelte des Durchschnittsgehalts); den Rest trägt der abgebende Verein, der den Spieler sonst ohne
-            // Einsatz bezahlen müsste. Junge Spieler bis 23 verleiht er zur Ausbildung notfalls auch ganz auf eigene Kosten.
-            var room = club.Budget.WageBudget * 1.05 - WageBillOf(club);
-            var target = Finance.DivisionFinance(club).TargetAnnualWage / 52.0;
-            var cap = target > 0 ? Math.Min(room, target * 2) : room;
-            var wage = Math.Max(1, p.Contract?.WeeklyWage ?? 0);
-            var shares = p.Age(World.Date) <= 23 ? new[] { 100, 75, 50, 25, 0 } : new[] { 100, 75, 50, 25 };
-            var share = shares.Select(s => (int?)s).FirstOrDefault(s => wage * s!.Value / 100.0 <= cap);
-            if (share is not { } fits) continue;
+            if (BorrowerShare(p, club) is not { } fits) continue;
             var offer = new ClubOffer { LoanMonths = 12, WageSharePercent = fits, RecallInWinter = Rng.Chance(0.2) };
             var value = ValueOf(p);
-            // Leihe mit Kaufpflicht (in Italien häufig), wenn der Marktwert ins Budget passt.
-            if (value <= Math.Min(club.Budget.TransferBudget, Finance.Equity(club)) && Rng.Chance(tendency.PurchaseObligationShare))
+            // Leihe mit Kaufpflicht (in Italien häufig), wenn der Marktwert ins Budget passt, abzüglich schon eingegangener Kaufpflichten.
+            if (value <= Math.Min(club.Budget.TransferBudget, Finance.Equity(club)) - Committed(club) && Rng.Chance(tendency.PurchaseObligationShare))
             {
                 offer.PurchaseFee = value;
                 offer.PurchaseObligation = true;
@@ -119,8 +110,27 @@ public sealed partial class TransfersModule
             .Where(c => rating >= PlayerGenerator.ClubLevel(c.Reputation) - 1)
             .OrderByDescending(c => c.CountryCode == club.CountryCode)
             .ThenByDescending(c => c.Reputation)
-            .FirstOrDefault(c => NeedOf(c) == candidate.MainPosition && CheckLoan(candidate, club, c) is null);
+            .FirstOrDefault(c => NeedOf(c) == candidate.MainPosition && CheckLoan(candidate, club, c) is null && BorrowerShare(candidate, c) is not null);
         if (target is null) return;
-        ExecuteLoan(candidate, target, club, new ClubOffer { LoanMonths = 12, WageSharePercent = Rng.Pick(new[] { 50, 75, 100 }), RecallInWinter = Rng.Chance(0.3) });
+        ExecuteLoan(candidate, target, club, new ClubOffer { LoanMonths = 12, WageSharePercent = BorrowerShare(candidate, target)!.Value, RecallInWinter = Rng.Chance(0.3) });
+    }
+
+    /// <summary>Ablösen aus eingegangenen Kaufpflichten, die bei Leihende fällig werden (im Transferbudget vorgemerkt).</summary>
+    private long Committed(Club club) =>
+        ActiveLoans().Where(x => x.ClubId == club.Id && x.Loan is { PurchaseObligation: true }).Sum(x => x.Loan!.PurchaseFee ?? 0);
+
+    /// <summary>
+    /// Gehaltsanteil, den der ausleihende Verein übernimmt: so viel, wie sein Budget hergibt und in seiner Spielklasse üblich
+    /// ist (höchstens das Doppelte des Durchschnittsgehalts); den Rest trägt der abgebende Verein, der den Spieler sonst ohne
+    /// Einsatz bezahlen müsste. Junge Spieler bis 23 verleiht er zur Ausbildung notfalls ganz auf eigene Kosten. null = passt nicht.
+    /// </summary>
+    private int? BorrowerShare(Player p, Club borrower)
+    {
+        var room = borrower.Budget.WageBudget * 1.05 - WageBillOf(borrower);
+        var target = Finance.DivisionFinance(borrower).TargetAnnualWage / 52.0;
+        var cap = target > 0 ? Math.Min(room, target * 2) : room;
+        var wage = Math.Max(1, p.Contract?.WeeklyWage ?? 0);
+        var shares = p.Age(World.Date) <= 23 ? new[] { 100, 75, 50, 25, 0 } : new[] { 100, 75, 50, 25 };
+        return shares.Select(s => (int?)s).FirstOrDefault(s => wage * s!.Value / 100.0 <= cap);
     }
 }
