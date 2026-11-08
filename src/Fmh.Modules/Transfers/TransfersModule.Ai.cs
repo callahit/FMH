@@ -83,14 +83,16 @@ public sealed partial class TransfersModule
         var youthAge = profile.YouthFocusAge;
         double Score(Player p, double r) =>
             youthAge > 0 && p.Age(World.Date) <= youthAge ? r + (p.Hidden.PotentialAbility - p.Hidden.CurrentAbility) / 20.0 : r;
-        // Ablösen nur aus echtem Vermögen: Mit Krediten im Rücken bleibt die Kasse zu (sonst Lizenzauflagen und Punktabzüge).
-        var budget = Math.Min(club.Budget.TransferBudget, Math.Max(0, Finance.Equity(club)));
+        // Kleinere Vereine zahlen Ablösen nur aus echtem Vermögen; mit Krediten im Rücken bleibt die Kasse zu (sonst
+        // Lizenzauflagen und Punktabzüge). Vereine der Amateurligen zahlen gar keine Ablöse.
+        var budget = profile.FreeAgentsOnly ? 0
+            : profile.EquityOnly ? Math.Min(club.Budget.TransferBudget, Math.Max(0, Finance.Equity(club))) : club.Budget.TransferBudget;
         var candidates = MarketOf(need)
             .Where(x => x.p.ClubId != club.Id && x.p.ClubId != HumanClub.Id && x.p.Loan is null && x.p.PreContract is null && !x.p.Retired && !x.p.IsYouth)
             .Where(x => x.r >= minRating && x.r <= level + profile.MaxAboveLevel)
             .Where(x => x.p.ClubId is null || World.Clubs[x.p.ClubId.Value].Reputation <= club.Reputation + 3)
             // Grobe Vorauswahl nach Marktwert, damit nicht nur unbezahlbare Spieler in die engere Wahl kommen.
-            .Where(x => x.p.ClubId is null || ValueOf(x.p) <= budget)
+            .Where(x => x.p.ClubId is null || !profile.FreeAgentsOnly && ValueOf(x.p) <= budget)
             .OrderByDescending(x => Score(x.p, x.r))
             .Take(8)
             .ToList();
