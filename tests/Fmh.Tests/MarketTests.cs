@@ -40,6 +40,13 @@ public class MarketTests
 
         // Kein Verein überschreitet die Leihgrenzen (ausgenommene Spieler zählen nicht).
         var loans = w.Players.Values.Where(p => p.Loan is not null).ToList();
+        // Kaufpflichten aus Leihen sind im Transferbudget gedeckt (Review zu F-07).
+        foreach (var g in loans.Where(p => p.Loan!.PurchaseObligation).GroupBy(p => p.ClubId!.Value))
+            Assert.True(g.Sum(p => p.Loan!.PurchaseFee ?? 0) <= w.Clubs[g.Key].Budget.TransferBudget, $"{w.Clubs[g.Key].Name}: Kaufpflichten über dem Budget");
+        // Die übernommenen Leihgehälter passen ins Gehaltsbudget des ausleihenden KI-Vereins.
+        foreach (var g in loans.Where(p => p.ClubId != s.HumanClub.Id).GroupBy(p => w.Clubs[p.ClubId!.Value]))
+            Assert.True(g.Sum(p => (p.Contract?.WeeklyWage ?? 0) * p.Loan!.WageSharePercent / 100) <= g.Key.Budget.WageBudget * 1.05,
+                $"{g.Key.Name}: Leihgehälter über dem Budget");
         foreach (var club in w.Clubs.Values)
         {
             int Count(Func<Player, bool> side, Func<Player, (Club lender, Club holder)> pair) => loans.Where(side).Count(p =>
