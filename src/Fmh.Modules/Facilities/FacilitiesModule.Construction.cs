@@ -40,20 +40,22 @@ public sealed partial class FacilitiesModule
     }
 
     /// <summary>Neubau auf dem Gelände. Fehlertext-Schlüssel oder null.</summary>
-    public string? OrderBuilding(string type, int x, int y, Contractor contractor, bool financed = false)
+    public string? OrderBuilding(string type, int x, int y, Contractor contractor, bool financed = false, int rotation = 0)
     {
         var club = HumanClub;
+        EnsureGrounds(club);
         if (Data.Building(type) is not { } def) return "build.error.unknown";
         if (!def.Multiple && club.Grounds.Buildings.Any(b => b.Type == type)) return "build.error.exists";
         if (MissingRequirement(club, def) is { } missing) return missing;
-        if (!Fits(club, def, x, y)) return "build.error.space";
+        rotation = BuildingFootprint.NormalizeRotation(rotation);
+        if (!Fits(club, def, x, y, rotation)) return "build.error.space";
         if (def.Land)
         {
-            Place(club, def, x, y, 1);
+            Place(club, def, x, y, 1, rotation);
             return null;
         }
-        return Order(club, new ConstructionProject { Kind = ProjectKind.NewBuilding, BuildingType = type, X = x, Y = y, Amount = 1 },
-            def.Cost, def.BuildDays, contractor, financed);
+        return Order(club, new ConstructionProject { Kind = ProjectKind.NewBuilding, BuildingType = type, X = x, Y = y, Amount = 1, BuildingId = null },
+            def.Cost, def.BuildDays, contractor, financed, rotation);
     }
 
     public string? UpgradeBuilding(Building b, Contractor contractor, bool financed = false)
@@ -77,6 +79,11 @@ public sealed partial class FacilitiesModule
     {
         var club = HumanClub;
         if (b.UnderConstruction) return "build.error.running";
+        if (Data.Building(b.Type) is { } def && !def.Land)
+        {
+            var refund = MarketValue.Round(ClubRules.LevelCost(def, Math.Max(1, b.Level)) * 0.25);
+            if (refund > 0) Finance.Book(club, TransactionType.Construction, refund, TR("tx.demolishRefund", TR("building." + b.Type)));
+        }
         club.Grounds.Buildings.Remove(b);
         InvalidateEffects(club);
         return null;
@@ -99,7 +106,10 @@ public sealed partial class FacilitiesModule
         return null;
     }
 
-    public string? Order(Club club, ConstructionProject p, long baseCost, int baseDays, Contractor contractor, bool financed)
+    public string? Order(Club club, ConstructionProject p, long baseCost, int baseDays, Contractor contractor, bool financed) =>
+        Order(club, p, baseCost, baseDays, contractor, financed, 0);
+
+    public string? Order(Club club, ConstructionProject p, long baseCost, int baseDays, Contractor contractor, bool financed, int rotation)
     {
         var (cf, df) = ClubRules.ContractorFactors(contractor);
         var fin = World.Country(club.CountryCode).Finance;
@@ -109,6 +119,7 @@ public sealed partial class FacilitiesModule
         p.Ordered = World.Date;
         p.Financed = financed;
         p.End = null;
+        p.Rotation = BuildingFootprint.NormalizeRotation(rotation);
         var days = (int)Math.Round(baseDays * df);
         if (!financed && p.Cost > club.Budget.Balance) return "neg.error.balance";
         var stadiumLoan = p.Kind == ProjectKind.NewStadium;
@@ -135,16 +146,33 @@ public sealed partial class FacilitiesModule
             p.PermitDate = World.Date.AddDays(wait);
             p.Start = p.PermitDate;
         }
+        else if (IsGroundsBuild(p) && HasActiveGroundsBuild(club))
+        {
+            // G-09: ein Geländeprojekt aktiv, weitere warten in der Warteschlange.
+            p.State = ProjectState.Queued;
+            p.Start = null;
+            p.End = null;
+            p.QueuedDays = days;
+        }
         else
         {
             p.State = ProjectState.Building;
             p.Start = World.Date;
+            p.End = p.Start.Value.AddDays(days);
         }
-        p.End = p.Start!.Value.AddDays(days);
+        if (p.State != ProjectState.Queued && p.End is null && p.Start is { } start)
+            p.End = start.AddDays(days);
         club.Grounds.Projects.Add(p);
-        BeginWork(club, p);
+        if (p.State is ProjectState.Building or ProjectState.AwaitingPermit)
+            BeginWork(club, p);
         return null;
     }
+
+    private static bool IsGroundsBuild(ConstructionProject p) =>
+        p.Kind is ProjectKind.NewBuilding or ProjectKind.UpgradeBuilding;
+
+    private static bool HasActiveGroundsBuild(Club club) =>
+        club.Grounds.Projects.Any(p => IsGroundsBuild(p) && p.State is ProjectState.Building or ProjectState.AwaitingPermit);
 
     public TextArg ProjectName(ConstructionProject p) => p.Kind switch
     {
@@ -158,9 +186,14 @@ public sealed partial class FacilitiesModule
     {
         if (p.Kind == ProjectKind.NewBuilding && Data.Building(p.BuildingType!) is { } def)
         {
-            var b = Place(club, def, p.X, p.Y, 0);
-            b.UnderConstruction = true;
-            p.BuildingId = b.Id;
+            if (p.BuildingId is null || club.Grounds.Buildings.All(b => b.Id != p.BuildingId))
+            {
+                var b = Place(club, def, p.X, p.Y, 0, p.Rotation);
+                b.UnderConstruction = true;
+                p.BuildingId = b.Id;
+            }
+            else if (club.Grounds.Buildings.FirstOrDefault(b => b.Id == p.BuildingId) is { } placed)
+                placed.UnderConstruction = true;
         }
         else if (p.Kind == ProjectKind.UpgradeBuilding && club.Grounds.Buildings.FirstOrDefault(b => b.Id == p.BuildingId) is { } existing)
             existing.UnderConstruction = true;
@@ -172,12 +205,33 @@ public sealed partial class FacilitiesModule
         InvalidateEffects(club);
     }
 
-    private Building Place(Club club, BuildingDef def, int x, int y, int level)
+    private Building Place(Club club, BuildingDef def, int x, int y, int level, int rotation = 0)
     {
-        var b = new Building { Id = World.NextBuildingId++, Type = def.Id, X = x, Y = y, Level = level };
+        var b = new Building
+        {
+            Id = World.NextBuildingId++,
+            Type = def.Id,
+            X = x,
+            Y = y,
+            Level = level,
+            Rotation = BuildingFootprint.NormalizeRotation(rotation),
+        };
         club.Grounds.Buildings.Add(b);
         InvalidateEffects(club);
         return b;
+    }
+
+    /// <summary>Nächstes wartendes Geländeprojekt starten (G-09).</summary>
+    private void StartNextQueued(Club club)
+    {
+        if (HasActiveGroundsBuild(club)) return;
+        var next = club.Grounds.Projects.Where(p => p.State == ProjectState.Queued).OrderBy(p => p.Id).FirstOrDefault();
+        if (next is null) return;
+        var days = next.QueuedDays > 0 ? next.QueuedDays : 30;
+        next.State = ProjectState.Building;
+        next.Start = World.Date;
+        next.End = World.Date.AddDays(days);
+        BeginWork(club, next);
     }
 
     /// <summary>Tägliche Bauaufsicht: Genehmigungen, Verzögerungen, Pleiten, Fertigstellung.</summary>
@@ -204,6 +258,15 @@ public sealed partial class FacilitiesModule
                         if (human) Notify(MessageType.Stadium, "msg.sender.city", TR("msg.build.permitNo.subject"), TR("msg.build.permitNo.body", ProjectName(p)));
                         continue;
                     }
+                    if (IsGroundsBuild(p) && HasActiveGroundsBuild(club))
+                    {
+                        var days = p.Start is { } st && p.End is { } en ? Math.Max(1, en.DayNumber - st.DayNumber) : p.QueuedDays;
+                        p.State = ProjectState.Queued;
+                        p.QueuedDays = days > 0 ? days : 30;
+                        p.Start = null;
+                        p.End = null;
+                        continue;
+                    }
                     p.State = ProjectState.Building;
                     BeginWork(club, p);
                     if (human) Notify(MessageType.Stadium, "msg.sender.city", TR("msg.build.permit.subject"), TR("msg.build.permit.body", ProjectName(p), TextArg.OfDate(p.End!.Value)));
@@ -228,7 +291,7 @@ public sealed partial class FacilitiesModule
                         if (human) Notify(MessageType.Stadium, "msg.sender.assistant", TR("msg.build.bankrupt.subject"), TR("msg.build.bankrupt.body", ProjectName(p), TextArg.Money(extra, Currency)));
                     }
                 }
-                if (World.Date >= p.End) Complete(club, p);
+                if (p.End is { } end && World.Date >= end) Complete(club, p);
             }
         }
     }
@@ -265,6 +328,7 @@ public sealed partial class FacilitiesModule
         if (stand is not null) stand.Closed = 0;
         club.StadiumCapacity = st.Capacity;
         InvalidateEffects(club);
+        if (IsGroundsBuild(p)) StartNextQueued(club);
         if (IsHuman(club))
             Notify(MessageType.Stadium, "msg.sender.assistant", TR("msg.build.done.subject"), TR("msg.build.done.body", ProjectName(p)));
     }
@@ -280,13 +344,19 @@ public sealed partial class FacilitiesModule
         InvalidateEffects(club);
     }
 
-    /// <summary>Startgebäude nach Vereinsgröße.</summary>
+    /// <summary>Startgebäude nach Vereinsgröße, inkl. Gate und Wegenetz (MapVersion 1).</summary>
     public void CreateGrounds(Club club)
     {
         var r = club.Reputation;
-        club.Grounds = new Grounds { Width = r >= 10 ? 14 : r >= 5 ? 12 : 10, Height = r >= 10 ? 9 : 8 };
+        club.Grounds = new Grounds
+        {
+            Width = r >= 10 ? 14 : r >= 5 ? 12 : 10,
+            Height = r >= 10 ? 9 : 8,
+            MapVersion = 1, // vor Gebäudeplatzierung, damit Occupancy keine Default-Wege legt
+        };
         var g = club.Grounds;
         g.StadiumX = g.Width / 2 - 2;
+        g.Gates = new List<GridPos> { new(g.EntranceX, Math.Min(g.Height - 1, g.EntranceY)) };
         var start = new (string type, int level, int count)[]
         {
             ("dressingRooms", 1 + r / 5, 1), ("trainingPitch", Math.Max(1, r / 4), r >= 12 ? 3 : r >= 6 ? 2 : 1), ("gym", r / 5, 1),
@@ -304,5 +374,16 @@ public sealed partial class FacilitiesModule
                 Place(club, def, spot.x, spot.y, Math.Min(def.MaxLevel, level));
             }
         }
+        var blocked = new HashSet<(int x, int y)>();
+        foreach (var b in g.Buildings)
+        {
+            if (Data.Building(b.Type) is not { } def) { blocked.Add((b.X, b.Y)); continue; }
+            var (fw, fh) = BuildingFootprint.Size(def, b.Rotation);
+            for (var x = b.X; x < b.X + fw; x++)
+                for (var y = b.Y; y < b.Y + fh; y++)
+                    blocked.Add((x, y));
+        }
+        g.SeedDefaultPaths(blocked);
+        InvalidateEffects(club);
     }
 }
