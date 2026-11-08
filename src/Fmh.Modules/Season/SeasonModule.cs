@@ -91,6 +91,7 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
 
         Transfers.ExpireContractsAndLoans();
         foreach (var club in World.Clubs.Values) RenewSquad(club);
+        Transfers.TrimAiSquads();
         Transfers.RetireFreeAgents();
         MarketValue.UpdateMarketLevel(World, Data.PositionProfiles);
 
