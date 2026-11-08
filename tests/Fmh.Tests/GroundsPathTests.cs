@@ -89,6 +89,8 @@ public class GroundsPathTests
         Assert.NotEmpty(g.Gates);
         Assert.NotEmpty(g.Paths);
         Assert.True(s.PathGraphOf(s.HumanClub).Distances.Count > 0);
+        var connected = g.Buildings.Count(b => s.IsBuildingConnected(s.HumanClub, b));
+        Assert.True(connected >= g.Buildings.Count * 0.8, $"angeschlossen {connected}/{g.Buildings.Count}");
     }
 
     [Fact]
