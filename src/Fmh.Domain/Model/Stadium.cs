@@ -39,7 +39,7 @@ public sealed class Stadium
 
 public enum ProjectKind { Standing, Seating, Roof, Boxes, Floodlight, Heating, Scoreboard, NewBuilding, UpgradeBuilding, NewStadium }
 
-public enum ProjectState { AwaitingBoard, AwaitingPermit, Building, Done, Rejected }
+public enum ProjectState { AwaitingBoard, AwaitingPermit, Building, Done, Rejected, Queued }
 
 /// <summary>Bauunternehmen: günstig und langsam, normal oder teuer und schnell (Kapitel 9).</summary>
 public enum Contractor { Cheap, Standard, Premium }
@@ -67,4 +67,8 @@ public sealed class ConstructionProject
     public bool Financed { get; set; }
     /// <summary>Planung beim Stadionneubau.</summary>
     public StadiumDesign? Design { get; set; }
+    /// <summary>Drehung des Neubaus (0/90/180/270).</summary>
+    public int Rotation { get; set; }
+    /// <summary>Geplante Baudauer in Tagen, solange das Projekt in der Warteschlange liegt.</summary>
+    public int QueuedDays { get; set; }
 }

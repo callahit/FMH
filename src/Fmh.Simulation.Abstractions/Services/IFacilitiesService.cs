@@ -10,7 +10,7 @@ namespace Fmh.Core.Simulation;
 public interface IFacilitiesService
 {
     void InvalidateEffects(Club club);
-    /// <summary>Summe einer Gebäudewirkung (Stufe × Wert, Zustand, Lagebonus, Synergien). Verpachtete Gebäude wirken nicht.</summary>
+    /// <summary>Summe einer Gebäudewirkung (Stufe × Wert × Zustand × Lage × Weganschluss + Synergien). Verpachtete Gebäude wirken nicht.</summary>
     double Effect(Club club, string key);
     int BuildingLevel(Club club, string type);
     long MonthlyUpkeep(Club club, Building b);
@@ -22,4 +22,5 @@ public interface IFacilitiesService
     void FacilitiesMonthly(Club club);
     /// <summary>Startgebäude nach Vereinsgröße.</summary>
     void CreateGrounds(Club club);
+    void EnsureGrounds(Club club);
 }
