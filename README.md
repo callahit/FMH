@@ -136,7 +136,7 @@ jederzeit. Für Leihen gelten Höchstzahlen (`loans` je Land, `rules/transfers.j
   - Leihspieler zahlt der ausleihende Verein, soweit sein Budget reicht, höchstens das Doppelte des
     Durchschnittsgehalts seiner Spielklasse; Spieler bis 23 verleiht der abgebende Verein notfalls ganz auf eigene
     Kosten.
-- **Länder** (`market`): Leihneigung (Italien 2,8, Frankreich 2,4, England 1,7, Spanien 1,3, Deutschland 0,6) und
+- **Länder** (`market`): Leihneigung (Italien 2,8, Frankreich 2,4, England 2,0, Spanien 1,3, Deutschland 0,6) und
   Anteil der Leihen mit Kaufpflicht (Italien 35 %).
 - **Kalibrierung:** Leihspieler am 1. März je Land und Ebene gegen CIES-Werte (Serie A 19 %, Serie B 23 %, Ligue 1
   11 %, Bundesliga am wenigsten), Neuzugänge je Verein der 1. Liga mindestens 4,5, Ablösetransfers je Verein
