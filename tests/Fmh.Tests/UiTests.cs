@@ -165,9 +165,9 @@ public class UiTests
         Pump();
         stadium.Stands[0].Actions[0].Command.Execute(null);
         Assert.Single(session.HumanClub.Grounds.Projects);
-        // Freies Feld anklicken und das erste mögliche Gebäude bauen.
-        w.GetVisualDescendants().OfType<TabControl>().First().SelectedIndex = 1;
-        var free = stadium.Tiles.First(t => t.Building is null && !t.IsStadium);
+        // Freies Feld anklicken und das erste mögliche Gebäude bauen (Listen-Fallback-Tab).
+        w.GetVisualDescendants().OfType<TabControl>().First().SelectedIndex = 2;
+        var free = stadium.Tiles.First(t => t.Building is null && !t.IsStadium && string.IsNullOrEmpty(t.Label));
         free.Select.Execute(null);
         Assert.True(stadium.IsFreeCell);
         var option = stadium.BuildOptions.First(o => o.Possible);

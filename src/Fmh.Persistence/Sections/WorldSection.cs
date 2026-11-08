@@ -194,7 +194,7 @@ public sealed class WorldSection : SaveSection
         PlayerIds = PJ<List<int>>(r.GetString(26)) ?? new(),
         Finance = Opt<FinanceState>(r, 27) ?? new(),
         Stadium = Opt<Stadium>(r, 28) ?? new(),
-        Grounds = Opt<Grounds>(r, 29) ?? new(),
+        Grounds = MigrateGrounds(Opt<Grounds>(r, 29) ?? new()),
         Sponsors = Opt<List<SponsorDeal>>(r, 30) ?? new(),
         SponsorOffers = Opt<List<SponsorDeal>>(r, 31) ?? new(),
         Board = Opt<BoardState>(r, 32) ?? new(),
@@ -205,4 +205,11 @@ public sealed class WorldSection : SaveSection
         ReserveOf = NInt(r, 37), Region = NStr(r, 38),
         Latitude = r.IsDBNull(39) ? null : r.GetDouble(39), Longitude = r.IsDBNull(40) ? null : r.GetDouble(40),
     };
+
+    /// <summary>G-02: Altstände ohne MapVersion auf Schema 1 heben (Paths/Gates/Rotation).</summary>
+    private static Grounds MigrateGrounds(Grounds grounds)
+    {
+        grounds.EnsureCurrent();
+        return grounds;
+    }
 }
