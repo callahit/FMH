@@ -31,7 +31,7 @@ Voraussetzung: [.NET 10 SDK](https://dotnet.microsoft.com/download).
 ```bash
 dotnet build -c Release
 dotnet run -c Release --project src/Fmh.Desktop     # das Spiel (Fenster, Maus und Tastatur)
-dotnet test                                          # 199 Tests, davon 14 Oberflächentests ohne Bildschirm
+dotnet test                                          # 212 Tests, davon 14 Oberflächentests ohne Bildschirm
 dotnet run -c Release --project src/Fmh.Calibrate -- --matches 10000           # Engine-Kalibrierung
 dotnet run -c Release --project src/Fmh.Calibrate -- --season --seasons 8      # Karriere-Simulation
 ```
@@ -80,8 +80,9 @@ Farbthemen: Klassik, Hell, Terminal.
   - Leihen mit Gehaltsanteil, Kaufoption oder -pflicht und Rückholklausel.
   - Vorverträge, ablösefreie Spieler, Vertragsverlängerungen und Beraterhonorar.
   - Verweigerungsgründe: Reputation, Liga, Konkurrenz, Vereinstreue.
-  - Die KI kauft, verleiht, sichert sich Vorverträge und bietet für eigene Spieler; solche Angebote
-    sind Pflicht-Entscheidungen im Posteingang.
+  - Die KI kauft, leiht aus, verleiht, sichert sich Vorverträge und bietet für eigene Spieler; solche Angebote
+    sind Pflicht-Entscheidungen im Posteingang. Strategien und Leihregeln siehe
+    [Transfermarkt und Leihen](#transfermarkt-und-leihen).
 - **Scouting:** Kenntnisstand je Spieler (0–100 %). Fremde Spieler zeigen Attribute als Spanne.
   Scouts beobachten Spieler, durchsuchen Ligen nach Kriterien (Berichte A–D mit Sternen für Stärke
   und Potenzial) oder analysieren den nächsten Gegner.
@@ -101,8 +102,48 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
 
 - Kader bleiben bei durchschnittlich 23–25 Spielern.
 - Das Durchschnittsalter liegt bei 26 Jahren.
-- Pro Saison gibt es rund 60 Transfers mit Ablöse und 25–70 Leihen.
-- Die Spielstärke der Ligen steigt nur leicht, um etwa 0,07 Punkte pro Saison.
+- Pro Saison gibt es über alle fünf Länder 550–970 Transfers mit Ablöse, 1.200–1.600 Leihen sowie
+  Wechsel nach Vertragsende und Verpflichtungen Vereinsloser (Kalibrierung mit allen Paketen, Seed 1).
+- Die Spielstärke der Ligen steigt nur leicht, um etwa 0,03 Punkte pro Saison.
+
+### Transfermarkt und Leihen
+
+Transfers über Ländergrenzen sind frei möglich: Ein Spieler wechselt, wenn Ablöse und Vertrag passen, Vereinslose
+jederzeit. Für Leihen gelten Höchstzahlen (`loans` je Land, `rules/transfers.json` für Leihen ins Ausland):
+
+| Regel | Leihen im Land | Leihen ins Ausland (FIFA) |
+|---|---|---|
+| Deutschland (DFL-Lizenzordnung Spieler) | 6 verliehen, 6 ausgeliehen, 3 mit demselben Verein | 6 / 6 / 3 |
+| England | EFL: 5 ausgeliehen, 4 vom selben Verein (Quelle unsicher); Premier League untereinander: 2 gleichzeitig, 4 je Saison, 1 je Verein | 6 / 6 / 3 |
+| Spanien (RFEF Art. 81, ab 2026/27) | 6 / 6 / 3 | 6 / 6 / 3 |
+| Frankreich (LFP) | 6 / 6 / 3, kein Weiterverleihen | 6 / 6 / 3 |
+| Italien (FIGC NOIF Art. 103/117) | 10 → 9 → 8 je Richtung (2025/26 bis 2027/28), 3 mit demselben Verein, höchstens eine Saison | 6 / 6 / 3 |
+
+- **Ausnahmen:** Selbst ausgebildete Spieler (drei Spielzeiten zwischen 15 und 21 im Verein) bis zur Saison, in der
+  sie 21 werden, zählen nicht; in Italien alle unter 23 am 31. Dezember, dort aber auch für die Grenze je Verein.
+  Nationale und internationale Kontingente sind getrennt, wie das Nebeneinander von Verbands- und FIFA-Regeln.
+- **Prüfung:** Für eigene Leihanfragen und für die KI; ein Verstoß nennt den Grund (z. B. „Der ausleihende Verein
+  hat bereits so viele Leihspieler, wie die Leihregeln erlauben“). Leihen enden spätestens mit der Saison.
+- **Strategien der KI** (nach CIES Football Observatory und einer Typologie nach Ressourcen und Marktverhalten,
+  Werte in `rules/transfers.json`):
+  - *Spitzenverein* (oberes Viertel der 1. Liga): kauft Qualität, verleiht überzählige Talente.
+  - *Ausbildungsverein*: kauft bevorzugt junge Spieler mit Potenzial, verleiht Talente außerhalb der besten 20.
+  - *Leihnehmer* (3. Liga oder halbes Transferbudget der Liga): leiht vor allem bei stärkeren Vereinen aus.
+  - *Ablösefrei* (Amateurligen): Vereinslose und Spieler nach Vertragsende.
+  - Gekauft wird höchstens 1,5 Punkte über dem Vereinsniveau (Spitzenverein 2); bei vollem Kader gibt der Verein
+    für einen Neuen den schwächsten Spieler der Position oder einen teuren Überzähligen ab. Leihnehmer und
+    Amateurvereine zahlen Ablösen nur aus Eigenkapital.
+  - Leihspieler zahlt der ausleihende Verein, soweit sein Budget reicht, höchstens das Doppelte des
+    Durchschnittsgehalts seiner Spielklasse; Spieler bis 23 verleiht der abgebende Verein notfalls ganz auf eigene
+    Kosten.
+- **Länder** (`market`): Leihneigung (Italien 2,8, Frankreich 2,4, England 1,7, Spanien 1,3, Deutschland 0,6) und
+  Anteil der Leihen mit Kaufpflicht (Italien 35 %).
+- **Kalibrierung:** Leihspieler am 1. März je Land und Ebene gegen CIES-Werte (Serie A 19 %, Serie B 23 %, Ligue 1
+  11 %, Bundesliga am wenigsten), Neuzugänge je Verein der 1. Liga 5–13 (CIES: 31–42 % des Kaders je Saison),
+  Ablösetransfers je Verein mindestens 0,6 und die erste Saison mindestens halb so viele Ablösetransfers wie die
+  Folgesaisons. Gemessen (5 Saisons): Leihspieler DE1 7,9 %, ENG1 7,5 %, ESP1 14,3 %, FRA1 6,9 %, ITA1 15,8 %;
+  Neuzugänge je Verein 4,5–7,2, davon 0,9–1,4 mit Ablöse; erste Saison 967 Ablösetransfers, Folgesaisons Ø 598.
+  Real liegen die Ablösetransfers je Verein höher; die Transferbudgets (45 % des Kontostands) begrenzen sie.
 
 ## Nachwuchsleistungszentrum
 
@@ -481,10 +522,12 @@ Weitere Prüfungen:
   deshalb nicht in der CI (gemessen: 2,4 ms in der Cloud-Umgebung, davon etwa 0,4 ms Aufstellung und
   KI-Taktik, der Rest Engine).
 - `--season --seasons 5 --strict` prüft den Karrierelauf: Der langsamste Spieltag muss unter 5 s
-  liegen, alle Saisons müssen durchlaufen, Gehälter und Ligazahlen müssen passen und Insolvenzen sowie
-  Lizenz-Punktabzüge unter den Grenzen bleiben (siehe Finanzen).
-- `--max-drift 0.05` prüft zusätzlich die Ligastärke-Drift (Durchschnitt der besten elf je Verein der 1. Liga);
-  die CI ruft den Karrierelauf damit auf. Gemessen: +0,024 je Saison. Dafür holen junge Spieler im Mittel nur ihren
+  liegen, alle Saisons müssen durchlaufen, Gehälter und Ligazahlen müssen passen, Insolvenzen sowie
+  Lizenz-Punktabzüge unter den Grenzen bleiben (siehe Finanzen) und der Transfermarkt die Zielwerte erreichen
+  (siehe [Transfermarkt und Leihen](#transfermarkt-und-leihen)).
+- `--max-drift 0.05` prüft zusätzlich die Ligastärke-Drift (Durchschnitt der besten elf je Verein der 1. Liga) von
+  Saisonende zu Saisonende; die erzeugte Startwelt hat volle Kader, am Tag nach einer Saison fehlen je nach
+  Transferfenster noch die Neuzugänge. Die CI ruft den Karrierelauf damit auf. Gemessen: +0,033 je Saison. Dafür holen junge Spieler im Mittel nur ihren
   Altersabschlag auf, Akademietalente erreichen etwa die Stärke ihres Vereins, und der Abbau ab 30 nimmt mit dem
   Alter zu.
 
@@ -559,7 +602,8 @@ frühere, Sprachdateien werden schlüsselweise zusammengeführt.
 
 | Datei | Inhalt |
 |---|---|
-| `countries/*.json` | Pyramide, Ligaformat, Kalender, Kaderregeln, Amateur-Pools, Pokal, Relegation, Transferfenster, Jugend |
+| `countries/*.json` | Pyramide, Ligaformat, Kalender, Kaderregeln, Amateur-Pools, Pokal, Relegation, Transferfenster, Jugend, Leihregeln, Marktverhalten |
+| `rules/transfers.json` | FIFA-Leihregeln für Leihen ins Ausland, Strategien der KI-Vereine, Zielwerte des Transfermarkts |
 | `clubs/*.json` | Vereine (fiktiv): Name, Liga oder Pool, Reputation, Farben, Stadion |
 | `names/*.json` | Namenslisten für Zufallsspieler je Land |
 | `formations.json` | Formationen auf dem 5x7-Raster |
