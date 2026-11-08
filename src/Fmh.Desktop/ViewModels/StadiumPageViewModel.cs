@@ -6,6 +6,7 @@ using Fmh.Core.Data;
 using Fmh.Core.Game;
 using Fmh.Core.Logic;
 using Fmh.Core.Model;
+using Fmh.Desktop.Controls;
 using Fmh.Desktop.Services;
 
 namespace Fmh.Desktop.ViewModels;
@@ -20,7 +21,9 @@ public sealed record ProjectLine(string Name, string State, string Dates, string
 public sealed record GroundTile(double Left, double Top, double Width, double Height, string Label, string Sub, IBrush Fill, IBrush Border,
     int X, int Y, Building? Building, bool IsStadium, IRelayCommand Select);
 
-public sealed record BuildOption(string Name, string Category, string Cost, string Effects, string Upkeep, bool Possible, string Hint, IRelayCommand Build);
+public sealed record BuildOption(string Type, string Name, string Category, string Cost, string Effects, string Upkeep, bool Possible, string Hint, IRelayCommand Build, IRelayCommand Pick);
+
+public sealed record BuildingListRow(string Name, string Category, string Level, string Condition, string Effects, string Link, Building Building, IRelayCommand Select);
 
 /// <summary>Stadion (Kapitel 8) und Vereinsgelände (Kapitel 9).</summary>
 public sealed partial class StadiumPageViewModel : PageViewModel, IRefreshable
@@ -56,6 +59,13 @@ public sealed partial class StadiumPageViewModel : PageViewModel, IRefreshable
     [ObservableProperty] private double _gridHeight;
     [ObservableProperty] private IReadOnlyList<ProjectLine> _projects = Array.Empty<ProjectLine>();
     [ObservableProperty] private string _groundsText = "";
+    [ObservableProperty] private IsoMapState? _isoMap;
+    [ObservableProperty] private int _toolIndex; // 0 select, 1 build, 2 path
+    [ObservableProperty] private bool _showPaths = true;
+    [ObservableProperty] private string _toolHint = "";
+    [ObservableProperty] private IReadOnlyList<BuildingListRow> _buildingRows = Array.Empty<BuildingListRow>();
+    [ObservableProperty] private string? _paletteType;
+    [ObservableProperty] private int _previewRotation;
 
     // Auswahl auf dem Gelände
     [ObservableProperty] private string _selectionTitle = "";
@@ -67,10 +77,15 @@ public sealed partial class StadiumPageViewModel : PageViewModel, IRefreshable
     [ObservableProperty] private IReadOnlyList<BuildOption> _buildOptions = Array.Empty<BuildOption>();
     private Building? _selected;
     private (int x, int y)? _cell;
+    private (int x, int y)? _hover;
 
     public bool NoProjects => Projects.Count == 0;
     partial void OnProjectsChanged(IReadOnlyList<ProjectLine> value) => OnPropertyChanged(nameof(NoProjects));
-    partial void OnCategoryIndexChanged(int value) => UpdateSelection();
+    partial void OnCategoryIndexChanged(int value)
+    {
+        UpdateSelection();
+        RefreshPalette();
+    }
 
     private Contractor Contractor => (Contractor)Math.Clamp(ContractorIndex, 0, 2);
 
@@ -127,16 +142,243 @@ public sealed partial class StadiumPageViewModel : PageViewModel, IRefreshable
         RefreshNewStadium();
 
         BuildTiles();
+        BuildIsoMap();
+        BuildBuildingRows();
         Projects = club.Grounds.Projects.OrderByDescending(p => p.Ordered).Take(30).Select(p => new ProjectLine(
             T.Render(s.ProjectName(p)),
             T["projectState." + p.State],
             p.End is { } end ? T.Format("build.until", Fmt.Date(end)) : Fmt.Date(p.Ordered),
             M(p.Cost),
-            new SolidColorBrush(p.State switch { ProjectState.Done => P.Good, ProjectState.Rejected => P.Bad, ProjectState.Building => P.Accent, _ => P.Warn }))).ToList();
+            new SolidColorBrush(p.State switch { ProjectState.Done => P.Good, ProjectState.Rejected => P.Bad, ProjectState.Building => P.Accent, ProjectState.Queued => P.Warn, _ => P.Warn }))).ToList();
         GroundsText = T.Format("build.groundsInfo", club.Grounds.Buildings.Count, M(club.Grounds.Buildings.Sum(b => s.MonthlyUpkeep(club, b))),
             M(GameSession.LandPrice(club) * club.Grounds.Height));
+        ToolHint = ToolIndex switch
+        {
+            1 => T["build.rotateHint"],
+            2 => T["build.pathHint"],
+            _ => T["build.isoHelp"],
+        };
         UpdateSelection();
     }
+
+    partial void OnToolIndexChanged(int value)
+    {
+        if (value != 1) PaletteType = null;
+        BuildIsoMap();
+        ToolHint = value switch
+        {
+            1 => T["build.rotateHint"],
+            2 => T["build.pathHint"],
+            _ => T["build.isoHelp"],
+        };
+    }
+
+    partial void OnShowPathsChanged(bool value) => BuildIsoMap();
+
+    private void BuildBuildingRows()
+    {
+        var s = Session;
+        var club = Club;
+        BuildingRows = club.Grounds.Buildings.OrderBy(b => T["building." + b.Type]).Select(b =>
+        {
+            var def = Data.Building(b.Type);
+            var linked = s.IsBuildingConnected(club, b);
+            var building = b;
+            return new BuildingListRow(
+                T["building." + b.Type],
+                def is null ? "" : T["buildingCat." + def.Category],
+                b.UnderConstruction ? T["build.underConstruction"] : T.Format("build.level", b.Level),
+                T.Format("build.condition", (int)Math.Round(b.Condition)),
+                def is null ? "" : EffectText(def, b.Level),
+                linked ? T["build.connected"] : T["build.disconnected"],
+                b,
+                new RelayCommand(() => SelectCell(building, null)));
+        }).ToList();
+    }
+
+    private void BuildIsoMap()
+    {
+        var s = Session;
+        var club = Club;
+        s.EnsureGrounds(club);
+        var g = club.Grounds;
+        var width = s.GroundsWidth(club);
+        var buildings = g.Buildings.Select(b =>
+        {
+            var def = Data.Building(b.Type);
+            var (fw, fh) = def is null ? (1, 1) : BuildingFootprint.Size(def, b.Rotation);
+            return new IsoBuildingVisual
+            {
+                Id = b.Id,
+                X = b.X,
+                Y = b.Y,
+                Width = fw,
+                Height = fh,
+                Level = Math.Max(1, b.Level),
+                Category = def?.Category ?? "",
+                Label = T["building." + b.Type],
+                UnderConstruction = b.UnderConstruction,
+                Connected = s.IsBuildingConnected(club, b),
+            };
+        }).ToList();
+
+        var state = new IsoMapState
+        {
+            Width = width,
+            Height = g.Height,
+            BaseWidth = g.Width,
+            StadiumX = g.StadiumX,
+            StadiumY = g.StadiumY,
+            StadiumWidth = g.StadiumWidth,
+            StadiumHeight = g.StadiumHeight,
+            StadiumRoof = club.Stadium.RoofShare >= 0.5,
+            StandHeights = club.Stadium.Stands.ToDictionary(st => st.Side.ToString(), st => Math.Clamp(st.Capacity / 5000 + 1, 1, 4)),
+            Paths = g.Paths.ToList(),
+            Gates = g.Gates.ToList(),
+            Buildings = buildings,
+            ShowPaths = ShowPaths,
+            Tool = ToolIndex switch { 1 => IsoMapTool.Build, 2 => IsoMapTool.Path, _ => IsoMapTool.Select },
+            OnHover = OnIsoHover,
+            OnClick = OnIsoClick,
+            OnRightClick = OnIsoRightClick,
+            OnRotate = RotatePreview,
+            OnPathDrag = OnPathDrag,
+            OnPathRelease = OnPathRelease,
+        };
+        UpdateGhost(state);
+        IsoMap = state;
+    }
+
+    private void UpdateGhost(IsoMapState state)
+    {
+        if (ToolIndex == 1 && PaletteType is { } type && Data.Building(type) is { } def && _hover is { } h)
+        {
+            var (fw, fh) = BuildingFootprint.Size(def, PreviewRotation);
+            var fits = Session.Fits(Club, def, h.x, h.y, PreviewRotation);
+            var canPay = Financed || def.Cost <= Club.Budget.Balance;
+            state.Ghost = new IsoGhost
+            {
+                X = h.x, Y = h.y, Width = fw, Height = fh,
+                Valid = fits && canPay && (def.Multiple || Club.Grounds.Buildings.All(b => b.Type != def.Id)),
+                Category = def.Category,
+                CostLabel = M(Cost(def.Cost)),
+            };
+        }
+        else state.Ghost = null;
+    }
+
+    private void OnIsoHover(int x, int y)
+    {
+        _hover = (x, y);
+        if (IsoMap is { } map)
+        {
+            UpdateGhost(map);
+            if (ToolIndex == 2) return;
+            map.Ghost = map.Ghost;
+            IsoMap = map;
+            // Trigger redraw via new reference
+            IsoMap = CloneMap(map);
+        }
+    }
+
+    private static IsoMapState CloneMap(IsoMapState m) => new()
+    {
+        Width = m.Width, Height = m.Height, BaseWidth = m.BaseWidth,
+        StadiumX = m.StadiumX, StadiumY = m.StadiumY, StadiumWidth = m.StadiumWidth, StadiumHeight = m.StadiumHeight,
+        StadiumRoof = m.StadiumRoof, StandHeights = m.StandHeights, Paths = m.Paths, Gates = m.Gates, Buildings = m.Buildings,
+        Ghost = m.Ghost, PathGhost = m.PathGhost, PathGhostValid = m.PathGhostValid, ShowPaths = m.ShowPaths, Tool = m.Tool,
+        OnHover = m.OnHover, OnClick = m.OnClick, OnRightClick = m.OnRightClick, OnRotate = m.OnRotate,
+        OnPathDrag = m.OnPathDrag, OnPathRelease = m.OnPathRelease,
+    };
+
+    private void OnIsoClick(int x, int y)
+    {
+        var s = Session;
+        var club = Club;
+        if (ToolIndex == 1 && PaletteType is { } type)
+        {
+            Show(s.OrderBuilding(type, x, y, Contractor, Financed, PreviewRotation), "build.ordered");
+            return;
+        }
+        if (ToolIndex == 2) return;
+        var hit = club.Grounds.Buildings.FirstOrDefault(b =>
+        {
+            var def = Data.Building(b.Type);
+            var (fw, fh) = def is null ? (1, 1) : BuildingFootprint.Size(def, b.Rotation);
+            return x >= b.X && x < b.X + fw && y >= b.Y && y < b.Y + fh;
+        });
+        if (hit is not null) SelectCell(hit, null);
+        else if (x >= 0 && y >= 0 && x < s.GroundsWidth(club) && y < club.Grounds.Height)
+            SelectCell(null, (x, y));
+    }
+
+    private void OnIsoRightClick(int x, int y)
+    {
+        var club = Club;
+        var hit = club.Grounds.Buildings.FirstOrDefault(b =>
+        {
+            var def = Data.Building(b.Type);
+            var (fw, fh) = def is null ? (1, 1) : BuildingFootprint.Size(def, b.Rotation);
+            return x >= b.X && x < b.X + fw && y >= b.Y && y < b.Y + fh;
+        });
+        if (hit is not null)
+        {
+            SelectCell(hit, null);
+            Demolish();
+            return;
+        }
+        if (x >= club.Grounds.Width)
+            Show(Session.BuyLand(), "build.landBought");
+    }
+
+    private void RotatePreview()
+    {
+        PreviewRotation = BuildingFootprint.NormalizeRotation(PreviewRotation + 90);
+        if (IsoMap is { } map)
+        {
+            UpdateGhost(map);
+            IsoMap = CloneMap(map);
+        }
+    }
+
+    private void OnPathDrag(int x0, int y0, int x1, int y1)
+    {
+        if (IsoMap is not { } map) return;
+        var width = Session.GroundsWidth(Club);
+        var grid = Session.Occupancy(Club);
+        bool Can(int x, int y) => x >= 0 && y >= 0 && x < width && y < Club.Grounds.Height && grid[x, y] is 0 or -2;
+        var cells = PathGraph.DrawPathL(x0, y0, x1, y1, Can);
+        map.PathGhost = cells;
+        map.PathGhostValid = cells.Count > 0 && cells.Count * PathGraph.PathTileCost <= Club.Budget.Balance;
+        IsoMap = CloneMap(map);
+    }
+
+    private void OnPathRelease(int x0, int y0, int x1, int y1)
+    {
+        Show(Session.DrawPath(x0, y0, x1, y1), "build.ordered");
+        if (IsoMap is { } map)
+        {
+            map.PathGhost = null;
+            IsoMap = CloneMap(map);
+        }
+    }
+
+    [RelayCommand]
+    private void SelectTool(string tool)
+    {
+        ToolIndex = tool switch { "build" => 1, "path" => 2, _ => 0 };
+    }
+
+    [RelayCommand]
+    private void PickBuilding(string type)
+    {
+        PaletteType = type;
+        ToolIndex = 1;
+        BuildIsoMap();
+    }
+
+    [RelayCommand]
+    private void SelectListBuilding(Building building) => SelectCell(building, null);
 
     private long Cost(long baseCost) => MarketValue.Round(baseCost * GameSession.ContractorFactors(Contractor).cost);
     private int Days(int baseDays) => (int)Math.Round(baseDays * GameSession.ContractorFactors(Contractor).days);
@@ -238,14 +480,22 @@ public sealed partial class StadiumPageViewModel : PageViewModel, IRefreshable
         var occupied = new bool[width, g.Height];
         for (var x = g.StadiumX; x < g.StadiumX + g.StadiumWidth; x++)
             for (var y = g.StadiumY; y < g.StadiumY + g.StadiumHeight; y++) occupied[x, y] = true;
+        foreach (var p in g.Paths)
+            if ((uint)p.X < (uint)width && (uint)p.Y < (uint)g.Height) occupied[p.X, p.Y] = true;
         tiles.Add(new GroundTile(g.StadiumX * Cell, g.StadiumY * Cell, g.StadiumWidth * Cell - 4, g.StadiumHeight * Cell - 4,
             s.StadiumDisplayName(club), Fmt.Int(club.Stadium.Capacity), new SolidColorBrush(Color.Parse("#2E7D32")), new SolidColorBrush(P.Gold),
             g.StadiumX, g.StadiumY, null, true, new RelayCommand(() => SelectCell(null, null))));
+        foreach (var p in g.Paths)
+        {
+            if (p.X < 0 || p.Y < 0 || p.X >= width || p.Y >= g.Height) continue;
+            tiles.Add(new GroundTile(p.X * Cell, p.Y * Cell, Cell - 4, Cell - 4, T["build.tool.path"], "",
+                new SolidColorBrush(Color.Parse("#C2A26B")), new SolidColorBrush(Colors.Transparent),
+                p.X, p.Y, null, false, new RelayCommand(() => { })));
+        }
         foreach (var b in g.Buildings)
         {
             var def = Data.Building(b.Type);
-            var w = def?.Width ?? 1;
-            var h = def?.Height ?? 1;
+            var (w, h) = def is null ? (1, 1) : BuildingFootprint.Size(def, b.Rotation);
             for (var x = b.X; x < Math.Min(width, b.X + w); x++)
                 for (var y = b.Y; y < Math.Min(g.Height, b.Y + h); y++) occupied[x, y] = true;
             var building = b;
@@ -307,6 +557,7 @@ public sealed partial class StadiumPageViewModel : PageViewModel, IRefreshable
                 T.Format("build.levelOf", b.Level, def.MaxLevel) + " · " + T.Format("build.condition", (int)Math.Round(b.Condition)),
                 T.Format("build.upkeep", M(s.MonthlyUpkeep(club, b))),
                 EffectText(def, b.Level),
+                s.IsBuildingConnected(club, b) ? T["build.connected"] : T["build.disconnected"],
             };
             if (b.Leased) lines.Add(T["build.leased"]);
             SelectionText = string.Join("\n", lines.Where(l => l.Length > 0));
@@ -314,39 +565,53 @@ public sealed partial class StadiumPageViewModel : PageViewModel, IRefreshable
                 ? T.Format("build.upgrade", b.Level + 1, M(Cost(GameSession.LevelCost(def, b.Level + 1))))
                 : T["build.maxLevel"];
             LeaseText = b.Leased ? T["build.endLease"] : T["build.lease"];
-            BuildOptions = Array.Empty<BuildOption>();
+            RefreshPalette();
             return;
         }
         if (_cell is { } c)
         {
             SelectionTitle = T.Format("build.freeCell", c.x + 1, c.y + 1);
             SelectionText = T["build.chooseBuilding"];
-            var category = CategoryIndex <= 0 ? null : CategoryIds[CategoryIndex - 1];
-            BuildOptions = Data.Buildings
-                .Where(d => category is null || d.Category == category)
-                .Where(d => d.Multiple || club.Grounds.Buildings.All(x => x.Type != d.Id))
-                .Select(d =>
-                {
-                    var fits = s.Fits(club, d, c.x, c.y);
-                    var missing = s.MissingRequirement(club, d) is null ? null
-                        : string.Join(", ", d.Requires.Where(r => s.BuildingLevel(club, r.Type) < r.Level).Select(r => T.Format("build.requiresLevel", T["building." + r.Type], r.Level)));
-                    var hint = !fits ? T.Format("build.size", d.Width, d.Height) : missing is not null ? T.Format("build.needs", missing) : T.Format("build.size", d.Width, d.Height);
-                    var type = d.Id;
-                    return new BuildOption(T["building." + d.Id], T["buildingCat." + d.Category], M(Cost(d.Cost)), EffectText(d, 1),
-                        T.Format("build.upkeep", M(d.Upkeep)), fits && missing is null, hint,
-                        new RelayCommand(() =>
-                        {
-                            Show(s.OrderBuilding(type, c.x, c.y, Contractor, Financed), "build.ordered");
-                            _cell = null;
-                            Refresh();
-                        }));
-                })
-                .OrderByDescending(o => o.Possible).ThenBy(o => o.Name).ToList();
+            RefreshPalette(c);
             return;
         }
         SelectionTitle = T["build.selectTitle"];
         SelectionText = T["build.selectHelp"];
-        BuildOptions = Array.Empty<BuildOption>();
+        RefreshPalette();
+    }
+
+    private void RefreshPalette((int x, int y)? cell = null)
+    {
+        var s = Session;
+        var club = Club;
+        var category = CategoryIndex <= 0 ? null : CategoryIds[CategoryIndex - 1];
+        BuildOptions = Data.Buildings
+            .Where(d => category is null || d.Category == category)
+            .Where(d => d.Multiple || club.Grounds.Buildings.All(x => x.Type != d.Id))
+            .Select(d =>
+            {
+                var (fw, fh) = BuildingFootprint.Size(d, PreviewRotation);
+                var fits = cell is { } c && s.Fits(club, d, c.x, c.y, PreviewRotation);
+                var missing = s.MissingRequirement(club, d) is null ? null
+                    : string.Join(", ", d.Requires.Where(r => s.BuildingLevel(club, r.Type) < r.Level).Select(r => T.Format("build.requiresLevel", T["building." + r.Type], r.Level)));
+                var hint = cell is null ? T.Format("build.size", fw, fh)
+                    : !fits ? T.Format("build.size", fw, fh)
+                    : missing is not null ? T.Format("build.needs", missing)
+                    : T.Format("build.size", fw, fh);
+                var type = d.Id;
+                var possible = missing is null && (cell is null || fits);
+                return new BuildOption(type, T["building." + d.Id], T["buildingCat." + d.Category], M(Cost(d.Cost)), EffectText(d, 1),
+                    T.Format("build.upkeep", M(d.Upkeep)), possible, hint,
+                    new RelayCommand(() =>
+                    {
+                        if (cell is not { } at) return;
+                        Show(s.OrderBuilding(type, at.x, at.y, Contractor, Financed, PreviewRotation), "build.ordered");
+                        _cell = null;
+                        Refresh();
+                    }, () => cell is not null && possible),
+                    new RelayCommand(() => PickBuilding(type)));
+            })
+            .OrderByDescending(o => o.Possible).ThenBy(o => o.Name).ToList();
     }
 
     private string EffectText(BuildingDef def, int level) => def.Effects.Count == 0 ? "" :
