@@ -144,7 +144,7 @@ public sealed partial class FacilitiesModule : GameModule, IFacilitiesService
         return true;
     }
 
-    /// <summary>Erster freier Platz; Gebäude mit Lagebonus bevorzugt nahe am Ziel.</summary>
+    /// <summary>Erster freier Platz; bevorzugt angeschlossene Felder und Lagebonus-Ziele.</summary>
     public (int x, int y)? FreeSpot(Club club, BuildingDef def)
     {
         var spots = new List<(int x, int y)>();
@@ -153,9 +153,23 @@ public sealed partial class FacilitiesModule : GameModule, IFacilitiesService
                 if (Fits(club, def, x, y)) spots.Add((x, y));
         if (spots.Count == 0) return null;
         var g = club.Grounds;
-        return def.Location == "entrance"
-            ? spots.OrderBy(s => Math.Abs(s.x - g.EntranceX) + Math.Abs(s.y - g.EntranceY)).First()
-            : spots[0];
+        EnsureGrounds(club);
+        var paths = new HashSet<(int, int)>(g.Paths.Select(p => (p.X, p.Y)));
+        foreach (var gate in g.Gates) paths.Add((gate.X, gate.Y));
+        int TouchScore(int sx, int sy)
+        {
+            var (fw, fh) = BuildingFootprint.Size(def, 0);
+            var touch = 0;
+            for (var x = sx; x < sx + fw; x++)
+            for (var y = sy; y < sy + fh; y++)
+            foreach (var n in PathGraph.Neighbors(x, y))
+                if (paths.Contains(n)) touch++;
+            return touch;
+        }
+        IOrderedEnumerable<(int x, int y)> ordered = spots.OrderByDescending(s => TouchScore(s.x, s.y));
+        if (def.Location == "entrance")
+            ordered = ordered.ThenBy(s => Math.Abs(s.x - g.EntranceX) + Math.Abs(s.y - g.EntranceY));
+        return ordered.First();
     }
 
     public long MonthlyUpkeep(Club club, Building b) =>
