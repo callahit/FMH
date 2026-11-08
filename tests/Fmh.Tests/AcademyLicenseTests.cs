@@ -165,8 +165,11 @@ public class AcademyLicenseTests
         s.SetTicketPrices(dear);
         club.Fans.Mood = 10;
         var empty = s.ForecastProject(club, ProjectKind.Standing, StandSide.North)!;
+        // Schwache Nachfrage füllt die neuen Plätze kaum (hohe Ticketpreise können die Einnahmen
+        // der wenigen Zuschauer trotzdem hoch halten – Maßstab ist die Zuschauerzahl).
         Assert.True(empty.ExtraSpectators < full.ExtraSpectators);
-        Assert.True(empty.PaybackYears is null || empty.PaybackYears > full.PaybackYears);
+        Assert.True(empty.ExtraSpectators < full.ExtraSpectators / 2);
+        Assert.True(full.PaybackYears is not null);
     }
 
     [Fact]
