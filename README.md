@@ -102,9 +102,9 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
 
 - Kader bleiben bei durchschnittlich 23–25 Spielern.
 - Das Durchschnittsalter liegt bei 26 Jahren.
-- Pro Saison gibt es über alle fünf Länder 550–970 Transfers mit Ablöse, 1.200–1.600 Leihen sowie
+- Pro Saison gibt es über alle fünf Länder 590–980 Transfers mit Ablöse, 1.260–1.620 Leihen sowie
   Wechsel nach Vertragsende und Verpflichtungen Vereinsloser (Kalibrierung mit allen Paketen, Seed 1).
-- Die Spielstärke der Ligen steigt nur leicht, um etwa 0,03 Punkte pro Saison.
+- Die Spielstärke der Ligen steigt nur leicht, um etwa 0,01–0,03 Punkte pro Saison.
 
 ### Transfermarkt und Leihen
 
@@ -139,11 +139,12 @@ jederzeit. Für Leihen gelten Höchstzahlen (`loans` je Land, `rules/transfers.j
 - **Länder** (`market`): Leihneigung (Italien 2,8, Frankreich 2,4, England 1,7, Spanien 1,3, Deutschland 0,6) und
   Anteil der Leihen mit Kaufpflicht (Italien 35 %).
 - **Kalibrierung:** Leihspieler am 1. März je Land und Ebene gegen CIES-Werte (Serie A 19 %, Serie B 23 %, Ligue 1
-  11 %, Bundesliga am wenigsten), Neuzugänge je Verein der 1. Liga 5–13 (CIES: 31–42 % des Kaders je Saison),
-  Ablösetransfers je Verein mindestens 0,6 und die erste Saison mindestens halb so viele Ablösetransfers wie die
-  Folgesaisons. Gemessen (5 Saisons): Leihspieler DE1 7,9 %, ENG1 7,5 %, ESP1 14,3 %, FRA1 6,9 %, ITA1 15,8 %;
-  Neuzugänge je Verein 4,5–7,2, davon 0,9–1,4 mit Ablöse; erste Saison 967 Ablösetransfers, Folgesaisons Ø 598.
-  Real liegen die Ablösetransfers je Verein höher; die Transferbudgets (45 % des Kontostands) begrenzen sie.
+  11 %, Bundesliga am wenigsten), Neuzugänge je Verein der 1. Liga mindestens 4,5, Ablösetransfers je Verein
+  mindestens 0,6 und die erste Saison mindestens halb so viele Ablösetransfers wie die Folgesaisons. Gemessen
+  (5 Saisons): Leihspieler DE1 8,0 %, ENG1 6,9 %, ESP1 14,0 %, FRA1 8,6 %, ITA1 14,8 %; Neuzugänge je Verein
+  4,9–7,5, davon 0,8–1,4 mit Ablöse; erste Saison 977 Ablösetransfers, Folgesaisons Ø 616.
+  Real sind es 8–11 Neuzugänge je Verein (CIES: 31–42 % des Kaders je Saison) und deutlich mehr Ablösetransfers;
+  die Transferbudgets (45 % des Kontostands) begrenzen den Markt, die Untergrenzen bilden den Stand des Spiels ab.
 
 ## Nachwuchsleistungszentrum
 
@@ -527,7 +528,7 @@ Weitere Prüfungen:
   (siehe [Transfermarkt und Leihen](#transfermarkt-und-leihen)).
 - `--max-drift 0.05` prüft zusätzlich die Ligastärke-Drift (Durchschnitt der besten elf je Verein der 1. Liga) von
   Saisonende zu Saisonende; die erzeugte Startwelt hat volle Kader, am Tag nach einer Saison fehlen je nach
-  Transferfenster noch die Neuzugänge. Die CI ruft den Karrierelauf damit auf. Gemessen: +0,033 je Saison. Dafür holen junge Spieler im Mittel nur ihren
+  Transferfenster noch die Neuzugänge. Die CI ruft den Karrierelauf damit auf. Gemessen: +0,010 je Saison. Dafür holen junge Spieler im Mittel nur ihren
   Altersabschlag auf, Akademietalente erreichen etwa die Stärke ihres Vereins, und der Abbau ab 30 nimmt mit dem
   Alter zu.
 
