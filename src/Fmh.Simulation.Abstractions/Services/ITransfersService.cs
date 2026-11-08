@@ -13,6 +13,8 @@ public interface ITransfersService
     Contract MakeContract(ContractOffer o, DateOnly start, Club club);
     /// <summary>Zum Saisonwechsel: Verträge enden, Vorverträge greifen, Leihen laufen aus.</summary>
     void ExpireContractsAndLoans();
+    /// <summary>KI-Vereine über der Kadergrenze (zurückgekehrte Leihspieler, Jugend) geben sofort Spieler ab.</summary>
+    void TrimAiSquads();
     /// <summary>Vereinslose ohne Perspektive beenden ihre Laufbahn (auch freigegebene Jugendspieler unterhalb des Amateurniveaus).</summary>
     void RetireFreeAgents();
     double Rating(Player p);

@@ -157,6 +157,13 @@ public sealed partial class TransfersModule
         return false;
     }
 
+    public void TrimAiSquads()
+    {
+        _activeLoans = null;
+        foreach (var club in World.Clubs.Values.Where(c => !IsHuman(c) && c.PlayerIds.Count > World.Country(c.CountryCode).Squad.MaxSquad))
+            ManageAiSquadSize(club);
+    }
+
     /// <summary>KI hält den Kader in Grenzen: Überzählige auf die Transferliste, notfalls Vertrag auflösen.</summary>
     private void ManageAiSquadSize(Club club)
     {

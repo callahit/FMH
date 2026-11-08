@@ -35,8 +35,8 @@ public sealed class LoanRules
     public int MaxMonths { get; set; } = 12;
     /// <summary>Abweichende Höchstzahlen ab einer Saison (stufenweise Einführung, z. B. FIGC 10 → 9 → 8).</summary>
     public List<LoanStep> Steps { get; set; } = new();
-    /// <summary>Herkunft der Zahlen.</summary>
-    public string? Source { get; set; }
+    /// <summary>Herkunft der Zahlen; ohne eigene Angabe gelten die Vorgaben der FIFA.</summary>
+    public string? Source { get; set; } = "FIFA-Transferstatut Art. 10 (Standard): sechs je Richtung, drei mit demselben Verein";
 
     /// <summary>Höchstzahlen (verliehen, ausgeliehen) in der Saison mit dem Startjahr <paramref name="seasonYear"/>.</summary>
     public (int maxOut, int maxIn) Limits(int seasonYear)
