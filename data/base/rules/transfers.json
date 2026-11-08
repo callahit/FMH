@@ -36,7 +36,8 @@
       "borrowChance": 0.5,
       "youthFocusAge": 0,
       "lendBeyondRank": 0,
-      "maxAboveLevel": 1.5
+      "maxAboveLevel": 1.5,
+      "equityOnly": true
     },
     "Bargain": {
       "signingChance": 0.15,
@@ -45,7 +46,9 @@
       "borrowChance": 0.0,
       "youthFocusAge": 0,
       "lendBeyondRank": 0,
-      "maxAboveLevel": 1.5
+      "maxAboveLevel": 1.5,
+      "equityOnly": true,
+      "freeAgentsOnly": true
     }
   },
   "reference": {
