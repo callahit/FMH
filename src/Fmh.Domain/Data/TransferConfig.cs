@@ -116,8 +116,6 @@ public sealed class StrategyProfile
     /// ohne Grenze wandern die Besten Jahr für Jahr nach oben und die Ligen werden stetig stärker (Review F-02).
     /// </summary>
     public double MaxAboveLevel { get; set; } = 1.5;
-    /// <summary>Verpflichtet nur ablösefreie Spieler (Vereinslose und Spieler nach Vertragsende).</summary>
-    public bool FreeAgentsOnly { get; set; }
     /// <summary>Zahlt Ablösen nur aus Eigenkapital (Kasse plus Festgeld minus Kredite), nicht auf Pump.</summary>
     public bool EquityOnly { get; set; }
     /// <summary>Verleiht Spieler außerhalb der besten so vielen des Kaders, wenn sie jung sind; 0 = verleiht nicht aktiv.</summary>
