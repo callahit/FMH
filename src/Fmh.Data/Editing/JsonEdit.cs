@@ -105,6 +105,26 @@ public sealed record RemoveItem(string File, JsonPath ListPath, int Index) : Jso
     public override string Describe() => $"{File}: Eintrag {Index} aus {ListPath} entfernt";
 }
 
+/// <summary>Ändert Name oder Version im Manifest des eigenen Pakets (Teil des Verlaufs wie jede andere Änderung).</summary>
+public sealed record SetManifestField(string Field, string Value) : JsonEdit(PackageLoader.ManifestFile)
+{
+    public override JsonEdit Apply(PackageWorkspace ws)
+    {
+        var m = ws.Manifest;
+        var old = Field switch
+        {
+            "name" => m.Name,
+            "version" => m.Version,
+            _ => throw new ArgumentException($"Feld '{Field}' im Manifest ist nicht bearbeitbar."),
+        };
+        if (Field == "name") m.Name = Value;
+        else m.Version = Value;
+        return new SetManifestField(Field, old);
+    }
+
+    public override string Describe() => $"{File}: {Field} geändert";
+}
+
 /// <summary>Mehrere Schritte als einer (z. B. CSV-Import), gemeinsam rückgängig zu machen.</summary>
 public sealed record EditBatch(string Label, IReadOnlyList<JsonEdit> Edits) : JsonEdit(Edits.Count > 0 ? Edits[0].File : "")
 {

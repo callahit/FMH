@@ -55,12 +55,19 @@ public sealed partial class ClubsSectionViewModel : SectionViewModel
     [RelayCommand]
     private void Add()
     {
-        var n = List.Count + 1;
-        Workspace.Apply(new InsertItem(File, JsonPath.Root, List.Count, new JsonObject
+        // Kleinster freie Schlüssel neuN (auch nach Löschen nie doppelt)
+        var keys = List.OfType<JsonObject>().Select(c => c["key"]?.ToString()).ToHashSet();
+        var n = 1;
+        while (keys.Contains($"neu{n}")) n++;
+        // Liga und Region vom ausgewählten (sonst letzten) Verein, damit der neue Verein gleich gültig ist
+        var template = (SelectedRow is { } sel ? List[sel.Index] : List.LastOrDefault()) as JsonObject;
+        var club = new JsonObject
         {
             ["key"] = $"neu{n}", ["name"] = EditorState.F("editor.clubs.newName", n), ["shortName"] = $"Neu {n}",
-            ["city"] = "", ["division"] = "", ["reputation"] = 5, ["capacity"] = 5000,
-        }));
+            ["city"] = $"Neu {n}", ["division"] = template?["division"]?.DeepClone() ?? "", ["reputation"] = 5, ["capacity"] = 5000,
+        };
+        if (template?["region"] is { } region) club["region"] = region.DeepClone();
+        Workspace.Apply(new InsertItem(File, JsonPath.Root, List.Count, club));
     }
 
     [RelayCommand]

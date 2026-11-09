@@ -139,7 +139,7 @@ public sealed class PackageWorkspace
 
     public void Apply(JsonEdit edit)
     {
-        Document(edit.File);
+        if (edit is not SetManifestField) Document(edit.File);
         var inverse = edit.Apply(this);
         _undo.Push((inverse, edit));
         _redo.Clear();

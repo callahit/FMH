@@ -2944,5 +2944,6 @@
  "editor.diff.file": "File",
  "editor.diff.path": "Field",
  "editor.diff.old": "Before",
- "editor.diff.new": "After"
+ "editor.diff.new": "After",
+ "editor.closeUnsaved": "Unsaved changes – click “Close” again to discard them."
 }
