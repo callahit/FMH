@@ -133,4 +133,36 @@ public sealed class EditorCountryTests : IDisposable
         ws.Apply(new SetValue("countries/de.json", de3.Then("movements"), new JsonArray(Rule("20", "Down", 2026, true))));
         Assert.Contains(ws.Validate(), e => e.Contains("ohne Nachrücker"));
     }
+
+    /// <summary>Abnahme 7.4: neues Land mit 4 Ebenen, 64 Vereinen und Pokal ohne Texteditor anlegen und damit spielen.</summary>
+    [Fact]
+    public void WizardCreatesPlayableCountryWithFourLevelsSixtyFourClubsAndCup()
+    {
+        var ws = PackageWorkspace.Create(_root, "neuland", "Neuland", new[] { "base" });
+        var files = CountryWizard.Create(ws, new NewCountrySpec("NL", "Neuland", new[] { 16, 16, 16, 16 }));
+        Assert.Contains("countries/nl.json", files);
+        Assert.Contains("names/nl.json", files);
+        Assert.Equal(64, ((JsonArray)ws.Document("clubs/nl.json")!).Count);
+        Assert.Empty(ws.Validate());
+        var pyramid = CountryTools.Pyramid(Obj(ws.Document("countries/nl.json")));
+        Assert.Equal(new[] { (0, 2), (2, 2), (2, 2), (2, 0) }, pyramid.Select(l => (l.Divisions[0].Up, l.Divisions[0].Down)));
+        Assert.Throws<InvalidOperationException>(() => CountryWizard.Create(ws, new NewCountrySpec("NL", "Doppelt", new[] { 10 })));
+        Assert.Throws<ArgumentException>(() => CountryWizard.Create(ws, new NewCountrySpec("N1", "Falsch", new[] { 10 })));
+
+        ws.Save();
+        var data = PackageLoader.Load(_root);
+        Assert.Empty(DataValidator.Validate(data));
+        var cup = Assert.Single(data.Countries.Single(c => c.Code == "NL").Cups);
+        Assert.Equal(64, cup.Teams);
+        var world = WorldGenerator.Create(data, new NewGameOptions
+        {
+            Seed = 11, ClubKey = "nl1-1", ManagerName = "Test", Activation = new() { ["DE"] = CountryActivation.Inactive },
+        });
+        Assert.Equal(64, world.Leagues.Sum(l => l.ClubIds.Count));
+        var s = new GameSession(world, data, new TextMatchEngine());
+        TestData.PlayUntil(s, r => r.Reason == StopReason.NewSeason, 20_000);
+        Assert.Equal(4, world.Leagues.Count);
+        Assert.All(world.Leagues, l => Assert.Equal(16, l.ClubIds.Count));
+        Assert.Contains(world.Cups, c => c.Id.StartsWith("NL-CUP", StringComparison.Ordinal));
+    }
 }
