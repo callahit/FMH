@@ -207,7 +207,7 @@ public sealed partial class PressModule : GameModule, IPressService
             }
         }
         // Unzufriedene Spieler (Zufriedenheit unter 30) melden sich häufiger zu Wort (Must-now E3-S4).
-        var unhappy = squad.Where(p => Relations.Of(p).Satisfaction < RelationsRules.UnhappyThreshold).ToList();
+        var unhappy = squad.Where(p => Relations.Of(p).Satisfaction < Data.Relations.UnhappyThreshold).ToList();
         var pressChance = unhappy.Count > 0 ? 0.14 : 0.05;
         if (Rng.Chance(pressChance))
         {

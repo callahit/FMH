@@ -122,6 +122,12 @@
     },
     {
       "fileMatch": [
+        "data/*/rules/relations.json"
+      ],
+      "url": "./data/schema/relations.schema.json"
+    },
+    {
+      "fileMatch": [
         "data/*/competitions/europe.json"
       ],
       "url": "./data/schema/europe.schema.json"
