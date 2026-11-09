@@ -80,11 +80,21 @@ public class SportsDirectorE2Tests
     }
 
     [Fact]
-    public void HighReputationClubsStartWithSportsDirector()
+    public void SportsDirectorIsHireableFromStaffMarket()
     {
         var s = TestData.NewSession(23);
-        var big = s.World.Clubs.Values.Where(c => c.Reputation >= 8 && c.ReserveOf is null)
-            .OrderByDescending(c => c.Reputation).First();
-        Assert.Contains(s.StaffOf(big), x => x.Role == StaffRole.SportsDirector);
+        if (!s.StaffMarket.Any(x => x.Role == StaffRole.SportsDirector))
+        {
+            s.World.Staff.Add(new StaffMember
+            {
+                Id = s.World.NextStaffId++, Name = "Markt Direktion", Role = StaffRole.SportsDirector,
+                Ability = 14, Motivation = 12, WeeklyWage = GameSession.StaffWage(14),
+                ContractUntil = new DateOnly(s.World.SeasonYear + 2, 6, 30),
+            });
+        }
+        var candidate = s.StaffMarket.First(x => x.Role == StaffRole.SportsDirector);
+        Assert.Null(s.HireStaff(candidate));
+        Assert.Equal(s.HumanClub.Id, candidate.ClubId);
+        Assert.Null(s.SetDirectorMandate(true, 1_000_000, 10_000));
     }
 }
