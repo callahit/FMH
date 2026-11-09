@@ -39,11 +39,13 @@ public sealed partial class TransfersModule
 
         CheckLoanGuarantees();
         ExpirePreemptionOffers();
-        var aiClubs = World.Clubs.Values.Where(c => !IsHuman(c)).ToList();
-        Rng.Shuffle(aiClubs);
         _loanPool = null;
         _market = null;
         _needs.Clear();
+        // Sportdirektor des Menschen zuerst (E2-S5), damit die Beobachtungsliste nicht von der KI weggekauft wird.
+        TryDirectorSigning();
+        var aiClubs = World.Clubs.Values.Where(c => !IsHuman(c)).ToList();
+        Rng.Shuffle(aiClubs);
         foreach (var club in aiClubs)
         {
             var window = WindowOpen(club);

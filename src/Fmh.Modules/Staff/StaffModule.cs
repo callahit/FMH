@@ -53,6 +53,7 @@ public sealed partial class StaffModule : GameModule, IStaffService
             var needed = role switch
             {
                 StaffRole.Psychologist => club.Reputation >= 12,
+                StaffRole.SportsDirector => club.Reputation >= 8,
                 StaffRole.PressOfficer => club.Reputation >= 7,
                 StaffRole.Doctor => club.Reputation >= 5,
                 StaffRole.GoalkeepingCoach => club.Reputation >= 5,
