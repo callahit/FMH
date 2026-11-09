@@ -2428,7 +2428,7 @@
  "build.connected": "On the path network",
  "build.showPaths": "Show path network",
  "build.pathCost": "Path cost: {0}",
- "build.isoHelp": "Isometric map: pick a building, press R to rotate, click to place. Use the path tool for the network.",
+ "build.isoHelp": "Isometric map: pick a building, press R to rotate, click to place. Use the path tool for the network. Ctrl+wheel or +/− zooms.",
  "build.tab.projects": "Projects",
  "build.tab.stadium": "Stadium",
  "build.underConstruction": "building",

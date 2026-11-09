@@ -215,7 +215,21 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
   Kommerz, Verwaltung, Infrastruktur, Energie, Mannschaften).
   - Bis zu fünf Ausbaustufen, Zustand, Unterhalt, Voraussetzungen, Lagebonus und Synergien.
   - Gebäude lassen sich verpachten oder abreißen, Bauland ist zukaufbar.
-  - Anklickbares Raster mit Baumenü.
+  - **Isometrische Karte** mit gezeichneter Grafik statt Klötzen (`Controls/IsoArt.cs`, `IsoBuildings.cs`,
+    `IsoStadium.cs`): Rasen mit Mähstreifen, Wege mit Bordstein, Tore, Baumreihe ringsum.
+    - Gebäude als Häuser mit Satteldach, Fenstern und Tür (Stockwerke nach Stufe) oder Hallen mit Flachdach.
+      Dachfarbe und Symbol zeigen den Bereich.
+    - Eigene Zeichnungen für Plätze (Rasen, Kunstrasen, Soccer-Court, Laufbahn), Parkplätze mit Autos,
+      Parkhaus, Zufahrt, Solarfeld, Park, Pool, Biergarten, LED-Turm, Flutlicht, Tank, BHKW, Statue und
+      Kapelle. Baustellen erscheinen mit Schraffur, Gerüst und Kran.
+    - Stadion mit ansteigenden Tribünen in der Vereinsfarbe: Tiefe und Höhe richten sich nach den Plätzen,
+      dazu Glasdach über den überdachten Tribünen, Logenband und Flutlichtmasten nach Ausbaustufe.
+    - Beschriftung erscheint für das gewählte Gebäude und beim Überfahren mit der Maus.
+    - Die Karte passt sich beim Öffnen dem Fenster an, Strg+Mausrad oder +/− zoomt.
+  - Listenansicht als Raster mit Bereichssymbolen, Baumenü mit Symbol je Gebäude.
+  - Stadion-Reiter mit Draufsicht des Stadions (Tribünen, Dach, Logen, Flutlicht wie im Spielstand).
+  - Der Grafikentwurf entstand als SVG und wurde mit Chromium gerendert; die Symbole sind Linienpfade im
+    24er-Raster wie die übrigen Symbole der Oberfläche.
 - **Personal:** neun Rollen (Co-Trainer, Fitness-, Torwart- und Jugendtrainer, Physiotherapeut,
   Arzt, Sportpsychologe, Pressesprecher, Platzwart) mit Arbeitsmarkt, Einstellung, Entlassung mit
   Abfindung. Das Personal wirkt auf Training, Verletzungen, Jugend, Moral, Presse und Rasen.
