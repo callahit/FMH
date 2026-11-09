@@ -66,8 +66,7 @@ public class TransferTermsTests
         var s = TestData.NewSession(22);
         var p = BuyTarget(s);
         var seller = s.World.Clubs[p.ClubId!.Value];
-        var (n, error) = s.StartNegotiation(p, DealType.Transfer);
-        Assert.Null(error);
+        var n = TestData.StartTalks(s, p, DealType.Transfer);
         var ask = Negotiations.AskingPrice(p, seller, s.World, s.Data);
         Assert.Equal(ResponseKind.Accept, s.SubmitClubOffer(n!, new ClubOffer { Fee = ask, AppearanceBonus = 5_000, GoalBonus = 25_000 }).Kind);
         Assert.Equal(ResponseKind.Accept, s.SubmitContract(n!, n!.Contract).Kind);
@@ -136,8 +135,7 @@ public class TransferTermsTests
         var p = BuyTarget(s);
         var parent = s.World.Clubs[p.ClubId!.Value];
         p.Transfer.LoanListed = true;
-        var (n, error) = s.StartNegotiation(p, DealType.Loan);
-        Assert.Null(error);
+        var n = TestData.StartTalks(s, p, DealType.Loan);
         Assert.Equal(ResponseKind.Accept, s.SubmitClubOffer(n!, new ClubOffer { LoanMonths = 12, WageSharePercent = 50, PlayingTimeGuarantee = true }).Kind);
         var loan = p.Loan!;
         Assert.True(loan.PlayingTimeGuarantee);
@@ -216,8 +214,7 @@ public class TransferTermsTests
         var own = s.World.SquadOf(s.HumanClub).First(x => x.Loan is null && !x.IsYouth);
         own.Contract!.Until = new DateOnly(s.World.SeasonYear + 1, 6, 30);
         Assert.False(s.CanExerciseExtensionOption(own));
-        var (n, error) = s.StartNegotiation(own, DealType.Renewal);
-        Assert.Null(error);
+        var n = TestData.StartTalks(s, own, DealType.Renewal);
         n!.Contract.WeeklyWage = 1;
         n.Contract.ExtensionOptionYears = 0;
         var plain = Negotiations.EvaluateContract(n, own, s.HumanClub, s.World, s.Data).Amount;

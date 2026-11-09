@@ -73,7 +73,12 @@ Farbthemen: Klassik, Hell, Terminal.
   - Taktikvertrautheit: Sie wächst durch Taktiktraining und Spiele und wirkt in der Matchengine.
 - **Transfers und Verträge:**
   - Suche mit Filtern, Beobachtungsliste und Transferfenster.
-  - Verhandlung in zwei Stufen mit höchstens drei Runden, danach 14 Tage Sperre:
+  - Verhandlung mit Anfrage (Antwort in 1–3 Tagen), danach parallele Gespräche mit Verein und Spieler
+    (höchstens drei Runden je Seite). Mehrere Vereine können um denselben Spieler bieten; der Verkäufer
+    wählt nach Angebotswert, der Spieler nach Ruf, Rolle und Gehalt. 14 Tage Sperre nur nach Abbruch
+    durch den Verkäufer. Am letzten Fenstertag (Deadline Day) gibt es einen Ticker und dringende KI-Käufe.
+    Verhandlungen lassen sich an den Sportdirektor mit Höchstablöse und Höchstgehalt delegieren
+    (Bericht im Posteingang).
     - mit dem Verein: Ablöse, Raten, Weiterverkaufsbeteiligung, Tauschspieler;
     - mit dem Spieler: Laufzeit, Gehalt, Handgeld, Prämien, Ausstiegsklausel, Auf- und Abstiegsklausel
       (Gehalt −% bei Abstieg, +% bei Aufstieg), jährliche Erhöhung, Kaderstatus.
@@ -393,7 +398,7 @@ aktive Spieler höchstens +10 % gegenüber dem ersten Saisonende, Vereinslose h�
 | 4 Spielerdatenmodell | 44 Attribute, versteckte Werte, Kondition, Form, Moral, Spielpraxis, Positionseignung, Entwicklung durch **Training** und Saisonwechsel, Karriereende, Dauerschäden | Zufriedenheit, Tutor-System |
 | 5 Kader, Training, Taktik | Kader, Profil, **Training**, **Trainingslager**, 25 Formationen, **Rollen und Aufgaben**, **Spieleranweisungen**, **freie Positionierung**, **Taktikvertrautheit**, **3 Taktikvarianten**, Standardvarianten, Co-Trainer | – |
 | 6 Spieltag und Matchengine | Vorbericht, Kabinenansprache, Kommentar/Ticker/Sofort/**Konferenz**, Wechsel, Taktik und Zurufe live, Nachbericht mit Noten und Statistik, **Verlängerung und Elfmeterschießen**, Hin- und Rückspiel, **Pressekonferenzen** | – |
-| 7 Transfers, Verträge, Scouting | **vollständig** (siehe oben) | – |
+| 7 Transfers, Verträge, Scouting | **vollständig** inkl. Anfrage, Konkurrenz, Deadline Day, Sportdirektor-Delegation (E2) | Berater als Akteure (E2-S3) |
 | 8 Finanzen, Stadion, Personal | **vollständig**: Einnahmen und Ausgaben, Bank, Lizenz, Insolvenz, Stadionausbau, Personal, Sponsoren | – |
 | 9 Vereinsgelände | **83 Gebäude** mit Stufen, Lage und Synergien, Baufirmen, Genehmigungen | – |
 | 10 Umfeld, Karriere | **Vorstand, Fans, Presse, 166 Zufallsereignisse, Managerkarriere** mit Lizenzen und Erfolgen | Nationalmannschaft, Medienhaus |
