@@ -15,9 +15,10 @@ public sealed partial class FacilitiesModule
         var r = club.Reputation;
         club.Grounds = new Grounds
         {
-            Width = r >= 10 ? 14 : r >= 5 ? 12 : 10,
-            Height = r >= 10 ? 9 : 8,
-            MapVersion = 1,
+            // Grundflächen nach realem Platzbedarf (Schema 2): mehr Fläche, damit Plätze mit Auslauf hineinpassen
+            Width = r >= 10 ? 18 : r >= 5 ? 15 : 12,
+            Height = r >= 10 ? 11 : r >= 5 ? 10 : 9,
+            MapVersion = CurrentMapVersion,
         };
         var g = club.Grounds;
         g.StadiumX = g.Width / 2 - 2;

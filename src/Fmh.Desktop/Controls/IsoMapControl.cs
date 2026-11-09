@@ -56,9 +56,9 @@ public sealed class IsoMapControl : Control
         {
             var fitW = (v.Bounds.Width - 24) / (maxX - minX + TileW);
             var fitH = (v.Bounds.Height - 24) / (maxY - minY + TileH * 3);
-            // Pixel-Art bleibt scharf bei ganzzahliger Vergrößerung: ab 0,8 auf 1× bzw. 2× einrasten
+            // Pixel-Art bleibt scharf bei ganzzahliger Vergrößerung: ab 0,6 auf 1× bzw. 2× einrasten (sonst scrollen)
             var fit = Math.Min(fitH, fitW * 1.35);
-            _zoom = fit >= 2 ? 2 : fit >= 0.8 ? 1 : Math.Max(0.6, fit);
+            _zoom = fit >= 2 ? 2 : fit >= 0.6 ? 1 : Math.Max(0.6, fit);
         }
         return new Size((maxX - minX + TileW) * Zoom, (maxY - minY + TileH * 3) * Zoom);
     }
