@@ -15,6 +15,7 @@ import buildings as B
 import specials as X
 import stadium as St
 import catalog_types as CT
+import people as PE
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 OUT = os.path.join(ROOT, "src", "Fmh.Desktop", "Assets")
@@ -42,6 +43,7 @@ def sprites():
     for i in range(2): out[f"path_{i}"] = X.path_tile(20 + i)
     out["gate"] = X.gate_tile()
     for i in range(2): out[f"plaza_{i}"] = X.plaza_tile(70 + i)
+    out.update(PE.people())
     out["deco_lamp"] = X.lamp()
     out["deco_bench"] = X.bench()
     out["deco_bin"] = X.bin_()
