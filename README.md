@@ -219,6 +219,15 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
 - **Vereinsgelände** (Kapitel 9): 83 Gebäude in neun Bereichen (Training, Medizin, Jugend, Fans,
   Kommerz, Verwaltung, Infrastruktur, Energie, Mannschaften).
   - Bis zu fünf Ausbaustufen, Zustand, Unterhalt, Voraussetzungen, Lagebonus und Synergien.
+  - **Platzbedarf nach realem Maßstab.** Eine Kachel entspricht rund 46 m; Maßstab ist das Stadion, dessen
+    4×3-Feld ein Spielfeld von etwa 2,3×1,5 Kacheln umschließt.
+    - Rasen-, Kunstrasen- und Reserveplatz sowie die Jugendplätze belegen mit Auslauf 3×2 Kacheln.
+    - Die Sprintbahn (100 m plus Auslauf) belegt 3×1, das Kleinstadion 3×3, die Trainingshalle 2×1.
+    - Das Startgelände ist entsprechend größer: 12×9, 15×10 oder 18×11 Kacheln je nach Vereinsgröße.
+    - Spielstände mit Geländeschema 1 werden beim Laden angepasst (Schema 2). Gebäude, die mit der neuen Fläche
+      an ihrem Platz passen, bleiben stehen, notfalls gedreht. Die übrigen werden auf freie Plätze gesetzt;
+      reicht der Platz nicht, wächst das Gelände kostenlos um Reihen. Wege unter Gebäuden entfallen, und jedes
+      Gebäude wird wieder ans Wegenetz angeschlossen.
   - Gebäude lassen sich verpachten oder abreißen, Bauland ist zukaufbar.
   - **Isometrische Karte in Pixel-Art** im Stil klassischer Aufbauspiele (`Controls/IsoAtlas.cs`, `IsoPixelArt.cs`):
     Rasenkacheln mit Blumen, Pflasterwege, Tor, Laub- und Nadelbäume ringsum.
