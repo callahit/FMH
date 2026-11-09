@@ -128,7 +128,8 @@ public sealed partial class TrainingModule : GameModule, ITrainingService
         var age = p.Age(World.Date);
         var ageFactor = age switch { <= 19 => 1.3, <= 21 => 1.1, <= 24 => 0.8, <= 27 => 0.35, <= 30 => 0.12, _ => 0.04 };
         var pro = 0.6 + h.Professionalism / 20.0 * 0.8;
-        var morale = 0.9 + (int)p.State.Morale * 0.033;
+        // Moral um „Okay“ herum: ±Stufen × Wirkung aus rules/relations.json
+        var morale = 1 + ((int)p.State.Morale - (int)Morale.Okay) * Data.Relations.TrainingMoralePerStep;
         return 0.014 * Math.Min(1.5, headroom / 35.0 + 0.15) * ageFactor * pro * morale * CoachFactor(club) * IntensityFactor(intensity);
     }
 

@@ -35,6 +35,12 @@ public sealed class RelationsConfig
     public PromiseRules Promises { get; set; } = new();
     public TrustRules Trust { get; set; } = new();
     public HierarchyRules Hierarchy { get; set; } = new();
+    /// <summary>
+    /// Wirkung der Moral auf den Trainingsfortschritt je Stufe über bzw. unter „Okay“ (sieben Stufen; 0,0167 = ±5 % an den
+    /// Enden). Zufriedenere Kader entwickeln sich schneller; zu viel davon lässt die Ligastärke wachsen (Drift).
+    /// </summary>
+    [Range(0, 0.1)]
+    public double TrainingMoralePerStep { get; set; } = 0.0167;
     /// <summary>Kalibrierung: Anteil unzufriedener Spieler je Kader in Prozent (von–bis, Mittel über die Saison).</summary>
     public double[] UnhappyShare { get; set; } = { 5, 20 };
 }
