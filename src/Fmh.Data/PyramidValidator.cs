@@ -95,6 +95,10 @@ public static class PyramidValidator
             if (m.Kind == MovementKind.Playoff && country.Playoffs.All(p => p.Id != m.Playoff))
                 errors.Add($"Liga '{name}': Bewegungsregel verweist auf unbekannte Relegation '{m.Playoff}'.");
             if (m.Cycle is < 2) errors.Add($"Liga '{name}': Rotation über {m.Cycle} Saisons (mindestens 2).");
+            var lowest = country.Levels.Count > 0 && country.Levels.OrderBy(l => l.Level).Last().Divisions.Contains(div);
+            if (m.WithoutReplacement && (m.To != MovementDirection.Down || m.Kind != MovementKind.Direct || !lowest
+                                         || country.Pools.All(p => p.Feeds != div.Id)))
+                errors.Add($"Liga '{name}': Abstieg ohne Nachrücker gibt es nur direkt aus der untersten Ebene in einen Pool mit \"feeds\".");
         }
         foreach (var season in seasons)
         {
@@ -210,6 +214,11 @@ public static class PyramidValidator
                 totals[levels[i].Level] += up - down;
                 totals[levels[i + 1].Level] += down - up;
             }
+            // Abstieg ohne Nachrücker verkleinert die unterste Ebene (die Vereine gehen in den Pool)
+            if (levels.Count > 0)
+                totals[levels[^1].Level] -= levels[^1].Divisions.Sum(d => d.LeagueIds.Sum(id => d.MovementsOf(id)
+                    .Where(m => m.WithoutReplacement && m.To == MovementDirection.Down && Applies(m, season, transition: true))
+                    .SelectMany(m => m.PositionList()).Distinct().Count()));
             foreach (var level in next.Levels)
             {
                 var teams = level.Divisions.Sum(d => d.Teams * Leagues(d));

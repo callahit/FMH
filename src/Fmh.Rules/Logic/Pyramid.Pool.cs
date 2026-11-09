@@ -38,6 +38,13 @@ public static partial class Pyramid
         }
         // Ohne Nachrücker bleiben die bestplatzierten Absteiger in ihrer Liga.
         while (x.Down.Count > x.Up.Count) x.Down.RemoveAt(0);
+        // Abstieg ohne Nachrücker (Verkleinerung der Ebene, z. B. vor einer Reform): diese Vereine gehen ohne Ausgleich in den Pool.
+        foreach (var league in lowest)
+        {
+            var table = tables[league.Id];
+            x.Down.AddRange(Rules(league, MovementDirection.Down, world.SeasonYear, withoutReplacement: true)
+                .Where(p => p <= table.Count).Select(p => table[p - 1]).Where(id => !x.Down.Contains(id) && !x.Up.Contains(id)));
+        }
         return (pool, x);
     }
 }
