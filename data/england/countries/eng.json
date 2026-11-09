@@ -22,7 +22,46 @@
     "yellowCardsForSuspension": 5,
     "redCardBanMin": 1,
     "redCardBanMax": 3,
-    "secondYellowBan": 1
+    "secondYellowBan": 1,
+    "resetYellowsOnSeason": true,
+    "carryYellowBansOnSeason": false,
+    "carryRedBansOnSeason": true,
+    "scopes": {
+      "league": { "yellowCardsForSuspension": 5 },
+      "cup": { "yellowCardsForSuspension": 4, "yellowRepeat": 2 },
+      "ENG1": {
+        "yellowCardsForSuspension": 0,
+        "thresholds": [
+          { "cards": 5, "matches": 1, "untilRound": 19 },
+          { "cards": 10, "matches": 2, "untilRound": 32 },
+          { "cards": 15, "matches": 3 }
+        ]
+      },
+      "ENG2": {
+        "yellowCardsForSuspension": 0,
+        "thresholds": [
+          { "cards": 5, "matches": 1, "untilRound": 19 },
+          { "cards": 10, "matches": 2, "untilRound": 37 },
+          { "cards": 15, "matches": 3 }
+        ]
+      },
+      "ENG3": {
+        "yellowCardsForSuspension": 0,
+        "thresholds": [
+          { "cards": 5, "matches": 1, "untilRound": 19 },
+          { "cards": 10, "matches": 2, "untilRound": 37 },
+          { "cards": 15, "matches": 3 }
+        ]
+      },
+      "ENG4": {
+        "yellowCardsForSuspension": 0,
+        "thresholds": [
+          { "cards": 5, "matches": 1, "untilRound": 19 },
+          { "cards": 10, "matches": 2, "untilRound": 37 },
+          { "cards": 15, "matches": 3 }
+        ]
+      }
+    }
   },
   "levels": [
     {

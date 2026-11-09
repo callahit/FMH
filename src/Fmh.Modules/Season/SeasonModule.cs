@@ -129,8 +129,9 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
                 var div = Finance.DivisionFinance(club);
                 (club.Finance.Prices.Standing, club.Finance.Prices.Seating, club.Finance.Prices.Box) = (div.Standing, div.Seating, div.Box);
             }
-            if (!IsHuman(club)) club.Tactic.FormationId = AiTactics.BestFormation(club, World, Data).Id;
-            LineupSelector.Repair(club, World, Data, BenchSize(club));
+            var nextScope = NextFixture(club) is { } next ? DisciplineRules.ScopeOf(next, World) : null;
+            if (!IsHuman(club)) club.Tactic.FormationId = AiTactics.BestFormation(club, World, Data, nextScope).Id;
+            LineupSelector.Repair(club, World, Data, BenchSize(club), scope: nextScope);
         }
 
         Sponsors.SponsorSeasonStart();
@@ -215,7 +216,7 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
             Development.ApplySeason(p, today, Data.PositionProfiles, Rng);
             if (p.SeasonStats.Appearances > 0) p.History.Add(p.SeasonStats);
             p.SeasonStats = new PlayerSeasonStats { SeasonYear = World.SeasonYear, ClubId = club.Id };
-            p.State.YellowCardsAccumulated = 0;
+            DisciplineRules.ApplySeason(p.State, World.Country(club.CountryCode).Discipline, Data.Europe);
             p.State.Condition = Math.Max(p.State.Condition, 92);
             p.State.Morale = Morale.Okay;
             if (p.Contract is { YearlyRaisePercent: > 0 } c) c.WeeklyWage = (int)(c.WeeklyWage * (1 + c.YearlyRaisePercent / 100.0));

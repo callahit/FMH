@@ -35,7 +35,7 @@ public sealed class PlayerRow
         });
         Form = p.State.Form;
         Status = UiText.Status(p, club);
-        StatusBrush = new SolidColorBrush(p.IsAvailable ? Palette.Current.Muted : Palette.Current.Bad);
+        StatusBrush = new SolidColorBrush(p.State.Injury is null && !p.State.AnySuspension ? Palette.Current.Muted : Palette.Current.Bad);
         Apps = p.SeasonStats.Appearances;
         Goals = p.SeasonStats.Goals;
         Grade = p.SeasonStats.AverageGrade ?? 9;
@@ -130,7 +130,7 @@ public sealed partial class SquadPageViewModel : PageViewModel, IRefreshable
             .OrderBy(p => (int)p.MainPosition).ThenByDescending(p => Ratings.Strength(p, Data.PositionProfiles))
             .Select(p => new PlayerRow(p, club)).ToList();
         var injured = squad.Count(p => p.State.Injury is not null);
-        var suspended = squad.Count(p => p.State.SuspendedMatches > 0);
+        var suspended = squad.Count(p => p.State.AnySuspension);
         Summary = T.Format("squad.summary", squad.Count, Fmt.Num(squad.Average(p => p.Age(Session.World.Date)), "0.0"),
             UiText.Strength(Ratings.StrengthFromRating(AiTactics.TeamStrength(club, Session.World, Data))), injured, suspended);
         var w = Session.World;

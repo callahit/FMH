@@ -1,4 +1,14 @@
 {
+  "discipline": {
+    "yellowCardsForSuspension": 3,
+    "yellowRepeat": 2,
+    "redCardBanMin": 1,
+    "redCardBanMax": 1,
+    "secondYellowBan": 1,
+    "resetYellowsOnSeason": true,
+    "carryYellowBansOnSeason": false,
+    "carryRedBansOnSeason": true
+  },
   "access": {
     "windowYears": 5,
     "win": 2.0,

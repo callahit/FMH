@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using Fmh.Core.Model;
 
 namespace Fmh.Core.Data;
@@ -171,9 +172,64 @@ public sealed class SquadRules
 public sealed class DisciplineConfig
 {
     public int YellowCardsForSuspension { get; set; } = 5;
+    /// <summary>0 = jede weitere Schwelle ist wieder <see cref="YellowCardsForSuspension"/> und der Zähler wird zurückgesetzt. Sonst bleibt der Zähler stehen (UEFA: 2, also Sperre bei 3, 5, 7 …).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int YellowRepeat { get; set; }
     public int RedCardBanMin { get; set; } = 1;
     public int RedCardBanMax { get; set; } = 3;
     public int SecondYellowBan { get; set; } = 1;
+    /// <summary>Gelbe Karten verfallen zum Saisonwechsel.</summary>
+    public bool ResetYellowsOnSeason { get; set; } = true;
+    /// <summary>Offene Gelbsperren gehen in die nächste Saison. Standard: nein (DFL, DFB-Pokal, UEFA).</summary>
+    public bool CarryYellowBansOnSeason { get; set; }
+    /// <summary>Offene Sperren nach Platzverweis gehen in die nächste Saison desselben Wettbewerbs.</summary>
+    public bool CarryRedBansOnSeason { get; set; } = true;
+    /// <summary>Nach diesem Spieltag werden die Gelben gelöscht (Primera División: 19), ohne die schon verhängte Sperre zu streichen.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? ClearYellowsAfterRound { get; set; }
+    /// <summary>Feste Schwellen statt des Zyklus (England: 5/10/15 mit Stichtag). Leer = Zyklus über <see cref="YellowCardsForSuspension"/>.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<YellowThreshold>? Thresholds { get; set; }
+    /// <summary>Abweichungen je Bereichsvorlage ("league", "cup") oder Wettbewerbs-Id ("ENG1", "ES1", "DE-CUP").</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public Dictionary<string, DisciplineScopeConfig>? Scopes { get; set; }
+    /// <summary>Wettbewerbs-Id → Bereichsname, wenn der Zähler nicht der Standardbereich sein soll.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public Dictionary<string, string>? CompetitionScopes { get; set; }
+}
+
+/// <summary>Eine Gelbschwelle: bei genau <see cref="Cards"/> Gelben eine Sperre von <see cref="Matches"/> Spielen, optional nur bis zu einem Spieltag.</summary>
+public sealed class YellowThreshold
+{
+    public int Cards { get; set; }
+    public int Matches { get; set; } = 1;
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? UntilRound { get; set; }
+}
+
+/// <summary>Überschreibt nur die gesetzten Felder der Landes- oder Europaregel.</summary>
+public sealed class DisciplineScopeConfig
+{
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? YellowCardsForSuspension { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? YellowRepeat { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? RedCardBanMin { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? RedCardBanMax { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? SecondYellowBan { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? ResetYellowsOnSeason { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? CarryYellowBansOnSeason { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public bool? CarryRedBansOnSeason { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public int? ClearYellowsAfterRound { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public List<YellowThreshold>? Thresholds { get; set; }
 }
 
 public sealed class LevelConfig
