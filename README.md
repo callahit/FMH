@@ -220,7 +220,28 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
   Kommerz, Verwaltung, Infrastruktur, Energie, Mannschaften).
   - Bis zu fünf Ausbaustufen, Zustand, Unterhalt, Voraussetzungen, Lagebonus und Synergien.
   - Gebäude lassen sich verpachten oder abreißen, Bauland ist zukaufbar.
-  - Anklickbares Raster mit Baumenü.
+  - **Isometrische Karte in Pixel-Art** im Stil klassischer Aufbauspiele (`Controls/IsoAtlas.cs`, `IsoPixelArt.cs`):
+    Rasenkacheln mit Blumen, Pflasterwege, Tor, Laub- und Nadelbäume ringsum.
+    - Häuser aus Backstein, Putz, Naturstein, Paneelen oder Glas je Bereich, mit Ziegeldach in der Bereichsfarbe,
+      Fenstern (einige erleuchtet), Tür und Schornstein. Die Stockwerke richten sich nach der Stufe (1–2, 3–4, ab 5).
+    - Große Gebäude als Hallen mit Kiesdach, Oberlichtern und Lüftungsgeräten.
+    - Eigene Sprites für Plätze mit Toren, Kunstrasen, Soccer-Court, Laufbahn, Parkplätze mit Autos, Zufahrt,
+      Solarfeld, Park, Pool und Eisbecken, Biergarten, LED-Turm, Flutlicht, Tank, BHKW, Statue und Kapelle.
+      Baustellen erscheinen mit Gerüst und Kran.
+    - Stadion aus Bausteinen: Sockel mit Spielfeld und Treppentürmen, je Seite eine Tribüne in drei Größen nach
+      Plätzen (bis 4.000, bis 12.000, darüber), mit oder ohne Glasdach, Flutlichtmasten nach Ausbaustufe.
+      Sitze und Fassadenband werden zur Laufzeit in die Vereinsfarbe umgefärbt.
+    - Die Sprites werden ohne Weichzeichnen gezeichnet, der automatische Zoom rastet auf 1× bzw. 2× ein.
+    - Sie entstehen mit `python3 tools/sprites/gen_sprites.py` (Pillow, deterministisch). Der Generator schreibt
+      `src/Fmh.Desktop/Assets/grounds.png` und `grounds.json`. Mit `--preview datei.png` erzeugt er eine
+      Beispielszene.
+    - Fehlt der Atlas, zeichnet die Karte die Vektorgrafik aus `IsoArt.cs`, `IsoBuildings.cs` und `IsoStadium.cs`.
+    - Beschriftung erscheint für das gewählte Gebäude und beim Überfahren mit der Maus.
+    - Die Karte passt sich beim Öffnen dem Fenster an, Strg+Mausrad oder +/− zoomt.
+  - Listenansicht als Raster mit Bereichssymbolen, Baumenü mit Symbol je Gebäude.
+  - Stadion-Reiter mit Draufsicht des Stadions (Tribünen, Dach, Logen, Flutlicht wie im Spielstand).
+  - Der Grafikentwurf entstand als SVG und wurde mit Chromium gerendert; die Symbole sind Linienpfade im
+    24er-Raster wie die übrigen Symbole der Oberfläche.
 - **Personal:** neun Rollen (Co-Trainer, Fitness-, Torwart- und Jugendtrainer, Physiotherapeut,
   Arzt, Sportpsychologe, Pressesprecher, Platzwart) mit Arbeitsmarkt, Einstellung, Entlassung mit
   Abfindung. Das Personal wirkt auf Training, Verletzungen, Jugend, Moral, Presse und Rasen.

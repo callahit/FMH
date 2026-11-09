@@ -19,9 +19,13 @@ public sealed record ProjectLine(string Name, string State, string Dates, string
 
 /// <summary>Kachel auf dem Geländeraster: Gebäude, Stadion oder freies Feld.</summary>
 public sealed record GroundTile(double Left, double Top, double Width, double Height, string Label, string Sub, IBrush Fill, IBrush Border,
-    int X, int Y, Building? Building, bool IsStadium, IRelayCommand Select);
+    int X, int Y, Building? Building, bool IsStadium, IRelayCommand Select, Geometry? Icon = null, bool IsPath = false)
+{
+    /// <summary>Text auf der Kachel; Wege bleiben ohne Beschriftung (nur Tooltip).</summary>
+    public string Caption => IsPath ? "" : Label;
+}
 
-public sealed record BuildOption(string Type, string Name, string Category, string Cost, string Effects, string Upkeep, bool Possible, string Hint, IRelayCommand Build, IRelayCommand Pick);
+public sealed record BuildOption(string Type, string Name, string Category, string Cost, string Effects, string Upkeep, bool Possible, string Hint, IRelayCommand Build, IRelayCommand Pick, Geometry? Icon = null, IBrush? IconBrush = null);
 
 public sealed record BuildingListRow(string Name, string Category, string Level, string Condition, string Effects, string Link, Building Building, IRelayCommand Select);
 
@@ -52,6 +56,7 @@ public sealed partial class StadiumPageViewModel : PageViewModel, IRefreshable
     [ObservableProperty] private string? _result;
     [ObservableProperty] private string _stadiumTitle = "";
     [ObservableProperty] private IReadOnlyList<InfoLine> _stadiumFacts = Array.Empty<InfoLine>();
+    [ObservableProperty] private StadiumPlanModel? _plan;
     [ObservableProperty] private IReadOnlyList<StandCard> _stands = Array.Empty<StandCard>();
     [ObservableProperty] private IReadOnlyList<BuildAction> _stadiumActions = Array.Empty<BuildAction>();
     [ObservableProperty] private IReadOnlyList<GroundTile> _tiles = Array.Empty<GroundTile>();
@@ -95,6 +100,12 @@ public sealed partial class StadiumPageViewModel : PageViewModel, IRefreshable
         var club = Club;
         var st = club.Stadium;
         StadiumTitle = s.StadiumDisplayName(club);
+        Plan = new StadiumPlanModel(
+            st.Stands.ToDictionary(x => x.Side.ToString(), x => x.Capacity),
+            st.Stands.Where(x => x.Roof).Select(x => x.Side.ToString()).ToHashSet(),
+            st.Stands.Where(x => x.Boxes > 0).Select(x => x.Side.ToString()).ToHashSet(),
+            st.Floodlight, SeatColor(club),
+            st.Stands.ToDictionary(x => x.Side.ToString(), x => $"{T["stand." + x.Side]} · {Fmt.Int(x.Capacity)}"));
         StadiumFacts = new List<InfoLine>
         {
             new(T["stadium.capacity"], Fmt.Int(st.Capacity)),
@@ -217,6 +228,7 @@ public sealed partial class StadiumPageViewModel : PageViewModel, IRefreshable
                 Level = Math.Max(1, b.Level),
                 Category = def?.Category ?? "",
                 Label = T["building." + b.Type],
+                Type = b.Type,
                 UnderConstruction = b.UnderConstruction,
                 Connected = s.IsBuildingConnected(club, b),
             };
@@ -233,6 +245,14 @@ public sealed partial class StadiumPageViewModel : PageViewModel, IRefreshable
             StadiumHeight = g.StadiumHeight,
             StadiumRoof = club.Stadium.RoofShare >= 0.5,
             StandHeights = club.Stadium.Stands.ToDictionary(st => st.Side.ToString(), st => Math.Clamp(st.Capacity / 5000 + 1, 1, 4)),
+            StandCapacities = club.Stadium.Stands.ToDictionary(st => st.Side.ToString(), st => st.Capacity),
+            RoofSides = club.Stadium.Stands.Where(st => st.Roof).Select(st => st.Side.ToString()).ToHashSet(),
+            BoxSides = club.Stadium.Stands.Where(st => st.Boxes > 0).Select(st => st.Side.ToString()).ToHashSet(),
+            Floodlight = club.Stadium.Floodlight,
+            SeatColor = SeatColor(club),
+            StadiumLabel = $"{s.StadiumDisplayName(club)} · {Fmt.Int(club.Stadium.Capacity)}",
+            SelectedId = _selected?.Id,
+            SelectedCell = _selected is null && _cell is { } sc ? new GridPos(sc.x, sc.y) : null,
             Paths = g.Paths.ToList(),
             Gates = g.Gates.ToList(),
             Buildings = buildings,
@@ -247,6 +267,16 @@ public sealed partial class StadiumPageViewModel : PageViewModel, IRefreshable
         };
         UpdateGhost(state);
         IsoMap = state;
+    }
+
+    /// <summary>Sitzfarbe der Tribünen: Vereinsfarbe, zu dunkle oder zu helle Farben weichen der Zweitfarbe bzw. einem Rot.</summary>
+    private static Color SeatColor(Club club)
+    {
+        static bool Usable(Color c) => c.R + c.G + c.B is > 90 and < 690;
+        var primary = Palette.ClubColor(club.PrimaryColor);
+        if (Usable(primary)) return primary;
+        var secondary = Palette.ClubColor(club.SecondaryColor);
+        return Usable(secondary) ? secondary : Color.Parse("#C8414A");
     }
 
     private void UpdateGhost(IsoMapState state)
@@ -286,6 +316,8 @@ public sealed partial class StadiumPageViewModel : PageViewModel, IRefreshable
         Width = m.Width, Height = m.Height, BaseWidth = m.BaseWidth,
         StadiumX = m.StadiumX, StadiumY = m.StadiumY, StadiumWidth = m.StadiumWidth, StadiumHeight = m.StadiumHeight,
         StadiumRoof = m.StadiumRoof, StandHeights = m.StandHeights, Paths = m.Paths, Gates = m.Gates, Buildings = m.Buildings,
+        StandCapacities = m.StandCapacities, RoofSides = m.RoofSides, BoxSides = m.BoxSides, Floodlight = m.Floodlight,
+        SeatColor = m.SeatColor, StadiumLabel = m.StadiumLabel, SelectedId = m.SelectedId, SelectedCell = m.SelectedCell,
         Ghost = m.Ghost, PathGhost = m.PathGhost, PathGhostValid = m.PathGhostValid, ShowPaths = m.ShowPaths, Tool = m.Tool,
         OnHover = m.OnHover, OnClick = m.OnClick, OnRightClick = m.OnRightClick, OnRotate = m.OnRotate,
         OnPathDrag = m.OnPathDrag, OnPathRelease = m.OnPathRelease,
@@ -483,14 +515,15 @@ public sealed partial class StadiumPageViewModel : PageViewModel, IRefreshable
         foreach (var p in g.Paths)
             if ((uint)p.X < (uint)width && (uint)p.Y < (uint)g.Height) occupied[p.X, p.Y] = true;
         tiles.Add(new GroundTile(g.StadiumX * Cell, g.StadiumY * Cell, g.StadiumWidth * Cell - 4, g.StadiumHeight * Cell - 4,
-            s.StadiumDisplayName(club), Fmt.Int(club.Stadium.Capacity), new SolidColorBrush(Color.Parse("#2E7D32")), new SolidColorBrush(P.Gold),
-            g.StadiumX, g.StadiumY, null, true, new RelayCommand(() => SelectCell(null, null))));
+            s.StadiumDisplayName(club), Fmt.Int(club.Stadium.Capacity), new SolidColorBrush(Color.Parse("#3E8E5A")), new SolidColorBrush(P.Gold),
+            g.StadiumX, g.StadiumY, null, true, new RelayCommand(() => SelectCell(null, null)), StadiumIcon));
         foreach (var p in g.Paths)
         {
             if (p.X < 0 || p.Y < 0 || p.X >= width || p.Y >= g.Height) continue;
+            // Wege als ruhige Pflasterfläche, Beschriftung nur im Tooltip
             tiles.Add(new GroundTile(p.X * Cell, p.Y * Cell, Cell - 4, Cell - 4, T["build.tool.path"], "",
-                new SolidColorBrush(Color.Parse("#C2A26B")), new SolidColorBrush(Colors.Transparent),
-                p.X, p.Y, null, false, new RelayCommand(() => { })));
+                new SolidColorBrush(Color.FromArgb(150, 217, 207, 184)), new SolidColorBrush(Colors.Transparent),
+                p.X, p.Y, null, false, new RelayCommand(() => { }), IsPath: true));
         }
         foreach (var b in g.Buildings)
         {
@@ -499,12 +532,12 @@ public sealed partial class StadiumPageViewModel : PageViewModel, IRefreshable
             for (var x = b.X; x < Math.Min(width, b.X + w); x++)
                 for (var y = b.Y; y < Math.Min(g.Height, b.Y + h); y++) occupied[x, y] = true;
             var building = b;
-            var color = CategoryColor(def?.Category ?? "");
+            var (color, _, icon) = IsoArt.Category(def?.Category ?? "");
             tiles.Add(new GroundTile(b.X * Cell, b.Y * Cell, w * Cell - 4, h * Cell - 4, T["building." + b.Type],
                 b.UnderConstruction ? T["build.underConstruction"] : def?.Land == true ? "" : T.Format("build.level", b.Level),
                 new SolidColorBrush(b.UnderConstruction ? Color.FromArgb(120, color.R, color.G, color.B) : color),
                 new SolidColorBrush(_selected == b ? P.Gold : Colors.Transparent), b.X, b.Y, b, false,
-                new RelayCommand(() => SelectCell(building, null))));
+                new RelayCommand(() => SelectCell(building, null)), icon));
         }
         for (var x = 0; x < width; x++)
             for (var y = 0; y < g.Height; y++)
@@ -521,25 +554,14 @@ public sealed partial class StadiumPageViewModel : PageViewModel, IRefreshable
         GridHeight = g.Height * Cell;
     }
 
-    private static Color CategoryColor(string category) => category switch
-    {
-        "training" => Color.Parse("#1E88E5"),
-        "medical" => Color.Parse("#E53935"),
-        "youth" => Color.Parse("#8E24AA"),
-        "fans" => Color.Parse("#FB8C00"),
-        "commerce" => Color.Parse("#F9A825"),
-        "admin" => Color.Parse("#546E7A"),
-        "infrastructure" => Color.Parse("#6D4C41"),
-        "energy" => Color.Parse("#00ACC1"),
-        "teams" => Color.Parse("#43A047"),
-        _ => Color.Parse("#757575"),
-    };
+    private static readonly Geometry StadiumIcon = StreamGeometry.Parse("M3,9 C3,5 21,5 21,9 V16 C21,20.5 3,20.5 3,16 Z M3,9 C3,13 21,13 21,9 M8,12.3 V19.4 M16,12.3 V19.4 M12,12.8 V19.8");
 
     private void SelectCell(Building? building, (int x, int y)? cell)
     {
         _selected = building;
         _cell = cell;
         BuildTiles();
+        BuildIsoMap();
         UpdateSelection();
     }
 
@@ -609,7 +631,7 @@ public sealed partial class StadiumPageViewModel : PageViewModel, IRefreshable
                         _cell = null;
                         Refresh();
                     }, () => cell is not null && possible),
-                    new RelayCommand(() => PickBuilding(type)));
+                    new RelayCommand(() => PickBuilding(type)), IsoArt.Category(d.Category).icon, new SolidColorBrush(IsoArt.Category(d.Category).dark));
             })
             .OrderByDescending(o => o.Possible).ThenBy(o => o.Name).ToList();
     }
