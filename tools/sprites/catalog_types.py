@@ -159,7 +159,7 @@ def s_garage(c):
         z0, z1 = d * 10, d * 10 + 10
         s.wall_left(x0, x1, y1, z0, z1, lambda u, v: shade(concrete, 1.05) if v < 0.3 else rgb("#3D4A5C") if (u * 10) % 1 > 0.1 else concrete)
         s.wall_right(x1, y0, y1, z0, z1, lambda u, v: shade(concrete, 0.8) if v < 0.3 else rgb("#2E3846") if (u * 10) % 1 > 0.1 else shade(concrete, 0.8))
-    K.flat(s, x0, y0, x1, y1, decks * 10, c.tier, "#8C98A8", c.seed, green=False)
+    K.flat(s, x0, y0, x1, y1, decks * 10, c.tier, "#8C98A8", c.seed, solar=c.stage == 4)
     K.sign(s, x0 + 0.1, x0 + 0.35, y1, decks * 10 - 8, "p", c.tier)
     return s
 
