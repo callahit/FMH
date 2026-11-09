@@ -515,9 +515,10 @@
           "expenses": {
             "squad": 19700000
           },
-          "toleranceNote": "Real 82 % Personalkosten je Umsatz (ReportCalcio 2025), finanziert von den Eigentümern; ohne Kapitalzuschüsse im Spiel wären die Vereine insolvent.",
+          "toleranceNote": "Real 82 % Personalkosten je Umsatz (ReportCalcio 2025), finanziert von den Eigentümern; ohne Kapitalzuschüsse im Spiel wären die Vereine insolvent. Gesamterlöse schwanken mit Auf- und Absteigern aus der Serie A: Fünf-Saisons-Mittel je nach Seed 20,2–23,2 Mio. (Kalibrierung KI-Manager, Seeds 1–3).",
           "tolerances": {
-            "expenses.squad": 0.4
+            "expenses.squad": 0.4,
+            "income.total": 0.15
           }
         }
       },
