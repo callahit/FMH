@@ -44,12 +44,21 @@ GLYPHS = {
 }
 
 
+# Bauweise je Stufe: 0 Holzbaracke, 1 Backstein, 2 Putz, 3 Paneel mit Flachdach, 4 Glas mit Gründach.
+# Die Leiter steigt immer an, damit jede Ausbaustufe sichtbar besser und moderner ist als die vorige.
+STAGES = {1: [2], 2: [1, 4], 3: [1, 2, 4], 4: [0, 1, 3, 4], 5: [0, 1, 2, 3, 4]}
+
+
+def stage_of(level, max_level):
+    """Bauweise (0–4) aus Stufe und Höchststufe."""
+    seq = STAGES.get(max_level) or [round(4 * i / (max_level - 1)) for i in range(max_level)]
+    return seq[max(1, min(level, max_level)) - 1]
+
+
 def tier_of(level, max_level):
-    """Ausbau-Epoche aus Stufe und Höchststufe (eine Stufe: solide; zwei: alt und modern)."""
-    if max_level <= 1:
-        return 2
-    t = (level - 1) / (max_level - 1)
-    return 1 if t < 0.34 else 2 if t < 0.67 else 3
+    """Grobe Epoche (1 alt, 2 solide, 3 modern) aus der Bauweise."""
+    st = stage_of(level, max_level)
+    return 1 if st <= 1 else 2 if st == 2 else 3
 
 
 def lot(s, w, h, tier, kind="grass", seed=1):
@@ -73,24 +82,28 @@ def lot(s, w, h, tier, kind="grass", seed=1):
     s.ground(0.03, 0.03, w - 0.03, h - 0.03, tex)
 
 
-def palette(tier, wall_hex, seed):
-    """Wandmaterial und -farbe je Epoche."""
-    if tier == 1:
-        return ("brick", shade(rgb("#9A5A44"), 0.95)) if seed % 2 else ("wood", rgb("#A8865E"))
-    if tier == 2:
+def palette(stage, wall_hex, seed):
+    """Wandmaterial und -farbe je Bauweise."""
+    if stage == 0:
+        return ("wood", rgb("#C29A64"))
+    if stage == 1:
+        return ("brick", shade(rgb("#9A5A44"), 0.95))
+    if stage == 2:
         return ("render", rgb(wall_hex))
-    return ("glass", rgb("#9DB8CF")) if seed % 3 == 0 else ("panel", mix(rgb(wall_hex), WHITE, 0.4))
+    if stage == 3:
+        return ("panel", mix(rgb(wall_hex), WHITE, 0.4))
+    return ("glass", rgb("#9DB8CF"))
 
 
-def walls(s, x0, y0, x1, y1, z, tier, wall_hex, seed, floors=1, door=True):
+def walls(s, x0, y0, x1, y1, z, stage, wall_hex, seed, floors=1, door=True):
     """Baukörper mit Fenstern; Holz bekommt Bretter, Glas Pfosten-Riegel, alt dunklere Fenster."""
-    material, color = palette(tier, wall_hex, seed)
+    material, color = palette(stage, wall_hex, seed)
     fh = max(9, (z - 2) / max(1, floors))
     lw, rw = (x1 - x0) * 36, (y1 - y0) * 36
     if material == "wood":
         def wood(light):
             def t(u, v):
-                c = shade(color, 0.92 + 0.12 * ((int(u * lw / 3)) % 2))
+                c = shade(color, 0.86 + 0.22 * ((int(u * lw / 3)) % 2))  # senkrechte Bretter
                 if v * z % fh > fh * 0.35 and v * z % fh < fh * 0.7 and (u * lw) % 14 > 5 and (u * lw) % 14 < 11:
                     c = rgb("#3D4A5C")
                 return shade(c, light)
@@ -126,20 +139,20 @@ def gable(s, x0, y0, x1, y1, z, roof_hex, tier, seed):
     return z + rise
 
 
-def flat(s, x0, y0, x1, y1, z, tier, edge_hex, seed, green=None):
-    """Flachdach mit Attika: solide Kies, modern begrünt oder mit Solarmodulen."""
+def flat(s, x0, y0, x1, y1, z, tier, edge_hex, seed, green=False, solar=False):
+    """Flachdach mit Attika: Kies, (modern) Gründach mit einem Streifen Solarmodule oder ganz mit Solarmodulen."""
     edge = rgb(edge_hex)
     s.wall_left(x0, x1, y1, z, z + 3, lambda u, v: shade(edge, 0.95))
     s.wall_right(x1, y0, y1, z, z + 3, lambda u, v: shade(edge, 0.75))
     n = noise(seed + 33)
-    green = (tier == 3 and seed % 2 == 0) if green is None else green
     def tex(u, v):
         k = n(int(u * 50), int(v * 50))
-        if tier == 3 and green:
+        if solar and 0.12 < u < 0.88 and 0.12 < v < 0.88:
+            return rgb("#A9C3E8") if (u * 10) % 1 < 0.1 or (v * 6) % 1 < 0.12 else rgb("#22447F")
+        if green:
+            if 0.3 < u < 0.7 and 0.18 < v < 0.82:
+                return rgb("#A9C3E8") if (u * 12) % 1 < 0.1 or (v * 6) % 1 < 0.12 else rgb("#22447F")
             return shade(rgb("#6FA858"), 0.85 + 0.25 * k)
-        if tier == 3:
-            if 0.12 < u < 0.88 and 0.12 < v < 0.88:
-                return rgb("#A9C3E8") if (u * 10) % 1 < 0.1 or (v * 6) % 1 < 0.12 else rgb("#22447F")
         return shade(rgb("#9DA3A8"), 0.88 + 0.2 * k)
     s.ground(x0, y0, x1, y1, tex, z=z + 3)
     s.ground(x0, y0, x1, y0 + 0.06, lambda u, v: edge, z=z + 3)
