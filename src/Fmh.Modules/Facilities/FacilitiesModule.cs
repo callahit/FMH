@@ -48,7 +48,11 @@ public sealed partial class FacilitiesModule : GameModule, IFacilitiesService
         return graph;
     }
 
-    public void EnsureGrounds(Club club) => club.Grounds.EnsureCurrent();
+    public void EnsureGrounds(Club club)
+    {
+        club.Grounds.EnsureCurrent();
+        if (club.Grounds.MapVersion < CurrentMapVersion) FitFootprints(club);
+    }
 
     private Dictionary<string, double> ComputeEffects(Club club)
     {

@@ -56,9 +56,9 @@ public sealed class IsoMapControl : Control
         {
             var fitW = (v.Bounds.Width - 24) / (maxX - minX + TileW);
             var fitH = (v.Bounds.Height - 24) / (maxY - minY + TileH * 3);
-            // Pixel-Art bleibt scharf bei ganzzahliger Vergrößerung: ab 0,8 auf 1× bzw. 2× einrasten
+            // Pixel-Art bleibt scharf bei ganzzahliger Vergrößerung: ab 0,6 auf 1× bzw. 2× einrasten (sonst scrollen)
             var fit = Math.Min(fitH, fitW * 1.35);
-            _zoom = fit >= 2 ? 2 : fit >= 0.8 ? 1 : Math.Max(0.6, fit);
+            _zoom = fit >= 2 ? 2 : fit >= 0.6 ? 1 : Math.Max(0.6, fit);
         }
         return new Size((maxX - minX + TileW) * Zoom, (maxY - minY + TileH * 3) * Zoom);
     }
@@ -98,7 +98,7 @@ public sealed class IsoMapControl : Control
             for (; di < decos.Count && decos[di].Key < key; di++) IsoPixelArt.Decoration(ctx, o, decos[di], s, atlas!);
             if (b is null) { stadiumTop = (atlas is null ? null : IsoPixelArt.Stadium(ctx, o, s, atlas)) ?? IsoStadium.Draw(ctx, o, s); continue; }
             if (b.Id == s.SelectedId) Outline(ctx, o, b.X, b.Y, b.Width, b.Height, Color.Parse("#F5C04E"), 2.6);
-            anchors[b.Id] = (atlas is null ? null : IsoPixelArt.Building(ctx, o, b, atlas)) ?? IsoBuildings.Draw(ctx, o, b);
+            anchors[b.Id] = (atlas is null ? null : IsoPixelArt.Building(ctx, o, b, atlas, s.SeatColor)) ?? IsoBuildings.Draw(ctx, o, b);
         }
         for (; di < decos.Count; di++) IsoPixelArt.Decoration(ctx, o, decos[di], s, atlas!);
         IsoPixelArt.Trees(ctx, o, s, back: false, atlas);

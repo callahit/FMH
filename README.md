@@ -219,15 +219,34 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
 - **Vereinsgelände** (Kapitel 9): 83 Gebäude in neun Bereichen (Training, Medizin, Jugend, Fans,
   Kommerz, Verwaltung, Infrastruktur, Energie, Mannschaften).
   - Bis zu fünf Ausbaustufen, Zustand, Unterhalt, Voraussetzungen, Lagebonus und Synergien.
+  - **Platzbedarf nach realem Maßstab.** Eine Kachel entspricht rund 46 m; Maßstab ist das Stadion, dessen
+    4×3-Feld ein Spielfeld von etwa 2,3×1,5 Kacheln umschließt.
+    - Rasen-, Kunstrasen- und Reserveplatz sowie die Jugendplätze belegen mit Auslauf 3×2 Kacheln.
+    - Die Sprintbahn (100 m plus Auslauf) belegt 3×1, das Kleinstadion 3×3, die Trainingshalle 2×1.
+    - Das Startgelände ist entsprechend größer: 12×9, 15×10 oder 18×11 Kacheln je nach Vereinsgröße.
+    - Spielstände mit Geländeschema 1 werden beim Laden angepasst (Schema 2). Gebäude, die mit der neuen Fläche
+      an ihrem Platz passen, bleiben stehen, notfalls gedreht. Die übrigen werden auf freie Plätze gesetzt;
+      reicht der Platz nicht, wächst das Gelände kostenlos um Reihen. Wege unter Gebäuden entfallen, und jedes
+      Gebäude wird wieder ans Wegenetz angeschlossen.
   - Gebäude lassen sich verpachten oder abreißen, Bauland ist zukaufbar.
   - **Isometrische Karte in Pixel-Art** im Stil klassischer Aufbauspiele (`Controls/IsoAtlas.cs`, `IsoPixelArt.cs`):
     Rasenkacheln mit Blumen, Pflasterwege, Tor, Laub- und Nadelbäume ringsum.
-    - Häuser aus Backstein, Putz, Naturstein, Paneelen oder Glas je Bereich, mit Ziegeldach in der Bereichsfarbe,
-      Fenstern (einige erleuchtet), Tür und Schornstein. Die Stockwerke richten sich nach der Stufe (1–2, 3–4, ab 5).
-    - Große Gebäude als Hallen mit Kiesdach, Oberlichtern und Lüftungsgeräten.
-    - Eigene Sprites für Plätze mit Toren, Kunstrasen, Soccer-Court, Laufbahn, Parkplätze mit Autos, Zufahrt,
-      Solarfeld, Park, Pool und Eisbecken, Biergarten, LED-Turm, Flutlicht, Tank, BHKW, Statue und Kapelle.
-      Baustellen erscheinen mit Gerüst und Kran.
+    - Jedes der 83 Gebäude hat ein eigenes Sprite je Ausbaustufe, für jede Grundfläche und Drehung
+      (`tools/sprites/catalog.py`, `catalog_types.py`, Baukasten `kit.py`).
+      - Die Stufe bestimmt die Epoche: Niedrige Stufen sind alt und einfach (Holz oder Backstein, verblasstes
+        Satteldach, Schornstein, fleckiger Rasen). Mittlere sind solide (Putz in Bereichsfarbe, größere Fenster).
+        Hohe sind modern (Glas und Paneele, Flachdach mit Begrünung oder Solar, Vordach, Leuchtschild in Vereinsfarbe).
+      - Zusätzlich wachsen Baukörper und Stockwerke mit jeder Stufe.
+      - Jedes Gebäude zeigt, wofür es da ist: Schild mit Symbol (Kreuz, Hantel, Trikot, Ball, Kamera, Bett …) und
+        passendes Zubehör.
+      - Zubehör, zum Beispiel: Satellitenschüssel und Sendemast, Übertragungswagen, Krankenwagen, Markise, Terrasse
+        mit Schirmen, Säulen, Glockenturm, Spielplatz, Fahnen, Ballmaschine, Freistoßmauer, Busse.
+      - Plätze steigern sich von fleckigem Rasen ohne Linien über markierte Felder bis zu Zaun, Flutlicht und
+        Spielerkabinen.
+      - Hallen mit Tonnendach werden modern zum Flachbau. Parkhäuser bekommen je Stufe ein Deck, Solarfelder mehr
+        Reihen, das Kleinstadion mehr Tribünen und ein Dach.
+    - Gebäude ohne eigenes Sprite, etwa aus Community-Paketen, erscheinen als allgemeines Haus oder als Halle nach
+      Bereich. Baustellen erscheinen mit Gerüst und Kran.
     - Stadion aus Bausteinen: Sockel mit Spielfeld und Treppentürmen, je Seite eine Tribüne in drei Größen nach
       Plätzen (bis 4.000, bis 12.000, darüber), mit oder ohne Kragdach, Flutlichtmasten nach Ausbaustufe.
       Das Kragdach aus Trapezblech deckt den äußeren Teil der Ränge, das Spielfeld bleibt frei.
@@ -239,7 +258,7 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
     - Die Sprites werden ohne Weichzeichnen gezeichnet, der automatische Zoom rastet auf 1× bzw. 2× ein.
     - Sie entstehen mit `python3 tools/sprites/gen_sprites.py` (Pillow, deterministisch). Der Generator schreibt
       `src/Fmh.Desktop/Assets/grounds.png` und `grounds.json`. Mit `--preview datei.png` erzeugt er eine
-      Beispielszene.
+      Beispielszene, mit `--sheet datei.png` einen Übersichtsbogen aller Gebäude und Stufen.
     - Fehlt der Atlas, zeichnet die Karte die Vektorgrafik aus `IsoArt.cs`, `IsoBuildings.cs` und `IsoStadium.cs`.
     - Beschriftung erscheint für das gewählte Gebäude und beim Überfahren mit der Maus.
     - Die Karte passt sich beim Öffnen dem Fenster an, Strg+Mausrad oder +/− zoomt.
