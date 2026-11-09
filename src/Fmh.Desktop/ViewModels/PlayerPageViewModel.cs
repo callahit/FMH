@@ -143,6 +143,7 @@ public sealed partial class PlayerPageViewModel : PageViewModel
         {
             new(T["player.condition"], $"{p.State.Condition:0} %", ConditionBrush),
             new(T["player.satisfaction"], $"{sat.Satisfaction}", satBrush, satTip),
+            new(T["relations.tier"], T["tier." + sat.Tier]),
             new(T["player.morale"], UiText.Morale(p.State.Morale)),
             new(T["player.form"], $"{p.State.Form}/10"),
             new(T["player.practice"], $"{p.State.MatchPractice:0} %"),

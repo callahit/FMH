@@ -83,6 +83,9 @@ public sealed partial class ClubPageViewModel : PageViewModel, IRefreshable
             new(T["club.youthFacilities"], $"{club.YouthFacilities}/20"),
             new(T["club.youthRecruitment"], $"{club.YouthRecruitment}/20"),
             new(T["club.youthSquad"], club.YouthIds.Count.ToString()),
+            new(T["relations.trust"], $"{Session.ClubRelationsOf(club).Trust:0}/100"),
+            new(T["relations.council"], string.Join(", ", Session.ClubRelationsOf(club).CouncilIds
+                .Where(id => world.Players.ContainsKey(id)).Select(id => world.Players[id].ShortName))),
         };
         Reputation = club.Reputation;
         History = world.History.OrderByDescending(h => h.SeasonYear).ThenBy(h => h.LeagueId).Select(h =>
