@@ -91,12 +91,16 @@ public sealed class IsoMapControl : Control
             .OrderBy(i => i.key).ToList();
         var anchors = new Dictionary<int, Point>();
         var stadiumTop = default(Point);
-        foreach (var (_, b) in items)
+        var decos = atlas is null ? new() : IsoPixelArt.Decorations(s);
+        var di = 0;
+        foreach (var (key, b) in items)
         {
+            for (; di < decos.Count && decos[di].Key < key; di++) IsoPixelArt.Decoration(ctx, o, decos[di], s, atlas!);
             if (b is null) { stadiumTop = (atlas is null ? null : IsoPixelArt.Stadium(ctx, o, s, atlas)) ?? IsoStadium.Draw(ctx, o, s); continue; }
             if (b.Id == s.SelectedId) Outline(ctx, o, b.X, b.Y, b.Width, b.Height, Color.Parse("#F5C04E"), 2.6);
             anchors[b.Id] = (atlas is null ? null : IsoPixelArt.Building(ctx, o, b, atlas)) ?? IsoBuildings.Draw(ctx, o, b);
         }
+        for (; di < decos.Count; di++) IsoPixelArt.Decoration(ctx, o, decos[di], s, atlas!);
         IsoPixelArt.Trees(ctx, o, s, back: false, atlas);
 
         // Geistervorschau Gebäude

@@ -32,7 +32,9 @@ def render(sprites, path):
     for y in range(gh):
         for x in range(gw):
             place(f"path_{(x + y) % 2}" if (x, y) in paths else f"grass_{(x * 7 + y * 3) % 4}", x, y)
-    place("gate", 6, 3)
+    place("gate", 6, 3, (46, 139, 87))
+    for (x, y, d) in ((1, 3, "deco_lamp"), (4, 3, "deco_bench"), (9, 3, "deco_planter_0"), (12, 3, "deco_lamp"), (6, 6, "deco_bin")):
+        place(d, x, y)
     objs = [
         ("house_training_2x1_2", 0, 0), ("pitch_2x1", 0, 1), ("hall_youth_2x2_2", 2, 1),
         ("stadium_base", 4, 0), ("house_medical_2x1_2", 8, 0), ("parking_2x1", 10, 0), ("house_admin_1x1_3", 12, 0),
