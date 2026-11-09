@@ -193,7 +193,8 @@ public sealed partial class TransfersPageViewModel : PageViewModel, IRefreshable
         Negotiations = Session.OpenNegotiations.Concat(w.Negotiations.Where(n => n.BuyerId == Session.HumanClub.Id && n.Stage is NegotiationStage.Completed or NegotiationStage.Failed).TakeLast(8))
             .Distinct()
             .Select(n => new NegotiationRow(n, w.Players[n.PlayerId].Name, T["dealType." + n.Type] + (n.Incoming ? " · " + T["transfer.incoming"] : ""),
-                T["neg.stage." + n.Stage], n.ResponseText(T), !n.Incoming && n.Stage is NegotiationStage.ClubTalks or NegotiationStage.PlayerTalks))
+                T["neg.stage." + n.Stage], n.ResponseText(T),
+                !n.Incoming && n.Stage is NegotiationStage.Enquiry or NegotiationStage.Talks or NegotiationStage.ClubTalks or NegotiationStage.PlayerTalks))
             .ToList();
     }
 

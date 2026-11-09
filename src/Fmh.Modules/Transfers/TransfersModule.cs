@@ -19,11 +19,12 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
 
     /// <summary>Offene Verhandlungen des menschlichen Managers (eigene Anfragen und eingehende Angebote).</summary>
     public IReadOnlyList<Negotiation> OpenNegotiations => World.Negotiations
-        .Where(n => n.Stage is NegotiationStage.ClubTalks or NegotiationStage.PlayerTalks or NegotiationStage.Pending)
+        .Where(n => Negotiations.IsOpenStage(n.Stage))
         .Where(n => n.BuyerId == HumanClub.Id || n.SellerId == HumanClub.Id)
         .ToList();
 
-    public Negotiation? OpenNegotiationFor(Player p) => OpenNegotiations.FirstOrDefault(n => n.PlayerId == p.Id && !n.Incoming);
+    public Negotiation? OpenNegotiationFor(Player p) =>
+        OpenNegotiations.FirstOrDefault(n => n.PlayerId == p.Id && n.BuyerId == HumanClub.Id && !n.Incoming);
 
     // ================================================================== Menschliche Aktionen
 
@@ -52,6 +53,10 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
                 return (null, limit);
         }
 
+        // Transfer/Leihe starten mit Anfrage an den Verkäufer (E2-S2); Ausstiegsklausel und Vereinslose überspringen sie.
+        var enquiry = type is DealType.Transfer or DealType.Loan
+                      && p.ClubId is not null
+                      && p.Contract?.ReleaseClause is null;
         var n = new Negotiation
         {
             Id = World.NextNegotiationId++,
@@ -60,7 +65,9 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
             BuyerId = buyer.Id,
             SellerId = type is DealType.FreeAgent or DealType.Renewal ? null : p.ClubId,
             Started = World.Date,
-            Stage = type is DealType.Transfer or DealType.Loan ? NegotiationStage.ClubTalks : NegotiationStage.PlayerTalks,
+            Stage = enquiry ? NegotiationStage.Enquiry
+                : type is DealType.Transfer or DealType.Loan ? NegotiationStage.Talks : NegotiationStage.PlayerTalks,
+            EnquiryDue = enquiry ? World.Date.AddDays(Rng.Next(1, 3)) : null,
             Contract = Negotiations.SuggestContract(p, buyer, World, Data),
         };
         if (type == DealType.Transfer && p.ClubId is { } sid)
@@ -70,7 +77,11 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
             n.Contract.Status = c.Status;
             n.Contract.WeeklyWage = Math.Max(c.WeeklyWage, n.Contract.WeeklyWage);
         }
+        if (n.Stage == NegotiationStage.Talks)
+            n.Response = TR("neg.enquiry.accepted");
         World.Negotiations.Add(n);
+        if (enquiry)
+            n.Response = TR("neg.enquiry.pending", TextArg.OfDate(n.EnquiryDue!.Value));
         return (n, null);
     }
 
@@ -86,7 +97,9 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
     {
         var p = World.Players[n.PlayerId];
         var buyer = World.Clubs[n.BuyerId];
-        if (n.Stage != NegotiationStage.ClubTalks || n.SellerId is not { } sellerId) return new(ResponseKind.Reject, "neg.error.stage");
+        if (!Negotiations.CanSubmitClub(n) || n.SellerId is not { } sellerId) return new(ResponseKind.Reject, "neg.error.stage");
+        if ((n.Type is DealType.Transfer or DealType.Loan) && !Season.IsTransferWindowOpen(buyer))
+            return new(ResponseKind.Reject, "neg.error.window");
         var seller = World.Clubs[sellerId];
         if (offer.SwapPlayerId is { } swap && World.Players[swap].ClubId != buyer.Id) return new(ResponseKind.Reject, "neg.error.swap");
         offer.InstallmentYears = Math.Clamp(offer.InstallmentYears, 0, 3);
@@ -116,20 +129,14 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
             case ResponseKind.Accept:
                 if (n.Type == DealType.Transfer && HoldForPreemption(n, p, offer))
                     return resp;
-                n.Stage = NegotiationStage.PlayerTalks;
-                if (n.Type == DealType.Loan)
-                {
-                    Complete(n);
-                    return resp;
-                }
-                n.Contract = Negotiations.SuggestContract(p, buyer, World, Data);
+                MarkClubAgreed(n, p, buyer);
                 break;
             case ResponseKind.Counter:
                 n.CounterFee = resp.Amount;
-                if (n.ClubRounds >= Negotiations.MaxRounds) Fail(n);
+                if (n.ClubRounds >= Negotiations.MaxRounds) FailSellerAbort(n);
                 break;
             default:
-                Fail(n);
+                FailSellerAbort(n);
                 break;
         }
         return resp;
@@ -139,7 +146,9 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
     {
         var p = World.Players[n.PlayerId];
         var buyer = World.Clubs[n.BuyerId];
-        if (n.Stage != NegotiationStage.PlayerTalks) return new(ResponseKind.Reject, "neg.error.stage");
+        if (!Negotiations.CanSubmitPlayer(n)) return new(ResponseKind.Reject, "neg.error.stage");
+        if ((n.Type is DealType.Transfer or DealType.Loan) && !Season.IsTransferWindowOpen(buyer))
+            return new(ResponseKind.Reject, "neg.error.window");
         var currentWage = n.Type == DealType.Renewal ? p.Contract?.WeeklyWage ?? 0 : 0;
         if (Budgets.WageBill(buyer, World) - currentWage + offer.WeeklyWage > buyer.Budget.WageBudget)
             return new(ResponseKind.Reject, "neg.error.wageBudget");
@@ -153,14 +162,18 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
         switch (resp.Kind)
         {
             case ResponseKind.Accept:
-                Complete(n);
+                n.PlayerAgreed = true;
+                if (n.Type is DealType.FreeAgent or DealType.Renewal or DealType.PreContract)
+                    Complete(n);
+                else
+                    TryFinishNegotiation(n);
                 break;
             case ResponseKind.Counter:
                 n.WageDemand = (int)resp.Amount;
-                if (n.PlayerRounds >= Negotiations.MaxRounds) Fail(n);
+                if (n.PlayerRounds >= Negotiations.MaxRounds) FailPlayerAbort(n);
                 break;
             default:
-                Fail(n);
+                FailPlayerAbort(n);
                 break;
         }
         return resp;
@@ -168,14 +181,21 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
 
     public void Withdraw(Negotiation n)
     {
-        if (n.Stage is NegotiationStage.ClubTalks or NegotiationStage.PlayerTalks) n.Stage = NegotiationStage.Withdrawn;
+        // Ausstieg des Käufers: keine 14-Tage-Sperre (E2-S1).
+        if (Negotiations.IsOpenStage(n.Stage)) n.Stage = NegotiationStage.Withdrawn;
     }
 
-    private void Fail(Negotiation n)
+    /// <summary>Verkäufer bricht ab → 14 Tage Sperre.</summary>
+    private void FailSellerAbort(Negotiation n)
     {
         n.Stage = NegotiationStage.Failed;
         World.NegotiationLocks[Negotiations.LockKey(n.PlayerId, n.BuyerId)] = World.Date.AddDays(Negotiations.LockDays);
     }
+
+    /// <summary>Spieler bricht ab → keine Sperre; der Käufer darf später erneut anfragen.</summary>
+    private void FailPlayerAbort(Negotiation n) => n.Stage = NegotiationStage.Failed;
+
+    private void Fail(Negotiation n) => FailSellerAbort(n);
 
     /// <summary>Antwort auf ein eingehendes Angebot eines KI-Vereins.</summary>
     public TextRef RespondIncoming(Negotiation n, ResponseKind answer, long counterFee = 0)
@@ -200,16 +220,20 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
             }
             n.Offer.Fee = counterFee;
         }
-        // Verein ist sich einig: der Spieler verhandelt selbst mit dem Käufer.
+        // Verein ist sich einig: Spieler und Konkurrenz laufen über denselben Abschlussweg (E2).
         n.Contract = Negotiations.SuggestContract(p, buyer, World, Data);
         if (Negotiations.RefusalReason(p, buyer, World, Data) is { } refusal)
         {
             n.Stage = NegotiationStage.Failed;
             return TR("neg.incoming.playerRefused", p.Name, TR(refusal));
         }
-        n.Stage = NegotiationStage.PlayerTalks;
-        Complete(n);
-        return TR("neg.incoming.sold", p.Name, buyer.Name, TextArg.Money(n.Offer.Fee, Currency));
+        n.Incoming = false;
+        n.Stage = NegotiationStage.Talks;
+        n.PlayerAgreed = true;
+        MarkClubAgreed(n, p, buyer);
+        return n.Stage == NegotiationStage.Completed
+            ? TR("neg.incoming.sold", p.Name, buyer.Name, TextArg.Money(n.Offer.Fee, Currency))
+            : TR("neg.incoming.waiting", p.Name, buyer.Name);
     }
 
     /// <summary>Überlässt offene Pflicht-Entscheidungen dem Assistenten: Angebote werden abgelehnt.</summary>
@@ -325,54 +349,11 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
         // Dritter darf fortsetzen.
         if (n is not null && n.Stage == NegotiationStage.Pending && !n.Incoming)
         {
-            n.Stage = NegotiationStage.PlayerTalks;
+            n.Stage = NegotiationStage.Talks;
             n.Contract = Negotiations.SuggestContract(p, World.Clubs[n.BuyerId], World, Data);
+            MarkClubAgreed(n, p, World.Clubs[n.BuyerId]);
         }
         return null;
     }
 
-    /// <summary>
-    /// Hält einen akzeptierten Vereinsdeal an, wenn ein Vorkaufsrecht greift.
-    /// Mensch: Pflicht-Entscheidung (3 Tage). KI: entscheidet sofort.
-    /// </summary>
-    private bool HoldForPreemption(Negotiation n, Player p, ClubOffer offer)
-    {
-        if (ActivePreemption(p) is not { } clause) return false;
-        if (clause.BeneficiaryClubId == n.BuyerId) return false;
-        if (World.PreemptionOffers.Any(o => o.PlayerId == p.Id && o.BeneficiaryClubId == clause.BeneficiaryClubId)) return true;
-
-        var pending = new PreemptionOffer
-        {
-            ClauseId = clause.Id, NegotiationId = n.Id, PlayerId = p.Id,
-            BeneficiaryClubId = clause.BeneficiaryClubId, Fee = offer.Fee,
-            Expires = World.Date.AddDays(3),
-        };
-
-        if (clause.BeneficiaryClubId == HumanClub.Id)
-        {
-            World.PreemptionOffers.Add(pending);
-            n.Stage = NegotiationStage.Pending;
-            Notify(MessageType.Transfer, "msg.sender.assistant", TR("msg.preemption.subject", p.Name),
-                TR("msg.preemption.body", p.Name, TextArg.Money(offer.Fee, Currency)),
-                MessageAction.Preemption, n.Id, required: true);
-            return true;
-        }
-
-        // KI-Begünstigter: Talente mit genug Budget mitbieten, sonst freigeben.
-        var beneficiary = World.Clubs[clause.BeneficiaryClubId];
-        if (AiWantsPreemption(beneficiary, p, offer.Fee))
-        {
-            clause.Active = false;
-            n.Stage = NegotiationStage.Withdrawn;
-            ExecuteTransfer(p, beneficiary, World.Clubs[n.SellerId ?? p.ClubId!.Value], new ClubOffer { Fee = offer.Fee },
-                Negotiations.SuggestContract(p, beneficiary, World, Data));
-            return true;
-        }
-        return false;
-    }
-
-    private bool AiWantsPreemption(Club club, Player p, long fee) =>
-        !IsHuman(club) && fee <= club.Budget.TransferBudget
-        && p.Age(World.Date) <= 24 && p.Hidden.PotentialAbility - p.Hidden.CurrentAbility >= 12
-        && Rating(p) >= PlayerGenerator.ClubLevel(club.Reputation) - 1;
 }

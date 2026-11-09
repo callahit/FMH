@@ -156,11 +156,17 @@ public sealed partial class NegotiationViewModel : ViewModelBase
 
     private void Update()
     {
-        ClubStage = _n.Stage == NegotiationStage.ClubTalks;
-        PlayerStage = _n.Stage == NegotiationStage.PlayerTalks;
-        Finished = !ClubStage && !PlayerStage;
+        ClubStage = Negotiations.CanSubmitClub(_n);
+        PlayerStage = Negotiations.CanSubmitPlayer(_n);
+        Finished = !Negotiations.IsOpenStage(_n.Stage) || (_n.ClubAgreed && (IsLoan || _n.PlayerAgreed) && _n.Stage is not NegotiationStage.Talks and not NegotiationStage.Enquiry);
+        if (_n.Stage is NegotiationStage.Completed or NegotiationStage.Failed or NegotiationStage.Withdrawn) Finished = true;
+        if (_n.Stage == NegotiationStage.Enquiry) { ClubStage = false; PlayerStage = false; }
         StageText = _n.Stage switch
         {
+            NegotiationStage.Enquiry => T["neg.stage.Enquiry"],
+            NegotiationStage.Talks => T.Format("neg.stage.talks",
+                _n.ClubAgreed ? T["neg.agreed.yes"] : T.Format("neg.stage.club", _n.ClubRounds + 1, Negotiations.MaxRounds),
+                _n.PlayerAgreed ? T["neg.agreed.yes"] : T.Format("neg.stage.player", _n.PlayerRounds + 1, Negotiations.MaxRounds)),
             NegotiationStage.ClubTalks => T.Format("neg.stage.club", _n.ClubRounds + 1, Negotiations.MaxRounds),
             NegotiationStage.PlayerTalks => T.Format("neg.stage.player", _n.PlayerRounds + 1, Negotiations.MaxRounds),
             _ => T["neg.stage." + _n.Stage],
@@ -186,72 +192,90 @@ public sealed partial class NegotiationViewModel : ViewModelBase
             if (pc.ReleaseClause is { } rc && _n.Type == DealType.Transfer) facts.Add(new(T["neg.releaseClause"], Fmt.Money(rc, Currency), new SolidColorBrush(P.Gold)));
         }
         if (Player.Transfer.Listed) facts.Add(new(T["neg.listed"], Player.Transfer.AskingPrice is { } ask ? Fmt.Money(ask, Currency) : "–", new SolidColorBrush(P.Good)));
+        var rivals = Negotiations.ActiveBids(Session.World, Player.Id).Count(x => x.Id != _n.Id);
+        if (rivals > 0) facts.Add(new(T["neg.rivals"], rivals.ToString(), new SolidColorBrush(P.Warn)));
+        if (_n.ClubAgreed) facts.Add(new(T["neg.clubStatus"], T["neg.agreed.yes"], new SolidColorBrush(P.Good)));
+        if (_n.PlayerAgreed) facts.Add(new(T["neg.playerStatus"], T["neg.agreed.yes"], new SolidColorBrush(P.Good)));
         if (_n.CounterFee is { } cf && ClubStage) facts.Add(new(T["neg.counterFee"], Fmt.Money(cf, Currency), new SolidColorBrush(P.Warn)));
         if (_n.WageDemand is { } wd && PlayerStage) facts.Add(new(T["neg.wageDemand"], Fmt.Money(wd, Currency) + T["unit.perWeek"], new SolidColorBrush(P.Warn)));
         facts.Add(new(T["neg.transferBudget"], Fmt.Money(b.TransferBudget, Currency)));
         var bill = Budgets.WageBill(club, Session.World);
         facts.Add(new(T["neg.wageRoom"], Fmt.Money(Math.Max(0, b.WageBudget - bill), Currency) + T["unit.perWeek"]));
         Facts = facts;
+        OnPropertyChanged(nameof(CanSubmit));
+        OnPropertyChanged(nameof(ShowClubPanel));
+        OnPropertyChanged(nameof(ShowPlayerPanel));
+    }
+
+    public bool ShowClubPanel => ClubStage || (_n.Stage == NegotiationStage.Talks && !_n.ClubAgreed);
+    public bool ShowPlayerPanel => PlayerStage || (_n.Stage == NegotiationStage.Talks && !_n.PlayerAgreed && IsTransfer);
+    public bool CanSubmit => ClubStage || PlayerStage;
+
+    [RelayCommand]
+    private void SubmitClub()
+    {
+        if (!ClubStage) return;
+        Error = null;
+        var offer = new ClubOffer
+        {
+            Fee = (long)Fee,
+            DownPayment = (long)DownPayment,
+            InstallmentCount = (int)InstallmentCount,
+            SellOnPercent = (int)SellOnPercent,
+            SellOnBasis = (SellOnBasis)SellOnBasisIndex,
+            SwapPlayerId = Swap.PlayerId,
+            LoanMonths = TransferTerms.ClampLoanMonths((int)LoanMonths),
+            WageSharePercent = (int)WageShare,
+            PurchaseFee = HasPurchaseOption ? (long)PurchaseFee : null,
+            PurchaseObligation = HasPurchaseOption && PurchaseObligation,
+            PurchaseCondition = (LoanBuyCondition)PurchaseConditionIndex,
+            PurchaseConditionValue = (int)PurchaseConditionValue,
+            RecallInWinter = RecallInWinter,
+            PlayingTimeGuarantee = IsLoan && PlayingTimeGuarantee,
+            LoanFee = IsLoan ? (long)LoanFee : 0,
+            AppearanceBonus = IsTransfer ? (long)SellerAppearanceAddOn : 0,
+            GoalBonus = IsTransfer ? (long)SellerGoalAddOn : 0,
+            BuyBackFee = IsTransfer && HasBuyBack ? (long)BuyBackFee : null,
+            BuyBackYears = (int)BuyBackYears,
+            PreemptionRight = IsTransfer && PreemptionRight,
+        };
+        var r = Session.SubmitClubOffer(_n, offer);
+        if (r.Kind == ResponseKind.Counter && _n.CounterFee is { } cf && IsTransfer) Fee = cf;
+        if (r.TextKey.StartsWith("neg.error.", StringComparison.Ordinal)) Error = T[r.TextKey];
+        Update();
+    }
+
+    [RelayCommand]
+    private void SubmitPlayer()
+    {
+        if (!PlayerStage) return;
+        Error = null;
+        var contract = new ContractOffer
+        {
+            Years = (int)Years,
+            WeeklyWage = (int)WeeklyWage,
+            SigningFee = (long)SigningFee,
+            Status = (SquadStatus)StatusIndex,
+            AppearanceBonus = (int)AppearanceBonus,
+            GoalBonus = (int)GoalBonus,
+            ReleaseClause = HasReleaseClause ? (long)ReleaseClause : null,
+            YearlyRaisePercent = (int)YearlyRaise,
+            RelegationPercent = (int)RelegationPercent,
+            PromotionPercent = (int)PromotionPercent,
+            ExtensionOptionYears = (int)ExtensionOptionYears,
+        };
+        var r = Session.SubmitContract(_n, contract);
+        if (r.Kind == ResponseKind.Counter && _n.WageDemand is { } wd) WeeklyWage = wd;
+        if (r.TextKey.StartsWith("neg.error.", StringComparison.Ordinal)) Error = T[r.TextKey];
+        Update();
     }
 
     [RelayCommand]
     private void Submit()
     {
-        Error = null;
-        NegotiationResponse r;
-        if (ClubStage)
-        {
-            var offer = new ClubOffer
-            {
-                Fee = (long)Fee,
-                DownPayment = (long)DownPayment,
-                InstallmentCount = (int)InstallmentCount,
-                SellOnPercent = (int)SellOnPercent,
-                SellOnBasis = (SellOnBasis)SellOnBasisIndex,
-                SwapPlayerId = Swap.PlayerId,
-                LoanMonths = TransferTerms.ClampLoanMonths((int)LoanMonths),
-                WageSharePercent = (int)WageShare,
-                PurchaseFee = HasPurchaseOption ? (long)PurchaseFee : null,
-                PurchaseObligation = HasPurchaseOption && PurchaseObligation,
-                PurchaseCondition = (LoanBuyCondition)PurchaseConditionIndex,
-                PurchaseConditionValue = (int)PurchaseConditionValue,
-                RecallInWinter = RecallInWinter,
-                PlayingTimeGuarantee = IsLoan && PlayingTimeGuarantee,
-                LoanFee = IsLoan ? (long)LoanFee : 0,
-                AppearanceBonus = IsTransfer ? (long)SellerAppearanceAddOn : 0,
-                GoalBonus = IsTransfer ? (long)SellerGoalAddOn : 0,
-                BuyBackFee = IsTransfer && HasBuyBack ? (long)BuyBackFee : null,
-                BuyBackYears = (int)BuyBackYears,
-                PreemptionRight = IsTransfer && PreemptionRight,
-            };
-            r = Session.SubmitClubOffer(_n, offer);
-            if (r.Kind == ResponseKind.Counter && _n.CounterFee is { } cf && IsTransfer) Fee = cf;
-            if (_n.Stage == NegotiationStage.PlayerTalks) LoadContract();
-        }
-        else if (PlayerStage)
-        {
-            var contract = new ContractOffer
-            {
-                Years = (int)Years,
-                WeeklyWage = (int)WeeklyWage,
-                SigningFee = (long)SigningFee,
-                Status = (SquadStatus)StatusIndex,
-                AppearanceBonus = (int)AppearanceBonus,
-                GoalBonus = (int)GoalBonus,
-                ReleaseClause = HasReleaseClause ? (long)ReleaseClause : null,
-                YearlyRaisePercent = (int)YearlyRaise,
-                RelegationPercent = (int)RelegationPercent,
-                PromotionPercent = (int)PromotionPercent,
-                ExtensionOptionYears = (int)ExtensionOptionYears,
-            };
-            r = Session.SubmitContract(_n, contract);
-            if (r.Kind == ResponseKind.Counter && _n.WageDemand is { } wd) WeeklyWage = wd;
-        }
-        else return;
-
-        // Prüffehler (Budget, Fenster) ändern die Verhandlung nicht und erscheinen als Hinweis.
-        if (r.TextKey.StartsWith("neg.error.", StringComparison.Ordinal)) Error = T[r.TextKey];
-        Update();
+        // Parallel: zuerst offene Vereinsrunde, sonst Spieler.
+        if (ClubStage) SubmitClub();
+        else if (PlayerStage) SubmitPlayer();
     }
 
     [RelayCommand]
