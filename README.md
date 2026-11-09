@@ -229,8 +229,13 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
       Solarfeld, Park, Pool und Eisbecken, Biergarten, LED-Turm, Flutlicht, Tank, BHKW, Statue und Kapelle.
       Baustellen erscheinen mit Gerüst und Kran.
     - Stadion aus Bausteinen: Sockel mit Spielfeld und Treppentürmen, je Seite eine Tribüne in drei Größen nach
-      Plätzen (bis 4.000, bis 12.000, darüber), mit oder ohne Glasdach, Flutlichtmasten nach Ausbaustufe.
-      Sitze und Fassadenband werden zur Laufzeit in die Vereinsfarbe umgefärbt.
+      Plätzen (bis 4.000, bis 12.000, darüber), mit oder ohne Kragdach, Flutlichtmasten nach Ausbaustufe.
+      Das Kragdach aus Trapezblech deckt den äußeren Teil der Ränge, das Spielfeld bleibt frei.
+      Sitze, Dachblende, Fassadenband und das Schild am Eingangstor werden zur Laufzeit in die Vereinsfarbe umgefärbt.
+    - Stadionumfeld: Eingangstor mit Backsteinpfeilern, Drehkreuzen und Vereinsschild. Bordsteine trennen Pflaster
+      und Rasen. Große Wegflächen erscheinen als Promenade aus Betonplatten mit Klinkerband.
+      Laternen stehen in festen Abständen am Wegrand, dazu Bänke, Pflanzkübel und Abfalleimer. Die Ausstattung ist
+      reine Grafik, fest aus der Lage abgeleitet und nie neben einem Tor.
     - Die Sprites werden ohne Weichzeichnen gezeichnet, der automatische Zoom rastet auf 1× bzw. 2× ein.
     - Sie entstehen mit `python3 tools/sprites/gen_sprites.py` (Pillow, deterministisch). Der Generator schreibt
       `src/Fmh.Desktop/Assets/grounds.png` und `grounds.json`. Mit `--preview datei.png` erzeugt er eine
