@@ -26,7 +26,8 @@ internal static class ManagerReport
     public static bool PrintSummary(GameData data)
     {
         if (Sackings.Count == 0) return true;
-        var range = data.ManagerRules.SackingsPerTopLeague;
+        // Ungültiger Zielbereich meldet der Datenvalidator; hier nur nicht abstürzen
+        var range = data.ManagerRules.SackingsPerTopLeague is [_, _] r ? r : new double[] { 1, 8 };
         var ok = true;
         var parts = new List<string>();
         foreach (var (country, list) in Sackings.OrderBy(kv => kv.Key))

@@ -27,10 +27,15 @@ public static class ManagerGenerator
 
     /// <summary>
     /// Fehlende KI-Manager ergänzen (neue Welt und ältere Spielstände) und den Pool auffüllen. Wiederholbar: Vereine mit
-    /// Trainer bleiben unverändert.
+    /// Trainer bleiben unverändert; KI-Manager älterer Spielstände ohne laufende Station bekommen eine ab Saisonbeginn.
     /// </summary>
     public static void Ensure(World world, GameData data)
     {
+        foreach (var m in world.Managers.Where(m => !m.Human && m.ClubId is { } id && world.Clubs.ContainsKey(id) && m.CurrentStation is null))
+        {
+            var club = world.Clubs[m.ClubId!.Value];
+            m.Career.Stations.Add(new CareerStation { ClubId = club.Id, ClubName = club.Name, From = new DateOnly(world.SeasonYear, 7, 1) });
+        }
         var rng = RngFor(world, world.SeasonYear * 7919L + world.Managers.Count);
         foreach (var club in world.Clubs.Values.Where(c => NeedsManager(world, c)).OrderBy(c => c.Id).ToList())
         {
