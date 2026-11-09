@@ -418,6 +418,15 @@
                     "description": "Erträge je Kategorie: matchday, advertising, media, merchandising, other und total.",
                     "type": "object"
                   },
+                  "maxDeductionsPerSeason": {
+                    "description": "Abweichende Grenze der Kalibrierung für Lizenz-Punktabzüge je Saison in dieser Ebene (sonst 1,25). Nur mit Begründung in ToleranceNote.",
+                    "maximum": 5,
+                    "minimum": 0,
+                    "type": [
+                      "number",
+                      "null"
+                    ]
+                  },
                   "official": {
                     "description": "Amtliche Zahlen des Ligaverbands (true) oder Schätzung Dritter (false).",
                     "type": "boolean"

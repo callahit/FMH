@@ -478,6 +478,8 @@
         "parachuteShares": [0.5],
         "squadSize": 28,
         "reference": {
+          "maxDeductionsPerSeason": 1.5,
+          "toleranceNote": "Punktabzüge: Serie-A-Klubs haben real hohes negatives Eigenkapital; im Fünf-Saisons-Lauf schwanken die Lizenz-Punktabzüge je Seed zwischen 0,6 und 1,4 je Saison (Kalibrierung KI-Manager, Seeds 1–3).",
           "source": "Deloitte Annual Review of Football Finance 2026, Serie A, Saison 2024/25 (keine amtliche Ligazahl)",
           "official": false,
           "income": {

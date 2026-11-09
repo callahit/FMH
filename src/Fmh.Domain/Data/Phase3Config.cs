@@ -194,6 +194,13 @@ public sealed class FinanceReference
     /// </summary>
     public Dictionary<string, double> Tolerances { get; set; } = new();
     public string ToleranceNote { get; set; } = "";
+    /// <summary>
+    /// Abweichende Grenze der Kalibrierung für Lizenz-Punktabzüge je Saison in dieser Ebene (sonst 1,25). Nur mit
+    /// Begründung in <see cref="ToleranceNote"/>.
+    /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    [System.ComponentModel.DataAnnotations.Range(0, 5)]
+    public double? MaxDeductionsPerSeason { get; set; }
 
     public static readonly string[] IncomeCategories = { "matchday", "advertising", "media", "merchandising", "other", "total" };
     public static readonly string[] ExpenseCategories = { "squad", "operations", "youth", "total" };

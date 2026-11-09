@@ -56,7 +56,7 @@ public static class DataValidator
                     var known = parts.Length == 2 && (parts[0] == "income" ? r.Income : parts[0] == "expenses" ? r.Expenses : null)?.ContainsKey(parts[1]) == true;
                     if (!known || tol <= 0 || tol > 1) errors.Add($"Ligazahlen '{div}': Toleranz '{key}' ungültig.");
                 }
-                if (r.Tolerances.Count > 0 && string.IsNullOrWhiteSpace(r.ToleranceNote))
+                if ((r.Tolerances.Count > 0 || r.MaxDeductionsPerSeason is not null) && string.IsNullOrWhiteSpace(r.ToleranceNote))
                     errors.Add($"Ligazahlen '{div}': abweichende Toleranzen ohne Begründung.");
             }
             // Mindestkader: ein voller Spieltagskader, höchstens so groß wie der erlaubte Kader.
