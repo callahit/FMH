@@ -67,10 +67,21 @@ public sealed partial class LeaguePageViewModel : PageViewModel, IRefreshable
     [ObservableProperty] private bool _isCup;
     [ObservableProperty] private IReadOnlyList<CupRoundVm> _cupRounds = Array.Empty<CupRoundVm>();
 
-    public bool ShowTable => !IsCup && !ShowScorers;
+    public bool ShowTable => !IsCup && !ShowScorers && !ShowManagers;
     public bool ShowScorerList => !IsCup && ShowScorers;
-    partial void OnShowScorersChanged(bool value) { OnPropertyChanged(nameof(ShowTable)); OnPropertyChanged(nameof(ShowScorerList)); }
-    partial void OnIsCupChanged(bool value) { OnPropertyChanged(nameof(ShowTable)); OnPropertyChanged(nameof(ShowScorerList)); }
+    partial void OnShowScorersChanged(bool value)
+    {
+        if (value) ShowManagers = false;
+        OnPropertyChanged(nameof(ShowTable));
+        OnPropertyChanged(nameof(ShowScorerList));
+    }
+
+    partial void OnIsCupChanged(bool value)
+    {
+        OnPropertyChanged(nameof(ShowTable));
+        OnPropertyChanged(nameof(ShowScorerList));
+        OnPropertyChanged(nameof(ShowManagerList));
+    }
 
     partial void OnLeagueChanged(LeagueChoice value) => Refresh();
 
@@ -122,6 +133,7 @@ public sealed partial class LeaguePageViewModel : PageViewModel, IRefreshable
                 p.SeasonStats.Appearances, UiText.Grade(p.SeasonStats.AverageGrade),
                 p.ClubId == own ? new SolidColorBrush(P.Accent) : new SolidColorBrush(P.Text)))
             .ToList();
+        RefreshManagers(league);
     }
 
     /// <summary>Pokal bzw. Relegation: Runden mit Duellen, Ergebnissen und Entscheidungsart.</summary>
@@ -155,6 +167,7 @@ public sealed partial class LeaguePageViewModel : PageViewModel, IRefreshable
     public override bool HandleKey(Avalonia.Input.Key key, Avalonia.Input.KeyModifiers modifiers)
     {
         if (key == Avalonia.Input.Key.T) { ToggleView(); return true; }
+        if (key == Avalonia.Input.Key.M && !IsCup) { ShowManagers = !ShowManagers; return true; }
         return false;
     }
 }
