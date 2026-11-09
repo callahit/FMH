@@ -1,0 +1,97 @@
+{
+  "$id": "https://fmh.local/schema/buildings.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "items": {
+    "additionalProperties": false,
+    "description": "Gebäudetyp des Vereinsgeländes (Kapitel 9), vollständig als Daten.",
+    "properties": {
+      "buildDays": {
+        "type": "integer"
+      },
+      "category": {
+        "type": "string"
+      },
+      "cost": {
+        "type": "integer"
+      },
+      "costGrowth": {
+        "description": "Kostenfaktor je weiterer Stufe.",
+        "type": "number"
+      },
+      "effects": {
+        "additionalProperties": {
+          "type": "number"
+        },
+        "description": "Wirkung je Stufe, Schlüssel siehe Effects.",
+        "type": "object"
+      },
+      "height": {
+        "type": "integer"
+      },
+      "id": {
+        "type": "string"
+      },
+      "land": {
+        "description": "Freies Bauland: keine Wirkung, verkaufbar.",
+        "type": "boolean"
+      },
+      "location": {
+        "description": "Lagebonus: \"entrance\" (nahe Stadioneingang), \"dressing\" (nahe Kabinentrakt).",
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "maxLevel": {
+        "type": "integer"
+      },
+      "multiple": {
+        "description": "Mehrfach baubar (z. B. Trainingsplätze, Imbissbuden).",
+        "type": "boolean"
+      },
+      "requires": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "level": {
+              "type": "integer"
+            },
+            "type": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "synergies": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "effect": {
+              "type": "string"
+            },
+            "value": {
+              "type": "number"
+            },
+            "with": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "upkeep": {
+        "description": "Unterhalt pro Monat auf Stufe 1 (steigt je Stufe um 50 %).",
+        "type": "integer"
+      },
+      "width": {
+        "type": "integer"
+      }
+    },
+    "type": "object"
+  },
+  "title": "FMH rules/buildings.json",
+  "type": "array"
+}

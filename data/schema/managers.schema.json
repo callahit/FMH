@@ -1,0 +1,25 @@
+{
+  "$id": "https://fmh.local/schema/managers.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "items": {
+    "additionalProperties": false,
+    "description": "KI-Manager eines Vereins (Datei managers/*.json); übernimmt den Verein, den der Spieler verlässt.",
+    "properties": {
+      "club": {
+        "description": "Verein (Schlüssel); leer = ohne Verein.",
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "reputation": {
+        "maximum": 20,
+        "minimum": 1,
+        "type": "integer"
+      }
+    },
+    "type": "object"
+  },
+  "title": "FMH managers/*.json",
+  "type": "array"
+}

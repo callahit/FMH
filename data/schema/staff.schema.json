@@ -1,0 +1,71 @@
+{
+  "$id": "https://fmh.local/schema/staff.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "items": {
+    "additionalProperties": false,
+    "description": "Vorgegebenes Personal (Datei staff/*.json); ersetzt beim Verein das erzeugte Personal derselben Rolle.",
+    "properties": {
+      "ability": {
+        "description": "Hauptwert der Rolle 1–20.",
+        "maximum": 20,
+        "minimum": 1,
+        "type": "integer"
+      },
+      "age": {
+        "maximum": 80,
+        "minimum": 18,
+        "type": "integer"
+      },
+      "ageGroup": {
+        "description": "Nur Jugendtrainer: betreute Altersstufe.",
+        "enum": [
+          "U15",
+          "U17",
+          "U19",
+          null
+        ]
+      },
+      "club": {
+        "description": "Verein (Schlüssel); leer = auf dem Arbeitsmarkt.",
+        "type": "string"
+      },
+      "contractUntil": {
+        "maximum": 2100,
+        "minimum": 2000,
+        "type": [
+          "integer",
+          "null"
+        ]
+      },
+      "motivation": {
+        "description": "Motivation und Menschenführung 1–20; leer = wie die Fähigkeit.",
+        "maximum": 20,
+        "minimum": 1,
+        "type": [
+          "integer",
+          "null"
+        ]
+      },
+      "name": {
+        "type": "string"
+      },
+      "role": {
+        "enum": [
+          "AssistantManager",
+          "FitnessCoach",
+          "GoalkeepingCoach",
+          "YouthCoach",
+          "Physio",
+          "Doctor",
+          "Psychologist",
+          "PressOfficer",
+          "Groundsman",
+          "SportsDirector"
+        ]
+      }
+    },
+    "type": "object"
+  },
+  "title": "FMH staff/*.json",
+  "type": "array"
+}

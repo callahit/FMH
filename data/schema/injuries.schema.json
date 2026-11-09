@@ -1,0 +1,24 @@
+{
+  "$id": "https://fmh.local/schema/injuries.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "items": {
+    "additionalProperties": false,
+    "properties": {
+      "key": {
+        "type": "string"
+      },
+      "maxDays": {
+        "type": "integer"
+      },
+      "minDays": {
+        "type": "integer"
+      },
+      "weight": {
+        "type": "number"
+      }
+    },
+    "type": "object"
+  },
+  "title": "FMH rules/injuries.json",
+  "type": "array"
+}

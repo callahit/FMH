@@ -1,0 +1,83 @@
+{
+  "$id": "https://fmh.local/schema/positions.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Gewichtung der Attribute je Position für Positionsstärke und Gesamtstärke.",
+  "properties": {
+    "weights": {
+      "additionalProperties": {
+        "additionalProperties": {
+          "type": "number"
+        },
+        "propertyNames": {
+          "enum": [
+            "FirstTouch",
+            "Dribbling",
+            "Crossing",
+            "Heading",
+            "Passing",
+            "Technique",
+            "Finishing",
+            "LongShots",
+            "FreeKicks",
+            "Penalties",
+            "Corners",
+            "LongThrows",
+            "Tackling",
+            "Marking",
+            "Anticipation",
+            "Decisions",
+            "Concentration",
+            "Determination",
+            "Bravery",
+            "Leadership",
+            "Flair",
+            "WorkRate",
+            "OffTheBall",
+            "Positioning",
+            "Teamwork",
+            "Aggression",
+            "Composure",
+            "Acceleration",
+            "Pace",
+            "Stamina",
+            "Strength",
+            "Agility",
+            "Balance",
+            "JumpingReach",
+            "NaturalFitness",
+            "Reflexes",
+            "CommandOfArea",
+            "Handling",
+            "OneOnOnes",
+            "Kicking",
+            "Throwing",
+            "RushingOut",
+            "Communication",
+            "Eccentricity"
+          ]
+        },
+        "type": "object"
+      },
+      "propertyNames": {
+        "enum": [
+          "GK",
+          "DL",
+          "DC",
+          "DR",
+          "DM",
+          "ML",
+          "MC",
+          "MR",
+          "AML",
+          "AMC",
+          "AMR",
+          "ST"
+        ]
+      },
+      "type": "object"
+    }
+  },
+  "title": "FMH rules/positions.json",
+  "type": "object"
+}

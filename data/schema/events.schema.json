@@ -1,0 +1,152 @@
+{
+  "$id": "https://fmh.local/schema/events.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "items": {
+    "additionalProperties": false,
+    "description": "Zufallsereignis (Kapitel 10) als Daten; Texte unter event.<id>.* in den Sprachdateien.",
+    "properties": {
+      "category": {
+        "type": "string"
+      },
+      "cooldownDays": {
+        "type": "integer"
+      },
+      "id": {
+        "type": "string"
+      },
+      "options": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "chance": {
+              "description": "Erfolgswahrscheinlichkeit; bei Misserfolg gelten FailEffects.",
+              "type": "number"
+            },
+            "effects": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "description": "Wirkungen: money (EUR bei Reputation 10, skaliert mit Vereinsgröße), fans, board, morale, media, reputation, playerMorale, playerCondition, playerInjury (Tage), playerSuspend (Spiele), playerFine (Wochengehälter), pitch, attendance (%).",
+              "type": "object"
+            },
+            "failEffects": {
+              "additionalProperties": {
+                "type": "number"
+              },
+              "type": [
+                "object",
+                "null"
+              ]
+            },
+            "id": {
+              "type": "string"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      },
+      "styles": {
+        "description": "Leer = alle Tonfälle.",
+        "items": {
+          "description": "Tonfall der Ereignisse, Schlagzeilen und Pressefragen (Kapitel 2): Anstoß-Satire bis FM-Ernst.",
+          "enum": [
+            "Satirical",
+            "Balanced",
+            "Serious"
+          ]
+        },
+        "type": "array"
+      },
+      "weight": {
+        "type": "number"
+      },
+      "when": {
+        "additionalProperties": false,
+        "properties": {
+          "afterLoss": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "afterWin": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "lowBalance": {
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "maxBoardTrust": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "maxFanMood": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "maxReputation": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "minFanMood": {
+            "type": [
+              "number",
+              "null"
+            ]
+          },
+          "minReputation": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "months": {
+            "items": {
+              "type": "integer"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "noStadiumSite": {
+            "description": "Nur ohne laufendes Grundstücksangebot und ohne laufenden Stadionneubau.",
+            "type": [
+              "boolean",
+              "null"
+            ]
+          },
+          "player": {
+            "description": "Betroffener Spieler: any, young, star, striker, keeper, injured, old, foreign.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "requiresBuilding": {
+            "type": [
+              "string",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      }
+    },
+    "type": "object"
+  },
+  "title": "FMH events/*.json",
+  "type": "array"
+}

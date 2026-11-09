@@ -1,0 +1,138 @@
+{
+  "$id": "https://fmh.local/schema/europe.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Gemeinsames Format der europäischen Wettbewerbe (AP 5): Qualifikation, Ligaphase, K.-o., Koeffizienten.",
+  "properties": {
+    "access": {
+      "additionalProperties": false,
+      "properties": {
+        "bonusFinal": {
+          "type": "number"
+        },
+        "bonusLeaguePhase": {
+          "type": "number"
+        },
+        "bonusQualifyingWin": {
+          "type": "number"
+        },
+        "bonusQuarter": {
+          "type": "number"
+        },
+        "bonusRoundOf16": {
+          "type": "number"
+        },
+        "bonusSemi": {
+          "type": "number"
+        },
+        "bonusTitle": {
+          "type": "number"
+        },
+        "defaultCountryScore": {
+          "type": "number"
+        },
+        "draw": {
+          "type": "number"
+        },
+        "entryByRank": {
+          "items": {
+            "additionalProperties": false,
+            "description": "Einstiegsrunde nach Länderkoeffizient-Rang (1 = bestes Land unter den geladenen).",
+            "properties": {
+              "maxRank": {
+                "type": "integer"
+              },
+              "uclChampion": {
+                "type": "string"
+              },
+              "uclOther": {
+                "type": "string"
+              },
+              "uecl": {
+                "type": "string"
+              },
+              "uel": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "win": {
+          "type": "number"
+        },
+        "windowYears": {
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "competitions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "dropTo": {
+            "description": "Wettbewerb, in den Qualifikationsverlierer fallen (leer = ausgeschieden).",
+            "type": "string"
+          },
+          "entryPrize": {
+            "type": "integer"
+          },
+          "fieldStrength": {
+            "type": "number"
+          },
+          "id": {
+            "type": "string"
+          },
+          "knockoutFrom": {
+            "description": "Wie viele Teams aus der Ligaphase in die K.-o.-Runde einziehen (Zweierpotenz).",
+            "type": "integer"
+          },
+          "stages": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "dates": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "key": {
+                  "type": "string"
+                },
+                "legs": {
+                  "type": "integer"
+                },
+                "prize": {
+                  "type": "integer"
+                },
+                "type": {
+                  "description": "knockout oder league.",
+                  "type": "string"
+                },
+                "weekday": {
+                  "type": "string"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "targetLeagueSize": {
+            "description": "Zielgröße der Ligaphase; bei weniger Teilnehmern wird verkleinert (gerade Zahl).",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "title": "FMH competitions/europe.json",
+  "type": "object"
+}

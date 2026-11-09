@@ -1,0 +1,1252 @@
+{
+  "$id": "https://fmh.local/schema/country.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Länderkonfiguration: Ligapyramide, Kalender, Regeln (Kapitel 3). Gilt ab ValidFrom.",
+  "properties": {
+    "activation": {
+      "enum": [
+        "Playable",
+        "Background",
+        "Inactive"
+      ]
+    },
+    "code": {
+      "type": "string"
+    },
+    "cups": {
+      "items": {
+        "additionalProperties": false,
+        "description": "Pokalformat (Kapitel 3): Teilnehmer, Runden, Heimrecht, Termine. Ein Land kann beliebig viele Pokale haben (Landespokal, nationaler Pokal, Ligapokal, Supercup); Qualifikation und späterer Einstieg stehen in Entries.",
+        "properties": {
+          "awayGoals": {
+            "type": "boolean"
+          },
+          "dates": {
+            "description": "Termine je Runde im Format MM-TT (bei zwei Spielen zwei Termine je Runde, durch Komma getrennt).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "entries": {
+            "description": "Feste Startplätze in der angegebenen Reihenfolge; Vereine werden nicht doppelt aufgenommen.",
+            "items": {
+              "additionalProperties": false,
+              "description": "Startplatz im Pokal. Entweder Vereine aus Ligen (Participants, optional nach dem Abschluss der Vorsaison und nur die ersten Count) oder die Bestplatzierten eines anderen Pokals der Vorsaison (QualifiersOf, z. B. Landespokalsieger für den DFB-Pokal).",
+              "properties": {
+                "count": {
+                  "description": "Höchstzahl der Vereine aus diesem Eintrag; null = alle.",
+                  "type": [
+                    "integer",
+                    "null"
+                  ]
+                },
+                "europe": {
+                  "description": "Nur Vereine, die in dieser Saison europäisch spielen (true) bzw. nicht (false); null = egal.",
+                  "type": [
+                    "boolean",
+                    "null"
+                  ]
+                },
+                "participants": {
+                  "items": {
+                    "type": "string"
+                  },
+                  "type": "array"
+                },
+                "previousSeason": {
+                  "description": "Abschlusstabelle der Vorsaison statt der aktuellen Ligazugehörigkeit (ohne Vorsaison: aktuelle Liga nach Ruf).",
+                  "type": "boolean"
+                },
+                "qualifiersOf": {
+                  "description": "Pokal der Vorsaison, dessen Bestplatzierte (Sieger, Finalist, Halbfinalisten …) einziehen.",
+                  "type": "string"
+                },
+                "round": {
+                  "description": "Runde, in der die Vereine einsteigen (1 = von Beginn an).",
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "finalLegs": {
+            "description": "Spiele im Finale, abweichend von Legs.",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "fixedPairing": {
+            "description": "Supercup und andere Einzelspiele: Teilnehmer in der Reihenfolge von Entries ohne Auslosung, Heimrecht beim Verein aus dem Eintrag mit diesem Index (null = erster Eintrag).",
+            "type": "boolean"
+          },
+          "homeEntry": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "legs": {
+            "type": "integer"
+          },
+          "lowerTierHome": {
+            "description": "Unterklassige Vereine haben Heimrecht (wie im DFB-Pokal).",
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "neutralFinal": {
+            "type": "boolean"
+          },
+          "participants": {
+            "description": "Ligen und Pools, deren Vereine teilnehmen. Mit Entries füllen sie nur die freien Plätze bis Teams auf (höhere Ebenen und höherer Ruf zuerst), etwa in der ersten Saison ohne Vorjahresergebnisse.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "prizes": {
+            "description": "Prämien je erreichter Runde und für den Sieger; null = Werte des Landes (CupPrizes).",
+            "items": {
+              "type": "integer"
+            },
+            "type": [
+              "array",
+              "null"
+            ]
+          },
+          "region": {
+            "description": "Nur Vereine dieser Region (Landespokal); leer = alle.",
+            "type": "string"
+          },
+          "roundLegs": {
+            "description": "Spiele je Runde (Index 0 = Runde 1), vorrangig vor Legs und FinalLegs.",
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "teams": {
+            "description": "Teilnehmerzahl. Ohne späteren Einstieg wird auf eine Zweierpotenz mit Freilosen aufgefüllt.",
+            "type": "integer"
+          },
+          "winnerPrize": {
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "currency": {
+      "description": "Währung der Beträge in den Daten; im Spiel nur Euro zulässig (Leitwährung, siehe CurrencyConfig).",
+      "type": "string"
+    },
+    "discipline": {
+      "additionalProperties": false,
+      "properties": {
+        "redCardBanMax": {
+          "type": "integer"
+        },
+        "redCardBanMin": {
+          "type": "integer"
+        },
+        "secondYellowBan": {
+          "type": "integer"
+        },
+        "yellowCardsForSuspension": {
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "divisions": {
+      "items": {
+        "$ref": "#/properties/levels/items/properties/divisions/items"
+      },
+      "type": [
+        "array",
+        "null"
+      ]
+    },
+    "europe": {
+      "additionalProperties": false,
+      "properties": {
+        "allCupPlaces": {
+          "description": "Alle Pokalplätze: zuerst Cup, dann CupPlaces.",
+          "items": {
+            "$ref": "#/properties/europe/properties/cupPlaces/items"
+          },
+          "type": [
+            "array",
+            "null"
+          ]
+        },
+        "competitions": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "entryPrize": {
+                "type": "integer"
+              },
+              "fieldStrength": {
+                "description": "Stärke des Teilnehmerfelds (Durchschnitt Top-11, Skala der Spielerbewertung).",
+                "type": "number"
+              },
+              "id": {
+                "type": "string"
+              },
+              "stages": {
+                "description": "Runden ab der Ligaphase: Name (Textschlüssel), Datum (MM-dd), Prämie fürs Erreichen.",
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "date": {
+                      "type": "string"
+                    },
+                    "key": {
+                      "type": "string"
+                    },
+                    "prize": {
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": "array"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "cup": {
+          "type": "string"
+        },
+        "cupPlaces": {
+          "description": "Weitere Pokalsieger mit Europaplatz (z. B. Ligapokal), in dieser Reihenfolge nach Cup.",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "competition": {
+                "type": "string"
+              },
+              "cup": {
+                "type": "string"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        },
+        "cupWinner": {
+          "description": "Wettbewerb des Pokalsiegers (fällt an den nächsten Ligaplatz, wenn er schon qualifiziert ist).",
+          "type": "string"
+        },
+        "ffp": {
+          "additionalProperties": false,
+          "properties": {
+            "acceptableDeviation": {
+              "description": "Zulässiges Break-even-Defizit über drei Spielzeiten.",
+              "type": "integer"
+            },
+            "finePercent": {
+              "description": "Geldstrafe in Prozent des Umsatzes.",
+              "type": "number"
+            },
+            "severeDeviation": {
+              "description": "Ab diesem Defizit Ausschluss aus europäischen Wettbewerben.",
+              "type": "integer"
+            },
+            "squadCostRatio": {
+              "description": "Höchstquote Kaderkosten zu Umsatz.",
+              "type": "number"
+            }
+          },
+          "type": "object"
+        },
+        "league": {
+          "description": "Liga, deren Abschlusstabelle die Plätze vergibt.",
+          "type": "string"
+        },
+        "license": {
+          "additionalProperties": false,
+          "properties": {
+            "academyStars": {
+              "type": "integer"
+            },
+            "floodlight": {
+              "type": "integer"
+            },
+            "minSeats": {
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "places": {
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "competition": {
+                "type": "string"
+              },
+              "from": {
+                "type": "integer"
+              },
+              "to": {
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "type": [
+        "object",
+        "null"
+      ]
+    },
+    "finance": {
+      "additionalProperties": false,
+      "properties": {
+        "boardApprovalAbove": {
+          "description": "Bausumme, ab der der Vorstand zustimmen muss.",
+          "type": "integer"
+        },
+        "cateringPerSpectator": {
+          "description": "Catering-Umsatz je Zuschauer und Heimspiel (DFL: Teil der sonstigen Erlöse).",
+          "type": "integer"
+        },
+        "conditionPenalty": {
+          "description": "Punktabzug, wenn Auflagen bis zum Nachweisstichtag nicht erfüllt sind.",
+          "type": "integer"
+        },
+        "creditLimitPercent": {
+          "description": "Kreditrahmen der Hausbank in Prozent der Saisoneinnahmen.",
+          "type": "integer"
+        },
+        "cupPrizes": {
+          "description": "Pokalprämie je erreichter Runde (Index 0 = Teilnahme an Runde 1).",
+          "items": {
+            "type": "integer"
+          },
+          "type": "array"
+        },
+        "cupWinnerPrize": {
+          "type": "integer"
+        },
+        "divisions": {
+          "additionalProperties": {
+            "additionalProperties": false,
+            "properties": {
+              "academyBudgetFactor": {
+                "description": "Jahresbudget des Nachwuchsleistungszentrums als Vielfaches des Länder-Referenzbudgets (skaliert nach Vereinsgröße); 0 = bisherige Staffel nach Ligaebene.",
+                "type": "number"
+              },
+              "box": {
+                "type": "integer"
+              },
+              "floodlightRequired": {
+                "description": "Mindestens nötige Flutlichtstufe (Lizenzpflicht).",
+                "type": "integer"
+              },
+              "maxAnnualWage": {
+                "description": "Höchstes Jahresgehalt, das ein Verein dieser Spielklasse zahlen kann (0 = ohne Grenze).",
+                "type": "integer"
+              },
+              "maxWeeklyWage": {
+                "description": "Höchstes Wochengehalt der Spielklasse (MaxValue ohne Grenze).",
+                "type": "integer"
+              },
+              "merchLevel": {
+                "description": "Fanartikel je Zuschauer gegenüber dem Landeswert (1,0); unterklassige Vereine verkaufen je Fan deutlich weniger.",
+                "type": "number"
+              },
+              "minEquity": {
+                "description": "Eigenkapital, das bei der Lizenzierung mindestens vorhanden sein muss.",
+                "type": "integer"
+              },
+              "minSquad": {
+                "description": "Mindestkader der Spielklasse: Darunter verpflichtet die KI sofort nach (Review F-06; Spieltag: 11 plus Bank).",
+                "type": "integer"
+              },
+              "operatingCostShare": {
+                "description": "Betriebskosten (Verwaltung, Spielbetrieb, Personal außerhalb des Kaders) als Anteil der laufenden Einnahmen; in der Bundesliga real rund 45 % (DFL-Wirtschaftsreport). 0 = keine.",
+                "type": "number"
+              },
+              "parachuteShares": {
+                "description": "Fallschirmzahlungen (England): Absteiger aus dieser Spielklasse erhalten je Saison nach dem Abstieg diesen Anteil am TV-Grundbetrag eines Vereins dieser Spielklasse, z. B. 55 %, 45 %, 20 %.",
+                "items": {
+                  "type": "number"
+                },
+                "type": "array"
+              },
+              "parachuteShortTenure": {
+                "description": "Höchstzahl der Fallschirmzahlungen nach nur einer Saison in der Spielklasse (0 = alle).",
+                "type": "integer"
+              },
+              "promotionWagePercent": {
+                "type": "integer"
+              },
+              "reference": {
+                "additionalProperties": false,
+                "description": "Veröffentlichte Ligazahlen je Verein als Kalibrierungsziel (null = keine).",
+                "properties": {
+                  "expenses": {
+                    "additionalProperties": {
+                      "type": "integer"
+                    },
+                    "description": "Aufwand je Kategorie: squad (Personal Spielbetrieb), operations (Verwaltung, Spielbetrieb, Sonstiges), youth und total.",
+                    "type": "object"
+                  },
+                  "income": {
+                    "additionalProperties": {
+                      "type": "integer"
+                    },
+                    "description": "Erträge je Kategorie: matchday, advertising, media, merchandising, other und total.",
+                    "type": "object"
+                  },
+                  "official": {
+                    "description": "Amtliche Zahlen des Ligaverbands (true) oder Schätzung Dritter (false).",
+                    "type": "boolean"
+                  },
+                  "source": {
+                    "description": "Quelle mit Saison, z. B. „DFL-Wirtschaftsreport 2025 (Saison 2023/24)“.",
+                    "type": "string"
+                  },
+                  "toleranceNote": {
+                    "type": "string"
+                  },
+                  "tolerances": {
+                    "additionalProperties": {
+                      "type": "number"
+                    },
+                    "description": "Abweichende Toleranzen der Kalibrierung je Kennzahl, z. B. „income.merchandising“: 0,4. Nur mit Begründung in ToleranceNote, sonst gelten 10 % für Summen und 20 % für Kategorien.",
+                    "type": "object"
+                  }
+                },
+                "type": [
+                  "object",
+                  "null"
+                ]
+              },
+              "relegationWagePercent": {
+                "description": "Übliche Vertragsklauseln für Spieler und Personal: Gehalt −% beim Abstieg aus bzw. +% beim Aufstieg aus dieser Spielklasse. 0 = keine Klausel.",
+                "type": "integer"
+              },
+              "seating": {
+                "type": "integer"
+              },
+              "sponsorLevel": {
+                "description": "Sponsorenniveau der Spielklasse gegenüber der höchsten Liga (1,0).",
+                "type": "number"
+              },
+              "squadSize": {
+                "description": "Übliche Kadergröße der Spielklasse (Profis und Vertragsspieler); Grundlage für Kaderaufbau und Kaderplanung der KI.",
+                "type": "integer"
+              },
+              "standing": {
+                "type": "integer"
+              },
+              "targetAnnualWage": {
+                "description": "Kalibrierungsziel: durchschnittliches Jahresgehalt eines Kaderspielers (0 = ohne Ziel).",
+                "type": "integer"
+              },
+              "travelPerAwayMatch": {
+                "type": "integer"
+              },
+              "tvEqualShare": {
+                "type": "number"
+              },
+              "tvPool": {
+                "description": "TV-Gelder der Liga je Saison, halb gleich verteilt, halb nach Tabellenplatz.",
+                "type": "integer"
+              },
+              "wageLevel": {
+                "description": "Gehaltsniveau der Spielklasse gegenüber dem Profimarkt (1,0); Halbprofis verdienen deutlich weniger.",
+                "type": "number"
+              },
+              "youthCenterRequired": {
+                "description": "Jugendleistungszentrum Pflicht (Lizenz).",
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "description": "Je Liga bzw. Pool (Id).",
+          "type": "object"
+        },
+        "licenseApplication": {
+          "description": "Stichtage des Lizenzverfahrens (MM-dd): Antrag, Erstentscheidung, Nachweis der Auflagen.",
+          "type": "string"
+        },
+        "licenseDeadline": {
+          "type": "string"
+        },
+        "licenseDecision": {
+          "type": "string"
+        },
+        "merchPerSpectator": {
+          "description": "Fanartikel-Umsatz je Zuschauer und Heimspiel, bevor Stimmung und Fanshop wirken.",
+          "type": "integer"
+        },
+        "permitAbove": {
+          "description": "Bausumme, ab der eine Baugenehmigung der Stadt nötig ist.",
+          "type": "integer"
+        },
+        "playoffPrize": {
+          "type": "integer"
+        },
+        "seasonTicketDeadline": {
+          "description": "Dauerkarten-Verkauf bis (MM-dd).",
+          "type": "string"
+        },
+        "sponsorPromotionPercent": {
+          "type": "integer"
+        },
+        "sponsorRelegationPercent": {
+          "description": "Übliche Klausel in Sponsorenverträgen: Zahlung −% bei Abstieg, +% bei Aufstieg.",
+          "type": "integer"
+        },
+        "stadiumBaseCost": {
+          "type": "integer"
+        },
+        "stadiumBuildDays": {
+          "type": "integer"
+        },
+        "stadiumCostPerBox": {
+          "type": "integer"
+        },
+        "stadiumCostPerPlace": {
+          "description": "Mindest-Zertifizierung des Nachwuchsleistungszentrums (Sterne) je Liga steht in DivisionFinance.YouthCenterRequired.",
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "formative": {
+      "additionalProperties": false,
+      "properties": {
+        "club": {
+          "type": "number"
+        },
+        "country": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "levels": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "divisions": {
+            "items": {
+              "additionalProperties": false,
+              "properties": {
+                "assignment": {
+                  "enum": [
+                    "Fixed",
+                    "Geographic",
+                    "Rotating"
+                  ]
+                },
+                "groups": {
+                  "description": "Staffeln (geteilte Liga); leer = eine Liga mit der Kennung der Division. Teams gilt je Staffel.",
+                  "items": {
+                    "additionalProperties": false,
+                    "description": "Staffel einer geteilten Liga; im Spiel eine eigene Liga mit der Kennung der Staffel.",
+                    "properties": {
+                      "id": {
+                        "type": "string"
+                      },
+                      "movements": {
+                        "description": "Eigene Bewegungsregeln der Staffel; leer = Regeln der Division (z. B. Direktaufstieg nur für einige Staffelsieger).",
+                        "items": {
+                          "additionalProperties": false,
+                          "description": "Bewegungsregel einer Liga: welche Tabellenplätze auf- oder absteigen. Ersetzt die früheren Felder promotion/relegation, die beim Laden darauf abgebildet werden.",
+                          "properties": {
+                            "cycle": {
+                              "description": "Rotation: Die Regel gilt nur alle Cycle Saisons, erstmals in CycleStart (Startjahr).",
+                              "type": [
+                                "integer",
+                                "null"
+                              ]
+                            },
+                            "cycleStart": {
+                              "type": "integer"
+                            },
+                            "kind": {
+                              "enum": [
+                                "Direct",
+                                "Playoff"
+                              ]
+                            },
+                            "onlySeason": {
+                              "description": "Übergangsregel, die nur in dieser Saison (Startjahr) gilt, z. B. Sonderabsteiger vor einer Reform.",
+                              "type": [
+                                "integer",
+                                "null"
+                              ]
+                            },
+                            "playoff": {
+                              "description": "Bei Playoff: Kennung der Relegation bzw. des Aufstiegsturniers.",
+                              "type": [
+                                "string",
+                                "null"
+                              ]
+                            },
+                            "positions": {
+                              "description": "Tabellenplätze, z. B. \"1-2\" oder \"18\".",
+                              "type": "string"
+                            },
+                            "to": {
+                              "enum": [
+                                "Up",
+                                "Down"
+                              ]
+                            },
+                            "withoutReplacement": {
+                              "description": "Abstieg in den Pool ohne Nachrücker (nur unterste Ebene mit Pool): verkleinert die Ebene, etwa vor einer Reform mit weniger Staffeln. Meist zusammen mit OnlySeason.",
+                              "type": "boolean"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "regions": {
+                        "description": "Regionen, deren Vereine bevorzugt in diese Staffel kommen (Zuteilung \"fixed\").",
+                        "items": {
+                          "type": "string"
+                        },
+                        "type": "array"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "id": {
+                  "type": "string"
+                },
+                "movements": {
+                  "items": {
+                    "$ref": "#/properties/levels/items/properties/divisions/items/properties/groups/items/properties/movements/items",
+                    "description": "Bewegungsregel einer Liga: welche Tabellenplätze auf- oder absteigen. Ersetzt die früheren Felder promotion/relegation, die beim Laden darauf abgebildet werden."
+                  },
+                  "type": "array"
+                },
+                "name": {
+                  "type": "string"
+                },
+                "phases": {
+                  "description": "Weitere Saisonphasen nach dem Grunddurchgang (bisher höchstens eine).",
+                  "items": {
+                    "additionalProperties": false,
+                    "description": "Folgephase nach dem Grunddurchgang oder einer früheren Phase (Umsetzungskonzept 6.1), z. B. Meister- und Abstiegsrunde. Die Liga teilt sich nach Tabellenplätzen in Gruppen, die Punkte werden mit PointsCarry übernommen. Mehrere Phasen laufen nacheinander. Die Endtabelle reiht die Gruppen der letzten Phase hintereinander.",
+                    "properties": {
+                      "groups": {
+                        "items": {
+                          "additionalProperties": false,
+                          "description": "Gruppe einer Saisonphase: die Tabellenplätze des Grunddurchgangs, die in ihr spielen.",
+                          "properties": {
+                            "id": {
+                              "type": "string"
+                            },
+                            "name": {
+                              "type": "string"
+                            },
+                            "positions": {
+                              "description": "Plätze, z. B. \"1-6\".",
+                              "type": "string"
+                            }
+                          },
+                          "type": "object"
+                        },
+                        "type": "array"
+                      },
+                      "id": {
+                        "type": "string"
+                      },
+                      "name": {
+                        "type": "string"
+                      },
+                      "pointsCarry": {
+                        "description": "Anteil der Punkte aus dem Grunddurchgang (1,0 oder 0,5).",
+                        "type": "number"
+                      },
+                      "rounding": {
+                        "enum": [
+                          "Down",
+                          "Up",
+                          "Nearest"
+                        ]
+                      },
+                      "rounds": {
+                        "description": "Runden innerhalb jeder Gruppe (1 = jeder gegen jeden einmal).",
+                        "type": "integer"
+                      }
+                    },
+                    "type": "object"
+                  },
+                  "type": "array"
+                },
+                "points": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "draw": {
+                      "type": "integer"
+                    },
+                    "loss": {
+                      "type": "integer"
+                    },
+                    "win": {
+                      "type": "integer"
+                    }
+                  },
+                  "type": "object"
+                },
+                "promotion": {
+                  "description": "Direkte Aufstiegsplätze in die nächsthöhere Ebene.",
+                  "type": "integer"
+                },
+                "relegation": {
+                  "description": "Direkte Abstiegsplätze in die nächsttiefere Ebene.",
+                  "type": "integer"
+                },
+                "rounds": {
+                  "description": "2 = Doppelrunde, 3 = Dreifachrunde, 4 = Vierfachrunde.",
+                  "type": "integer"
+                },
+                "teams": {
+                  "type": "integer"
+                },
+                "tieBreakers": {
+                  "items": {
+                    "description": "Tabellenkriterien nach Punkten, Reihenfolge frei konfigurierbar.",
+                    "enum": [
+                      "GoalDifference",
+                      "GoalsFor",
+                      "HeadToHead",
+                      "AwayGoals",
+                      "Wins"
+                    ]
+                  },
+                  "type": "array"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "level": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "loans": {
+      "additionalProperties": false,
+      "description": "Nationale Leihregeln (Leihen zwischen Vereinen dieses Landes).",
+      "properties": {
+        "default": {
+          "additionalProperties": false,
+          "properties": {
+            "ageCutoff": {
+              "enum": [
+                "SeasonEnd",
+                "December31"
+              ]
+            },
+            "exemptAge": {
+              "description": "Spieler bis zu diesem Alter sind ausgenommen (0 = keine Ausnahme), Stichtag siehe AgeCutoff.",
+              "type": "integer"
+            },
+            "exemptNeedsClubTrained": {
+              "description": "Die Ausnahme gilt nur für Spieler, die der verleihende Verein selbst ausgebildet hat.",
+              "type": "boolean"
+            },
+            "maxIn": {
+              "description": "Höchstzahl gleichzeitig von anderen Vereinen ausgeliehener Spieler.",
+              "type": "integer"
+            },
+            "maxInPerSeason": {
+              "description": "Höchstzahl der in einer Saison ausgeliehenen Spieler (Premier League: vier); 0 = keine Grenze.",
+              "type": "integer"
+            },
+            "maxMonths": {
+              "description": "Längste Leihdauer in Monaten.",
+              "type": "integer"
+            },
+            "maxOut": {
+              "description": "Höchstzahl gleichzeitig an andere Vereine verliehener Spieler.",
+              "type": "integer"
+            },
+            "maxPerClub": {
+              "description": "Höchstzahl gleichzeitiger Leihen mit demselben Verein, je Richtung.",
+              "type": "integer"
+            },
+            "perClubCountsExempt": {
+              "description": "Die Grenze je Partnerverein gilt auch für ausgenommene Spieler (FIGC).",
+              "type": "boolean"
+            },
+            "source": {
+              "description": "Herkunft der Zahlen.",
+              "type": [
+                "string",
+                "null"
+              ]
+            },
+            "steps": {
+              "description": "Abweichende Höchstzahlen ab einer Saison (stufenweise Einführung, z. B. FIGC 10 → 9 → 8).",
+              "items": {
+                "additionalProperties": false,
+                "properties": {
+                  "fromSeason": {
+                    "type": "integer"
+                  },
+                  "maxIn": {
+                    "type": "integer"
+                  },
+                  "maxOut": {
+                    "type": "integer"
+                  }
+                },
+                "type": "object"
+              },
+              "type": "array"
+            }
+          },
+          "type": "object"
+        },
+        "divisions": {
+          "additionalProperties": {
+            "additionalProperties": false,
+            "description": "Leihgrenzen (FIFA-Transferstatut Art. 10 bzw. die nationalen Umsetzungen): Höchstzahl gleichzeitig verliehener und ausgeliehener Spieler, Höchstzahl mit demselben Verein, Ausnahme für junge bzw. selbst ausgebildete Spieler. 0 bei einer Grenze bedeutet: keine Grenze.",
+            "properties": {
+              "ageCutoff": {
+                "enum": [
+                  "SeasonEnd",
+                  "December31"
+                ]
+              },
+              "exemptAge": {
+                "description": "Spieler bis zu diesem Alter sind ausgenommen (0 = keine Ausnahme), Stichtag siehe AgeCutoff.",
+                "type": "integer"
+              },
+              "exemptNeedsClubTrained": {
+                "description": "Die Ausnahme gilt nur für Spieler, die der verleihende Verein selbst ausgebildet hat.",
+                "type": "boolean"
+              },
+              "maxIn": {
+                "description": "Höchstzahl gleichzeitig von anderen Vereinen ausgeliehener Spieler.",
+                "type": "integer"
+              },
+              "maxInPerSeason": {
+                "description": "Höchstzahl der in einer Saison ausgeliehenen Spieler (Premier League: vier); 0 = keine Grenze.",
+                "type": "integer"
+              },
+              "maxMonths": {
+                "description": "Längste Leihdauer in Monaten.",
+                "type": "integer"
+              },
+              "maxOut": {
+                "description": "Höchstzahl gleichzeitig an andere Vereine verliehener Spieler.",
+                "type": "integer"
+              },
+              "maxPerClub": {
+                "description": "Höchstzahl gleichzeitiger Leihen mit demselben Verein, je Richtung.",
+                "type": "integer"
+              },
+              "perClubCountsExempt": {
+                "description": "Die Grenze je Partnerverein gilt auch für ausgenommene Spieler (FIGC).",
+                "type": "boolean"
+              },
+              "source": {
+                "description": "Herkunft der Zahlen.",
+                "type": [
+                  "string",
+                  "null"
+                ]
+              },
+              "steps": {
+                "$ref": "#/properties/loans/properties/default/properties/steps",
+                "description": "Abweichende Höchstzahlen ab einer Saison (stufenweise Einführung, z. B. FIGC 10 → 9 → 8)."
+              }
+            },
+            "type": "object"
+          },
+          "description": "Abweichende Regeln je Division (Id), gelten für Leihen zwischen zwei Vereinen dieser Division.",
+          "type": "object"
+        }
+      },
+      "type": "object"
+    },
+    "market": {
+      "additionalProperties": false,
+      "properties": {
+        "loanAffinity": {
+          "description": "Wie gern Vereine Spieler ausleihen statt kaufen (1 = Durchschnitt).",
+          "type": "number"
+        },
+        "loanShare": {
+          "additionalProperties": {
+            "items": {
+              "type": "number"
+            },
+            "type": "array"
+          },
+          "description": "Kalibrierungsziel: Anteil der Leihspieler in den Kadern je Ebene (Ebene → [min, max], Stichtag 1. März).",
+          "type": "object"
+        },
+        "purchaseObligationShare": {
+          "description": "Anteil der Leihen mit Kaufpflicht (Italien: obbligo di riscatto).",
+          "type": "number"
+        },
+        "source": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "name": {
+      "type": "string"
+    },
+    "playoffs": {
+      "items": {
+        "additionalProperties": false,
+        "description": "Relegation bzw. Aufstiegsturnier zwischen zwei Ebenen. Zwei Teilnehmer spielen ein Duell, vier oder acht ein K.-o.-Turnier. Die Places Sieger spielen in der nächsten Saison in UpperDivision, alle übrigen Teilnehmer in LowerDivision.",
+        "properties": {
+          "awayGoals": {
+            "type": "boolean"
+          },
+          "cycle": {
+            "description": "Rotation: Die Relegation findet nur alle Cycle Saisons statt, erstmals in CycleStart.",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "cycleStart": {
+            "type": "integer"
+          },
+          "dates": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "entrants": {
+            "items": {
+              "additionalProperties": false,
+              "description": "Teilnehmer einer Relegation: Tabellenplatz einer Liga (bei geteilten Ligen aus jeder Staffel).",
+              "properties": {
+                "division": {
+                  "description": "Kennung der Liga oder einer einzelnen Staffel.",
+                  "type": "string"
+                },
+                "position": {
+                  "type": "integer"
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "finalLegs": {
+            "description": "Spiele im Finale eines Aufstiegsturniers, abweichend von Legs (z. B. 1 in England).",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "legs": {
+            "type": "integer"
+          },
+          "lowerDivision": {
+            "type": "string"
+          },
+          "lowerPosition": {
+            "description": "Älteres Format: Platz in der unteren Liga (wird auf Entrants abgebildet).",
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          },
+          "onlySeason": {
+            "description": "Übergangsregel, die nur in dieser Saison gilt.",
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "places": {
+            "type": "integer"
+          },
+          "seeded": {
+            "description": "Gesetzte Paarungen statt Auslosung: Teilnehmer in der Reihenfolge der Entrants, der Beste gegen den Schwächsten (3. gegen 6., 4. gegen 5.); der Besserplatzierte hat im Rückspiel Heimrecht, bei nur einem Spiel in diesem.",
+            "type": "boolean"
+          },
+          "upperDivision": {
+            "type": "string"
+          },
+          "upperPosition": {
+            "description": "Älteres Format: Platz in der oberen Liga (wird auf Entrants abgebildet).",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "pools": {
+      "description": "Vereine ohne Ligabetrieb im Spiel (z. B. Amateure), die nur im Pokal antreten.",
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "feeds": {
+            "description": "Division der untersten Ebene, unter der der Pool liegt: Ihre Absteiger fallen in den Pool, dafür steigen ebenso viele Poolvereine auf. Leer = der Pool spielt nur im Pokal.",
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "teams": {
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "registration": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "description": "Meldelisten je Spielklasse (Spielberechtigungsliste der DFL, Squad List der Premier League): Größe, Ausnahmen für Junge, Mindestzahl ausgebildeter und eigener Spieler sowie U-Spieler im Spieltagskader.",
+        "properties": {
+          "exemptAge": {
+            "description": "Spieler, die im Startjahr der Saison höchstens so alt werden, sind ohne Meldeplatz spielberechtigt (0 = keine Ausnahme).",
+            "type": "integer"
+          },
+          "loansNeedSlot": {
+            "description": "Leihspieler brauchen immer einen Meldeplatz, auch wenn sie jung genug sind (EFL).",
+            "type": "boolean"
+          },
+          "matchdayMinYoung": {
+            "description": "Mindestzahl junger Spieler im Spieltagskader (Startelf und Bank), z. B. vier U23-Spieler in der 3. Liga.",
+            "type": "integer"
+          },
+          "matchdayYoungAge": {
+            "description": "Jung im Sinne von MatchdayMinYoung: wird im Startjahr der Saison höchstens so alt.",
+            "type": "integer"
+          },
+          "maxPlayers": {
+            "description": "Höchstzahl gemeldeter Spieler ohne Ausnahme; 0 = Kadergrenze des Landes.",
+            "type": "integer"
+          },
+          "minClubTrained": {
+            "description": "Davon mindestens so viele beim eigenen Verein ausgebildet.",
+            "type": "integer"
+          },
+          "minLocal": {
+            "description": "Mindestzahl Spieler, die zwischen 15 und 21 mindestens drei Spielzeiten bei Vereinen des Landes waren (Local Player, Homegrown).",
+            "type": "integer"
+          },
+          "minNationals": {
+            "description": "Mindestzahl Spieler mit der Staatsangehörigkeit des Landes.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "description": "Meldelisten je Liga bzw. Division (Id); ohne Eintrag gibt es keine Meldepflicht.",
+      "type": "object"
+    },
+    "reserves": {
+      "additionalProperties": false,
+      "properties": {
+        "ageLimit": {
+          "description": "Spielrecht: Altersgrenze (Jahre am Saisonstart); darüber nur OverAgePlayers Spieler je Spiel.",
+          "type": "integer"
+        },
+        "minLevelGap": {
+          "description": "Mindestabstand in Ebenen zur ersten Mannschaft (1 = nie in derselben Liga).",
+          "type": "integer"
+        },
+        "overAgePlayers": {
+          "type": "integer"
+        },
+        "playInCups": {
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    },
+    "season": {
+      "additionalProperties": false,
+      "properties": {
+        "firstMatchday": {
+          "description": "Frühester Termin des 1. Spieltags im Format MM-TT.",
+          "type": "string"
+        },
+        "lastMatchday": {
+          "description": "Letzter Termin für reguläre Spieltage (MM-TT). Passen nicht alle Spieltage wöchentlich davor, kommen Englische Wochen am MidweekDay hinzu, gleichmäßig über die Saison verteilt. Leer = nur wöchentlich.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "matchDay": {
+          "enum": [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday"
+          ]
+        },
+        "midweekDay": {
+          "enum": [
+            "Sunday",
+            "Monday",
+            "Tuesday",
+            "Wednesday",
+            "Thursday",
+            "Friday",
+            "Saturday"
+          ]
+        },
+        "startMonth": {
+          "description": "Monat des Saisonbeginns (7 = Juli, Herbst–Frühjahr; 1 = Kalenderjahr).",
+          "type": "integer"
+        },
+        "winterBreakEnd": {
+          "type": "string"
+        },
+        "winterBreakStart": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "squad": {
+      "additionalProperties": false,
+      "properties": {
+        "benchSize": {
+          "type": "integer"
+        },
+        "freeAgentsPerClub": {
+          "description": "Vereinslose Spieler zum Spielstart je Verein einer Liga (Bestand nach dem Vertragsende im Sommer).",
+          "type": "number"
+        },
+        "maxSquad": {
+          "type": "integer"
+        },
+        "substitutions": {
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "transferWindows": {
+      "additionalProperties": false,
+      "properties": {
+        "preContractFrom": {
+          "description": "Vorverträge mit auslaufenden Spielern ab diesem Datum (MM-TT).",
+          "type": "string"
+        },
+        "summerEnd": {
+          "type": "string"
+        },
+        "summerStart": {
+          "type": "string"
+        },
+        "winterEnd": {
+          "type": "string"
+        },
+        "winterStart": {
+          "type": "string"
+        }
+      },
+      "type": "object"
+    },
+    "validFrom": {
+      "type": "integer"
+    },
+    "validTo": {
+      "description": "Letzte Saison (Startjahr), in der diese Formatversion gilt; null = unbegrenzt.",
+      "type": [
+        "integer",
+        "null"
+      ]
+    },
+    "youth": {
+      "additionalProperties": false,
+      "properties": {
+        "groupSize": {
+          "description": "Kader je Altersstufe (Grundwert; die Infrastruktur erweitert ihn).",
+          "type": "integer"
+        },
+        "intakeAge": {
+          "description": "Alter der Neuzugänge im Nachwuchsleistungszentrum (jüngste Altersstufe U15).",
+          "type": "integer"
+        },
+        "intakeMonth": {
+          "description": "Monat des Jugendjahrgangs (Kapitel 7: März).",
+          "type": "integer"
+        },
+        "maxPlayers": {
+          "type": "integer"
+        },
+        "minPlayers": {
+          "type": "integer"
+        },
+        "proContractAge": {
+          "type": "integer"
+        },
+        "promoteAge": {
+          "type": "integer"
+        },
+        "referenceBudget": {
+          "description": "Jahresbudget eines durchschnittlichen Leistungszentrums bei Reputation 10.",
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "title": "FMH countries/*.json",
+  "type": "object"
+}

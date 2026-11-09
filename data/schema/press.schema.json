@@ -1,0 +1,38 @@
+{
+  "$id": "https://fmh.local/schema/press.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "items": {
+    "additionalProperties": false,
+    "description": "Frage für Pressekonferenzen; Text unter press.q.<key>.",
+    "properties": {
+      "category": {
+        "type": "string"
+      },
+      "context": {
+        "description": "Bedingung: any, win, loss, draw, derby, streakWin, streakLoss, bigGame, injury, newSigning, favourite, rumour.",
+        "type": "string"
+      },
+      "key": {
+        "type": "string"
+      },
+      "styles": {
+        "items": {
+          "description": "Tonfall der Ereignisse, Schlagzeilen und Pressefragen (Kapitel 2): Anstoß-Satire bis FM-Ernst.",
+          "enum": [
+            "Satirical",
+            "Balanced",
+            "Serious"
+          ]
+        },
+        "type": "array"
+      },
+      "when": {
+        "description": "before, after",
+        "type": "string"
+      }
+    },
+    "type": "object"
+  },
+  "title": "FMH rules/press.json",
+  "type": "array"
+}

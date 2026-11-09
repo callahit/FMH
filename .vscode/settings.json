@@ -1,0 +1,137 @@
+{
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "data/*/package.json"
+      ],
+      "url": "./data/schema/package.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/countries/*.json"
+      ],
+      "url": "./data/schema/country.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/clubs/*.json"
+      ],
+      "url": "./data/schema/clubs.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/players/*.json"
+      ],
+      "url": "./data/schema/players.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/staff/*.json"
+      ],
+      "url": "./data/schema/staff.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/managers/*.json"
+      ],
+      "url": "./data/schema/managers.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/referees/*.json"
+      ],
+      "url": "./data/schema/referees.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/names/*.json"
+      ],
+      "url": "./data/schema/names.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/sponsors/*.json"
+      ],
+      "url": "./data/schema/sponsors.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/events/*.json"
+      ],
+      "url": "./data/schema/events.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/formations.json"
+      ],
+      "url": "./data/schema/formations.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/rules/positions.json"
+      ],
+      "url": "./data/schema/positions.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/rules/injuries.json"
+      ],
+      "url": "./data/schema/injuries.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/rules/roles.json"
+      ],
+      "url": "./data/schema/roles.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/rules/buildings.json"
+      ],
+      "url": "./data/schema/buildings.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/rules/press.json"
+      ],
+      "url": "./data/schema/press.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/rules/engine.json"
+      ],
+      "url": "./data/schema/engine.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/rules/currencies.json"
+      ],
+      "url": "./data/schema/currencies.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/rules/transfers.json"
+      ],
+      "url": "./data/schema/transfers.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/competitions/europe.json"
+      ],
+      "url": "./data/schema/europe.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/lang/*.json",
+        "!data/*/lang/*.commentary.json"
+      ],
+      "url": "./data/schema/lang.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/lang/*.commentary.json"
+      ],
+      "url": "./data/schema/commentary.schema.json"
+    }
+  ]
+}
