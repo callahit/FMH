@@ -646,6 +646,10 @@
           },
           "expenses": {
             "squad": 5500000
+          },
+          "toleranceNote": "Gesamteinnahmen ±15 %: Orte-Wirkungen und Aufsteiger verzerren den DFB-Schnitt über fünf Saisons.",
+          "tolerances": {
+            "income.total": 0.15
           }
         }
       },
