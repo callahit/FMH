@@ -97,22 +97,22 @@ Mitten in Spielzügen, nicht als eigene Kategorie, und nur wenn das Wetter passt
 
 ## Kalibrierung
 
-`SceneCalibrationTests` spielt 1.000 Partien beider Engines. Stand nach der Ereignisschicht, je Spiel, beide Teams:
+`SceneCalibrationTests` spielt 1.000 Partien beider Engines mit festen Seeds. Stand nach der Abnahme (docs/textmodus-abnahme.md), je Spiel, beide Teams:
 
-| | Textmodus | schnelle Engine |
-| --- | ---: | ---: |
-| Tore | 3,19 | 3,07 |
-| Schüsse | 26,6 | 27,7 |
-| davon aufs Tor | 11,0 | 10,4 |
-| xG | 3,15 | 3,19 |
-| Ecken | 9,9 | 9,0 |
-| Fouls | 23,2 | 21,3 |
-| Abseits | 7,1 | 6,8 |
-| Gelb | 3,6 | 3,6 |
-| Rot | 0,17 | 0,16 |
-| Verletzungen | 0,72 | 0,68 |
+| | Textmodus | schnelle Engine | Abweichung |
+| --- | ---: | ---: | ---: |
+| Tore | 3,14 | 3,07 | +2,3 % |
+| Schüsse | 26,81 | 27,70 | −3,2 % |
+| davon aufs Tor | 10,53 | 10,39 | +1,3 % |
+| xG | 3,11 | 3,19 | −2,5 % |
+| Ecken | 9,44 | 9,04 | +4,4 % |
+| Fouls | 22,30 | 21,27 | +4,8 % |
+| Abseits | 7,19 | 6,76 | +6,4 % |
+| Gelb | 3,56 | 3,57 | −0,3 % |
+| Rot | 0,16 | 0,16 | 0 % |
+| Verletzungen | 0,71 | 0,68 | +4,4 % |
 
-Alle Werte liegen innerhalb von etwa ±10 %. Der Test lässt ±13 % zu, bei Rot und Verletzungen ±20 %, weil die Stichprobe klein ist.
+Jede Kennzahl liegt innerhalb von ±10 %. Dasselbe Band prüft der Test.
 
 ## Offen
 

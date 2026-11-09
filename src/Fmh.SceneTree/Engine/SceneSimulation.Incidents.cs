@@ -103,7 +103,11 @@ public sealed partial class SceneSimulation
     private bool ArmFull(PlannedIncident item)
     {
         _attack = item.Attack;
-        if (item.Kind == IncidentKind.Corner) Team(item.Attack).Stats.Corners++;
+        if (item.Kind == IncidentKind.Corner)
+        {
+            Team(item.Attack).Stats.Corners++;
+            Emit(MatchEventType.Corner, item.Attack);
+        }
         PreparePeople(item);
         if (item.Category < 1 || item.Category > _tree.Categories.Count) return false;
         _incidentDriven = true;
@@ -133,10 +137,10 @@ public sealed partial class SceneSimulation
             Team(item.Attack).Stats.Corners++;
         else if (item.Kind == IncidentKind.Shot)
             AddShortShot(item, att);
-        else if (item.Kind == IncidentKind.Rare && item.RareTag is { } tag)
+        else if (item.Kind == IncidentKind.Rare)
         {
-            _rareTags.Add(tag);
-            _extraStoppage += item.Stoppage;
+            EmitRare(item);
+            return;
         }
         if (item.Node < 0) return;
         var node = _tree.Nodes[item.Node];
@@ -188,8 +192,7 @@ public sealed partial class SceneSimulation
                 Team(item.Fouler).Stats.RedCards++;
                 player.RatingScore -= 1.2;
                 _pendingCard = second ? CardPending.Second : CardPending.Red;
-                Remove(player);
-                if (Team(item.Fouler).OnPitch.All(p => p.Position != Position.GK)) EnsureGoalkeeper(Team(item.Fouler));
+                _ejectAfterIncident = player;
             }
             _cardPlayer = player;
             _reason = conduct ? (byte)37 : (byte)5;
@@ -200,7 +203,6 @@ public sealed partial class SceneSimulation
             var player = Outfield(item.Attack, Attr.Bravery) ?? Outfield(item.Fouler, Attr.Bravery);
             if (player is null || player.Injured) return;
             var (key, days, label) = CardCatalog.Injury((byte)(player.Player.Hidden.InjuryProneness > 14 ? 18 : 31));
-            player.Injured = true;
             player.InjuryType = key;
             player.InjuryDays = Math.Max(1, (int)Math.Round(days * Math.Max(0.2, Setup.InjuryFrequency)));
             _teamOf[player].Stats.Injuries++;
@@ -208,7 +210,7 @@ public sealed partial class SceneSimulation
             _injuryPlayer = player;
             _injuryLabel = label;
             _victim = player;
-            if (!_teamOf[player].HumanControlled) AutoReplace(_teamOf[player], player);
+            _injureAfterIncident = player;
         }
     }
 
@@ -221,6 +223,7 @@ public sealed partial class SceneSimulation
         for (var i = 0; i < spots.Length; i++)
         {
             if (!SceneRare.Allows(spots[i].Kind, Setup.Weather, Setup.Floodlit, _opt.EasterEggs)) continue;
+            if (!SceneFilters.WeatherAllows(_tree.Nodes[spots[i].Node], Setup.Weather, Setup.Floodlit)) continue;
             weights[i] = spots[i].Kind == RareKind.Crowd ? 1.15 * crowd : 1;
             any = true;
         }
@@ -239,6 +242,14 @@ public sealed partial class SceneSimulation
         if (home.Fans.Mood < 42) weight *= 1.7;
         else if (home.Fans.Mood > 78) weight *= 0.75;
         return weight;
+    }
+
+    private double PlannedRareStoppage()
+    {
+        double sum = 0;
+        foreach (var item in _plan)
+            if (item.Kind == IncidentKind.Rare) sum += item.Stoppage;
+        return sum;
     }
 
     private double ExpectFouls() => _opt.FoulsPerMatch * 0.5 * (FoulFactor(Side.Home) + FoulFactor(Side.Away));
@@ -309,7 +320,21 @@ public sealed partial class SceneSimulation
     private Side PickSide(Func<Side, double> weight) =>
         (Side)_rng.WeightedIndex(new[] { Math.Max(0.05, weight(Side.Home)), Math.Max(0.05, weight(Side.Away)) });
 
-    private int Pick(int[] pool) => pool.Length == 0 ? -1 : pool[_rng.Next(pool.Length)];
+    private int Pick(int[] pool)
+    {
+        if (pool.Length == 0) return -1;
+        var legal = 0;
+        foreach (var id in pool)
+            if (SceneFilters.WeatherAllows(_tree.Nodes[id], Setup.Weather, Setup.Floodlit)) legal++;
+        if (legal == 0) return pool[_rng.Next(pool.Length)];
+        var draw = _rng.Next(legal);
+        foreach (var id in pool)
+        {
+            if (!SceneFilters.WeatherAllows(_tree.Nodes[id], Setup.Weather, Setup.Floodlit)) continue;
+            if (draw-- == 0) return id;
+        }
+        return pool[^1];
+    }
 
     private MatchPlayer? CardTarget(Side side, bool red)
     {

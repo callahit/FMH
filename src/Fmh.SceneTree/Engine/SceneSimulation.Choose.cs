@@ -52,6 +52,7 @@ public sealed partial class SceneSimulation
         _follow.Clear();
         _followChain = 0;
         _pendingCard = CardPending.None;
+        _heldCheer = null;
         _lastAttacker = _cardPlayer = _victim = _injuryPlayer = null;
         _reason = 0;
         _injuryLabel = "Verletzung";
@@ -75,13 +76,16 @@ public sealed partial class SceneSimulation
                 return;
             }
         }
+        var driven = _incidentDriven;
         _incidentDriven = false;
+        if (driven) SettleIncident();
         Advance(_sceneMinutes);
         Drain(_sceneMinutes);
         _parent = -1;
+        _heldCheer = null;
         AiManage(Side.Home);
         AiManage(Side.Away);
-        if (ClockDone()) EndPeriod();
+        // Halbzeit erst im nächsten Schritt: fällige Unterbrechungen (Nachspielzeit) laufen vorher noch ab.
     }
 
     private void EndKick()
@@ -136,7 +140,8 @@ public sealed partial class SceneSimulation
         }
         var pool = Pool(n => SceneFilters.Allows(n, gate));
         if (pool.Length == 0) pool = Pool(n => SceneFilters.AllowsCore(n, gate));
-        if (pool.Length == 0) pool = Pool(n => SceneFilters.RolesFit(n, gate.Occupied));
+        // Wetter bleibt hart. Lieber ein fehlender Rollenname als Flutlicht bei Tageslicht oder Eis bei Sonne.
+        if (pool.Length == 0) pool = Pool(n => SceneFilters.WeatherAllows(n, gate.Weather, gate.Floodlit));
         if (pool.Length == 0) pool = kids.ToArray();
         var mood = Mood();
         var weights = new double[pool.Length];
