@@ -40,10 +40,14 @@ public sealed class AiManagerTests
     public void OldSavesWithoutAiManagersGetThemOnLoad()
     {
         var w = WorldGenerator.Create(TestData.Data, new NewGameOptions { Seed = 3, ClubKey = "nordheide", ManagerName = "Test" });
-        foreach (var club in w.Clubs.Values.Where(c => c.ManagerId is { } id && !w.Managers.First(m => m.Id == id).Human)) club.ManagerId = null;
-        w.Managers.RemoveAll(m => !m.Human);
+        // Ein KI-Manager mit Verein, aber ohne Station (aus Vorgabedateien vor diesem Stand); alle anderen fehlen
+        var legacy = w.Managers.First(m => !m.Human && m.ClubId is not null);
+        legacy.Career.Stations.Clear();
+        foreach (var club in w.Clubs.Values.Where(c => c.ManagerId is { } id && id != legacy.Id && !w.Managers.First(m => m.Id == id).Human)) club.ManagerId = null;
+        w.Managers.RemoveAll(m => !m.Human && m != legacy);
         var s = new GameSession(w, TestData.Data, new TextMatchEngine());
         Assert.All(LeagueClubs(w), c => Assert.NotNull(s.ManagerOf(c)));
+        Assert.All(w.Managers.Where(m => !m.Human && m.ClubId is not null), m => Assert.NotNull(m.CurrentStation));
     }
 
     [Fact]
@@ -172,6 +176,8 @@ public sealed class AiManagerTests
         Assert.Equal(1.5, reference.MaxDeductionsPerSeason);
         Assert.DoesNotContain(DataValidator.Validate(data), e => e.Contains("'ITA1'"));
         reference.ToleranceNote = "";
+        data.ManagerRules.SackingsPerTopLeague = new double[] { 3 };
+        Assert.Contains(DataValidator.Validate(data), e => e.Contains("sackingsPerTopLeague"));
         Assert.Contains(DataValidator.Validate(data), e => e.Contains("Ligazahlen 'ITA1': abweichende Toleranzen ohne Begründung"));
     }
 }

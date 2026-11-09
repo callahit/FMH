@@ -34,6 +34,8 @@ public static class DataValidator
             errors.Add("Währungskurse: Kurse müssen positiv sein, der Euro hat den Kurs 1.");
         errors.AddRange(PyramidValidator.Validate(data));
         errors.AddRange(PeopleValidator.Validate(data));
+        if (data.ManagerRules.SackingsPerTopLeague is not [var low, var high] || low < 0 || low > high)
+            errors.Add("Trainerregeln: „sackingsPerTopLeague“ braucht genau zwei Werte (von, bis) mit 0 ≤ von ≤ bis.");
         errors.AddRange(Schema.SchemaCheck.Validate(data.Packages));
         bool KnownDivision(string id) =>
             data.Countries.SelectMany(x => x.Divisions).Any(d => d.Id == id || d.Groups.Any(g => g.Id == id))
