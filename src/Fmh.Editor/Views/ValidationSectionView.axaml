@@ -1,0 +1,19 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:s="using:Fmh.Editor.Services"
+             xmlns:vm="using:Fmh.Editor.ViewModels"
+             x:Class="Fmh.Editor.Views.ValidationSectionView"
+             x:DataType="vm:ValidationSectionViewModel">
+  <DockPanel>
+    <StackPanel DockPanel.Dock="Top" Spacing="8" Margin="0,0,0,10">
+      <TextBlock Classes="h1" Text="{Binding Title}" />
+      <TextBlock Classes="hint" Text="{s:L editor.validation.hint}" />
+      <TextBlock Text="{s:L editor.validation.ok}" IsVisible="{Binding IsValid}" Foreground="#7ED69A" />
+    </StackPanel>
+    <ListBox ItemsSource="{Binding Errors}">
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="x:String"><TextBlock Classes="error" Text="{Binding}" /></DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+  </DockPanel>
+</UserControl>

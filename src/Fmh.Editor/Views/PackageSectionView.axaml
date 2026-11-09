@@ -1,0 +1,20 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:s="using:Fmh.Editor.Services"
+             xmlns:vm="using:Fmh.Editor.ViewModels"
+             x:Class="Fmh.Editor.Views.PackageSectionView"
+             x:DataType="vm:PackageSectionViewModel">
+  <StackPanel Spacing="12" MaxWidth="820" HorizontalAlignment="Left">
+    <TextBlock Classes="h1" Text="{Binding Title}" />
+    <Grid ColumnDefinitions="180,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto" RowSpacing="8">
+      <TextBlock Text="{s:L editor.package.id}" /><TextBlock Grid.Column="1" Text="{Binding Id}" FontWeight="SemiBold" />
+      <TextBlock Grid.Row="1" Text="{s:L editor.start.name}" VerticalAlignment="Center" /><TextBox Grid.Row="1" Grid.Column="1" Text="{Binding Name}" />
+      <TextBlock Grid.Row="2" Text="{s:L editor.package.version}" VerticalAlignment="Center" /><TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Version}" />
+      <TextBlock Grid.Row="3" Text="{s:L editor.package.dependsOn}" /><TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding DependsOn}" />
+      <TextBlock Grid.Row="4" Text="{s:L editor.package.directory}" /><TextBlock Grid.Row="4" Grid.Column="1" Text="{Binding Directory}" Classes="hint" />
+    </Grid>
+    <TextBlock Classes="hint" Text="{s:L editor.package.hint}" />
+    <TextBlock Classes="h2" Text="{s:L editor.package.changed}" />
+    <ItemsControl ItemsSource="{Binding ChangedFiles}" />
+  </StackPanel>
+</UserControl>

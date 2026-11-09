@@ -1,0 +1,15 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:e="using:Fmh.Editor"
+             xmlns:vm="using:Fmh.Editor.ViewModels"
+             x:Class="Fmh.Editor.Views.MainView"
+             x:DataType="vm:MainViewModel">
+  <!-- Eigene View-Zuordnung und Stile, damit die Ansichten auch in fremden Fenstern (Tests) funktionieren -->
+  <UserControl.DataTemplates>
+    <e:ViewLocator />
+  </UserControl.DataTemplates>
+  <UserControl.Styles>
+    <StyleInclude Source="avares://fmh-editor/Styles/Editor.axaml" />
+  </UserControl.Styles>
+  <ContentControl Content="{Binding Page}" />
+</UserControl>
