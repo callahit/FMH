@@ -128,7 +128,7 @@ public sealed class Grounds
         path.Add((x, y));
     }
 
-    private bool IsStadiumCell(int x, int y) =>
+    public bool IsStadiumCell(int x, int y) =>
         x >= StadiumX && x < StadiumX + StadiumWidth && y >= StadiumY && y < StadiumY + StadiumHeight;
 
     private void ConnectL(HashSet<(int x, int y)> path, int x0, int y0, int x1, int y1, int width, HashSet<(int x, int y)>? blocked)

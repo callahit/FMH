@@ -75,6 +75,11 @@ def sprites():
     out["chp_1x1"] = X.tank(chp=True)
     out["statue_1x1"] = X.monument()
     out["chapel_1x1"] = X.monument(chapel=True)
+    # Baustellen für jede Grundfläche aus den Daten (auch gedreht)
+    with open(os.path.join(ROOT, "data", "base", "rules", "buildings.json")) as f:
+        for b in json.load(f):
+            for (sw, sh) in {(b.get("width", 1), b.get("height", 1)), (b.get("height", 1), b.get("width", 1))}:
+                out.setdefault(f"construction_{sw}x{sh}", X.construction(sw, sh))
     # Eigene Sprites je Gebäudetyp, Grundfläche (auch gedreht) und Stufe: b_<typ>_<B>x<H>_<stufe>
     with open(os.path.join(ROOT, "data", "base", "rules", "buildings.json")) as f:
         for b in json.load(f):
