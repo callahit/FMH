@@ -1,0 +1,36 @@
+{
+  "poolShare": 0.125,
+  "poolMinimum": 6,
+  "retirementAge": 70,
+  "styleWeights": {
+    "Balanced": 40,
+    "Attacking": 18,
+    "Defensive": 16,
+    "Counter": 16,
+    "Pressing": 10
+  },
+  "mentalityBias": {
+    "Attacking": 0.6,
+    "Defensive": -0.6,
+    "Counter": -0.35
+  },
+  "inSeason": {
+    "minTenureDays": 120,
+    "earliestShare": 0.333,
+    "minMatchday": 8,
+    "belowShare": 0.25,
+    "minBelow": 4,
+    "maxFormPoints": 3,
+    "newcomerDays": 30
+  },
+  "seasonEnd": {
+    "relegatedBelow": 3,
+    "belowShare": 0.5,
+    "minBelow": 8,
+    "praiseShare": 0.25
+  },
+  "sackingsPerTopLeague": [
+    1,
+    8
+  ]
+}

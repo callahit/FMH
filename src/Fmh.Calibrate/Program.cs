@@ -312,6 +312,7 @@ public static class Program
                     Console.WriteLine();
                 }
                 PrintCareerStats(session);
+                ManagerReport.Observe(session);
                 seasonEnds.Add(TopEleven(session, topLeague));
             }
             // Nach der Saisonauswertung, damit eine Entlassung am letzten Spieltag die Saison nicht überspringt.
@@ -341,8 +342,9 @@ public static class Program
         var financeOk = ReferenceReport.MeansOk();
         var economyOk = EconomyReport.PrintSummary();
         var marketOk = MarketReport.PrintSummary(world, data);
+        var managersOk = ManagerReport.PrintSummary(data);
         var ok = slowest.TotalMilliseconds < 5000 && world.SeasonYear >= targetSeason && (maxDrift is not { } m || drift <= m) && _wagesOk && _squadOk && _worldOk
-                 && financeOk && economyOk && marketOk;
+                 && financeOk && economyOk && marketOk && managersOk;
         if (!ok) Console.WriteLine("ACHTUNG: Saisonlauf außerhalb der Vorgaben.");
         return strict && !ok ? 1 : 0;
     }

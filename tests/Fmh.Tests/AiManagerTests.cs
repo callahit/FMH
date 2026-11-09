@@ -22,7 +22,7 @@ public sealed class AiManagerTests
         Assert.Same(s.HumanManager, s.ManagerOf(s.HumanClub));
         var ai = w.Managers.Where(m => !m.Human).ToList();
         Assert.Equal(ai.Count, ai.Select(m => m.Id).Distinct().Count());
-        Assert.True(s.FreeManagers.Count() >= ManagerGenerator.PoolTarget(w));
+        Assert.True(s.FreeManagers.Count() >= ManagerGenerator.PoolTarget(w, s.Data.ManagerRules));
         Assert.All(ai.Where(m => m.ClubId is not null), m =>
         {
             Assert.NotNull(m.CurrentStation);
