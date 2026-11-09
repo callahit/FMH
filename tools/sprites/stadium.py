@@ -91,16 +91,45 @@ def stand(side, level, roof, seed=1):
         s.poly(end, shade(CONCRETE, 0.95))
         region = (x1, y0, W - OUT, y1)
     if roof:
-        rx0, ry0, rx1, ry1 = region
-        z = hi + 9
-        for (px, py) in ((rx0 + 0.05, ry0 + 0.05), (rx1 - 0.05, ry0 + 0.05), (rx0 + 0.05, ry1 - 0.05), (rx1 - 0.05, ry1 - 0.05)):
-            s.line(s.p(px, py, hi * 0.5), s.p(px, py, z), rgb("#DDE3EA"))
-        def glass(u, v):
-            if (u * 10) % 1 < 0.12 or (v * 3) % 1 < 0.12:
-                return rgb("#E9EEF4")
-            return (220, 232, 245, 110)
-        s.ground(rx0 - 0.05, ry0 - 0.05, rx1 + 0.05, ry1 + 0.05, glass, z=z)
+        roof_over(s, side, region, hi)
     return s
+
+
+def roof_over(s, side, region, hi):
+    """Kragdach über dem äußeren Teil der Tribüne: Trapezblech mit Rippen, Blende in Vereinsfarbe an der Innenkante,
+    Stützen an der Außenkante. Das Spielfeld bleibt frei."""
+    rx0, ry0, rx1, ry1 = region
+    k = 0.62  # überdachter Anteil der Tribünentiefe
+    if side == "North":
+        ry1 = ry0 + (ry1 - ry0) * k
+    elif side == "South":
+        ry0 = ry1 - (ry1 - ry0) * k
+    elif side == "West":
+        rx1 = rx0 + (rx1 - rx0) * k
+    else:
+        rx0 = rx1 - (rx1 - rx0) * k
+    z = hi + 7
+    metal = rgb("#C9D1DB")
+    def tex(u, v):
+        # a: entlang der Tribüne, b: 0 = außen, 1 = Innenkante
+        a, b = {"North": (u, v), "South": (u, 1 - v), "West": (v, u), "East": (v, 1 - u)}[side]
+        if b > 0.84:
+            return mask(0.95) if b < 0.97 else mask(0.6)  # Blende
+        c = shade(metal, 1.06 if (a * 28) % 1 < 0.5 else 0.94)  # Rippen
+        if (a * 4) % 1 < 0.03:
+            c = shade(metal, 0.75)  # Binder
+        return c
+    # Stützen an der Außenkante
+    outer = {"North": [(rx0 + 0.1, ry0), (rx1 - 0.1, ry0), ((rx0 + rx1) / 2, ry0)],
+             "South": [(rx0 + 0.1, ry1), (rx1 - 0.1, ry1), ((rx0 + rx1) / 2, ry1)],
+             "West": [(rx0, ry0 + 0.1), (rx0, ry1 - 0.1), (rx0, (ry0 + ry1) / 2)],
+             "East": [(rx1, ry0 + 0.1), (rx1, ry1 - 0.1), (rx1, (ry0 + ry1) / 2)]}[side]
+    for (px, py) in outer:
+        s.line(s.p(px, py, hi), s.p(px, py, z), rgb("#7D8796"))
+    s.ground(rx0, ry0, rx1, ry1, tex, z=z)
+    # Dachkante (Dicke) sichtbar an den vorderen Seiten
+    s.wall_left(rx0, rx1, ry1, z - 2, z, lambda u, v: shade(metal, 0.7))
+    s.wall_right(rx1, ry0, ry1, z - 2, z, lambda u, v: shade(metal, 0.6))
 
 
 def facade(s, a, b, c, hi, left, seed):

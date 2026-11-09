@@ -1,8 +1,10 @@
 """Boden, Bäume und Sondergebäude (Plätze, Parkplätze, Solar, Park, Pool, Biergarten, Türme, Baustelle)."""
 import math
 import random
+from PIL import Image
 from iso import Sprite, rgb, shade, mix, noise
 from buildings import box, shadow, house
+from stadium import mask
 
 GRASS = rgb("#5FA34C")
 PAVE = rgb("#CFC4AA")
@@ -40,14 +42,93 @@ def path_tile(seed):
     return s
 
 
+def plaza_tile(seed):
+    """Platzfläche: große helle Betonplatten (2x2 je Feld) mit Fugen und einem Zierband aus Klinker."""
+    s = Sprite(1, 1, 0)
+    n = noise(seed)
+    slab = rgb("#D9D2C2")
+    def tex(u, v):
+        if u < 0.06 or v < 0.06:
+            return shade(rgb("#B07A5A"), 0.95 + 0.1 * n(int(u * 20), int(v * 20)))  # Klinkerband
+        if abs(u - 0.53) < 0.025 or abs(v - 0.53) < 0.025:
+            return shade(slab, 0.82)
+        return shade(slab, 0.95 + 0.08 * n(int(u * 2) + 3, int(v * 2) + 5))
+    s.ground(0, 0, 1, 1, tex)
+    return s
+
+
 def gate_tile():
-    s = Sprite(1, 1, 30)
-    s.ground(0, 0, 1, 1, lambda u, v: shade(PAVE, 1.08))
-    for (x, y) in ((0.15, 0.5), (0.85, 0.5)):
-        box(s, x - 0.05, y - 0.05, 0.1, 0.1, 0, 22, rgb("#4A5263"))
-    a, b = s.p(0.1, 0.5, 22), s.p(0.9, 0.5, 22)
-    s.line(a, b, rgb("#E2B13C"), 3)
-    s.line((a[0], a[1] - 2), (b[0], b[1] - 2), rgb("#F5D77A"), 1)
+    """Eingangstor: Backsteinpfeiler mit Abdeckung, Torbalken als Schild in Vereinsfarbe, Drehkreuze, Gitter."""
+    s = Sprite(1, 1, 40)
+    s.ground(0, 0, 1, 1, lambda u, v: shade(PAVE, 1.06) if (u * 8) % 1 > 0.1 and (v * 8) % 1 > 0.1 else shade(PAVE, 0.86))
+    brick = rgb("#A4523C")
+    def bricks(u, v):
+        return shade(brick, 1.15) if (v * 9) % 1 < 0.2 else shade(brick, 0.95 + 0.1 * ((u * 3 + int(v * 9)) % 2))
+    for x in (0.06, 0.8):
+        s.wall_left(x, x + 0.14, 0.57, 0, 26, bricks)
+        s.wall_right(x + 0.14, 0.43, 0.57, 0, 26, lambda u, v: shade(bricks(u, v), 0.75))
+        s.ground(x - 0.01, 0.42, x + 0.15, 0.58, lambda u, v: rgb("#D9D4C8"), z=27)
+        s.wall_left(x - 0.01, x + 0.15, 0.58, 26, 27, lambda u, v: rgb("#B8B2A4"))
+    # Schild: Vereinsfarbe (Maske) mit hellem Rand und Schriftpunkten
+    def sign(u, v):
+        if v < 0.15 or v > 0.85 or u < 0.02 or u > 0.98:
+            return rgb("#F1EEE6")
+        if 0.4 < v < 0.6 and (u * 18) % 1 < 0.55 and 0.15 < u < 0.85:
+            return rgb("#FFFFFF")
+        return mask(0.9)
+    s.wall_left(0.2, 0.8, 0.5, 22, 30, sign)
+    # Drehkreuze und Gitter zwischen den Pfeilern
+    for x in (0.32, 0.5, 0.68):
+        s.wall_left(x - 0.04, x + 0.04, 0.55, 0, 8, lambda u, v: rgb("#6E7686"))
+        s.ground(x - 0.04, 0.47, x + 0.04, 0.55, lambda u, v: rgb("#9AA2B0"), z=8)
+    for x in (0.22, 0.26, 0.42, 0.58, 0.74, 0.78):
+        s.line(s.p(x, 0.5, 0), s.p(x, 0.5, 14), rgb("#3A3F4A"))
+    s.line(s.p(0.2, 0.5, 14), s.p(0.8, 0.5, 14), rgb("#3A3F4A"))
+    return s
+
+
+def lamp():
+    """Laterne: Mast mit Leuchtenkopf und Lichtkegel am Boden."""
+    s = Sprite(1, 1, 34)
+    cx, cy = s.p(0.5, 0.5)
+    for dy in range(-3, 4):
+        for dx in range(-8, 9):
+            if (dx / 8) ** 2 + (dy / 4) ** 2 <= 1:
+                s.dot(cx + dx, cy + dy, (255, 240, 180, 40))
+    s.line((cx, cy), (cx, cy - 26), rgb("#3A3F4A"))
+    s.line((cx, cy - 26), (cx + 4, cy - 28), rgb("#3A3F4A"))
+    for dx in range(3, 7):
+        s.dot(cx + dx, cy - 28, rgb("#4A5263"))
+        s.dot(cx + dx, cy - 27, rgb("#FFF3B0"))
+    return s
+
+
+def bench():
+    s = Sprite(1, 1, 12)
+    wood = rgb("#9A6A3E")
+    s.wall_left(0.3, 0.7, 0.55, 3, 4, lambda u, v: shade(wood, 1.1))
+    s.ground(0.3, 0.45, 0.7, 0.55, lambda u, v: wood if (v * 3) % 1 > 0.25 else shade(wood, 0.8), z=4)
+    s.wall_left(0.3, 0.7, 0.45, 4, 8, lambda u, v: shade(wood, 0.95) if v > 0.4 else shade(wood, 1.15))
+    for x in (0.32, 0.68):
+        s.line(s.p(x, 0.55, 0), s.p(x, 0.55, 3), rgb("#3A3F4A"))
+    return s
+
+
+def planter(seed=1):
+    """Pflanzkübel mit kleinem Baum."""
+    s = Sprite(1, 1, 46)
+    box(s, 0.3, 0.3, 0.4, 0.4, 0, 5, rgb("#B9B2A2"))
+    s.ground(0.33, 0.33, 0.67, 0.67, lambda u, v: rgb("#5B4632"), z=5)
+    t = tree("oak", seed)
+    small = t.img.resize((t.img.size[0] * 3 // 4, t.img.size[1] * 3 // 4), Image.NEAREST)
+    cx, cy = s.p(0.5, 0.5)
+    s.img.alpha_composite(small, (int(cx - t.ax * 3 / 4), int(cy - 5 - t.ay * 3 / 4)))
+    return s
+
+
+def bin_():
+    s = Sprite(1, 1, 10)
+    box(s, 0.45, 0.45, 0.1, 0.1, 0, 7, rgb("#3E7A52"))
     return s
 
 
