@@ -11,7 +11,7 @@ public sealed partial class RelationsModule
     {
         if (p.ClubId != HumanClub.Id) return new TalkResult { Allowed = false, ReactionKey = "talk.error.notOwn" };
         var rel = Of(p);
-        if (rel.LastTalk is { } last && World.Date < last.AddDays(RelationsRules.TalkCooldownDays))
+        if (rel.LastTalk is { } last && World.Date < last.AddDays(Data.Relations.TalkCooldownDays))
             return new TalkResult { Allowed = false, ReactionKey = "talk.error.cooldown" };
 
         var temp = p.Hidden.Temperament;
@@ -131,16 +131,24 @@ public sealed partial class RelationsModule
     {
         promise.Outcome = held ? PromiseOutcome.Held : PromiseOutcome.Broken;
         var rel = Of(player);
+        var rules = Data.Relations;
+        // Vertrauen des ganzen Kaders: gebrochene Versprechen sprechen sich herum (implizite zählen halb)
+        if (World.Clubs.TryGetValue(promise.ClubId, out var promiseClub))
+        {
+            var cr = ClubOf(promiseClub);
+            var weight = promise.Implicit ? 0.5 : 1.0;
+            cr.Trust = Math.Clamp(cr.Trust + (held ? rules.Trust.HeldPromise : -rules.Trust.BrokenPromise) * weight, 0, 100);
+        }
         if (held)
         {
-            rel.Satisfaction = Math.Clamp(rel.Satisfaction + (promise.Implicit ? 4 : 12), 0, 100);
+            rel.Satisfaction = Math.Clamp(rel.Satisfaction + (promise.Implicit ? rules.Promises.ImplicitHeldBonus : rules.Promises.HeldBonus), 0, 100);
             if (player.ClubId == HumanClub.Id)
                 Notify(MessageType.Info, "msg.sender.assistant", TR("promise.held.subject", player.Name),
                     TR("promise.held.body", player.Name, TR("promise.kind." + promise.Kind)));
         }
         else
         {
-            rel.Satisfaction = Math.Clamp(rel.Satisfaction - (promise.Implicit ? 14 : 25), 0, 100);
+            rel.Satisfaction = Math.Clamp(rel.Satisfaction - (promise.Implicit ? rules.Promises.ImplicitBrokenPenalty : rules.Promises.BrokenPenalty), 0, 100);
             player.State.Morale = (Morale)Math.Max(0, (int)player.State.Morale - 2);
             if (player.ClubId == HumanClub.Id)
                 Notify(MessageType.Info, "msg.sender.assistant", TR("promise.broken.subject", player.Name),

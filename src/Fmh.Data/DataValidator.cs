@@ -36,6 +36,8 @@ public static class DataValidator
         errors.AddRange(PeopleValidator.Validate(data));
         if (data.ManagerRules.SackingsPerTopLeague is not [var low, var high] || low < 0 || low > high)
             errors.Add("Trainerregeln: „sackingsPerTopLeague“ braucht genau zwei Werte (von, bis) mit 0 ≤ von ≤ bis.");
+        if (data.Relations.UnhappyShare is not [var ulow, var uhigh] || ulow < 0 || ulow > uhigh || uhigh > 100)
+            errors.Add("Kabine: „unhappyShare“ braucht genau zwei Werte (von, bis) in Prozent mit 0 ≤ von ≤ bis ≤ 100.");
         errors.AddRange(Schema.SchemaCheck.Validate(data.Packages));
         bool KnownDivision(string id) =>
             data.Countries.SelectMany(x => x.Divisions).Any(d => d.Id == id || d.Groups.Any(g => g.Id == id))

@@ -1,0 +1,224 @@
+{
+  "$id": "https://fmh.local/schema/relations.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Regeln der Kabine (Datei rules/relations.json, AP 7): Zufriedenheit, Wechselwünsche, Versprechen, Vertrauen, Hierarchie.",
+  "properties": {
+    "goalsMax": {
+      "maximum": 100,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "goalsMin": {
+      "maximum": 0,
+      "minimum": -100,
+      "type": "integer"
+    },
+    "goalsPerPlace": {
+      "description": "Saisonziel: Zufriedenheitspunkte je Tabellenplatz Abstand zum Zielplatz, begrenzt auf Min … Max.",
+      "maximum": 20,
+      "minimum": 0,
+      "type": "number"
+    },
+    "graceMatchdays": {
+      "description": "Einsatzzeit zählt erst ab diesem Spieltag (vorher hat noch niemand genug gespielt).",
+      "maximum": 20,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "hierarchy": {
+      "additionalProperties": false,
+      "properties": {
+        "councilConcernBelow": {
+          "description": "Unter dieser mittleren Zufriedenheit meldet sich der Rat beim Trainer (höchstens monatlich).",
+          "maximum": 100,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "councilPull": {
+          "description": "Wöchentliche Wirkung der Ratsstimmung auf Mitläufer: ab 70 bzw. bis 35 Zufriedenheit des Rats.",
+          "maximum": 10,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "councilSize": {
+          "description": "Mitglieder im Mannschaftsrat (Führungsspieler plus Etablierte mit der höchsten Führungsqualität).",
+          "maximum": 10,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "establishedShare": {
+          "description": "Anteil Etablierter am Kader (ohne Führungsspieler).",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "leaderMinLeadership": {
+          "description": "Mindestwert Führungsqualität für Führungsspieler.",
+          "maximum": 20,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "mentorBase": {
+          "description": "Mentoring: wöchentliche Chance auf +1 Professionalität (Basis, je Punkt Professionalität und Führung des Mentors).",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "mentorPerLeadership": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "mentorPerProfessionalism": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "playingTimeMax": {
+      "maximum": 100,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "playingTimeMin": {
+      "maximum": 0,
+      "minimum": -100,
+      "type": "integer"
+    },
+    "playingTimeSlope": {
+      "description": "Einsatzzeit: Zufriedenheitspunkte je 100 % Abweichung vom erwarteten Anteil, begrenzt auf Min … Max.",
+      "maximum": 100,
+      "minimum": 0,
+      "type": "number"
+    },
+    "promises": {
+      "additionalProperties": false,
+      "properties": {
+        "brokenPenalty": {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "heldBonus": {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "implicitBrokenPenalty": {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "implicitHeldBonus": {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "talkCooldownDays": {
+      "description": "Tage zwischen zwei Einzelgesprächen mit demselben Spieler.",
+      "maximum": 120,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "transferRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "base": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "loyalFactor": {
+          "description": "Faktor für sehr treue Spieler (Loyalität ab 15).",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "max": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "min": {
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "perAmbition": {
+          "description": "Zuschlag je Punkt Ehrgeiz (1–20).",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "perPointBelow20": {
+          "description": "Zuschlag je Zufriedenheitspunkt unter 20.",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "trust": {
+      "additionalProperties": false,
+      "properties": {
+        "brokenPromise": {
+          "description": "Vertrauensverlust je gebrochenem (ausdrücklichem) Versprechen; implizite zählen halb.",
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "heldPromise": {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "satisfactionPer4": {
+          "description": "Zufriedenheitspunkte je 4 Punkte Vertrauen über bzw. unter dem Startwert (begrenzt auf −8 … +5).",
+          "maximum": 5,
+          "minimum": 0,
+          "type": "number"
+        },
+        "start": {
+          "maximum": 100,
+          "minimum": 0,
+          "type": "number"
+        },
+        "weeklyRecovery": {
+          "description": "Wöchentliche Erholung Richtung Startwert.",
+          "maximum": 10,
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "unhappyShare": {
+      "description": "Kalibrierung: Anteil unzufriedener Spieler je Kader in Prozent (von–bis, Mittel über die Saison).",
+      "items": {
+        "type": "number"
+      },
+      "type": "array"
+    },
+    "unhappyThreshold": {
+      "description": "Unter dieser Zufriedenheit (0–100) gilt ein Spieler als unzufrieden.",
+      "maximum": 100,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "wantsTransferResetAt": {
+      "description": "Ab dieser Zufriedenheit erlischt ein Wechselwunsch wieder.",
+      "maximum": 100,
+      "minimum": 0,
+      "type": "integer"
+    }
+  },
+  "title": "FMH rules/relations.json",
+  "type": "object"
+}

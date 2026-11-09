@@ -89,6 +89,7 @@ public static class PackageLoader
             Currencies = Path1("rules/currencies.json") is { } cu ? Json.Load<CurrencyConfig>(cu) : new(),
             TransferRules = Path1("rules/transfers.json") is { } tr ? Json.Load<TransferRules>(tr) : new(),
             ManagerRules = Path1("rules/managers.json") is { } mr ? Json.Load<ManagerRules>(mr) : new(),
+            Relations = Path1("rules/relations.json") is { } rel ? Json.Load<RelationsConfig>(rel) : new(),
             Europe = Path1("competitions/europe.json") is { } eu ? Json.Load<EuropeFormat>(eu) : null,
             Languages = languages,
             DefaultLanguage = defaultLanguage,

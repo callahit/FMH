@@ -23,6 +23,8 @@ public sealed partial class RelationsModule : GameModule, IRelationsService
                 RecalculateClub(club);
                 MentoringWeekly(club);
                 CaptainMoodWeekly(club);
+                CouncilWeekly(club);
+                TrustWeekly(club);
                 UnhappyWeekly(club);
             }
         }
@@ -42,7 +44,7 @@ public sealed partial class RelationsModule : GameModule, IRelationsService
     {
         if (!World.ClubRelations.TryGetValue(club.Id, out var r))
         {
-            r = new ClubRelations { ClubId = club.Id };
+            r = new ClubRelations { ClubId = club.Id, Trust = Data.Relations.Trust.Start };
             World.ClubRelations[club.Id] = r;
             EnsureLeaders(club);
         }
@@ -82,14 +84,20 @@ public sealed partial class RelationsModule : GameModule, IRelationsService
         var available = matchdays * 90.0;
         var share = available <= 0 ? 0 : p.SeasonStats.Minutes / available;
         var expected = ExpectedMinutesShare(status, p.Hidden.Ambition);
-        var playDelta = (int)Math.Round(Math.Clamp((share - expected) / Math.Max(0.15, expected) * 25, -30, 20));
+        // Schonfrist zum Saisonstart: Nach wenigen Spieltagen sagt die Einsatzzeit noch nichts aus
+        var playDelta = (league?.CurrentMatchday ?? 0) < Data.Relations.GraceMatchdays ? 0
+            : (int)Math.Round(Math.Clamp((share - expected) / Math.Max(0.15, expected) * Data.Relations.PlayingTimeSlope,
+                Data.Relations.PlayingTimeMin, Data.Relations.PlayingTimeMax));
         if (playDelta <= -8) reasons.Add(("sat.reason.playingTime.low", playDelta));
         else if (playDelta >= 8) reasons.Add(("sat.reason.playingTime.high", playDelta));
         else reasons.Add(("sat.reason.playingTime.ok", playDelta));
 
-        // Gehalt gegen Teamgefüge (Peers mit ähnlicher Stärke).
+        // Gehalt gegen Teamgefüge: Vergleich mit Spielern desselben Kaderstatus (ein Ergänzungsspieler misst sich nicht
+        // am Star); bei weniger als drei solchen Spielern mit dem ganzen Kader.
         var wage = p.Contract?.WeeklyWage ?? 0;
-        var peers = World.SquadOf(club).Where(x => !x.IsYouth && x.Contract is not null && x.Id != p.Id).ToList();
+        var squadPeers = World.SquadOf(club).Where(x => !x.IsYouth && x.Contract is not null && x.Id != p.Id).ToList();
+        var samePeers = squadPeers.Where(x => x.Contract!.Status == p.Contract?.Status).ToList();
+        var peers = samePeers.Count >= 3 ? samePeers : squadPeers;
         if (peers.Count > 0 && wage > 0)
         {
             var peerWage = peers.Average(x => (double)x.Contract!.WeeklyWage);
@@ -109,7 +117,8 @@ public sealed partial class RelationsModule : GameModule, IRelationsService
             {
                 var goalPos = Board.GoalPosition(club, club.Board.Goal);
                 var gap = goalPos - pos;
-                var goalDelta = (int)Math.Round(Math.Clamp(gap * 3.5 + (pos <= goalPos ? 5 : -5), -20, 15));
+                var goalDelta = (int)Math.Round(Math.Clamp(gap * Data.Relations.GoalsPerPlace + (pos <= goalPos ? 5 : -5),
+                    Data.Relations.GoalsMin, Data.Relations.GoalsMax));
                 if (goalDelta <= -6) reasons.Add(("sat.reason.goals.bad", goalDelta));
                 else if (goalDelta >= 6) reasons.Add(("sat.reason.goals.good", goalDelta));
                 else reasons.Add(("sat.reason.goals.ok", goalDelta));
@@ -124,6 +133,12 @@ public sealed partial class RelationsModule : GameModule, IRelationsService
             else if (promise.Outcome == PromiseOutcome.Held)
                 reasons.Add(("sat.reason.promise.held", 10));
         }
+
+        // Vertrauen in den Trainer (gebrochene Versprechen im Kader)
+        var trust = ClubOf(club).Trust - Data.Relations.Trust.Start;
+        var trustDelta = (int)Math.Round(Math.Clamp(trust / 4 * Data.Relations.Trust.SatisfactionPer4, -8, 5));
+        if (trustDelta <= -3) reasons.Add(("sat.reason.trust.low", trustDelta));
+        else if (trustDelta >= 3) reasons.Add(("sat.reason.trust.high", trustDelta));
 
         // Loyalität dämpft Unzufriedenheit, Temperament verstärkt sie.
         var raw = 55 + reasons.Sum(r => r.Delta);
