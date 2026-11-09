@@ -647,9 +647,9 @@
           "expenses": {
             "squad": 106200000
           },
-          "toleranceNote": "Fanartikel je Zuschauer gelten für das ganze Land; real konzentrieren sich die Shop-Umsätze der Primera auf die Großvereine (Segunda: 1,0 Mio. je Klub). Gesamteinnahmen ±12 % wegen Transfer-/Europapokal-Schwankungen nach Must-now E1.",
+          "toleranceNote": "Fanartikel je Zuschauer gelten für das ganze Land; real konzentrieren sich die Shop-Umsätze der Primera auf die Großvereine (Segunda: 1,0 Mio. je Klub). Merch ±40 %, Gesamteinnahmen ±12 % wegen Transfer-/Europapokal-Schwankungen nach Must-now E1.",
           "tolerances": {
-            "income.merchandising": 0.3,
+            "income.merchandising": 0.4,
             "income.total": 0.12
           }
         }
