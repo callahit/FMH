@@ -1,0 +1,26 @@
+{
+  "$id": "https://fmh.local/schema/referees.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "items": {
+    "additionalProperties": false,
+    "description": "Schiedsrichter (Datei referees/*.json); sind welche vorgegeben, ersetzen sie die erzeugten.",
+    "properties": {
+      "country": {
+        "description": "Ländercode; leer = alle Länder.",
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "strictness": {
+        "description": "Strenge 1–20.",
+        "maximum": 20,
+        "minimum": 1,
+        "type": "integer"
+      }
+    },
+    "type": "object"
+  },
+  "title": "FMH referees/*.json",
+  "type": "array"
+}

@@ -18,6 +18,8 @@ public sealed partial class WorkspaceViewModel : ViewModelBase
     public IReadOnlyList<SectionViewModel> Sections { get; }
     public ValidationSectionViewModel Validation { get; }
     public CountriesSectionViewModel Countries { get; }
+    public TableSectionViewModel Players { get; }
+    public TableSectionViewModel People { get; }
     [ObservableProperty] private SectionViewModel _selected;
     [ObservableProperty] private string _status = "";
     [ObservableProperty] private bool _dirty;
@@ -28,12 +30,16 @@ public sealed partial class WorkspaceViewModel : ViewModelBase
     {
         Workspace = ws;
         _close = close;
-        Validation = new ValidationSectionViewModel(ws);
         var files = new FilesSectionViewModel(ws);
-        Countries = new CountriesSectionViewModel(ws, file => { files.Open(file); Selected = files; });
+        void OpenInTree(string file) { files.Open(file); Selected = files; }
+        Validation = new ValidationSectionViewModel(ws, (file, path) => { files.Open(file, path); Selected = files; });
+        Countries = new CountriesSectionViewModel(ws, OpenInTree);
+        Players = new TableSectionViewModel(ws, "editor.section.players", "editor.players.hint", new[] { PeopleKinds.Players }, OpenInTree);
+        People = new TableSectionViewModel(ws, "editor.section.people", "editor.people.hint",
+            new[] { PeopleKinds.Staff, PeopleKinds.Managers, PeopleKinds.Referees }, OpenInTree);
         Sections = new SectionViewModel[]
         {
-            new PackageSectionViewModel(ws), Countries, new ClubsSectionViewModel(ws), files,
+            new PackageSectionViewModel(ws), Countries, new ClubsSectionViewModel(ws), Players, People, files,
             new LanguagesSectionViewModel(ws), Validation, new DiffSectionViewModel(ws), new TrialSectionViewModel(ws),
         };
         _selected = Sections[0];

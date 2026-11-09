@@ -1,0 +1,159 @@
+{
+  "$id": "https://fmh.local/schema/transfers.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Weltweite Transferregeln (rules/transfers.json).",
+  "properties": {
+    "internationalLoans": {
+      "additionalProperties": false,
+      "description": "Leihen zwischen Vereinen verschiedener Länder (FIFA-Transferstatut Art. 10, ab 2024/25).",
+      "properties": {
+        "ageCutoff": {
+          "enum": [
+            "SeasonEnd",
+            "December31"
+          ]
+        },
+        "exemptAge": {
+          "description": "Spieler bis zu diesem Alter sind ausgenommen (0 = keine Ausnahme), Stichtag siehe AgeCutoff.",
+          "type": "integer"
+        },
+        "exemptNeedsClubTrained": {
+          "description": "Die Ausnahme gilt nur für Spieler, die der verleihende Verein selbst ausgebildet hat.",
+          "type": "boolean"
+        },
+        "maxIn": {
+          "description": "Höchstzahl gleichzeitig von anderen Vereinen ausgeliehener Spieler.",
+          "type": "integer"
+        },
+        "maxInPerSeason": {
+          "description": "Höchstzahl der in einer Saison ausgeliehenen Spieler (Premier League: vier); 0 = keine Grenze.",
+          "type": "integer"
+        },
+        "maxMonths": {
+          "description": "Längste Leihdauer in Monaten.",
+          "type": "integer"
+        },
+        "maxOut": {
+          "description": "Höchstzahl gleichzeitig an andere Vereine verliehener Spieler.",
+          "type": "integer"
+        },
+        "maxPerClub": {
+          "description": "Höchstzahl gleichzeitiger Leihen mit demselben Verein, je Richtung.",
+          "type": "integer"
+        },
+        "perClubCountsExempt": {
+          "description": "Die Grenze je Partnerverein gilt auch für ausgenommene Spieler (FIGC).",
+          "type": "boolean"
+        },
+        "source": {
+          "description": "Herkunft der Zahlen.",
+          "type": [
+            "string",
+            "null"
+          ]
+        },
+        "steps": {
+          "description": "Abweichende Höchstzahlen ab einer Saison (stufenweise Einführung, z. B. FIGC 10 → 9 → 8).",
+          "items": {
+            "additionalProperties": false,
+            "properties": {
+              "fromSeason": {
+                "type": "integer"
+              },
+              "maxIn": {
+                "type": "integer"
+              },
+              "maxOut": {
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "type": "array"
+        }
+      },
+      "type": "object"
+    },
+    "professionalLevels": {
+      "description": "Tiefste Spielklasse, in der Vereine Ablösen zahlen, Leihspieler aufnehmen und Strategien verfolgen.",
+      "type": "integer"
+    },
+    "reference": {
+      "additionalProperties": false,
+      "properties": {
+        "feeSigningsPerClub": {
+          "description": "Ablösetransfers je Verein und Saison: [min, max].",
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        "newSigningsPerClub": {
+          "description": "Neuzugänge je Verein und Saison (Ablöse, ablösefrei, Leihe): [min, max].",
+          "items": {
+            "type": "number"
+          },
+          "type": "array"
+        },
+        "seasonOneMinRatio": {
+          "description": "Ablösetransfers der ersten Saison mindestens dieser Anteil vom Mittel der Folgesaisons (Review F-07).",
+          "type": "number"
+        },
+        "source": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      },
+      "type": "object"
+    },
+    "strategies": {
+      "additionalProperties": {
+        "additionalProperties": false,
+        "description": "Verhalten einer Strategie im Transferfenster (je Woche bzw. je Fenster).",
+        "properties": {
+          "borrowChance": {
+            "description": "Wahrscheinlichkeit je Woche im Fenster, einen Leihspieler zu suchen (vor der Leihneigung des Landes).",
+            "type": "number"
+          },
+          "lendBeyondRank": {
+            "description": "Verleiht Spieler außerhalb der besten so vielen des Kaders, wenn sie jung sind; 0 = verleiht nicht aktiv.",
+            "type": "integer"
+          },
+          "maxAboveLevel": {
+            "description": "Kauft Spieler höchstens so viel stärker als das Niveau des Vereins (Ansehen). Größere Sprünge machen Vereine selten; ohne Grenze wandern die Besten Jahr für Jahr nach oben und die Ligen werden stetig stärker (Review F-02).",
+            "type": "number"
+          },
+          "maxSummerSignings": {
+            "type": "integer"
+          },
+          "maxWinterSignings": {
+            "type": "integer"
+          },
+          "signingChance": {
+            "description": "Wahrscheinlichkeit je Woche im Fenster, einen Kauf zu versuchen.",
+            "type": "number"
+          },
+          "youthFocusAge": {
+            "description": "Kauft bevorzugt junge Spieler mit Potenzial (bis zu diesem Alter); 0 = nach aktueller Stärke.",
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "propertyNames": {
+        "enum": [
+          "Elite",
+          "Developer",
+          "Borrower",
+          "Bargain"
+        ]
+      },
+      "type": "object"
+    }
+  },
+  "title": "FMH rules/transfers.json",
+  "type": "object"
+}

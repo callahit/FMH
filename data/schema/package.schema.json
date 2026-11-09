@@ -1,0 +1,38 @@
+{
+  "$id": "https://fmh.local/schema/package.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "createdWith": {
+      "description": "Werkzeug, das das Paket angelegt hat (z. B. „fmh-editor“); nur solche Pakete bearbeitet der Editor.",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "defaultLanguage": {
+      "description": "Rückfallsprache für fehlende Texte anderer Sprachen (nur im Grundpaket nötig).",
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "dependsOn": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "version": {
+      "type": "string"
+    }
+  },
+  "title": "FMH package.json",
+  "type": "object"
+}

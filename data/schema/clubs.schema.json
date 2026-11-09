@@ -1,0 +1,69 @@
+{
+  "$id": "https://fmh.local/schema/clubs.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "items": {
+    "additionalProperties": false,
+    "description": "Vereinsdefinition im Datenpaket. Spieler werden beim Start erzeugt.",
+    "properties": {
+      "capacity": {
+        "type": "integer"
+      },
+      "city": {
+        "type": "string"
+      },
+      "division": {
+        "type": "string"
+      },
+      "key": {
+        "type": "string"
+      },
+      "latitude": {
+        "type": [
+          "number",
+          "null"
+        ]
+      },
+      "longitude": {
+        "type": [
+          "number",
+          "null"
+        ]
+      },
+      "name": {
+        "type": "string"
+      },
+      "primaryColor": {
+        "type": "string"
+      },
+      "region": {
+        "description": "Region für die Staffelzuteilung.",
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "reputation": {
+        "type": "integer"
+      },
+      "reserveOf": {
+        "description": "Zweite Mannschaft: Schlüssel des Vereins der ersten Mannschaft.",
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "secondaryColor": {
+        "type": "string"
+      },
+      "shortName": {
+        "type": "string"
+      },
+      "stadium": {
+        "type": "string"
+      }
+    },
+    "type": "object"
+  },
+  "title": "FMH clubs/*.json",
+  "type": "array"
+}
