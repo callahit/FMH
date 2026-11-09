@@ -3,6 +3,7 @@ using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Input;
 using Avalonia.Media;
+using Avalonia.Media.Imaging;
 using Avalonia.VisualTree;
 using Fmh.Core.Model;
 
@@ -55,7 +56,9 @@ public sealed class IsoMapControl : Control
         {
             var fitW = (v.Bounds.Width - 24) / (maxX - minX + TileW);
             var fitH = (v.Bounds.Height - 24) / (maxY - minY + TileH * 3);
-            _zoom = Math.Clamp(Math.Min(fitH, fitW * 1.35), 0.6, 1.8);
+            // Pixel-Art bleibt scharf bei ganzzahliger Vergrößerung: ab 0,8 auf 1× bzw. 2× einrasten
+            var fit = Math.Min(fitH, fitW * 1.35);
+            _zoom = fit >= 2 ? 2 : fit >= 0.8 ? 1 : Math.Max(0.6, fit);
         }
         return new Size((maxX - minX + TileW) * Zoom, (maxY - minY + TileH * 3) * Zoom);
     }
@@ -65,9 +68,16 @@ public sealed class IsoMapControl : Control
         if (State is not { } s) return;
         var o = OriginVector();
         using var zoom = ctx.PushTransform(Matrix.CreateScale(Zoom, Zoom));
-        DrawTrees(ctx, o, s, back: true);
-        DrawGround(ctx, o, s);
-        if (s.ShowPaths) DrawPaths(ctx, o, s);
+        // Pixel-Art scharf zeichnen (ohne Weichzeichnen beim Vergrößern)
+        using var pixels = ctx.PushRenderOptions(new RenderOptions { BitmapInterpolationMode = BitmapInterpolationMode.None });
+        var atlas = IsoAtlas.Shared;
+        IsoPixelArt.Trees(ctx, o, s, back: true, atlas);
+        if (atlas is not null) IsoPixelArt.Ground(ctx, o, s, atlas);
+        else
+        {
+            DrawGround(ctx, o, s);
+            if (s.ShowPaths) DrawPaths(ctx, o, s);
+        }
 
         // Markiertes freies Feld bzw. Feld unter der Maus
         if (_hover is { } hv && hv.x >= 0 && hv.y >= 0 && hv.x < s.Width && hv.y < s.Height && s.Ghost is null && HitBuilding(s, hv) is null)
@@ -83,11 +93,11 @@ public sealed class IsoMapControl : Control
         var stadiumTop = default(Point);
         foreach (var (_, b) in items)
         {
-            if (b is null) { stadiumTop = IsoStadium.Draw(ctx, o, s); continue; }
+            if (b is null) { stadiumTop = (atlas is null ? null : IsoPixelArt.Stadium(ctx, o, s, atlas)) ?? IsoStadium.Draw(ctx, o, s); continue; }
             if (b.Id == s.SelectedId) Outline(ctx, o, b.X, b.Y, b.Width, b.Height, Color.Parse("#F5C04E"), 2.6);
-            anchors[b.Id] = IsoBuildings.Draw(ctx, o, b);
+            anchors[b.Id] = (atlas is null ? null : IsoPixelArt.Building(ctx, o, b, atlas)) ?? IsoBuildings.Draw(ctx, o, b);
         }
-        DrawTrees(ctx, o, s, back: false);
+        IsoPixelArt.Trees(ctx, o, s, back: false, atlas);
 
         // Geistervorschau Gebäude
         if (s.Ghost is { } ghost)
@@ -193,20 +203,6 @@ public sealed class IsoMapControl : Control
             ctx.DrawLine(pen, b, b - new Vector(0, 22));
             ctx.DrawLine(new Pen(IsoArt.B("#F5C04E"), 4), a - new Vector(0, 22), b - new Vector(0, 22));
         }
-    }
-
-    /// <summary>Baumreihe rund um das Gelände (hinten vor dem Boden, vorn zuletzt).</summary>
-    private static void DrawTrees(DrawingContext ctx, Vector o, IsoMapState s, bool back)
-    {
-        var rnd = new Random(17);
-        var spots = new List<(double x, double y)>();
-        for (var x = 0; x <= s.Width + 1; x++) spots.Add((x + rnd.NextDouble() * 0.6, -0.55 - rnd.NextDouble() * 0.3));
-        for (var y = 0; y < s.Height; y++) spots.Add((-0.55 - rnd.NextDouble() * 0.3, y + rnd.NextDouble() * 0.6));
-        var front = new List<(double x, double y)>();
-        for (var x = 0; x <= s.Width; x++) front.Add((x + rnd.NextDouble() * 0.6, s.Height + 0.45 + rnd.NextDouble() * 0.3));
-        for (var y = 0; y < s.Height; y++) front.Add((s.Width + 1.45 + rnd.NextDouble() * 0.3, y + rnd.NextDouble() * 0.6));
-        foreach (var (x, y) in (back ? spots : front).OrderBy(p => p.x + p.y))
-            IsoArt.Tree(ctx, IsoArt.P(o, x, y), 6 + (x * 7 + y * 3) % 3);
     }
 
     public static Point Iso(int x, int y) => new((x - y) * (TileW / 2.0), (x + y) * (TileH / 2.0));
