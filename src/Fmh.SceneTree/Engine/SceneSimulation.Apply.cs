@@ -16,10 +16,25 @@ public sealed partial class SceneSimulation
         if (!_shootout) ApplyStats(node, att, def, ref scorer, ref assist, ref ownGoal, ref xg);
 
         var type = EventType(node);
+        // Ecken und Fouls zählt die Ereignisschicht. Dieselben Flags im Baum sind der Text, kein zweites Ereignis.
+        if (type is MatchEventType.Corner or MatchEventType.Foul) type = MatchEventType.Attack;
         var player = type is MatchEventType.YellowCard or MatchEventType.SecondYellow or MatchEventType.RedCard ? _cardPlayer
             : type == MatchEventType.Injury ? _injuryPlayer
             : scorer ?? Actor(node, att, def);
         var text = Narrative(node, att, def);
+        var scoresNow = type == MatchEventType.Goal;
+        if (text is not null && !_shootout && !scoresNow && SceneNarrative.IsGoalCheer(text))
+        {
+            // „Tor!“ auf einem Knoten, der selbst kein Tor schreibt, erst ausgeben, wenn ein Kind den Treffer gibt.
+            _heldCheer = text;
+            text = null;
+        }
+        else if (_heldCheer is not null)
+        {
+            if (scoresNow && (string.IsNullOrEmpty(text) || !SceneNarrative.IsGoalCheer(text)))
+                text = string.IsNullOrEmpty(text) ? _heldCheer : _heldCheer + " " + text;
+            _heldCheer = null;
+        }
         var zoneCol = node.Zone switch { 1 => 4, 2 => 0, _ => 2 };
         var outcome = OutcomeOf(node);
         var kind = KindOf(node);
@@ -72,7 +87,9 @@ public sealed partial class SceneSimulation
         }
         else if (node.IsLeaf && node.Result.ShotLike)
         {
-            var onTarget = node.Result.OnTarget || node.Result.Post || node.Result.Bar || node.Result.KeeperBall;
+            // Aufs Tor nur, wenn der ausgegebene Abschluss gehalten wurde. Pfosten, Latte und Vorbei zählen nicht,
+            // auch wenn ein Knoten zusätzlich das Aufs-Tor-Bit trägt.
+            var onTarget = OutcomeOf(node) == ShotOutcome.Saved;
             xg = Chance(node);
             attack.Stats.Shots++;
             if (onTarget) attack.Stats.ShotsOnTarget++;
@@ -151,7 +168,8 @@ public sealed partial class SceneSimulation
             Reason = CardCatalog.Reason(_reason),
             Injury = _injuryLabel,
         };
-        return SceneNarrative.Apply(line, name);
+        var spoken = SceneNarrative.Apply(line, name).Trim();
+        return spoken.Length == 0 ? null : spoken;
     }
 
     private static void Rate(SceneNode node, RoleBook att, RoleBook def)
