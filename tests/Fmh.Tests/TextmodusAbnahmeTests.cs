@@ -182,7 +182,7 @@ public class TextmodusAbnahmeTests
         AssertSurface(Lines(scene), allowEaster: false);
         Assert.True(File.Exists(path), "Beispielprotokoll fehlt: docs/textmodus-beispiel.txt");
         var stored = File.ReadAllText(path);
-        AssertSurface(stored.Split('\n').Select(l => l.Contains('|') ? l[(l.IndexOf('|') + 1)..].Trim() : l).Where(l => l.Length > 0), allowEaster: false);
+        AssertSurface(ProtocolBodies(stored), allowEaster: false);
         Assert.Contains("ß", stored);
     }
 
@@ -365,6 +365,13 @@ public class TextmodusAbnahmeTests
 
     private static string Signature(SceneSimulation scene) =>
         string.Join("\n", scene.Events.Select(e => $"{e.Minute}+{e.Stoppage}|{e.Type}|{e.Side}|{e.PlayerId}|{e.OtherPlayerId}|{e.HomeScore}:{e.AwayScore}|{e.Value}|{e.Xg}|{e.Outcome}|{e.Narrative}"));
+
+    /// <summary>Zeilen des Beispielprotokolls. Git auf Windows checkt die Datei mit CR LF aus.</summary>
+    private static IEnumerable<string> ProtocolBodies(string stored) =>
+        stored.Replace("\r\n", "\n").Replace('\r', '\n')
+            .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
+            .Select(l => l.Contains('|', StringComparison.Ordinal) ? l[(l.IndexOf('|') + 1)..].Trim() : l)
+            .Where(l => l.Length > 0);
 
     internal static string Protocol(SceneSimulation scene)
     {
