@@ -116,12 +116,12 @@ public sealed partial class BoardModule
         var oldClub = HumanClub;
         var newClub = World.Clubs[offer.ClubId];
         if (m.Career.Stations.LastOrDefault() is { } st && st.To is null) { st.To = World.Date; st.Exit = "moved"; }
-        oldClub.ManagerId = null;
-        // Ein KI-Manager des neuen Vereins übernimmt den alten (AP 6c)
-        if (newClub.ManagerId is { } ai && World.Managers.FirstOrDefault(x => x.Id == ai) is { Human: false } aiManager)
+        if (oldClub.ManagerId == m.Id) oldClub.ManagerId = null;
+        // Der KI-Manager des neuen Vereins übernimmt den alten, wenn dort niemand (z. B. kein Interimstrainer) ist; sonst wird er vereinslos
+        if (ManagerGenerator.AiManagerOf(World, newClub) is { } aiManager)
         {
-            aiManager.ClubId = oldClub.Id;
-            oldClub.ManagerId = aiManager.Id;
+            ManagerGenerator.Release(aiManager, newClub, World.Date, "moved");
+            if (oldClub.ManagerId is null && oldClub.Id != newClub.Id) ManagerGenerator.Assign(aiManager, oldClub, World.Date);
         }
         newClub.ManagerId = m.Id;
         m.ClubId = newClub.Id;

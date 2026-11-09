@@ -143,6 +143,7 @@ public class PyramidTests
                 con.Open();
                 using var cmd = con.CreateCommand();
                 cmd.CommandText = """
+                    ALTER TABLE managers DROP COLUMN traits;
                     ALTER TABLE clubs DROP COLUMN reserve_of; ALTER TABLE clubs DROP COLUMN region;
                     ALTER TABLE clubs DROP COLUMN latitude; ALTER TABLE clubs DROP COLUMN longitude;
                     UPDATE meta SET value = '6' WHERE key = 'schema.world';
@@ -152,7 +153,7 @@ public class PyramidTests
             var w = Fmh.Core.Persistence.SqliteStore.Load(path);
             Assert.Equal(s.World.Clubs.Count, w.Clubs.Count);
             Assert.All(w.Clubs.Values, c => Assert.Null(c.ReserveOf));
-            Assert.Equal("7", Fmh.Core.Persistence.SqliteStore.ReadMetaTable(path)["schema.world"]);
+            Assert.Equal("8", Fmh.Core.Persistence.SqliteStore.ReadMetaTable(path)["schema.world"]);
         }
         finally
         {

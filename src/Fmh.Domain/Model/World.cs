@@ -162,6 +162,30 @@ public sealed class Manager
     public int Reputation { get; set; } = 5;
     public ManagerProfile Profile { get; set; } = new();
     public ManagerCareer Career { get; set; } = new();
+    /// <summary>Eigenschaften eines KI-Managers (Stil, Fähigkeiten, Herkunft); beim menschlichen Manager ohne Bedeutung.</summary>
+    public ManagerTraits Traits { get; set; } = new();
+
+    /// <summary>Laufende Station (beim aktuellen Verein), sonst null.</summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public CareerStation? CurrentStation => Career.Stations.LastOrDefault() is { To: null } s && s.ClubId == ClubId ? s : null;
+}
+
+/// <summary>Spielidee eines KI-Managers; wirkt auf Grundhaltung und Anweisungen seiner Mannschaft.</summary>
+public enum ManagerStyle { Balanced, Attacking, Defensive, Counter, Pressing }
+
+/// <summary>Eigenschaften eines KI-Managers (Trainerkarussell).</summary>
+public sealed class ManagerTraits
+{
+    public ManagerStyle Style { get; set; } = ManagerStyle.Balanced;
+    /// <summary>Taktisches Können 1–20 (Ruf bei der Vereinssuche).</summary>
+    public int Tactics { get; set; } = 10;
+    /// <summary>Menschenführung 1–20.</summary>
+    public int Motivation { get; set; } = 10;
+    public int BirthYear { get; set; } = 1975;
+    /// <summary>Ländercode der Herkunft.</summary>
+    public string Nationality { get; set; } = "";
+    /// <summary>Zahl der Entlassungen in der Laufbahn.</summary>
+    public int Sackings { get; set; }
 }
 
 public enum MessageType { Info, Board, Medical, Discipline, Result, Season, Transfer, Contract, Scouting, Youth, Training, Cup, Finance, Stadium, Fans, Press, Event, Career }

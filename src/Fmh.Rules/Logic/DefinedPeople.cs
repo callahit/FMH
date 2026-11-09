@@ -115,13 +115,19 @@ public static class DefinedPeople
         var clubs = world.Clubs.Values.GroupBy(c => c.Key, StringComparer.Ordinal).ToDictionary(g => g.Key, g => g.First(), StringComparer.Ordinal);
         foreach (var def in data.Managers)
         {
-            var manager = new Manager { Id = world.Managers.Max(m => m.Id) + 1, Name = def.Name, Reputation = Math.Clamp(def.Reputation, 1, 20) };
-            if (clubs.TryGetValue(def.Club, out var club) && club != humanClub && club.ManagerId is null)
+            var reputation = Math.Clamp(def.Reputation, 1, 20);
+            var manager = new Manager
             {
-                manager.ClubId = club.Id;
-                club.ManagerId = manager.Id;
-            }
+                Id = world.Managers.Max(m => m.Id) + 1, Name = def.Name, Reputation = reputation,
+                Traits = new ManagerTraits
+                {
+                    Style = def.Style, Tactics = Math.Clamp(def.Tactics ?? reputation, 1, 20), Motivation = Math.Clamp(def.Motivation ?? 10, 1, 20),
+                    BirthYear = world.SeasonYear - Math.Clamp(def.Age, 25, 80), Nationality = def.Nationality,
+                },
+            };
             world.Managers.Add(manager);
+            if (clubs.TryGetValue(def.Club, out var club) && club != humanClub && club.ManagerId is null)
+                ManagerGenerator.Assign(manager, club, new DateOnly(world.SeasonYear, 7, 1));
         }
     }
 

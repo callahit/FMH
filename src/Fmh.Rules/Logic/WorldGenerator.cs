@@ -79,6 +79,7 @@ public static class WorldGenerator
         humanClub.ManagerId = manager.Id;
         world.Managers.Add(manager);
         DefinedPeople.ApplyManagers(world, data, humanClub);
+        ManagerGenerator.Ensure(world, data);
         if (!world.Scouts.Any(s => s.ClubId == humanClub.Id))
             ScoutGenerator.CreateScouts(world, humanClub, data, rng, 2);
 
