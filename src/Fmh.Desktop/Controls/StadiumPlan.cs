@@ -61,8 +61,12 @@ public sealed class StadiumPlan : Control
         Stand(ctx, new Rect(pitch.Left + 4, st.Bottom - ds, pitch.Width - 8, ds), true, true, m.Seat);
         Stand(ctx, new Rect(st.X, pitch.Top + 4, dw, pitch.Height - 8), false, false, m.Seat);
         Stand(ctx, new Rect(st.Right - de, pitch.Top + 4, de, pitch.Height - 8), false, true, m.Seat);
-        if (m.Boxes.Contains("West"))
-            ctx.FillRectangle(B("#9FD3F5"), new Rect(st.X + dw * 0.45, pitch.Top + pitch.Height * 0.22, 4, pitch.Height * 0.56));
+        // Logen als Glasband auf jeder Tribüne, die welche hat
+        var glass = B("#9FD3F5");
+        if (m.Boxes.Contains("West")) ctx.FillRectangle(glass, new Rect(st.X + dw * 0.45, pitch.Top + pitch.Height * 0.22, 4, pitch.Height * 0.56));
+        if (m.Boxes.Contains("East")) ctx.FillRectangle(glass, new Rect(st.Right - de * 0.45 - 4, pitch.Top + pitch.Height * 0.22, 4, pitch.Height * 0.56));
+        if (m.Boxes.Contains("North")) ctx.FillRectangle(glass, new Rect(pitch.Left + pitch.Width * 0.22, st.Y + dn * 0.45, pitch.Width * 0.56, 4));
+        if (m.Boxes.Contains("South")) ctx.FillRectangle(glass, new Rect(pitch.Left + pitch.Width * 0.22, st.Bottom - ds * 0.45 - 4, pitch.Width * 0.56, 4));
 
         // Spielfeld
         ctx.DrawRectangle(B("#3E8E5A"), null, pitch, 4, 4);

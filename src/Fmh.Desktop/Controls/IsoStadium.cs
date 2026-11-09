@@ -36,13 +36,25 @@ public static class IsoStadium
         EndFace(ctx, o, ix + iw, sy, iy, Height("North"), alongY: true);
         Slope(ctx, o, sx, iy, ix, iy + ih, Height("West"), 2, horizontal: false, seat);
         EndFace(ctx, o, iy + ih, sx, ix, Height("West"), alongY: false);
-        if (s.BoxSides.Contains("West"))
+        // Logen: Glasband auf den Rängen der hinteren Tribünen (vordere siehe Fassade unten)
+        void BackBoxes(string side)
         {
-            var bx = sx + dW * 0.45;
-            ctx.DrawGeometry(B("#9FD3F5"), new Pen(B("#E8F6FF"), 0.8),
-                Poly(P(o, bx, iy + ih * 0.2, Height("West") * 0.6), P(o, bx, iy + ih * 0.8, Height("West") * 0.6),
-                     P(o, bx, iy + ih * 0.8, Height("West") * 0.6 + 4), P(o, bx, iy + ih * 0.2, Height("West") * 0.6 + 4)));
+            if (!s.BoxSides.Contains(side)) return;
+            var z = Height(side) * 0.6;
+            var pen = new Pen(B("#E8F6FF"), 0.8);
+            if (side == "West")
+            {
+                var bx = sx + dW * 0.45;
+                ctx.DrawGeometry(B("#9FD3F5"), pen, Poly(P(o, bx, iy + ih * 0.2, z), P(o, bx, iy + ih * 0.8, z), P(o, bx, iy + ih * 0.8, z + 4), P(o, bx, iy + ih * 0.2, z + 4)));
+            }
+            else
+            {
+                var by = sy + dN * 0.45;
+                ctx.DrawGeometry(B("#9FD3F5"), pen, Poly(P(o, ix + iw * 0.2, by, z), P(o, ix + iw * 0.8, by, z), P(o, ix + iw * 0.8, by, z + 4), P(o, ix + iw * 0.2, by, z + 4)));
+            }
         }
+        BackBoxes("North");
+        BackBoxes("West");
 
         // Spielfeld
         using (ctx.PushTransform(Ground(o, 1)))
@@ -57,9 +69,11 @@ public static class IsoStadium
         // Vordere Tribünen: Fassade sichtbar
         Slope(ctx, o, ix, iy + ih, ix + iw, sy + sh, Height("South"), 2, horizontal: true, seat, rising: true);
         Front(ctx, o, ix, sy + sh, ix + iw, sy + sh, Height("South"), Facade);
+        if (s.BoxSides.Contains("South")) FrontBoxes(ctx, o, ix + iw * 0.2, sy + sh, ix + iw * 0.8, sy + sh, Height("South") * 0.55);
         EndFace(ctx, o, ix + iw, iy + ih, sy + sh, Height("South"), alongY: true, rising: true);
         Slope(ctx, o, ix + iw, iy, sx + sw, iy + ih, Height("East"), 2, horizontal: false, seat, rising: true);
         Front(ctx, o, sx + sw, iy, sx + sw, iy + ih, Height("East"), FacadeSide);
+        if (s.BoxSides.Contains("East")) FrontBoxes(ctx, o, sx + sw, iy + ih * 0.2, sx + sw, iy + ih * 0.8, Height("East") * 0.55);
         EndFace(ctx, o, iy + ih, ix + iw, sx + sw, Height("East"), alongY: false, rising: true);
 
         // Dach: ein Glasring über den überdachten Tribünen, getragen von Stützen an den Ecken
@@ -147,6 +161,10 @@ public static class IsoStadium
         }
         ctx.DrawLine(new Pen(B(Alpha(Colors.White, 120)), 1.2), P(o, ax, ay, h), P(o, bx, by, h));
     }
+
+    /// <summary>Logen einer vorderen Tribüne als Glasband auf der Fassade.</summary>
+    private static void FrontBoxes(DrawingContext ctx, Vector o, double ax, double ay, double bx, double by, double z) =>
+        ctx.DrawGeometry(B("#9FD3F5"), new Pen(B("#E8F6FF"), 0.8), Poly(P(o, ax, ay, z), P(o, bx, by, z), P(o, bx, by, z + 5), P(o, ax, ay, z + 5)));
 
     /// <summary>Seitliche Stirnfläche einer Tribüne (Dreieck/Trapez).</summary>
     private static void EndFace(DrawingContext ctx, Vector o, double fixedCoord, double from, double to, double high, bool alongY, bool rising = false)
