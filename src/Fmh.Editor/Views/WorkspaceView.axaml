@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:s="using:Fmh.Editor.Services"
+             xmlns:vm="using:Fmh.Editor.ViewModels"
+             x:Class="Fmh.Editor.Views.WorkspaceView"
+             x:DataType="vm:WorkspaceViewModel">
+  <UserControl.KeyBindings>
+    <KeyBinding Gesture="Ctrl+Z" Command="{Binding UndoCommand}" />
+    <KeyBinding Gesture="Ctrl+Y" Command="{Binding RedoCommand}" />
+    <KeyBinding Gesture="Ctrl+S" Command="{Binding SaveCommand}" />
+  </UserControl.KeyBindings>
+  <DockPanel>
+    <Border DockPanel.Dock="Top" Background="#1A2433" Padding="16,10">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Spacing="2">
+          <TextBlock Classes="h2" Text="{Binding Title}" />
+          <TextBlock Classes="hint" Text="{Binding Status}" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+          <Button Content="{s:L editor.undo}" Command="{Binding UndoCommand}" ToolTip.Tip="Strg+Z" />
+          <Button Content="{s:L editor.redo}" Command="{Binding RedoCommand}" ToolTip.Tip="Strg+Y" />
+          <Button Content="{s:L editor.save}" Command="{Binding SaveCommand}" ToolTip.Tip="Strg+S" Classes="accent" />
+          <Button Content="{s:L editor.close}" Command="{Binding CloseCommand}" />
+        </StackPanel>
+      </Grid>
+    </Border>
+    <Border DockPanel.Dock="Left" Width="220" Background="#16202E">
+      <DockPanel>
+        <TextBlock DockPanel.Dock="Bottom" Margin="14" Text="{Binding ErrorSummary}" TextWrapping="Wrap" />
+        <ListBox Classes="nav" ItemsSource="{Binding Sections}" SelectedItem="{Binding Selected}" Background="Transparent">
+          <ListBox.ItemTemplate>
+            <DataTemplate x:DataType="vm:SectionViewModel">
+              <TextBlock Text="{Binding Title}" />
+            </DataTemplate>
+          </ListBox.ItemTemplate>
+        </ListBox>
+      </DockPanel>
+    </Border>
+    <ContentControl Margin="16" Content="{Binding Selected}" />
+  </DockPanel>
+</UserControl>

@@ -611,6 +611,37 @@ Neu gesetzt wird er nur in PRs, die eine Regeländerung ankündigen und im PR-Te
 Oberflächentests laufen ohne Bildschirm (Avalonia Headless). Mit `FMH_SHOTS=<ordner> dotnet test`
 speichern sie Bildschirmfotos aller Seiten.
 
+## Datenbank-Editor (AP 6)
+
+`fmh-editor` (Projekt `src/Fmh.Editor`, Start: `dotnet run --project src/Fmh.Editor [-- --data pfad --lang de|en]`)
+bearbeitet Datenpakete, ohne JSON von Hand zu schreiben. Umgesetzt ist Schritt 6a (Paket-Modus); Länder und
+Wettbewerbe mit Pyramide, Probelauf und „Neues Land“ folgen in 6b, JSON-Schemas, Spieler und Personal in 6c.
+
+- **Eigenes Paket statt Eingriff:**
+  - Ausgelieferte Pakete (`base`, Länderpakete) bleiben unverändert und lassen sich im Editor nicht öffnen.
+  - Ein neues Paket baut auf den angehakten Paketen auf (`dependsOn`). Im Manifest steht `"createdWith": "fmh-editor"`.
+  - Ins Paket kommen nur geänderte Dateien. Sprachdateien enthalten nur die geänderten Texte, weil das Spiel sie
+    schlüsselweise zusammenführt.
+- **Bereiche:**
+  - Paket: Name, Version, geänderte Dateien.
+  - Vereine: Tabelle zur Massenbearbeitung, hinzufügen und löschen, CSV-Import und -Export mit Semikolon und Kopfzeile.
+  - Regeln und Inhalte: jede Datendatei als Baum. Werte behalten ihren Typ, ungültige Zahlen werden abgewiesen.
+  - Sprachen: Sprachen nebeneinander; fehlende Texte und abweichende Platzhalter sind markiert und filterbar.
+  - Prüfung: Liste aller Fehler.
+  - Unterschiede: Änderungen je Datei und Feld. Listen mit `key`, `id` oder `code` werden über den Schlüssel verglichen.
+- **Rückgängig und Wiederholen** über alle Bereiche (Strg+Z, Strg+Y). Ein CSV-Import ist ein einziger Schritt.
+  Speichern mit Strg+S.
+- **Prüfung wie beim Spielstart:**
+  - Nach jeder Änderung lädt der Editor die Pakete mit dem ungespeicherten Stand aus einem temporären Ordner und
+    lässt den Datenvalidator laufen.
+  - Speichern geht auch mit Fehlern.
+  - Der Paketlader nimmt bei gleicher Paket-Id die Fassung aus dem späteren Verzeichnis.
+- **Feste Schreibweise** (`CanonicalJson`): Schlüssel ordinal sortiert, zwei Leerzeichen Einrückung, LF, UTF-8 ohne
+  BOM, Umlaute unmaskiert. Gleicher Inhalt ergibt byte-identische Dateien, und Git-Diffs bleiben lesbar.
+- Kern ohne Oberfläche in `src/Fmh.Data/Editing`: `PackageWorkspace`, `JsonEdit`, `CanonicalJson`, `JsonDiff`,
+  `ClubCsv`. Der Editor darf laut Architekturtest nur `Fmh.Domain` und `Fmh.Data` referenzieren.
+- Die Texte der Oberfläche stehen wie im Spiel in den Sprachdateien (`editor.*`, Deutsch und Englisch).
+
 ## Datenpakete und Modding
 
 Jedes Unterverzeichnis von `data/` mit einer `package.json` ist ein Paket. Pakete werden nach

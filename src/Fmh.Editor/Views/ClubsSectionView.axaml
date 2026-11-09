@@ -1,0 +1,40 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:s="using:Fmh.Editor.Services"
+             xmlns:vm="using:Fmh.Editor.ViewModels"
+             x:Class="Fmh.Editor.Views.ClubsSectionView"
+             x:DataType="vm:ClubsSectionViewModel">
+  <DockPanel>
+    <StackPanel DockPanel.Dock="Top" Spacing="8" Margin="0,0,0,10">
+      <TextBlock Classes="h1" Text="{Binding Title}" />
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <ComboBox ItemsSource="{Binding Files}" SelectedItem="{Binding File}" MinWidth="200" />
+        <Button Content="{s:L editor.clubs.add}" Command="{Binding AddCommand}" />
+        <Button Content="{s:L editor.clubs.remove}" Command="{Binding RemoveCommand}" />
+        <Button Content="{s:L editor.clubs.importCsv}" Click="OnImport" />
+        <Button Content="{s:L editor.clubs.exportCsv}" Click="OnExport" />
+      </StackPanel>
+      <TextBlock Classes="hint" Text="{s:L editor.clubs.hint}" />
+      <TextBlock Classes="error" Text="{Binding Message}" />
+    </StackPanel>
+    <DataGrid ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow}" AutoGenerateColumns="False" CanUserResizeColumns="True"
+              GridLinesVisibility="Horizontal" Name="Grid">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="key" Binding="{Binding Key}" Width="120" />
+        <DataGridTextColumn Header="name" Binding="{Binding Name}" Width="200" />
+        <DataGridTextColumn Header="shortName" Binding="{Binding ShortName}" Width="130" />
+        <DataGridTextColumn Header="city" Binding="{Binding City}" Width="130" />
+        <DataGridTextColumn Header="division" Binding="{Binding Division}" Width="90" />
+        <DataGridTextColumn Header="reputation" Binding="{Binding Reputation}" Width="90" />
+        <DataGridTextColumn Header="region" Binding="{Binding Region}" Width="110" />
+        <DataGridTextColumn Header="reserveOf" Binding="{Binding ReserveOf}" Width="110" />
+        <DataGridTextColumn Header="stadium" Binding="{Binding Stadium}" Width="180" />
+        <DataGridTextColumn Header="capacity" Binding="{Binding Capacity}" Width="90" />
+        <DataGridTextColumn Header="primaryColor" Binding="{Binding PrimaryColor}" Width="110" />
+        <DataGridTextColumn Header="secondaryColor" Binding="{Binding SecondaryColor}" Width="110" />
+        <DataGridTextColumn Header="latitude" Binding="{Binding Latitude}" Width="90" />
+        <DataGridTextColumn Header="longitude" Binding="{Binding Longitude}" Width="90" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </DockPanel>
+</UserControl>

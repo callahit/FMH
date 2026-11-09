@@ -21,6 +21,7 @@
     <ProjectReference Include="..\..\src\Fmh.MatchEngine\Fmh.MatchEngine.csproj" />
     <ProjectReference Include="..\..\src\Fmh.SceneTree\Fmh.SceneTree.csproj" />
     <ProjectReference Include="..\..\src\Fmh.Desktop\Fmh.Desktop.csproj" />
+    <ProjectReference Include="..\..\src\Fmh.Editor\Fmh.Editor.csproj" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="..\..\data\**\*" LinkBase="data" CopyToOutputDirectory="PreserveNewest" />

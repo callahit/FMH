@@ -47,6 +47,8 @@ public static class PackageLoader
             if (enabledPackages is null || enabledPackages.Contains(m.Id)) manifests.Add(m);
         }
         if (manifests.Count == 0) throw new InvalidDataException($"Keine Datenpakete in '{string.Join(", ", dataRoots)}'.");
+        // Gleiche Paket-Id in einem späteren Verzeichnis ersetzt die frühere (z. B. ungespeicherte Fassung aus dem Editor).
+        manifests = manifests.GroupBy(m => m.Id, StringComparer.Ordinal).Select(g => g.Last()).ToList();
 
         var ordered = SortByDependencies(manifests);
         var files = Overlay(ordered);
@@ -152,7 +154,7 @@ public static class PackageLoader
         return files;
     }
 
-    private static List<PackageManifest> SortByDependencies(List<PackageManifest> manifests)
+    internal static List<PackageManifest> SortByDependencies(List<PackageManifest> manifests)
     {
         var byId = manifests.ToDictionary(m => m.Id);
         var result = new List<PackageManifest>();

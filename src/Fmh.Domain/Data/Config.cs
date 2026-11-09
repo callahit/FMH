@@ -255,6 +255,9 @@ public sealed class PackageManifest
     public List<string> DependsOn { get; set; } = new();
     /// <summary>Rückfallsprache für fehlende Texte anderer Sprachen (nur im Grundpaket nötig).</summary>
     public string? DefaultLanguage { get; set; }
+    /// <summary>Werkzeug, das das Paket angelegt hat (z. B. „fmh-editor“); nur solche Pakete bearbeitet der Editor.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? CreatedWith { get; set; }
 
     /// <summary>Verzeichnis des Pakets auf der Platte (nicht Teil der Datei).</summary>
     [System.Text.Json.Serialization.JsonIgnore]
