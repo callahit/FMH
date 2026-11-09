@@ -16,7 +16,7 @@
         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
           <Button Content="{s:L neg.withdraw}" Command="{Binding WithdrawCommand}" IsVisible="{Binding !Finished}" />
           <Button Content="{s:L ui.close}" Command="{Binding CloseCommand}" />
-          <Button Classes="primary" Content="{s:L neg.submit}" Command="{Binding SubmitCommand}" IsVisible="{Binding !Finished}" />
+          <Button Classes="primary" Content="{s:L neg.submit}" Command="{Binding SubmitCommand}" IsVisible="{Binding CanSubmit}" />
         </StackPanel>
       </Grid>
 
@@ -26,8 +26,8 @@
             <TextBlock Text="{Binding StageText}" FontWeight="SemiBold" />
           </Border>
 
-          <!-- Stufe 1: Verein -->
-          <StackPanel Spacing="8" IsVisible="{Binding ClubStage}">
+          <!-- Verein (auch parallel in Talks) -->
+          <StackPanel Spacing="8" IsVisible="{Binding ShowClubPanel}">
             <StackPanel Spacing="8" IsVisible="{Binding IsTransfer}">
               <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.fee}" VerticalAlignment="Center" />
                 <NumericUpDown Grid.Column="1" Value="{Binding Fee, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="50000" FormatString="N0" /></Grid>
@@ -73,8 +73,8 @@
             </StackPanel>
           </StackPanel>
 
-          <!-- Stufe 2: Spieler -->
-          <StackPanel Spacing="8" IsVisible="{Binding PlayerStage}">
+          <!-- Spieler (auch parallel in Talks) -->
+          <StackPanel Spacing="8" IsVisible="{Binding ShowPlayerPanel}">
             <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.years}" VerticalAlignment="Center" />
               <NumericUpDown Grid.Column="1" Value="{Binding Years}" Minimum="1" Maximum="5" Increment="1" /></Grid>
             <Grid ColumnDefinitions="170,*"><TextBlock Text="{s:L neg.weeklyWage}" VerticalAlignment="Center" />

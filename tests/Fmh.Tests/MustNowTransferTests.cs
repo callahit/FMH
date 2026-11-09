@@ -23,8 +23,7 @@ public class MustNowTransferTests
         var down = fee / 5;
         s.HumanClub.Budget.TransferBudget = down; // nur Anzahlung muss reichen
         var beforeTb = s.HumanClub.Budget.TransferBudget;
-        var (n, error) = s.StartNegotiation(p, DealType.Transfer);
-        Assert.Null(error);
+        var n = TestData.StartTalks(s, p, DealType.Transfer);
         Assert.Equal(ResponseKind.Accept, s.SubmitClubOffer(n!, new ClubOffer
         {
             Fee = fee, DownPayment = down, InstallmentCount = 8, SellOnPercent = 0,
@@ -54,8 +53,7 @@ public class MustNowTransferTests
         var p = BuyTarget(s);
         p.Transfer.LoanListed = true;
         p.BirthDate = s.World.Date.AddYears(-25);
-        var (n, error) = s.StartNegotiation(p, DealType.Loan);
-        Assert.Null(error);
+        var n = TestData.StartTalks(s, p, DealType.Loan);
         var resp = s.SubmitClubOffer(n!, new ClubOffer
         {
             LoanMonths = 24, WageSharePercent = 100, PurchaseFee = s.ValueOf(p),
@@ -90,8 +88,7 @@ public class MustNowTransferTests
         var sellerId = p.ClubId!.Value;
         var fee = Negotiations.AskingPrice(p, s.World.Clubs[sellerId], s.World, s.Data) * 2;
         s.HumanClub.Budget.TransferBudget = Math.Max(s.HumanClub.Budget.TransferBudget, fee);
-        var (n, error) = s.StartNegotiation(p, DealType.Transfer);
-        Assert.Null(error);
+        var n = TestData.StartTalks(s, p, DealType.Transfer);
         Assert.Equal(ResponseKind.Accept, s.SubmitClubOffer(n!, new ClubOffer
         {
             Fee = fee, BuyBackFee = fee / 2, BuyBackYears = 2, PreemptionRight = true,
