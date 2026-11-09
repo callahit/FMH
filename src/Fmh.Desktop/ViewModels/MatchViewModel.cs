@@ -158,7 +158,8 @@ public sealed partial class MatchViewModel : ViewModelBase
         Subline = $"{CompetitionLabel()} · {Home.StadiumName} · {T["weather." + weather]}";
         Clock = Fmt.Date(_fixture.Date);
 
-        var keyPlayers = world.SquadOf(opp).Where(p => p.IsAvailable)
+        var scope = DisciplineRules.ScopeOf(_fixture, world);
+        var keyPlayers = world.SquadOf(opp).Where(p => p.IsAvailableFor(scope))
             .OrderByDescending(p => Ratings.Strength(p, profiles)).Take(3)
             .Select(p => $"{p.Name} ({UiText.Position(p.MainPosition)}, {UiText.Strength(Ratings.Strength(p, profiles))})");
         Preview = new List<InfoLine>
@@ -173,14 +174,14 @@ public sealed partial class MatchViewModel : ViewModelBase
             new(T["match.oppFormation"], Data.Formation(opp.Tactic.FormationId).Name),
             new(T["match.keyPlayers"], string.Join(", ", keyPlayers)),
             new(T["match.strength"], T.Format("match.strengthValue",
-                UiText.Strength(Ratings.StrengthFromRating(AiTactics.TeamStrength(own, world, Data))),
-                UiText.Strength(Ratings.StrengthFromRating(AiTactics.TeamStrength(opp, world, Data))))),
+                UiText.Strength(Ratings.StrengthFromRating(AiTactics.TeamStrength(own, world, Data, scope))),
+                UiText.Strength(Ratings.StrengthFromRating(AiTactics.TeamStrength(opp, world, Data, scope))))),
             new(T["match.venue"], $"{Home.StadiumName} ({Fmt.Int(Home.StadiumCapacity)} {T["unit.seats"]})"),
             new(T["match.weather"], T["weather." + weather]),
             new(T["match.referee"], referee is null ? "–" : T.Format("match.refereeValue", referee.Name, referee.Strictness)),
         };
 
-        var checks = LineupSelector.Validate(own, world, Data, AiTactics.ReserveEligibility(own, world, Data))
+        var checks = LineupSelector.Validate(own, world, Data, AiTactics.ReserveEligibility(own, world, Data, scope), scope)
             .Select(p => new AdviceVm(T[p], new SolidColorBrush(P.Bad))).ToList();
         if (checks.Count > 0) checks.Add(new AdviceVm(T["match.autoFixHint"], new SolidColorBrush(P.Warn)));
         checks.AddRange(TacticAdvisor.Analyse(own, world, Data).Select(a =>
@@ -209,7 +210,9 @@ public sealed partial class MatchViewModel : ViewModelBase
     [RelayCommand]
     private void RepairLineup()
     {
-        LineupSelector.Repair(Session.HumanClub, Session.World, Data, Session.BenchSize(Session.HumanClub));
+        var scope = DisciplineRules.ScopeOf(_fixture, Session.World);
+        LineupSelector.Repair(Session.HumanClub, Session.World, Data, Session.BenchSize(Session.HumanClub),
+            AiTactics.MatchEligibility(Session.HumanClub, Session.World, Data, scope), scope);
         BuildPreview();
     }
 

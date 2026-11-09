@@ -241,4 +241,35 @@ public class SaveCompatibilityTests
             Cleanup(path);
         }
     }
+
+    /// <summary>E4-S1: der eine Sperrenzähler alter Spielstände wird zur Ligasperre, Pokale starten bei null.</summary>
+    [Fact]
+    public void LegacySuspensionCounterBecomesLeagueScope()
+    {
+        var path = Fixture();
+        try
+        {
+            int id;
+            using (var con = new SqliteConnection($"Data Source={path};Pooling=False"))
+            {
+                con.Open();
+                using var cmd = con.CreateCommand();
+                cmd.CommandText = "SELECT id FROM players ORDER BY id LIMIT 1";
+                id = (int)(long)cmd.ExecuteScalar()!;
+            }
+            Exec(path, "UPDATE players SET suspended = 3, yellow_acc = 4 WHERE id = " + id);
+            var player = SqliteStore.Load(path).Players[id];
+            Assert.Equal(4, player.State.Yellows(Fmh.Core.Model.PlayerState.LeagueScope));
+            Assert.Equal(0, player.State.YellowBan(Fmh.Core.Model.PlayerState.LeagueScope));
+            Assert.Equal(3, player.State.RedBan(Fmh.Core.Model.PlayerState.LeagueScope));
+            Assert.Equal(3, player.State.SuspendedMatches);
+            Assert.Equal(0, player.State.Ban("DE-CUP"));
+            Assert.Equal(0, player.State.Ban("UCL"));
+            Assert.Equal(0, player.State.PersonalBan);
+        }
+        finally
+        {
+            Cleanup(path);
+        }
+    }
 }

@@ -55,11 +55,11 @@ public static class LineupSelector
     }
 
     /// <summary>Komplette Aufstellung für einen Verein: Startelf, Bank (mit Ersatztorwart) und Standardschützen.</summary>
-    public static void PickBest(Club club, World world, GameData data, int benchSize, SlotScores? scores = null, Func<Player, bool>? eligible = null)
+    public static void PickBest(Club club, World world, GameData data, int benchSize, SlotScores? scores = null, Func<Player, bool>? eligible = null, string? scope = null)
     {
         scores ??= new SlotScores(data.PositionProfiles);
         var formation = TacticResolver.Resolve(club.Tactic, data);
-        var available = world.SquadOf(club).Where(p => p.IsAvailable && (eligible is null || eligible(p))).ToList();
+        var available = world.SquadOf(club).Where(p => p.IsAvailableFor(scope) && (eligible is null || eligible(p))).ToList();
         club.Tactic.Lineup = Assign(formation, available, data.PositionProfiles, scores);
         club.Tactic.Bench = PickBench(club.Tactic.Lineup, available, benchSize, data.PositionProfiles, scores);
         PickSetPieceTakers(club, world);
@@ -102,7 +102,7 @@ public static class LineupSelector
     /// Ersetzt nur die Lücken einer Aufstellung (verletzte, gesperrte, fehlende Spieler) durch den besten
     /// verfügbaren Ersatz und lässt alle übrigen Entscheidungen des Managers stehen.
     /// </summary>
-    public static bool Repair(Club club, World world, GameData data, int benchSize, Func<Player, bool>? eligible = null)
+    public static bool Repair(Club club, World world, GameData data, int benchSize, Func<Player, bool>? eligible = null, string? scope = null)
     {
         var formation = TacticResolver.Resolve(club.Tactic, data);
         var lineup = club.Tactic.Lineup;
@@ -110,7 +110,7 @@ public static class LineupSelector
         while (lineup.Count < formation.Slots.Count) { lineup.Add(null); changed = true; }
         while (lineup.Count > formation.Slots.Count) { lineup.RemoveAt(lineup.Count - 1); changed = true; }
 
-        bool Usable(int? id) => id is { } v && world.Players.TryGetValue(v, out var p) && p.ClubId == club.Id && p.IsAvailable
+        bool Usable(int? id) => id is { } v && world.Players.TryGetValue(v, out var p) && p.ClubId == club.Id && p.IsAvailableFor(scope)
                                 && (eligible is null || eligible(p));
         var seen = new HashSet<int>();
         for (var i = 0; i < lineup.Count; i++)
@@ -118,7 +118,7 @@ public static class LineupSelector
             if (!Usable(lineup[i]) || !seen.Add(lineup[i]!.Value)) { lineup[i] = null; changed = true; }
         }
 
-        var available = world.SquadOf(club).Where(p => p.IsAvailable && (eligible is null || eligible(p))).ToList();
+        var available = world.SquadOf(club).Where(p => p.IsAvailableFor(scope) && (eligible is null || eligible(p))).ToList();
         for (var i = 0; i < lineup.Count; i++)
         {
             if (lineup[i] is not null) continue;
@@ -154,7 +154,7 @@ public static class LineupSelector
     }
 
     /// <summary>Prüft eine Aufstellung: Liste von Text-Schlüsseln mit Problemen (leer = in Ordnung).</summary>
-    public static List<string> Validate(Club club, World world, GameData data, Func<Player, bool>? eligible = null)
+    public static List<string> Validate(Club club, World world, GameData data, Func<Player, bool>? eligible = null, string? scope = null)
     {
         var problems = new List<string>();
         var formation = TacticResolver.Resolve(club.Tactic, data);
@@ -167,9 +167,10 @@ public static class LineupSelector
         {
             if (!world.Players.TryGetValue(id, out var p) || p.ClubId != club.Id) { problems.Add("lineup.foreign"); break; }
         }
+        bool SuspendedHere(Player p) => p.State.PersonalBan > 0 || (scope is not null && p.State.Ban(scope) > 0);
         if (ids.Any(id => world.Players.TryGetValue(id, out var p) && p.State.Injury is not null)) problems.Add("lineup.injured");
-        if (ids.Any(id => world.Players.TryGetValue(id, out var p) && p.State.SuspendedMatches > 0)) problems.Add("lineup.suspended");
-        if (club.Tactic.Bench.Any(id => world.Players.TryGetValue(id, out var p) && !p.IsAvailable)) problems.Add("lineup.benchUnavailable");
+        if (ids.Any(id => world.Players.TryGetValue(id, out var p) && SuspendedHere(p))) problems.Add("lineup.suspended");
+        if (club.Tactic.Bench.Any(id => world.Players.TryGetValue(id, out var p) && (p.State.Injury is not null || SuspendedHere(p)))) problems.Add("lineup.benchUnavailable");
         if (club.Tactic.Bench.Any(ids.Contains)) problems.Add("lineup.duplicate");
         if (eligible is not null && ids.Concat(club.Tactic.Bench).Any(id => world.Players.TryGetValue(id, out var p) && !eligible(p)))
             problems.Add("lineup.reserveAge");

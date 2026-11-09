@@ -96,6 +96,10 @@ public sealed partial class TacticsPageViewModel : PageViewModel, IRefreshable
     private Club Club => Session.HumanClub;
     private Formation Formation => TacticResolver.Resolve(Club.Tactic, Data);
     private int BenchSize => Session.BenchSize(Club);
+    private string? NextScope => Session.NextFixture(Club) is { } f ? DisciplineRules.ScopeOf(f, Session.World) : null;
+
+    private bool SuspendedForNext(Player p) =>
+        p.State.PersonalBan > 0 || (NextScope is { } scope && p.State.Ban(scope) > 0);
 
     [ObservableProperty] private IReadOnlyList<SlotVm> _slots = Array.Empty<SlotVm>();
     [ObservableProperty] private IReadOnlyList<SquadEntryVm> _bench = Array.Empty<SquadEntryVm>();
@@ -131,9 +135,11 @@ public sealed partial class TacticsPageViewModel : PageViewModel, IRefreshable
             var roleShort = role is null ? "" : $"{T["roleShort." + role.Id]}-{T["dutyShort." + slot.Duty]}";
             var rating = player is null ? 0 : Ratings.EffectiveRating(player, slot.Position, profiles);
             var suit = player?.SuitabilityFor(slot.Position) ?? Suitability.Natural;
+            var blocked = player is not null && (player.State.Injury is not null || SuspendedForNext(player));
+            var otherBan = player is not null && !blocked && player.State.AnySuspension;
             var ring = player is null ? Palette.Current.Muted
-                : !player.IsAvailable || suit == Suitability.Unsuitable ? Palette.Current.Bad
-                : suit == Suitability.Adequate ? Palette.Current.Warn : Avalonia.Media.Colors.White;
+                : blocked || suit == Suitability.Unsuitable ? Palette.Current.Bad
+                : otherBan || suit == Suitability.Adequate ? Palette.Current.Warn : Avalonia.Media.Colors.White;
             return new SlotVm
             {
                 Index = i,
@@ -161,7 +167,7 @@ public sealed partial class TacticsPageViewModel : PageViewModel, IRefreshable
             StrengthBrush = new SolidColorBrush(Palette.Current.AttributeColor((int)Math.Round(Ratings.PositionRating(p, p.MainPosition, profiles)))),
             Condition = p.State.Condition,
             ConditionBrush = new SolidColorBrush(Palette.Current.ConditionColor(p.State.Condition)),
-            Status = p.IsAvailable ? "" : UiText.Status(p, Club),
+            Status = p.State.Injury is null && !SuspendedForNext(p) && !p.State.AnySuspension ? "" : UiText.Status(p, Club),
             StatusBrush = new SolidColorBrush(Palette.Current.Bad),
             BenchIndex = bench,
             IsSelected = bench is { } b && _selectedTarget == formation.Slots.Count + b,
@@ -346,7 +352,7 @@ public sealed partial class TacticsPageViewModel : PageViewModel, IRefreshable
         if (slot is null || !slot.Used) return;
         var saved = Club.SavedTactics[slot.Index].Clone();
         Club.Tactic = saved;
-        LineupSelector.Repair(Club, Session.World, Data, BenchSize);
+        LineupSelector.Repair(Club, Session.World, Data, BenchSize, scope: NextScope);
         _selectedTarget = null;
         Shell.StatusMessage = T.Format("tactics.loadedFrom", slot.Index + 1);
         Refresh();
@@ -367,6 +373,7 @@ public sealed partial class TacticsPageViewModel : PageViewModel, IRefreshable
         }
         else if (_selectedTarget is { } benchSel && benchSel >= slots && Bench.FirstOrDefault(b => b.BenchIndex == benchSel - slots) is { } benchEntry)
         {
+            if (SuspendedForNext(benchEntry.Player)) { Shell.StatusMessage = T["tactics.suspended"]; return; }
             LineupEditor.Place(Club.Tactic, slots, BenchSize, slot.Index, benchEntry.Player.Id);
             _selectedTarget = null;
         }
@@ -382,12 +389,14 @@ public sealed partial class TacticsPageViewModel : PageViewModel, IRefreshable
         var slots = Formation.Slots.Count;
         if (_selectedTarget is { } target)
         {
+            if (SuspendedForNext(entry.Player)) { Shell.StatusMessage = T["tactics.suspended"]; return; }
             LineupEditor.Place(Club.Tactic, slots, BenchSize, target, entry.Player.Id);
             _selectedTarget = null;
         }
         else if (entry.BenchIndex is { } b) _selectedTarget = slots + b;
         else
         {
+            if (SuspendedForNext(entry.Player)) { Shell.StatusMessage = T["tactics.suspended"]; return; }
             if (!LineupEditor.ToBench(Club.Tactic, BenchSize, entry.Player.Id))
                 Shell.StatusMessage = T["tactics.benchFull"];
         }
@@ -397,6 +406,11 @@ public sealed partial class TacticsPageViewModel : PageViewModel, IRefreshable
     /// <summary>Drag &amp; Drop: Spieler auf einen Platz ziehen.</summary>
     public void DropOnSlot(int slotIndex, int playerId)
     {
+        if (Session.World.Players.TryGetValue(playerId, out var player) && SuspendedForNext(player))
+        {
+            Shell.StatusMessage = T["tactics.suspended"];
+            return;
+        }
         LineupEditor.Place(Club.Tactic, Formation.Slots.Count, BenchSize, slotIndex, playerId);
         _selectedTarget = null;
         Refresh();
@@ -404,6 +418,11 @@ public sealed partial class TacticsPageViewModel : PageViewModel, IRefreshable
 
     public void DropOnBench(int playerId)
     {
+        if (Session.World.Players.TryGetValue(playerId, out var player) && SuspendedForNext(player))
+        {
+            Shell.StatusMessage = T["tactics.suspended"];
+            return;
+        }
         if (!LineupEditor.ToBench(Club.Tactic, BenchSize, playerId)) Shell.StatusMessage = T["tactics.benchFull"];
         Refresh();
     }
@@ -425,7 +444,7 @@ public sealed partial class TacticsPageViewModel : PageViewModel, IRefreshable
     [RelayCommand]
     private void AutoPick()
     {
-        LineupSelector.PickBest(Club, Session.World, Data, BenchSize);
+        LineupSelector.PickBest(Club, Session.World, Data, BenchSize, scope: NextScope);
         _selectedTarget = null;
         Shell.StatusMessage = T["tactics.autoDone"];
         Refresh();

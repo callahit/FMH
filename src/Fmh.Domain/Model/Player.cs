@@ -1,3 +1,5 @@
+using System.Text.Json.Serialization;
+
 namespace Fmh.Core.Model;
 
 /// <summary>Moral in sieben Stufen von "Sehr schlecht" bis "Super" (Kapitel 4).</summary>
@@ -59,7 +61,15 @@ public sealed class Player
     public PreferredFoot Foot =>
         Math.Abs(LeftFoot - RightFoot) <= 3 ? PreferredFoot.Both : LeftFoot > RightFoot ? PreferredFoot.Left : PreferredFoot.Right;
 
-    public bool IsAvailable => State.Injury is null && State.SuspendedMatches == 0;
+    /// <summary>Ohne Spielkontext: nicht verletzt, keine Ereignissperre und nicht für die Liga gesperrt.</summary>
+    public bool IsAvailable => State.Injury is null && State.PersonalBan == 0 && State.Ban(PlayerState.LeagueScope) == 0;
+
+    /// <summary>
+    /// Einsatzfähig für einen Wettbewerb. <paramref name="scope"/> null prüft nur Verletzung und Ereignissperre,
+    /// nicht die Wettbewerbssperren (die gelten nur in ihrem Bereich).
+    /// </summary>
+    public bool IsAvailableFor(string? scope) =>
+        State.Injury is null && State.PersonalBan == 0 && (scope is null || State.Ban(scope) == 0);
 }
 
 public sealed class PlayerRegistration
@@ -107,6 +117,13 @@ public sealed class Contract
 
 public sealed class PlayerState
 {
+    /// <summary>Gemeinsamer Bereich aller Ligaspiele und der Relegation.</summary>
+    public const string LeagueScope = "league";
+    /// <summary>Vorlage für Pokalschwellen; der Zähler selbst hängt an der Pokal-Id.</summary>
+    public const string CupScope = "cup";
+    /// <summary>Vorlage, wenn ein Europapokal keinen eigenen Bereich hat.</summary>
+    public const string InternationalScope = "international";
+
     /// <summary>Kondition 0–100 %.</summary>
     public double Condition { get; set; } = 100;
     /// <summary>Spielpraxis 0–100 %.</summary>
@@ -115,8 +132,103 @@ public sealed class PlayerState
     /// <summary>Noten der letzten Spiele (1,0–6,0), neueste zuletzt, höchstens 5.</summary>
     public List<double> RecentGrades { get; set; } = new();
     public Injury? Injury { get; set; }
-    public int SuspendedMatches { get; set; }
-    public int YellowCardsAccumulated { get; set; }
+
+    /// <summary>Ligasperre (Gelb- und Rotsperre zusammen). Setzen ersetzt sie durch eine Rotsperre dieser Länge (Altdaten).</summary>
+    public int SuspendedMatches
+    {
+        get => Ban(LeagueScope);
+        set => SetDiscipline(LeagueScope, Yellows(LeagueScope), 0, value);
+    }
+
+    /// <summary>Gelbe Karten der Liga in dieser Saison.</summary>
+    public int YellowCardsAccumulated
+    {
+        get => Yellows(LeagueScope);
+        set => SetDiscipline(LeagueScope, value, YellowBan(LeagueScope), RedBan(LeagueScope));
+    }
+
+    /// <summary>Sperre aus Ereignissen: gilt in jedem Wettbewerb und wird im nächsten Pflichtspiel abgesessen, das keine Wettbewerbssperre abbaut.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public int PersonalBan
+    {
+        get => _personalBan;
+        set => _personalBan = Math.Max(0, value);
+    }
+
+    /// <summary>Zähler außerhalb der Liga (Pokal-Id, Europapokal-Id). Leer bleibt unsichtbar, damit Spieler ohne solche Karten ihr bisheriges Format behalten.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public Dictionary<string, ScopeDiscipline>? Competitions
+    {
+        get
+        {
+            Dictionary<string, ScopeDiscipline>? copy = null;
+            foreach (var (key, row) in _byScope.OrderBy(kv => kv.Key, StringComparer.Ordinal))
+            {
+                if (key == LeagueScope || row.IsEmpty) continue;
+                copy ??= new Dictionary<string, ScopeDiscipline>();
+                copy[key] = row;
+            }
+            return copy;
+        }
+        set
+        {
+            if (value is null) return;
+            foreach (var (key, row) in value)
+            {
+                if (key == LeagueScope || row is null) continue;
+                _byScope[key] = row;
+            }
+        }
+    }
+
+    private readonly Dictionary<string, ScopeDiscipline> _byScope = new(StringComparer.Ordinal);
+    private int _personalBan;
+
+    public int Ban(string scope) => YellowBan(scope) + RedBan(scope);
+    public int Yellows(string scope) => Row(scope)?.YellowCards ?? 0;
+    public int YellowBan(string scope) => Row(scope)?.YellowBanMatches ?? 0;
+    public int RedBan(string scope) => Row(scope)?.RedBanMatches ?? 0;
+
+    public bool AnySuspension => PersonalBan > 0 || _byScope.Values.Any(r => r.YellowBanMatches + r.RedBanMatches > 0);
+
+    public List<string> ScopeKeys() => _byScope.Keys.ToList();
+
+    public int AddYellow(string scope)
+    {
+        var row = Edit(scope);
+        row.YellowCards++;
+        return row.YellowCards;
+    }
+
+    public void SetYellows(string scope, int value) => SetDiscipline(scope, value, YellowBan(scope), RedBan(scope));
+
+    public void AddYellowBan(string scope, int delta) => SetDiscipline(scope, Yellows(scope), YellowBan(scope) + delta, RedBan(scope));
+
+    public void AddRedBan(string scope, int delta) => SetDiscipline(scope, Yellows(scope), YellowBan(scope), RedBan(scope) + delta);
+
+    public void SetDiscipline(string scope, int yellows, int yellowBan, int redBan)
+    {
+        yellows = Math.Max(0, yellows);
+        yellowBan = Math.Max(0, yellowBan);
+        redBan = Math.Max(0, redBan);
+        if (yellows == 0 && yellowBan == 0 && redBan == 0)
+        {
+            _byScope.Remove(scope);
+            return;
+        }
+        var row = Edit(scope);
+        row.YellowCards = yellows;
+        row.YellowBanMatches = yellowBan;
+        row.RedBanMatches = redBan;
+    }
+
+    private ScopeDiscipline? Row(string scope) => _byScope.TryGetValue(scope, out var row) ? row : null;
+
+    private ScopeDiscipline Edit(string scope)
+    {
+        if (!_byScope.TryGetValue(scope, out var row)) _byScope[scope] = row = new ScopeDiscipline();
+        return row;
+    }
 
     /// <summary>Form 1–10 aus den letzten 5 Noten; ohne Noten neutral 5.</summary>
     public int Form
@@ -135,6 +247,16 @@ public sealed class PlayerState
         RecentGrades.Add(grade);
         while (RecentGrades.Count > 5) RecentGrades.RemoveAt(0);
     }
+}
+
+/// <summary>Gelbe Karten und daraus folgende sowie rote Sperren in einem Wettbewerb.</summary>
+public sealed class ScopeDiscipline
+{
+    public int YellowCards { get; set; }
+    public int YellowBanMatches { get; set; }
+    public int RedBanMatches { get; set; }
+    [JsonIgnore]
+    public bool IsEmpty => YellowCards == 0 && YellowBanMatches == 0 && RedBanMatches == 0;
 }
 
 public sealed class Injury

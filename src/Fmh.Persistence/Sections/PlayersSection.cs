@@ -10,11 +10,12 @@ public sealed class PlayersSection : SaveSection
 {
     public override string ModuleId => "players";
 
-    /// <summary>Version 6: Meldeliste. Version 7: FK Positionen/Saison. Version 8: Nationalitäten-Tabelle (E6-S3).</summary>
-    public override int Version => 8;
+    /// <summary>Version 6: Meldeliste. Version 7: FK Positionen/Saison. Version 8: Nationalitäten. Version 9: Sperren je Wettbewerb.</summary>
+    public override int Version => 9;
 
     /// <summary>
-    /// 5 → 6: Meldeliste. 6 → 7: FK Kindtabellen. 7 → 8: <c>player_nationalities</c> aus der Kommaliste.
+    /// 5 → 6: Meldeliste. 6 → 7: FK Kindtabellen. 7 → 8: <c>player_nationalities</c>. 8 → 9: <c>player_suspensions</c>,
+    /// der alte Zähler wird zur Ligasperre.
     /// </summary>
     public override void Migrate(SqliteConnection c, SqliteTransaction tx, int fromVersion)
     {
@@ -57,6 +58,20 @@ public sealed class PlayersSection : SaveSection
                 }
             }
         }
+        if (fromVersion <= 8)
+        {
+            Exec(c, tx, """
+                CREATE TABLE IF NOT EXISTS player_suspensions (player_id INTEGER NOT NULL REFERENCES players(id), scope TEXT NOT NULL,
+                    yellow INTEGER NOT NULL, yellow_ban INTEGER NOT NULL, red_ban INTEGER NOT NULL, PRIMARY KEY (player_id, scope));
+                """);
+            var emptySuspensions = true;
+            foreach (var _ in Rows(c, "SELECT 1 FROM player_suspensions LIMIT 1")) { emptySuspensions = false; break; }
+            if (emptySuspensions)
+                Exec(c, tx, """
+                    INSERT INTO player_suspensions (player_id, scope, yellow, yellow_ban, red_ban)
+                    SELECT id, 'league', yellow_acc, 0, suspended FROM players WHERE suspended <> 0 OR yellow_acc <> 0;
+                    """);
+        }
     }
 
     internal static string AttrCol(Attr a) => "a_" + a;
@@ -87,6 +102,8 @@ public sealed class PlayersSection : SaveSection
         CREATE INDEX player_seasons_player ON player_seasons (player_id);
         CREATE TABLE player_nationalities (player_id INTEGER NOT NULL REFERENCES players(id), ord INTEGER NOT NULL, code TEXT NOT NULL,
             PRIMARY KEY (player_id, ord));
+        CREATE TABLE player_suspensions (player_id INTEGER NOT NULL REFERENCES players(id), scope TEXT NOT NULL,
+            yellow INTEGER NOT NULL, yellow_ban INTEGER NOT NULL, red_ban INTEGER NOT NULL, PRIMARY KEY (player_id, scope));
         """;
 
     public override void Save(SqliteConnection con, SqliteTransaction tx, World w)
@@ -105,6 +122,7 @@ public sealed class PlayersSection : SaveSection
         using var pos = Insert(con, tx, "player_positions", 3);
         using var sea = Insert(con, tx, "player_seasons", 13);
         using var nat = Insert(con, tx, "player_nationalities", 3);
+        using var sus = Insert(con, tx, "player_suspensions", 5);
 
         foreach (var p in w.Players.Values)
         {
@@ -137,8 +155,13 @@ public sealed class PlayersSection : SaveSection
                     s.YellowCards, s.RedCards, s.GradedMatches, s.GradeSum);
             Season(p.SeasonStats, true, 0);
             for (var i = 0; i < p.History.Count; i++) Season(p.History[i], false, i);
+            foreach (var scope in st.ScopeKeys())
+                Run(sus, p.Id, scope, st.Yellows(scope), st.YellowBan(scope), st.RedBan(scope));
+            if (st.PersonalBan > 0) Run(sus, p.Id, PersonalScope, 0, 0, st.PersonalBan);
         }
     }
+
+    private const string PersonalScope = "personal";
 
     public override void Load(SqliteConnection con, World w)
     {
@@ -177,6 +200,18 @@ public sealed class PlayersSection : SaveSection
                 if (w.Players.TryGetValue(id, out var p) && codes.Count > 0) p.Nationalities = codes;
         }
         catch (SqliteException) { /* ältere Abschnitte ohne Tabelle */ }
+
+        try
+        {
+            foreach (var r in Rows(con, "SELECT player_id, scope, yellow, yellow_ban, red_ban FROM player_suspensions"))
+            {
+                if (!w.Players.TryGetValue(r.GetInt32(0), out var p)) continue;
+                var scope = r.GetString(1);
+                if (scope == PersonalScope) p.State.PersonalBan = r.GetInt32(4);
+                else p.State.SetDiscipline(scope, r.GetInt32(2), r.GetInt32(3), r.GetInt32(4));
+            }
+        }
+        catch (SqliteException) { /* Spielstände vor den Wettbewerbssperren */ }
 
         // Must-now E6-S4: Kaderliste aus players.club_id aufbauen; Abweichungen werden überschrieben.
         foreach (var club in w.Clubs.Values)

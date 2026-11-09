@@ -3,6 +3,8 @@ namespace Fmh.Core.Data;
 /// <summary>Gemeinsames Format der europäischen Wettbewerbe (AP 5): Qualifikation, Ligaphase, K.-o., Koeffizienten.</summary>
 public sealed class EuropeFormat
 {
+    /// <summary>Disziplin der Klubwettbewerbe (UEFA). Gelb und Sperren gelten je Wettbewerb, die Schwellen sind gemeinsam.</summary>
+    public DisciplineConfig? Discipline { get; set; }
     public EuropeAccess Access { get; set; } = new();
     public List<EuropeCompetitionFormat> Competitions { get; set; } = new();
 

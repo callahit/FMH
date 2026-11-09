@@ -151,8 +151,8 @@ public sealed partial class PlayerPageViewModel : PageViewModel
             state.Add(new(T["player.wantsTransfer"], T["ui.yes"], new SolidColorBrush(P.Bad)));
         if (p.State.Injury is { } inj)
             state.Add(new(T["player.injury"], T.Format("player.injuryValue", T["injury." + inj.Type], inj.DaysRemaining), new SolidColorBrush(P.Bad)));
-        if (p.State.SuspendedMatches > 0)
-            state.Add(new(T["player.suspension"], T.Format("status.suspended", p.State.SuspendedMatches), new SolidColorBrush(P.Bad)));
+        if (UiText.Suspension(p) is { Length: > 0 } suspension)
+            state.Add(new(T["player.suspension"], suspension, new SolidColorBrush(P.Bad)));
         StateLines = state;
 
         Positions = p.Positions.OrderByDescending(kv => kv.Value).ThenBy(kv => kv.Key).Select(kv =>
