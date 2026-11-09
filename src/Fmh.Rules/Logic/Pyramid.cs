@@ -137,8 +137,9 @@ public static partial class Pyramid
         return plan.ToList();
     }
 
-    private static List<int> Rules(League league, MovementDirection to, int year) =>
-        league.Format.MovementsOf(league.Id).Where(m => m.Kind == MovementKind.Direct && m.To == to && m.AppliesTo(year))
+    private static List<int> Rules(League league, MovementDirection to, int year, bool withoutReplacement = false) =>
+        league.Format.MovementsOf(league.Id).Where(m => m.Kind == MovementKind.Direct && m.To == to && m.AppliesTo(year)
+                                                        && m.WithoutReplacement == withoutReplacement)
             .SelectMany(m => m.PositionList()).Distinct().Order().ToList();
 
     /// <summary>Relegation: Sieger aus der unteren Ebene steigen auf, unterlegene Teilnehmer der oberen ab.</summary>
