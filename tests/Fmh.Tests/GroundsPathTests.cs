@@ -236,6 +236,26 @@ public class GroundsPathTests
     }
 
     [Fact]
+    public void LegacyGrounds_RemovePathsUnderGrownFootprintEvenWithoutMoves()
+    {
+        var s = TestData.NewSession();
+        var club = s.HumanClub;
+        club.Grounds = new Grounds
+        {
+            MapVersion = 1, Width = 10, Height = 8, StadiumX = 3, StadiumY = 0, StadiumWidth = 4, StadiumHeight = 3,
+            Gates = new List<GridPos> { new(5, 3) },
+            // Alter Platz 2×1 bei (0,4); der Weg bei (1,5) lag daneben und liegt nun unter der 3×2-Fläche
+            Buildings = new List<Building> { new() { Id = 1, Type = "trainingPitch", X = 0, Y = 4, Level = 1 } },
+            Paths = new List<GridPos> { new(5, 4), new(5, 5), new(4, 5), new(3, 5), new(2, 5), new(1, 5), new(0, 6) },
+        };
+        s.EnsureGrounds(club);
+        var b = club.Grounds.Buildings[0];
+        Assert.Equal((0, 4, 0), (b.X, b.Y, b.Rotation));
+        Assert.DoesNotContain(club.Grounds.Paths, p => p.X < 3 && p.Y is 4 or 5);
+        Assert.True(s.IsBuildingConnected(club, b));
+    }
+
+    [Fact]
     public void NewGrounds_FitAllStartBuildingsWithRealFootprints()
     {
         var s = TestData.NewSession();

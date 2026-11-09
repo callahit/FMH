@@ -57,8 +57,10 @@ public sealed partial class FacilitiesModule
             (b.X, b.Y, b.Rotation) = (spot.Value.x, spot.Value.y, 0);
             Occupy(b, def);
         }
-        if (!moved) return;
+        // Auch ohne Umsetzung kann ein Weg unter einer nur größer gewordenen Fläche liegen
+        var pathsBefore = g.Paths.Count;
         g.Paths = g.Paths.Where(p => !placed.Contains((p.X, p.Y))).ToList();
+        if (!moved && g.Paths.Count == pathsBefore) return;
         EnsureBuildingsLinked(club);
         InvalidateEffects(club);
     }
