@@ -41,7 +41,10 @@ public static class WorldGenerator
         var startMonth = countries[0].Season.StartMonth;
         world.Date = new DateOnly(options.StartYear, startMonth, 1);
 
-        CreateReferees(world, data, rng, countries[0].Code);
+        // Vorgegebene Schiedsrichter ersetzen die erzeugten (AP 6c)
+        var referees = DefinedPeople.Referees(world, data);
+        if (referees.Count > 0) world.Referees.AddRange(referees);
+        else CreateReferees(world, data, rng, countries[0].Code);
 
         foreach (var country in countries)
         {
@@ -49,6 +52,7 @@ public static class WorldGenerator
             AddPoolClubs(world, data, rng, country);
         }
         LinkReserves(world, data);
+        DefinedPeople.ApplyPlayers(world, data, rng);
 
         foreach (var club in world.Clubs.Values)
         {
@@ -74,6 +78,7 @@ public static class WorldGenerator
         };
         humanClub.ManagerId = manager.Id;
         world.Managers.Add(manager);
+        DefinedPeople.ApplyManagers(world, data, humanClub);
         if (!world.Scouts.Any(s => s.ClubId == humanClub.Id))
             ScoutGenerator.CreateScouts(world, humanClub, data, rng, 2);
 

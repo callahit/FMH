@@ -45,11 +45,30 @@ public sealed partial class StaffModule : GameModule, IStaffService
         };
     }
 
-    /// <summary>Startpersonal nach Vereinsgröße; kleine Vereine besetzen nicht jede Stelle.</summary>
+    /// <summary>Personal aus den Daten (AP 6c); Gehalt nach Vereinsliga bzw. Marktgehalt ohne Verein.</summary>
+    private StaffMember FromDefinition(StaffDefinition d, Club? club) => new()
+    {
+        Id = World.NextStaffId++, Role = d.Role, Name = d.Name, Age = d.Age, ClubId = club?.Id,
+        Ability = Math.Clamp(d.Ability, 1, 20), Motivation = Math.Clamp(d.Motivation ?? d.Ability, 1, 20),
+        WeeklyWage = club is null ? StaffWage(d.Ability) : ClubStaffWage(club, d.Ability),
+        ContractUntil = new DateOnly(Math.Max(d.ContractUntil ?? World.SeasonYear + 2, World.SeasonYear + 1), 6, 30),
+        AgeGroup = d.AgeGroup,
+    };
+
+    /// <summary>
+    /// Startpersonal nach Vereinsgröße; kleine Vereine besetzen nicht jede Stelle. Ist für eine Rolle Personal
+    /// vorgegeben, ersetzt es das erzeugte dieser Rolle.
+    /// </summary>
     public void CreateStaff(Club club)
     {
+        var defined = Data.Staff.Where(d => d.Club == club.Key).ToList();
         foreach (var role in Enum.GetValues<StaffRole>())
         {
+            if (defined.Any(d => d.Role == role))
+            {
+                World.Staff.AddRange(defined.Where(d => d.Role == role).Select(d => FromDefinition(d, club)));
+                continue;
+            }
             var needed = role switch
             {
                 // Sportdirektor nur über den Arbeitsmarkt: automatische Besetzung bei vielen Vereinen
@@ -73,6 +92,10 @@ public sealed partial class StaffModule : GameModule, IStaffService
         }
         RefreshStaffEffects(club);
     }
+
+    /// <summary>Vorgegebenes Personal ohne Verein kommt zum Spielstart auf den Arbeitsmarkt.</summary>
+    public void AddDefinedMarketStaff() =>
+        World.Staff.AddRange(Data.Staff.Where(d => d.Club.Length == 0).Select(d => FromDefinition(d, null)));
 
     /// <summary>Arbeitsmarkt für Personal: jedes Jahr frische Kandidaten.</summary>
     public void RefreshStaffMarket()

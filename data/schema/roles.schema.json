@@ -1,0 +1,89 @@
+{
+  "$id": "https://fmh.local/schema/roles.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "items": {
+    "additionalProperties": false,
+    "description": "Spielerrolle (Kapitel 5, FM22): erlaubte Positionen, Aufgaben und Wirkung in der Matchengine.",
+    "properties": {
+      "aerial": {
+        "type": "number"
+      },
+      "cross": {
+        "type": "number"
+      },
+      "defaultDuty": {
+        "enum": [
+          "Defend",
+          "Support",
+          "Attack"
+        ]
+      },
+      "dribble": {
+        "type": "number"
+      },
+      "duties": {
+        "items": {
+          "description": "Aufgabe eines Spielers in der Formation.",
+          "enum": [
+            "Defend",
+            "Support",
+            "Attack"
+          ]
+        },
+        "type": "array"
+      },
+      "id": {
+        "type": "string"
+      },
+      "longPass": {
+        "type": "number"
+      },
+      "pass": {
+        "description": "Faktoren auf die Aktionswahl (1 = neutral).",
+        "type": "number"
+      },
+      "playmaking": {
+        "description": "Bonus beim Passspiel (Attributpunkte).",
+        "type": "number"
+      },
+      "positions": {
+        "items": {
+          "description": "Positionen. Anzeige deutsch über die Sprachdatei (TW, IV, LV ...).",
+          "enum": [
+            "GK",
+            "DL",
+            "DC",
+            "DR",
+            "DM",
+            "ML",
+            "MC",
+            "MR",
+            "AML",
+            "AMC",
+            "AMR",
+            "ST"
+          ]
+        },
+        "type": "array"
+      },
+      "push": {
+        "description": "Zusätzlicher Vorstoß in Reihen beim Angriff.",
+        "type": "number"
+      },
+      "shot": {
+        "type": "number"
+      },
+      "tackle": {
+        "description": "Bonus im Zweikampf als Verteidiger (Attributpunkte).",
+        "type": "number"
+      },
+      "target": {
+        "description": "Wie oft der Spieler angespielt wird bzw. Ziel von Flanken ist.",
+        "type": "number"
+      }
+    },
+    "type": "object"
+  },
+  "title": "FMH rules/roles.json",
+  "type": "array"
+}

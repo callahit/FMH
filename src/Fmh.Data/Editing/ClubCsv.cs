@@ -30,10 +30,10 @@ public static class ClubCsv
         return sb.ToString();
     }
 
-    private static string Format(JsonValue v) =>
+    internal static string Format(JsonValue v) =>
         v.TryGetValue<double>(out var d) && !v.TryGetValue<string>(out _) ? d.ToString(CultureInfo.InvariantCulture) : v.ToString();
 
-    private static string Quote(string s) =>
+    internal static string Quote(string s) =>
         s.IndexOfAny(new[] { ';', '"', '\n', '\r' }) >= 0 ? "\"" + s.Replace("\"", "\"\"") + "\"" : s;
 
     /// <summary>Liest Vereine aus CSV. Unbekannte Spalten werden übernommen (als Text), Fehler je Zeile gesammelt.</summary>
@@ -74,7 +74,7 @@ public static class ClubCsv
     }
 
     /// <summary>CSV-Zerlegung mit Anführungszeichen (auch Zeilenumbrüche in Zellen).</summary>
-    private static List<List<string>> Parse(string csv)
+    internal static List<List<string>> Parse(string csv)
     {
         var rows = new List<List<string>>();
         var row = new List<string>();

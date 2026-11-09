@@ -1,0 +1,190 @@
+{
+  "$id": "https://fmh.local/schema/engine.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Gewichte und Wahrscheinlichkeiten der Matchengine. Werden aus rules/engine.json geladen und sind im Editor bzw. per Datenpaket bearbeitbar. Die Standardwerte sind auf die Zielwerte aus Kapitel 6 kalibriert (siehe fmh-calibrate).",
+  "properties": {
+    "actionWeights": {
+      "description": "Gewichte für Pass, Dribbling, Flanke, Schuss je Reihe 0–6.",
+      "items": {
+        "items": {
+          "type": "number"
+        },
+        "type": "array"
+      },
+      "type": "array"
+    },
+    "aerialBase": {
+      "type": "number"
+    },
+    "aiEarliestSubMinute": {
+      "type": "integer"
+    },
+    "aiSubCondition": {
+      "type": "number"
+    },
+    "blockChance": {
+      "type": "number"
+    },
+    "boxFoulShare": {
+      "description": "Anteil der Fouls in Reihe 6 (zentral), die im Strafraum passieren.",
+      "type": "number"
+    },
+    "conditionPerAction": {
+      "type": "number"
+    },
+    "conditionPerSecond": {
+      "type": "number"
+    },
+    "cornerFromBlock": {
+      "type": "number"
+    },
+    "cornerFromCross": {
+      "type": "number"
+    },
+    "cornerFromSave": {
+      "type": "number"
+    },
+    "cornerHeaderChance": {
+      "type": "number"
+    },
+    "cornerHeaderXg": {
+      "type": "number"
+    },
+    "counterBonus": {
+      "type": "number"
+    },
+    "counterChance": {
+      "type": "number"
+    },
+    "crossBase": {
+      "type": "number"
+    },
+    "directFreeKickShare": {
+      "type": "number"
+    },
+    "dribbleBase": {
+      "type": "number"
+    },
+    "duelSlope": {
+      "description": "Steigung der logistischen Duellfunktion je Attributpunkt Differenz.",
+      "type": "number"
+    },
+    "edgeFoulShare": {
+      "description": "Anteil der Fouls in Reihe 5 (zentral, Strafraumgrenze), die noch im Strafraum passieren.",
+      "type": "number"
+    },
+    "finishingSlope": {
+      "type": "number"
+    },
+    "foulPerDuel": {
+      "type": "number"
+    },
+    "foulSeconds": {
+      "type": "number"
+    },
+    "freeKickXg": {
+      "type": "number"
+    },
+    "gegenpressingRegain": {
+      "type": "number"
+    },
+    "goalSeconds": {
+      "type": "number"
+    },
+    "gradeBase": {
+      "type": "number"
+    },
+    "gradeMinMinutes": {
+      "type": "integer"
+    },
+    "gradeScale": {
+      "type": "number"
+    },
+    "headerXg": {
+      "type": "number"
+    },
+    "homeAdvantage": {
+      "description": "Heimvorteil auf alle Duellwerte (+4 %).",
+      "type": "number"
+    },
+    "injuryPerFoul": {
+      "type": "number"
+    },
+    "injuryPerPhase": {
+      "type": "number"
+    },
+    "keeperSlope": {
+      "type": "number"
+    },
+    "longPassPenalty": {
+      "type": "number"
+    },
+    "maxStepsPerPhase": {
+      "type": "integer"
+    },
+    "offsideBase": {
+      "type": "number"
+    },
+    "onTargetBase": {
+      "type": "number"
+    },
+    "oneOnOneChance": {
+      "type": "number"
+    },
+    "oneOnOneXg": {
+      "type": "number"
+    },
+    "passBaseByRow": {
+      "description": "Grundwahrscheinlichkeit eines erfolgreichen Passes in die Zielreihe 0–6.",
+      "items": {
+        "type": "number"
+      },
+      "type": "array"
+    },
+    "penaltyXg": {
+      "type": "number"
+    },
+    "postChance": {
+      "type": "number"
+    },
+    "pressureSlope": {
+      "type": "number"
+    },
+    "recycleChance": {
+      "type": "number"
+    },
+    "redPerFoul": {
+      "type": "number"
+    },
+    "restartSeconds": {
+      "type": "number"
+    },
+    "setPieceSeconds": {
+      "type": "number"
+    },
+    "stepSeconds": {
+      "type": "number"
+    },
+    "wallBlockChance": {
+      "type": "number"
+    },
+    "xgCentralByRow": {
+      "items": {
+        "type": "number"
+      },
+      "type": "array"
+    },
+    "xgWideByRow": {
+      "items": {
+        "type": "number"
+      },
+      "type": "array"
+    },
+    "yellowPerFoul": {
+      "type": "number"
+    }
+  },
+  "title": "FMH rules/engine.json",
+  "type": "object"
+}

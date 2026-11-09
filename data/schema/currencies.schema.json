@@ -1,0 +1,30 @@
+{
+  "$id": "https://fmh.local/schema/currencies.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Spielwährung und Anzeigekurse: Alle Beträge im Spiel sind in Euro (Leitwährung). Andere Währungen dienen nur der Anzeige; ihre Kurse stehen in rules/currencies.json und lassen sich im Managerprofil überschreiben.",
+  "properties": {
+    "asOf": {
+      "description": "Stand der Standardkurse (Quelle in der Datei).",
+      "type": "string"
+    },
+    "rates": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "perEuro": {
+            "description": "Einheiten dieser Währung je Euro (z. B. 0,87 Pfund).",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "title": "FMH rules/currencies.json",
+  "type": "object"
+}

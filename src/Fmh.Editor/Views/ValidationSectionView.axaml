@@ -10,9 +10,14 @@
       <TextBlock Classes="hint" Text="{s:L editor.validation.hint}" />
       <TextBlock Text="{s:L editor.validation.ok}" IsVisible="{Binding IsValid}" Foreground="#7ED69A" />
     </StackPanel>
-    <ListBox ItemsSource="{Binding Errors}">
+    <ListBox ItemsSource="{Binding Items}">
       <ListBox.ItemTemplate>
-        <DataTemplate x:DataType="x:String"><TextBlock Classes="error" Text="{Binding}" /></DataTemplate>
+        <DataTemplate x:DataType="vm:ValidationItem">
+          <DockPanel>
+            <Button DockPanel.Dock="Right" Content="{s:L editor.validation.open}" Command="{Binding OpenCommand}" IsVisible="{Binding CanOpen}" Padding="8,2" />
+            <TextBlock Classes="error" Text="{Binding Text}" TextWrapping="Wrap" VerticalAlignment="Center" />
+          </DockPanel>
+        </DataTemplate>
       </ListBox.ItemTemplate>
     </ListBox>
   </DockPanel>

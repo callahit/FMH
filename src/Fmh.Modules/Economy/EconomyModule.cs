@@ -36,6 +36,7 @@ public sealed partial class EconomyModule : GameModule, IEconomyService
         if (fresh.Count == 0) return;
         AssignRivals();
         if (!World.Staff.Any(s => s.ClubId is null)) Staff.RefreshStaffMarket();
+        Staff.AddDefinedMarketStaff();
         foreach (var club in fresh)
         {
             Staff.RefreshStaffEffects(club);

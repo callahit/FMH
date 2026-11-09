@@ -1,0 +1,314 @@
+{
+  "$id": "https://fmh.local/schema/players.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "items": {
+    "additionalProperties": false,
+    "description": "Vorgegebener Spieler (Umsetzungskonzept 7.2, Datei players/*.json). Nur Schlüssel, Name und Position sind Pflicht; alles Weitere ist ein Rahmen, den der Weltgenerator wie bei Zufallsspielern auffüllt.",
+    "properties": {
+      "age": {
+        "maximum": 45,
+        "minimum": 15,
+        "type": [
+          "integer",
+          "null"
+        ]
+      },
+      "attributes": {
+        "additionalProperties": {
+          "type": "integer"
+        },
+        "description": "Einzelne Attribute 1–20, die die erzeugten Werte ersetzen.",
+        "propertyNames": {
+          "enum": [
+            "FirstTouch",
+            "Dribbling",
+            "Crossing",
+            "Heading",
+            "Passing",
+            "Technique",
+            "Finishing",
+            "LongShots",
+            "FreeKicks",
+            "Penalties",
+            "Corners",
+            "LongThrows",
+            "Tackling",
+            "Marking",
+            "Anticipation",
+            "Decisions",
+            "Concentration",
+            "Determination",
+            "Bravery",
+            "Leadership",
+            "Flair",
+            "WorkRate",
+            "OffTheBall",
+            "Positioning",
+            "Teamwork",
+            "Aggression",
+            "Composure",
+            "Acceleration",
+            "Pace",
+            "Stamina",
+            "Strength",
+            "Agility",
+            "Balance",
+            "JumpingReach",
+            "NaturalFitness",
+            "Reflexes",
+            "CommandOfArea",
+            "Handling",
+            "OneOnOnes",
+            "Kicking",
+            "Throwing",
+            "RushingOut",
+            "Communication",
+            "Eccentricity"
+          ]
+        },
+        "type": "object"
+      },
+      "birthDate": {
+        "description": "Geburtsdatum (JJJJ-MM-TT); sonst Age am Spielstart, sonst zufällig.",
+        "format": "date",
+        "type": [
+          "string",
+          "null"
+        ]
+      },
+      "club": {
+        "description": "Verein (Schlüssel aus clubs/*.json); leer = vereinslos zum Spielstart.",
+        "type": "string"
+      },
+      "contractUntil": {
+        "description": "Vertrag bis 30. Juni dieses Jahres.",
+        "maximum": 2100,
+        "minimum": 2000,
+        "type": [
+          "integer",
+          "null"
+        ]
+      },
+      "firstName": {
+        "type": "string"
+      },
+      "foot": {
+        "enum": [
+          "Left",
+          "Right",
+          "Both",
+          null
+        ]
+      },
+      "height": {
+        "maximum": 215,
+        "minimum": 150,
+        "type": [
+          "integer",
+          "null"
+        ]
+      },
+      "hidden": {
+        "additionalProperties": false,
+        "description": "Versteckte Charakterwerte 1–20, die die erzeugten Werte ersetzen.",
+        "properties": {
+          "adaptability": {
+            "maximum": 20,
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "ambition": {
+            "maximum": 20,
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "consistency": {
+            "maximum": 20,
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "controversy": {
+            "maximum": 20,
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "importantMatches": {
+            "maximum": 20,
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "injuryProneness": {
+            "maximum": 20,
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "loyalty": {
+            "maximum": 20,
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "pressure": {
+            "maximum": 20,
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "professionalism": {
+            "maximum": 20,
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "sportsmanship": {
+            "maximum": 20,
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          },
+          "temperament": {
+            "maximum": 20,
+            "minimum": 1,
+            "type": [
+              "integer",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "key": {
+        "description": "Eindeutiger Schlüssel über alle Pakete, z. B. \"de1-3-p7\".",
+        "type": "string"
+      },
+      "lastName": {
+        "type": "string"
+      },
+      "level": {
+        "description": "Gesamtstärke 1–20, aus der die Attribute entstehen; leer = nach Verein und Alter.",
+        "maximum": 20,
+        "minimum": 1,
+        "type": [
+          "number",
+          "null"
+        ]
+      },
+      "nationalities": {
+        "description": "Nationalitäten (Ländercodes); leer = Land des Vereins.",
+        "items": {
+          "type": "string"
+        },
+        "type": "array"
+      },
+      "position": {
+        "description": "Hauptposition; dort ist der Spieler immer „Natural“.",
+        "enum": [
+          "GK",
+          "DL",
+          "DC",
+          "DR",
+          "DM",
+          "ML",
+          "MC",
+          "MR",
+          "AML",
+          "AMC",
+          "AMR",
+          "ST"
+        ]
+      },
+      "positions": {
+        "additionalProperties": {
+          "description": "Eignung für eine Position (Kapitel 4: Natural, Gut, Ausreichend, Ungeeignet).",
+          "enum": [
+            "Unsuitable",
+            "Adequate",
+            "Good",
+            "Natural"
+          ]
+        },
+        "description": "Weitere Positionen mit Eignung; fehlende erzeugt der Generator.",
+        "propertyNames": {
+          "enum": [
+            "GK",
+            "DL",
+            "DC",
+            "DR",
+            "DM",
+            "ML",
+            "MC",
+            "MR",
+            "AML",
+            "AMC",
+            "AMR",
+            "ST"
+          ]
+        },
+        "type": "object"
+      },
+      "potentialAbility": {
+        "description": "Potenzial 1–200 (Skala der versteckten Fähigkeit); nie unter der aktuellen Fähigkeit.",
+        "maximum": 200,
+        "minimum": 1,
+        "type": [
+          "integer",
+          "null"
+        ]
+      },
+      "reputation": {
+        "maximum": 20,
+        "minimum": 1,
+        "type": [
+          "integer",
+          "null"
+        ]
+      },
+      "weeklyWage": {
+        "description": "Wochengehalt in Euro (vor der Umrechnung auf das Lohnniveau der Liga); leer = nach Stärke.",
+        "maximum": 5000000,
+        "minimum": 0,
+        "type": [
+          "integer",
+          "null"
+        ]
+      },
+      "weight": {
+        "maximum": 110,
+        "minimum": 50,
+        "type": [
+          "integer",
+          "null"
+        ]
+      }
+    },
+    "type": "object"
+  },
+  "title": "FMH players/*.json",
+  "type": "array"
+}
