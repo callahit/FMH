@@ -44,6 +44,8 @@ public sealed class MovementRule
     /// Abstieg in den Pool ohne Nachrücker (nur unterste Ebene mit Pool): verkleinert die Ebene, etwa vor einer Reform
     /// mit weniger Staffeln. Meist zusammen mit <see cref="OnlySeason"/>.
     /// </summary>
+    // Nur geschrieben, wenn gesetzt: Spielstände und Golden Master bleiben für Regeln ohne das Feld unverändert
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
     public bool WithoutReplacement { get; set; }
     /// <summary>Rotation: Die Regel gilt nur alle <see cref="Cycle"/> Saisons, erstmals in <see cref="CycleStart"/> (Startjahr).</summary>
     public int? Cycle { get; set; }
