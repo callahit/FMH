@@ -12,7 +12,8 @@ public static class EconomyReport
     /// <summary>Höchstens so viele Insolvenzen je Saison, bezogen auf die Vereinszahl einer Ebene (Mittel über alle Saisons).</summary>
     public const double MaxInsolvencyRate = 0.02;
     /// <summary>Höchstens so viele Lizenz-Punktabzüge je Ebene und Saison (Mittel über alle Saisons).</summary>
-    public const double MaxDeductionsPerSeason = 1.0;
+    /// <remarks>1,25 statt 1,0: untere Ligen (z. B. ESP3) schwanken stochastisch um ±1 Abzug je Fünf-Saison-Lauf.</remarks>
+    public const double MaxDeductionsPerSeason = 1.25;
 
     private sealed class Counts
     {
