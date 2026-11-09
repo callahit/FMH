@@ -131,14 +131,15 @@ def s_parking(c, bus=False, ev=False):
         r = random.Random(c.seed)
         L = max(c.w, c.h)
         n = max(1, int(L * (1.5 if bus else 3)))
+        fill = 0.35 if c.level <= 1 else 0.75  # Stufe 2: deutlich mehr Stellplätze belegt
         for k in range(n):
-            if not bus and r.random() > 0.5:
+            if not bus and r.random() > fill:
                 continue
             fx = 0.08 + 0.84 * k / n
             x, y = c.pt(fx + 0.02, 0.2)
             col = rgb("#E2B13C") if bus else r.choice(CARS)
             K.vehicle(s, x, y, not c.along, 0.55 if bus else 0.3, col, 9 if bus else 5)
-    if ev:
+    if ev or (c.stage == 4 and not bus):
         for k in range(3):
             a = s.p(*c.pt(0.2 + 0.3 * k, 0.5))
             s.line(a, (a[0], a[1] - 9), rgb("#1F9AAD"))
@@ -158,7 +159,7 @@ def s_garage(c):
         z0, z1 = d * 10, d * 10 + 10
         s.wall_left(x0, x1, y1, z0, z1, lambda u, v: shade(concrete, 1.05) if v < 0.3 else rgb("#3D4A5C") if (u * 10) % 1 > 0.1 else concrete)
         s.wall_right(x1, y0, y1, z0, z1, lambda u, v: shade(concrete, 0.8) if v < 0.3 else rgb("#2E3846") if (u * 10) % 1 > 0.1 else shade(concrete, 0.8))
-    K.flat(s, x0, y0, x1, y1, decks * 10, c.tier, "#8C98A8", c.seed, green=False)
+    K.flat(s, x0, y0, x1, y1, decks * 10, c.tier, "#8C98A8", c.seed, solar=c.stage == 4)
     K.sign(s, x0 + 0.1, x0 + 0.35, y1, decks * 10 - 8, "p", c.tier)
     return s
 

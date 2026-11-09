@@ -233,9 +233,11 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
     Rasenkacheln mit Blumen, Pflasterwege, Tor, Laub- und Nadelbäume ringsum.
     - Jedes der 83 Gebäude hat ein eigenes Sprite je Ausbaustufe, für jede Grundfläche und Drehung
       (`tools/sprites/catalog.py`, `catalog_types.py`, Baukasten `kit.py`).
-      - Die Stufe bestimmt die Epoche: Niedrige Stufen sind alt und einfach (Holz oder Backstein, verblasstes
-        Satteldach, Schornstein, fleckiger Rasen). Mittlere sind solide (Putz in Bereichsfarbe, größere Fenster).
-        Hohe sind modern (Glas und Paneele, Flachdach mit Begrünung oder Solar, Vordach, Leuchtschild in Vereinsfarbe).
+      - Die Stufe bestimmt die Bauweise nach einer festen, stets ansteigenden Leiter: Holzbaracke mit verblasstem
+        Satteldach und Schornstein, Backstein, Putz in Bereichsfarbe, Paneelfassade mit Flachdach und Leuchtschild,
+        Glasfassade mit Gründach, Solarmodulen und Vordach.
+      - Gebäude mit fünf Stufen durchlaufen alle fünf Bauweisen. Bei drei Stufen sind es Backstein, Putz und Glas,
+        bei zwei Backstein und Glas. So ist jede Stufe sichtbar besser als die vorige.
       - Zusätzlich wachsen Baukörper und Stockwerke mit jeder Stufe.
       - Jedes Gebäude zeigt, wofür es da ist: Schild mit Symbol (Kreuz, Hantel, Trikot, Ball, Kamera, Bett …) und
         passendes Zubehör.
@@ -245,6 +247,11 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
         Spielerkabinen.
       - Hallen mit Tonnendach werden modern zum Flachbau. Parkhäuser bekommen je Stufe ein Deck, Solarfelder mehr
         Reihen, das Kleinstadion mehr Tribünen und ein Dach.
+    - **Leben auf dem Gelände** (`Controls/IsoCrowd.cs`): Besucher, Fans im Vereinstrikot und Mitarbeiter laufen
+      über das Wegenetz, auf jedem Platz trainieren Spieler in Vereinsfarbe (mehr Spieler bei höherer Stufe).
+      - Die Figuren haben vier Blickrichtungen und zwei Schrittbilder und werden etwa zehnmal je Sekunde bewegt.
+      - Gebäude davor verdecken sie richtig.
+      - Das Ganze ist reine Darstellung ohne Wirkung im Spiel und mit festem Seed reproduzierbar.
     - Gebäude ohne eigenes Sprite, etwa aus Community-Paketen, erscheinen als allgemeines Haus oder als Halle nach
       Bereich. Baustellen erscheinen mit Gerüst und Kran.
     - Stadion aus Bausteinen: Sockel mit Spielfeld und Treppentürmen, je Seite eine Tribüne in drei Größen nach
