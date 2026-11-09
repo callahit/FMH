@@ -68,6 +68,8 @@ public sealed class EditorCountryTests : IDisposable
         var pyramid = CountryTools.Pyramid(Obj(ws.Document("countries/de.json")));
         Assert.Equal(new[] { 18, 18, 20, 90 }, pyramid.Select(l => l.Teams));
         Assert.Equal("5 × 18", pyramid[3].Divisions[0].Shape);
+        // Regionalliga: Staffelregeln zählen; zwei feste Aufsteiger plus ein rotierender Platz (3 × 1/3), 5 × 2 Absteiger
+        Assert.Equal((3, 10), (pyramid[3].Divisions[0].Up, pyramid[3].Divisions[0].Down));
     }
 
     /// <summary>Abnahme 7.4: Regionalliga ab einer gewählten Saison mit 4 statt 5 Staffeln, allein über Bearbeitungsschritte des Editors.</summary>
@@ -176,5 +178,34 @@ public sealed class EditorCountryTests : IDisposable
         Assert.False(System.Text.Json.JsonSerializer.Deserialize<MovementRule>(plain, options)!.WithoutReplacement);
         var set = System.Text.Json.JsonSerializer.Serialize(new MovementRule { Positions = "17-18", WithoutReplacement = true }, options);
         Assert.True(System.Text.Json.JsonSerializer.Deserialize<MovementRule>(set, options)!.WithoutReplacement);
+    }
+
+    /// <summary>Großes Land: Der Pokal mit 256 Teams braucht acht Termine, die der Assistent in der Saison ergänzt.</summary>
+    [Fact]
+    public void WizardAddsCupDatesForLargeCountries()
+    {
+        var ws = PackageWorkspace.Create(_root, "gross", "Groß", new[] { "base" });
+        CountryWizard.Create(ws, new NewCountrySpec("GR", "Großland", new[] { 24, 24, 24, 24, 24, 24 }));
+        Assert.Empty(ws.Validate());
+        var cup = (JsonObject)((JsonArray)Obj(ws.Document("countries/gr.json"))["cups"]!)[0]!;
+        Assert.Equal(256, (int)cup["teams"]!);
+        var dates = ((JsonArray)cup["dates"]!).Select(d => d!.ToString()).ToList();
+        Assert.Equal(8, dates.Count);
+        Assert.Equal("08-05", dates[0]);
+        Assert.Equal("05-08", dates[^1]);
+        Assert.Equal(new[] { "08-10", "05-20" }, CountryWizard.FillDates(new List<string> { "09-01" }, 2));
+    }
+
+    /// <summary>Probelauf mit einem Land, das in den Daten nur im Hintergrund läuft: Für den Lauf wird es spielbar.</summary>
+    [Fact]
+    public void TrialPlaysCountryConfiguredAsBackground()
+    {
+        var ws = PackageWorkspace.Create(_root, "hinter", "Hintergrund", new[] { "base" });
+        CountryWizard.Create(ws, new NewCountrySpec("HG", "Hinterland", new[] { 10, 10 }, Cup: false));
+        ws.Apply(new SetValue("countries/hg.json", JsonPath.Root.Then("activation"), JsonValue.Create("Background")));
+        var result = Fmh.Editor.Services.TrialSeason.Run(ws, "HG", seed: 3);
+        Assert.Empty(result.Errors);
+        Assert.Equal(2, result.Leagues.Count);
+        Assert.All(result.Leagues, l => Assert.Equal(10, l.Clubs));
     }
 }

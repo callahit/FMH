@@ -116,7 +116,32 @@ public static class CountryWizard
         cup["participants"] = new JsonArray(Enumerable.Range(1, levels).Select(l => (JsonNode)JsonValue.Create($"{code}{l}")!).ToArray());
         cup["entries"] = new JsonArray();
         cup["region"] = "";
+        var rounds = (int)Math.Ceiling(Math.Log2(size));
+        var dates = (cup["dates"] as JsonArray)?.Select(d => d?.ToString() ?? "").Where(d => d.Length == 5).ToList() ?? new List<string>();
+        cup["dates"] = new JsonArray(FillDates(dates, rounds).Select(d => (JsonNode)JsonValue.Create(d)!).ToArray());
         return cup;
+    }
+
+    /// <summary>
+    /// Ergänzt Pokaltermine (MM-TT) bis zur Rundenzahl: jeweils in die Mitte der größten Lücke, damit alle Runden
+    /// in der Saison der Vorlage bleiben. Ohne Vorlagetermine gelten Saisontermine von August bis Mai.
+    /// </summary>
+    public static List<string> FillDates(List<string> dates, int rounds)
+    {
+        if (dates.Count < 2) dates = new List<string> { "08-10", "05-20" };
+        // Tage ab Saisonbeginn (Juli), damit der Jahreswechsel die Reihenfolge nicht stört
+        static int Day(string d)
+        {
+            var day = new DateTime(2001, int.Parse(d[..2]), int.Parse(d[3..])).DayOfYear;
+            return day < 182 ? day + 365 : day;
+        }
+        var days = dates.Select(Day).ToList();
+        while (days.Count < rounds)
+        {
+            var gap = Enumerable.Range(0, days.Count - 1).MaxBy(i => days[i + 1] - days[i]);
+            days.Insert(gap + 1, (days[gap] + days[gap + 1]) / 2);
+        }
+        return days.Select(d => new DateTime(2001, 1, 1).AddDays((d - 1) % 365).ToString("MM-dd", System.Globalization.CultureInfo.InvariantCulture)).ToList();
     }
 
     /// <summary>Fiktive Vereine je Ebene: Ruf und Stadion nach Ebene, Namen aus Silben (feste Reihenfolge, eindeutig).</summary>
