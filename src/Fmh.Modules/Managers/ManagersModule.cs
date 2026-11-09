@@ -15,9 +15,6 @@ public sealed class ManagersModule : GameModule
 {
     public override string Id => "managers";
 
-    /// <summary>Mindestamtszeit vor einer Entlassung während der Saison.</summary>
-    public const int MinTenureDays = 120;
-
     public override void Register(ModuleContext ctx)
     {
         base.Register(ctx);
@@ -66,8 +63,9 @@ public sealed class ManagersModule : GameModule
     /// </summary>
     public void Evaluate(League league, DateOnly date)
     {
+        var rules = Data.ManagerRules.InSeason;
         var total = league.Fixtures.Count == 0 ? 0 : league.Fixtures.Max(f => f.Matchday);
-        if (league.ClubIds.Count < 6 || league.CurrentMatchday < Math.Max(8, total / 3) || league.CurrentMatchday >= total) return;
+        if (league.ClubIds.Count < 6 || league.CurrentMatchday < Math.Max(rules.MinMatchday, (int)(total * rules.EarliestShare)) || league.CurrentMatchday >= total) return;
         var seasonStart = new DateOnly(World.SeasonYear, 7, 1);
         var n = league.ClubIds.Count;
         var expected = ExpectedPositions(league, World);
@@ -75,17 +73,18 @@ public sealed class ManagersModule : GameModule
         {
             var club = World.Clubs[row.ClubId];
             if (ManagerGenerator.AiManagerOf(World, club) is not { CurrentStation: { } st } m) continue;
-            if (date.DayNumber - st.From.DayNumber < MinTenureDays || st.From > seasonStart.AddDays(30)) continue;
+            if (date.DayNumber - st.From.DayNumber < rules.MinTenureDays || st.From > seasonStart.AddDays(rules.NewcomerDays)) continue;
             var formPoints = row.Form.TakeLast(5).Sum(c => c == 'S' ? 3 : c == 'U' ? 1 : 0);
             var bottom = Pyramid.DirectZone(league, row.Position, World.SeasonYear) == MovementDirection.Down || row.Position > n - 2;
             var below = row.Position - expected.GetValueOrDefault(club.Id, row.Position);
-            if (bottom && below >= Math.Max(4, n / 4) && formPoints <= 3) Sack(m, club, date, row.Position);
+            if (bottom && below >= Math.Max(rules.MinBelow, (int)(n * rules.BelowShare)) && formPoints <= rules.MaxFormPoints) Sack(m, club, date, row.Position);
         }
     }
 
     /// <summary>Saisonende: Absteiger und deutlich enttäuschende Vereine trennen sich, erfolgreiche Trainer gewinnen an Ruf.</summary>
     public void ReviewSeason(DateOnly date)
     {
+        var rules = Data.ManagerRules.SeasonEnd;
         foreach (var h in World.History.Where(h => h.SeasonYear == World.SeasonYear).OrderBy(h => h.LeagueId).ToList())
         {
             if (World.FindLeague(h.LeagueId) is not { } league || h.FinalOrder.Count < 6) continue;
@@ -97,13 +96,14 @@ public sealed class ManagersModule : GameModule
                 var pos = i + 1;
                 var below = pos - expected.GetValueOrDefault(club.Id, pos);
                 var relegated = Pyramid.DirectZone(league, pos, World.SeasonYear) == MovementDirection.Down;
-                if (pos == 1 || below <= -Math.Max(2, n / 4)) m.Reputation = Math.Min(20, m.Reputation + 1);
+                if (pos == 1 || below <= -Math.Max(2, (int)(n * rules.PraiseShare))) m.Reputation = Math.Min(20, m.Reputation + 1);
                 // Nur wer schon vor dieser Saison im Amt war; Absteiger mit klarer Enttäuschung oder weit hinter den Erwartungen
-                if (st.From <= new DateOnly(World.SeasonYear, 7, 1) && (relegated && below >= 3 || below >= Math.Max(8, n / 2))) Sack(m, club, date, pos);
+                if (st.From <= new DateOnly(World.SeasonYear, 7, 1)
+                    && (relegated && below >= rules.RelegatedBelow || below >= Math.Max(rules.MinBelow, (int)(n * rules.BelowShare)))) Sack(m, club, date, pos);
             }
         }
         // Ältere Trainer ohne Verein gehen in den Ruhestand, der Pool wird aufgefüllt
-        World.Managers.RemoveAll(m => !m.Human && m.ClubId is null && World.SeasonYear - m.Traits.BirthYear >= 70);
+        World.Managers.RemoveAll(m => !m.Human && m.ClubId is null && World.SeasonYear - m.Traits.BirthYear >= Data.ManagerRules.RetirementAge);
         ManagerGenerator.TopUpPool(World, Data, ManagerGenerator.RngFor(World, World.SeasonYear * 104729L + 1));
     }
 

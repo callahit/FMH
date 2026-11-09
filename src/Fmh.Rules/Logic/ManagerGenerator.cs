@@ -12,11 +12,6 @@ public static class ManagerGenerator
 {
     private const ulong Stream = 0x4B494D414E414745UL;
 
-    private static readonly (ManagerStyle style, double weight)[] Styles =
-    {
-        (ManagerStyle.Balanced, 40), (ManagerStyle.Attacking, 18), (ManagerStyle.Defensive, 16), (ManagerStyle.Counter, 16), (ManagerStyle.Pressing, 10),
-    };
-
     /// <summary>Zufallsstrom für einen Anlass (z. B. Saison und Verein), unabhängig vom Spielzufall und vom Spielstand.</summary>
     public static Rng RngFor(World world, long salt) => new(Rng.Mix(world.Seed ^ Stream, (ulong)salt));
 
@@ -24,9 +19,9 @@ public static class ManagerGenerator
     public static bool NeedsManager(World world, Club club) =>
         club.ManagerId is null && club.ReserveOf is null && world.FindLeague(club.LeagueId) is not null;
 
-    /// <summary>Gewünschte Größe des Pools vereinsloser Trainer.</summary>
-    public static int PoolTarget(World world) =>
-        Math.Max(6, world.Clubs.Values.Count(c => c.ReserveOf is null && world.FindLeague(c.LeagueId) is not null) / 8);
+    /// <summary>Gewünschte Größe des Pools vereinsloser Trainer (Regeln aus rules/managers.json).</summary>
+    public static int PoolTarget(World world, ManagerRules rules) =>
+        Math.Max(rules.PoolMinimum, (int)(world.Clubs.Values.Count(c => c.ReserveOf is null && world.FindLeague(c.LeagueId) is not null) * rules.PoolShare));
 
     public static IEnumerable<Manager> FreeManagers(World world) => world.Managers.Where(m => !m.Human && m.ClubId is null);
 
@@ -50,7 +45,7 @@ public static class ManagerGenerator
     {
         var clubs = world.Clubs.Values.Where(c => c.ReserveOf is null && world.FindLeague(c.LeagueId) is not null).OrderBy(c => c.Id).ToList();
         if (clubs.Count == 0) return;
-        for (var free = FreeManagers(world).Count(); free < PoolTarget(world); free++)
+        for (var free = FreeManagers(world).Count(); free < PoolTarget(world, data.ManagerRules); free++)
         {
             var like = clubs[rng.Next(clubs.Count)];
             Create(world, data, rng, like.CountryCode, Math.Max(1, like.Reputation - 2));
@@ -62,6 +57,7 @@ public static class ManagerGenerator
     {
         var names = data.Names.TryGetValue(country, out var n) ? n : data.Names.Values.First();
         var rep = (int)Math.Clamp(Math.Round(reputation + rng.Normal(0, 1.5)), 1, 20);
+        var styles = data.ManagerRules.StyleWeights.Where(kv => kv.Value > 0).OrderBy(kv => kv.Key).ToList();
         var m = new Manager
         {
             Id = world.Managers.Count == 0 ? 1 : world.Managers.Max(x => x.Id) + 1,
@@ -69,7 +65,7 @@ public static class ManagerGenerator
             Reputation = rep,
             Traits = new ManagerTraits
             {
-                Style = Styles[rng.WeightedIndex(Styles.Select(s => s.weight).ToList())].style,
+                Style = styles.Count == 0 ? ManagerStyle.Balanced : styles[rng.WeightedIndex(styles.Select(kv => kv.Value).ToList())].Key,
                 Tactics = (int)Math.Clamp(Math.Round(rep * 0.75 + 3 + rng.Normal(0, 2)), 1, 20),
                 Motivation = (int)Math.Clamp(Math.Round(rng.Normal(11, 3.5)), 1, 20),
                 BirthYear = world.SeasonYear - rng.Next(36, 65),

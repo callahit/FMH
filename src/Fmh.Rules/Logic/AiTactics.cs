@@ -42,7 +42,7 @@ public static class AiTactics
         var diff = own - opp + (home ? 0.6 : -0.4);
         // Spielidee des KI-Managers verschiebt die Grundhaltung (offensiv/defensiv) und einzelne Anweisungen
         var style = ManagerGenerator.AiManagerOf(world, club)?.Traits.Style ?? ManagerStyle.Balanced;
-        var bias = style switch { ManagerStyle.Attacking => 0.6, ManagerStyle.Defensive => -0.6, ManagerStyle.Counter => -0.35, _ => 0.0 };
+        var bias = data.ManagerRules.MentalityBias.GetValueOrDefault(style);
         club.Tactic.Mentality = (Mentality)Math.Clamp((int)Math.Round(diff * 0.7 + bias), -2, 2);
 
         var ins = club.Tactic.Instructions;
