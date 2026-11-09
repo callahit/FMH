@@ -32,6 +32,7 @@ public sealed class GameData
     /// <summary>Anzeigekurse; gerechnet wird immer in Euro.</summary>
     public CurrencyConfig Currencies { get; init; } = new();
     public TransferRules TransferRules { get; init; } = new();
+    public ManagerRules ManagerRules { get; init; } = new();
     /// <summary>Gemeinsames Format UCL/UEL/UECL (AP 5); null in älteren Paketen ohne competitions/europe.json.</summary>
     public EuropeFormat? Europe { get; set; }
 

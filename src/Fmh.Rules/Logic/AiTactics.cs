@@ -40,15 +40,20 @@ public static class AiTactics
         var own = TeamStrength(club, world, data);
         var opp = TeamStrength(opponent, world, data);
         var diff = own - opp + (home ? 0.6 : -0.4);
-        club.Tactic.Mentality = (Mentality)Math.Clamp((int)Math.Round(diff * 0.7), -2, 2);
+        // Spielidee des KI-Managers verschiebt die Grundhaltung (offensiv/defensiv) und einzelne Anweisungen
+        var style = ManagerGenerator.AiManagerOf(world, club)?.Traits.Style ?? ManagerStyle.Balanced;
+        var bias = data.ManagerRules.MentalityBias.GetValueOrDefault(style);
+        club.Tactic.Mentality = (Mentality)Math.Clamp((int)Math.Round(diff * 0.7 + bias), -2, 2);
 
         var ins = club.Tactic.Instructions;
         var eleven = club.Tactic.Lineup.Where(id => id.HasValue).Select(id => world.Players[id!.Value]).ToList();
         if (eleven.Count == 0) return;
         double Avg(Attr a) => eleven.Average(p => p.Attributes[a]);
-        ins.Counter = diff < -0.5 && Avg(Attr.Pace) >= 11;
+        ins.Counter = style == ManagerStyle.Counter ? diff < 0.5 : diff < -0.5 && Avg(Attr.Pace) >= 11;
         ins.PassingLength = Avg(Attr.Passing) >= 12.5 ? PassingLength.Short : Avg(Attr.Passing) < 9.5 ? PassingLength.Long : PassingLength.Mixed;
-        ins.Pressing = Avg(Attr.WorkRate) + Avg(Attr.Stamina) >= 25 ? PressingHeight.High : diff < -1 ? PressingHeight.Low : PressingHeight.Mid;
+        var stamina = Avg(Attr.WorkRate) + Avg(Attr.Stamina);
+        ins.Pressing = stamina >= (style == ManagerStyle.Pressing ? 21 : 25) ? PressingHeight.High
+            : diff < -1 && style != ManagerStyle.Pressing ? PressingHeight.Low : PressingHeight.Mid;
         ins.Line = ins.Pressing == PressingHeight.High ? DefensiveLine.High : ins.Pressing == PressingHeight.Low ? DefensiveLine.Deep : DefensiveLine.Normal;
         ins.Tempo = diff > 1 ? Tempo.High : Tempo.Normal;
     }

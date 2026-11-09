@@ -116,6 +116,12 @@
     },
     {
       "fileMatch": [
+        "data/*/rules/managers.json"
+      ],
+      "url": "./data/schema/manager-rules.schema.json"
+    },
+    {
+      "fileMatch": [
         "data/*/competitions/europe.json"
       ],
       "url": "./data/schema/europe.schema.json"

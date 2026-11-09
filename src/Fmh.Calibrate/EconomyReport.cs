@@ -71,7 +71,7 @@ public static class EconomyReport
     }
 
     /// <summary>Mittel über alle ausgewerteten Saisons; true, wenn jede Ebene die Grenzen einhält.</summary>
-    public static bool PrintSummary()
+    public static bool PrintSummary(World w)
     {
         var ok = true;
         var parts = new List<string>();
@@ -80,11 +80,18 @@ public static class EconomyReport
             var seasons = g.Count();
             var rate = g.Sum(kv => kv.Value.Insolvencies) / (double)g.Sum(kv => kv.Value.Clubs);
             var deductions = g.Sum(kv => kv.Value.Deductions) / (double)seasons;
-            var inside = rate <= MaxInsolvencyRate && deductions <= MaxDeductionsPerSeason;
+            var limit = DeductionLimit(w, g.Key.Country, g.Key.Level);
+            var inside = rate <= MaxInsolvencyRate && deductions <= limit;
             ok &= inside;
-            parts.Add($"{g.Key.Country}{g.Key.Level} {rate:P1}/{deductions:0.0}{(inside ? "" : " ABWEICHUNG")}");
+            parts.Add($"{g.Key.Country}{g.Key.Level} {rate:P1}/{deductions:0.0}{(limit != MaxDeductionsPerSeason ? $" (Grenze {limit:0.0})" : "")}{(inside ? "" : " ABWEICHUNG")}");
         }
         Console.WriteLine($"Ø Insolvenzquote/Punktabzüge je Saison (Grenzen {MaxInsolvencyRate:P0}/{MaxDeductionsPerSeason:0.0}): {string.Join(", ", parts)}");
         return ok;
     }
+
+    /// <summary>Grenze für Punktabzüge einer Ebene: abweichender Wert aus den Ligazahlen der Daten, sonst <see cref="MaxDeductionsPerSeason"/>.</summary>
+    private static double DeductionLimit(World w, string country, int level) =>
+        w.Countries.Where(c => c.Code == country).SelectMany(c => c.Levels.Where(l => l.Level == level).SelectMany(l => l.Divisions)
+                .Select(d => c.Finance.Divisions.TryGetValue(d.Id, out var f) ? f.Reference?.MaxDeductionsPerSeason : null))
+            .OfType<double>().DefaultIfEmpty(MaxDeductionsPerSeason).Max();
 }
