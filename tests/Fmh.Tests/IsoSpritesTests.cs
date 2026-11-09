@@ -44,6 +44,38 @@ public class IsoSpritesTests
         for (var level = 1; level <= 4; level++) Assert.True(atlas.Has($"mast_{level}"));
     }
 
+    [AvaloniaFact]
+    public void StartingGroundsGetGateAndPathFurnitureButNothingBesideTheGate()
+    {
+        var g = TestData.NewSession().HumanClub.Grounds;
+        var state = new IsoMapState { Width = g.Width, Height = g.Height, Paths = g.Paths.ToList(), Gates = g.Gates.ToList() };
+        var decos = IsoPixelArt.Decorations(state);
+        var atlas = IsoAtlas.Shared!;
+        Assert.Equal(g.Gates.Count, decos.Count(d => d.Name == "gate"));
+        Assert.Contains(decos, d => d.Name == "deco_lamp");
+        Assert.All(decos, d => Assert.True(atlas.Has(d.Name), d.Name));
+        foreach (var d in decos.Where(d => d.Name != "gate"))
+        {
+            var (x, y) = ((int)Math.Floor(d.X), (int)Math.Floor(d.Y));
+            Assert.Contains(g.Paths, p => p.X == x && p.Y == y);
+            Assert.DoesNotContain(g.Gates, gt => Math.Abs(gt.X - x) <= 1 && Math.Abs(gt.Y - y) <= 1);
+        }
+        Assert.Equal(decos.OrderBy(d => d.Key).Select(d => d.Key), decos.Select(d => d.Key));
+        // Ohne Wegenetz-Anzeige keine Ausstattung
+        state.ShowPaths = false;
+        Assert.Empty(IsoPixelArt.Decorations(state));
+    }
+
+    [Fact]
+    public void PlazaNeedsPathOnAllEightNeighbours()
+    {
+        var block = new HashSet<(int, int)>();
+        for (var x = 0; x < 3; x++) for (var y = 0; y < 3; y++) block.Add((x, y));
+        Assert.True(IsoPixelArt.IsPlaza(block, 1, 1));
+        block.Remove((2, 2));
+        Assert.False(IsoPixelArt.IsPlaza(block, 1, 1));
+    }
+
     [Theory]
     [InlineData(0, 0)]
     [InlineData(2500, 1)]

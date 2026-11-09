@@ -105,9 +105,20 @@ public static class IsoPixelArt
         for (var y = 0; y < s.Height; y++)
             for (var x = 0; x < s.Width; x++)
             {
-                var name = gates.Contains((x, y)) ? "gate" : paths.Contains((x, y)) ? $"path_{(x + y) % 2}" : $"grass_{(x * 7 + y * 3) % 4}";
+                var paved = paths.Contains((x, y)) || gates.Contains((x, y));
+                var name = !paved ? $"grass_{(x * 7 + y * 3) % 4}"
+                    : IsPlaza(paths, x, y) ? $"plaza_{(x + y) % 2}" : $"path_{(x + y) % 2}";
                 atlas.Draw(ctx, name, P(o, x, y));
             }
+        // Bordstein, wo Pflaster an Rasen grenzt
+        var curb = new Pen(B("#9C8C70"), 1);
+        foreach (var (x, y) in paths)
+        {
+            if (!paths.Contains((x, y - 1)) && !gates.Contains((x, y - 1))) ctx.DrawLine(curb, P(o, x, y), P(o, x + 1, y));
+            if (!paths.Contains((x - 1, y)) && !gates.Contains((x - 1, y))) ctx.DrawLine(curb, P(o, x, y), P(o, x, y + 1));
+            if (!paths.Contains((x, y + 1)) && !gates.Contains((x, y + 1))) ctx.DrawLine(curb, P(o, x, y + 1), P(o, x + 1, y + 1));
+            if (!paths.Contains((x + 1, y)) && !gates.Contains((x + 1, y))) ctx.DrawLine(curb, P(o, x + 1, y), P(o, x + 1, y + 1));
+        }
         using (ctx.PushTransform(IsoArt.Ground(o)))
         {
             if (s.BaseWidth < s.Width)
@@ -117,6 +128,53 @@ public static class IsoPixelArt
             ctx.FillRectangle(B(Color.FromArgb(40, 120, 150, 110)), new Rect(s.Width, 0, 1, s.Height));
             ctx.DrawRectangle(null, new Pen(B(Color.FromArgb(90, 255, 255, 255)), 0.025, new DashStyle(new double[] { 3, 3 }, 0)), new Rect(s.Width, 0, 1, s.Height));
         }
+    }
+
+    /// <summary>
+    /// Ausstattung der Wege, fest aus der Lage abgeleitet und ohne Wirkung im Spiel: Laternen in festen Abständen am
+    /// hinteren und linken Wegrand, Bänke an der vorderen Kante, Pflanzkübel und Abfalleimer auf inneren Feldern.
+    /// Dazu die Tore (in Vereinsfarbe). Nichts steht neben einem Tor.
+    /// Rückgabe sortiert nach Zeichenreihenfolge (Schlüssel = vordere Ecke des Feldes, x + y + 2).
+    /// </summary>
+    public static List<IsoDecoration> Decorations(IsoMapState s)
+    {
+        var list = new List<IsoDecoration>();
+        if (!s.ShowPaths) return list;
+        var paths = s.Paths.Select(p => (p.X, p.Y)).ToHashSet();
+        var gates = s.Gates.Select(p => (p.X, p.Y)).ToHashSet();
+        bool P(int x, int y) => paths.Contains((x, y)) || gates.Contains((x, y));
+        bool NearGate(int x, int y) => gates.Any(g => Math.Abs(g.X - x) <= 1 && Math.Abs(g.Y - y) <= 1);
+        foreach (var g in gates) list.Add(new(g.X + g.Y + 2, g.X, g.Y, "gate", true));
+        foreach (var (x, y) in paths)
+        {
+            if (gates.Contains((x, y)) || NearGate(x, y)) continue;
+            var key = x + y + 2;
+            var inner = true;
+            for (var dy = -1; dy <= 1 && inner; dy++)
+                for (var dx = -1; dx <= 1 && inner; dx++)
+                    inner = P(x + dx, y + dy);
+            var h = (x * 92821) ^ (y * 68917);
+            if (!P(x, y - 1) && x % 3 == 0) list.Add(new(key, x + 0.5, y + 0.1, "deco_lamp", false));
+            else if (!P(x - 1, y) && y % 3 == 0) list.Add(new(key, x + 0.1, y + 0.5, "deco_lamp", false));
+            else if (!P(x, y + 1) && x % 4 == 2) list.Add(new(key, x + 0.5, y + 0.85, "deco_bench", false));
+            else if (inner && h % 4 == 0) list.Add(new(key, x + 0.5, y + 0.5, $"deco_planter_{(x + y) % 2}", false));
+            else if (inner && h % 7 == 3) list.Add(new(key, x + 0.5, y + 0.5, "deco_bin", false));
+        }
+        list.Sort((a, b) => a.Key != b.Key ? a.Key.CompareTo(b.Key) : a.X.CompareTo(b.X));
+        return list;
+    }
+
+    /// <summary>Zeichnet ein Ausstattungsstück; die Sprites sind auf die Feldmitte ausgerichtet.</summary>
+    public static void Decoration(DrawingContext ctx, Vector o, IsoDecoration d, IsoMapState s, IsoAtlas atlas) =>
+        atlas.Draw(ctx, d.Name, d.Name == "gate" ? P(o, d.X, d.Y) : P(o, d.X - 0.5, d.Y - 0.5), d.Tinted ? s.SeatColor : null);
+
+    /// <summary>Platzfeld: Weg, dessen acht Nachbarn ebenfalls Weg sind (große Fläche statt Gehweg).</summary>
+    public static bool IsPlaza(HashSet<(int, int)> paths, int x, int y)
+    {
+        for (var dy = -1; dy <= 1; dy++)
+            for (var dx = -1; dx <= 1; dx++)
+                if (!paths.Contains((x + dx, y + dy))) return false;
+        return true;
     }
 
     /// <summary>Baum-Sprite an einem Rasterpunkt; die Art ergibt sich fest aus der Lage.</summary>
@@ -142,3 +200,6 @@ public static class IsoPixelArt
             else IsoArt.Tree(ctx, P(o, x, y), 6 + (x * 7 + y * 3) % 3);
     }
 }
+
+/// <summary>Ausstattungsstück oder Tor auf der Karte (Rasterposition des Fußpunkts, Zeichenschlüssel).</summary>
+public sealed record IsoDecoration(int Key, double X, double Y, string Name, bool Tinted);
