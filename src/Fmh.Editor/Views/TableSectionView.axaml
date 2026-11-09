@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:s="using:Fmh.Editor.Services"
+             xmlns:vm="using:Fmh.Editor.ViewModels"
+             x:Class="Fmh.Editor.Views.TableSectionView"
+             x:DataType="vm:TableSectionViewModel">
+  <DockPanel>
+    <StackPanel DockPanel.Dock="Top" Spacing="8" Margin="0,0,0,10">
+      <TextBlock Classes="h1" Text="{Binding Title}" />
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <ComboBox ItemsSource="{Binding Kinds}" SelectedItem="{Binding Kind}" IsVisible="{Binding HasKinds}" MinWidth="160" />
+        <ComboBox ItemsSource="{Binding Files}" SelectedItem="{Binding File}" MinWidth="200" />
+        <Button Content="{s:L editor.table.add}" Command="{Binding AddCommand}" />
+        <Button Content="{s:L editor.table.remove}" Command="{Binding RemoveCommand}" />
+        <Button Content="{s:L editor.countries.editInTree}" Command="{Binding EditInTreeCommand}" />
+        <Button Content="{s:L editor.clubs.importCsv}" Click="OnImport" />
+        <Button Content="{s:L editor.clubs.exportCsv}" Click="OnExport" />
+      </StackPanel>
+      <TextBlock Classes="hint" Text="{Binding Hint}" TextWrapping="Wrap" />
+      <TextBlock Classes="error" Text="{Binding Message}" TextWrapping="Wrap" />
+    </StackPanel>
+    <DataGrid ItemsSource="{Binding Rows}" SelectedItem="{Binding SelectedRow}" AutoGenerateColumns="False" CanUserResizeColumns="True"
+              GridLinesVisibility="Horizontal" Name="Grid" />
+  </DockPanel>
+</UserControl>

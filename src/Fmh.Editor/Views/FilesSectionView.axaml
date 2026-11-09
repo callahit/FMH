@@ -10,16 +10,22 @@
       <TextBlock Classes="hint" Text="{s:L editor.files.hint}" />
     </StackPanel>
     <ListBox DockPanel.Dock="Left" Width="240" ItemsSource="{Binding Files}" SelectedItem="{Binding File}" Margin="0,0,12,0" />
-    <TreeView ItemsSource="{Binding Nodes}">
+    <TreeView ItemsSource="{Binding Nodes}" SelectedItem="{Binding SelectedNode}">
+      <TreeView.Styles>
+        <Style Selector="TreeViewItem" x:DataType="vm:JsonNodeItem">
+          <Setter Property="IsExpanded" Value="{Binding IsExpanded, Mode=TwoWay}" />
+        </Style>
+      </TreeView.Styles>
       <TreeView.ItemTemplate>
         <TreeDataTemplate ItemsSource="{Binding Items}" x:DataType="vm:JsonNodeItem">
           <StackPanel Orientation="Horizontal" Spacing="10">
-            <TextBlock Text="{Binding Name}" MinWidth="200" VerticalAlignment="Center" />
+            <TextBlock Text="{Binding Name}" MinWidth="200" VerticalAlignment="Center" ToolTip.Tip="{Binding Description}" />
             <TextBlock Text="{Binding Summary}" Classes="hint" VerticalAlignment="Center" />
             <TextBox Text="{Binding Value}" IsVisible="{Binding IsLeaf}" MinWidth="220" />
             <Button Content="{s:L editor.files.addItem}" Command="{Binding AddItemCommand}" IsVisible="{Binding IsArray}" Padding="8,2" />
             <StackPanel Orientation="Horizontal" Spacing="4" IsVisible="{Binding IsObject}">
-              <TextBox Text="{Binding NewField}" Watermark="{s:L editor.files.fieldName}" Width="120" />
+              <AutoCompleteBox Text="{Binding NewField}" ItemsSource="{Binding FieldSuggestions}" FilterMode="StartsWithOrdinal"
+                               MinimumPrefixLength="0" Watermark="{s:L editor.files.fieldName}" Width="150" />
               <TextBox Text="{Binding NewValue}" Watermark="{s:L editor.files.fieldValue}" Width="90" />
               <Button Content="{s:L editor.files.addField}" Command="{Binding AddFieldCommand}" Padding="8,2" />
             </StackPanel>

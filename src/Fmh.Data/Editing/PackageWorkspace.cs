@@ -196,6 +196,15 @@ public sealed class PackageWorkspace
     /// <summary>Paket mit dem aktuellen (auch ungespeicherten) Stand in ein anderes Verzeichnis schreiben, z. B. für den Probelauf.</summary>
     public void Export(string dir) => WriteTo(dir);
 
+    private Dictionary<string, System.Text.Json.Nodes.JsonObject>? _schemas;
+
+    /// <summary>JSON-Schema einer Datei (aus data/schema, wie beim Validator); null, wenn die Datei keines hat.</summary>
+    public System.Text.Json.Nodes.JsonObject? Schema(string file)
+    {
+        _schemas ??= Fmh.Core.Data.Schema.SchemaCatalog.Load(Directory.GetDirectories(DataRoot));
+        return Fmh.Core.Data.Schema.SchemaCatalog.For(file) is { } entry ? _schemas[entry.Name] : null;
+    }
+
     private void WriteTo(string dir)
     {
         Directory.CreateDirectory(dir);
