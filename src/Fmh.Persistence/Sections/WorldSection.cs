@@ -11,8 +11,11 @@ public sealed class WorldSection : SaveSection
 {
     public override string ModuleId => "world";
 
-    /// <summary>Version 6: Mannschaften (Tabelle teams). Version 7: zweite Mannschaften und Regionen (Ligapyramiden, AP 3).</summary>
-    public override int Version => 7;
+    /// <summary>
+    /// Version 6: Mannschaften (Tabelle teams). Version 7: zweite Mannschaften und Regionen (Ligapyramiden, AP 3).
+    /// Version 8: Eigenschaften der KI-Manager (Spalte managers.traits).
+    /// </summary>
+    public override int Version => 8;
 
     private const string TeamsTable = """
         CREATE TABLE teams (id INTEGER PRIMARY KEY, club_id INTEGER NOT NULL, world_id TEXT NOT NULL, ord INTEGER NOT NULL, data TEXT);
@@ -28,6 +31,7 @@ public sealed class WorldSection : SaveSection
     /// <summary>
     /// 5 → 6: jeder Verein bekommt seine erste Mannschaft (Männer) mit der Kennung des Vereins.
     /// 6 → 7: Spalten für zweite Mannschaften, Region und Koordinaten.
+    /// 7 → 8: Spalte für die Eigenschaften der KI-Manager; fehlende Manager rüstet die Spielsitzung beim Laden nach.
     /// </summary>
     public override void Migrate(SqliteConnection c, SqliteTransaction tx, int fromVersion)
     {
@@ -38,13 +42,14 @@ public sealed class WorldSection : SaveSection
             Exec(c, tx, "INSERT INTO teams (id, club_id, world_id, ord, data) SELECT id, id, 'men', 0, NULL FROM clubs");
         }
         if (fromVersion <= 6) Exec(c, tx, ClubColumnsV7);
+        if (fromVersion <= 7) Exec(c, tx, "ALTER TABLE managers ADD COLUMN traits TEXT");
     }
 
     protected override string Schema => """
         CREATE TABLE countries (code TEXT PRIMARY KEY, config TEXT NOT NULL);
         CREATE TABLE referees (id INTEGER PRIMARY KEY, name TEXT NOT NULL, strictness INTEGER NOT NULL);
         CREATE TABLE managers (id INTEGER PRIMARY KEY, name TEXT NOT NULL, human INTEGER NOT NULL, club_id INTEGER,
-            reputation INTEGER NOT NULL, profile TEXT NOT NULL, career TEXT);
+            reputation INTEGER NOT NULL, profile TEXT NOT NULL, career TEXT, traits TEXT);
         CREATE TABLE clubs (id INTEGER PRIMARY KEY, key TEXT NOT NULL UNIQUE, name TEXT NOT NULL, short_name TEXT NOT NULL,
             city TEXT NOT NULL, country TEXT NOT NULL, reputation INTEGER NOT NULL, primary_color TEXT NOT NULL,
             secondary_color TEXT NOT NULL, stadium TEXT NOT NULL, capacity INTEGER NOT NULL, league_id TEXT NOT NULL,
@@ -74,8 +79,8 @@ public sealed class WorldSection : SaveSection
         using (var cmd = Insert(con, tx, "referees", 3))
             foreach (var r in w.Referees) Run(cmd, r.Id, r.Name, r.Strictness);
 
-        using (var cmd = Insert(con, tx, "managers", 7))
-            foreach (var m in w.Managers) Run(cmd, m.Id, m.Name, m.Human, m.ClubId, m.Reputation, JsonSerializer.Serialize(m.Profile, Json.Compact), J(m.Career));
+        using (var cmd = Insert(con, tx, "managers", 8))
+            foreach (var m in w.Managers) Run(cmd, m.Id, m.Name, m.Human, m.ClubId, m.Reputation, JsonSerializer.Serialize(m.Profile, Json.Compact), J(m.Career), J(m.Traits));
 
         using (var cmd = Insert(con, tx, "clubs", 41))
             foreach (var c in w.Clubs.Values)
@@ -124,12 +129,13 @@ public sealed class WorldSection : SaveSection
         foreach (var r in Rows(con, "SELECT id, name, strictness FROM referees ORDER BY id"))
             w.Referees.Add(new Referee { Id = r.GetInt32(0), Name = r.GetString(1), Strictness = r.GetInt32(2) });
 
-        foreach (var r in Rows(con, "SELECT id, name, human, club_id, reputation, profile, career FROM managers ORDER BY id"))
+        foreach (var r in Rows(con, "SELECT id, name, human, club_id, reputation, profile, career, traits FROM managers ORDER BY id"))
             w.Managers.Add(new Manager
             {
                 Id = r.GetInt32(0), Name = r.GetString(1), Human = r.GetInt32(2) == 1, ClubId = NInt(r, 3), Reputation = r.GetInt32(4),
                 Profile = JsonSerializer.Deserialize<ManagerProfile>(r.GetString(5), Json.Compact) ?? new ManagerProfile(),
                 Career = r.IsDBNull(6) ? new ManagerCareer() : PJ<ManagerCareer>(r.GetString(6)) ?? new(),
+                Traits = r.IsDBNull(7) ? new ManagerTraits() : PJ<ManagerTraits>(r.GetString(7)) ?? new(),
             });
 
         foreach (var r in Rows(con, "SELECT * FROM clubs ORDER BY id"))

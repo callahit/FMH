@@ -95,6 +95,18 @@ public sealed class ManagerDefinition
     public string Club { get; set; } = "";
     [Range(1, 20)]
     public int Reputation { get; set; } = 8;
+    /// <summary>Spielidee: wirkt auf Grundhaltung und Anweisungen der Mannschaft.</summary>
+    public ManagerStyle Style { get; set; } = ManagerStyle.Balanced;
+    /// <summary>Taktisches Können 1–20; leer = wie der Ruf.</summary>
+    [Range(1, 20)]
+    public int? Tactics { get; set; }
+    /// <summary>Menschenführung 1–20; leer = 10.</summary>
+    [Range(1, 20)]
+    public int? Motivation { get; set; }
+    [Range(25, 80)]
+    public int Age { get; set; } = 50;
+    /// <summary>Ländercode der Herkunft.</summary>
+    public string Nationality { get; set; } = "";
 }
 
 /// <summary>Schiedsrichter (Datei <c>referees/*.json</c>); sind welche vorgegeben, ersetzen sie die erzeugten.</summary>
