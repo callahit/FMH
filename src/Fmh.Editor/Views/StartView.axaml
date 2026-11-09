@@ -1,0 +1,46 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:s="using:Fmh.Editor.Services"
+             xmlns:vm="using:Fmh.Editor.ViewModels"
+             x:Class="Fmh.Editor.Views.StartView"
+             x:DataType="vm:StartViewModel">
+  <ScrollViewer>
+    <StackPanel Margin="32" Spacing="18" MaxWidth="900" HorizontalAlignment="Left">
+      <TextBlock Classes="h1" Text="{s:L editor.title}" />
+      <TextBlock Classes="hint" Text="{s:L editor.start.intro}" />
+      <TextBlock Classes="hint" Text="{Binding DataRoot}" />
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="{s:L editor.start.packages}" />
+          <ItemsControl ItemsSource="{Binding Packages}">
+            <ItemsControl.ItemTemplate>
+              <DataTemplate x:DataType="vm:PackageItem">
+                <Grid ColumnDefinitions="Auto,160,*,Auto" Margin="0,4">
+                  <CheckBox IsChecked="{Binding Base}" ToolTip.Tip="{s:L editor.start.useAsBase}" />
+                  <TextBlock Grid.Column="1" Text="{Binding Id}" VerticalAlignment="Center" FontWeight="SemiBold" />
+                  <TextBlock Grid.Column="2" Text="{Binding Name}" VerticalAlignment="Center" Classes="hint" />
+                  <Button Grid.Column="3" Content="{s:L editor.start.open}" IsVisible="{Binding Editable}"
+                          Command="{Binding $parent[ItemsControl].((vm:StartViewModel)DataContext).OpenCommand}" CommandParameter="{Binding}" />
+                </Grid>
+              </DataTemplate>
+            </ItemsControl.ItemTemplate>
+          </ItemsControl>
+        </StackPanel>
+      </Border>
+      <Border Classes="card">
+        <StackPanel Spacing="10">
+          <TextBlock Classes="h2" Text="{s:L editor.start.new}" />
+          <TextBlock Classes="hint" Text="{s:L editor.start.newHint}" />
+          <Grid ColumnDefinitions="160,*" RowDefinitions="Auto,Auto" RowSpacing="8">
+            <TextBlock Text="{s:L editor.start.id}" VerticalAlignment="Center" />
+            <TextBox Grid.Column="1" Text="{Binding NewId}" Name="NewIdBox" />
+            <TextBlock Grid.Row="1" Text="{s:L editor.start.name}" VerticalAlignment="Center" />
+            <TextBox Grid.Row="1" Grid.Column="1" Text="{Binding NewName}" />
+          </Grid>
+          <Button Content="{s:L editor.start.create}" Command="{Binding CreateCommand}" Name="CreateButton" />
+        </StackPanel>
+      </Border>
+      <TextBlock Classes="error" Text="{Binding Error}" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

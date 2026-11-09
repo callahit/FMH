@@ -1,0 +1,10 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:s="using:Fmh.Editor.Services"
+        xmlns:vm="using:Fmh.Editor.ViewModels"
+        xmlns:v="using:Fmh.Editor.Views"
+        x:Class="Fmh.Editor.Views.MainWindow"
+        x:DataType="vm:MainViewModel"
+        Title="{s:L editor.title}" Width="1280" Height="820" Background="#121A26">
+  <v:MainView />
+</Window>

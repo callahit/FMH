@@ -20,6 +20,8 @@ public class ArchitectureTests
         ["Fmh.Persistence"] = new[] { "Fmh.Domain", "Fmh.Rules", "Fmh.Simulation.Abstractions" },
         ["Fmh.MatchEngine"] = new[] { "Fmh.Domain" },
         ["Fmh.SceneTree"] = new[] { "Fmh.Domain" },
+        // Datenbank-Editor (AP 6): bearbeitet Datenpakete, kennt weder Spiel-Oberfläche noch Spielstände.
+        ["fmh-editor"] = new[] { "Fmh.Domain", "Fmh.Data" },
     };
 
     private static string Src => Path.Combine(TestData.RepoRoot(), "src");
@@ -39,7 +41,7 @@ public class ArchitectureTests
     [Fact]
     public void InterfacesDoNotReferenceEachOther()
     {
-        foreach (var project in new[] { "Fmh.Desktop", "Fmh.Calibrate" })
+        foreach (var project in new[] { "Fmh.Desktop", "Fmh.Calibrate", "Fmh.Editor" })
         {
             var csproj = File.ReadAllText(Path.Combine(Src, project, project + ".csproj"));
             foreach (var other in new[] { "Fmh.Desktop", "Fmh.Calibrate", "Fmh.Editor" }.Where(o => o != project))
@@ -53,6 +55,8 @@ public class ArchitectureTests
     [InlineData("Fmh.MatchEngine")]
     [InlineData("Fmh.SceneTree")]
     [InlineData("Fmh.Rules")]
+    [InlineData("Fmh.Data")]
+    [InlineData("Fmh.Editor")]
     public void NoFileExceedsFourHundredLines(string project)
     {
         var tooLong = Directory.EnumerateFiles(Path.Combine(Src, project), "*.cs", SearchOption.AllDirectories)
