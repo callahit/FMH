@@ -2944,5 +2944,6 @@
  "editor.diff.file": "Datei",
  "editor.diff.path": "Feld",
  "editor.diff.old": "Vorher",
- "editor.diff.new": "Nachher"
+ "editor.diff.new": "Nachher",
+ "editor.closeUnsaved": "Ungespeicherte Änderungen – zum Verwerfen noch einmal auf „Schließen“ klicken."
 }

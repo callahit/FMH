@@ -3,6 +3,7 @@ using Avalonia.Headless;
 using Avalonia.Headless.XUnit;
 using Avalonia.Threading;
 using Fmh.Core.Data;
+using Fmh.Core.Data.Editing;
 using Fmh.Editor.Services;
 using Fmh.Editor.ViewModels;
 using Fmh.Editor.Views;
@@ -143,5 +144,46 @@ public sealed class EditorUiTests : IDisposable
         ws.CloseCommand.Execute(null);
         var again = Assert.IsType<StartViewModel>(vm.Page);
         Assert.Contains(again.Packages, p => p.Id == "neue-welt" && p.Editable);
+    }
+
+    [AvaloniaFact]
+    public void NewClubKeysStayUniqueManifestEditsAreUndoableAndCloseWarnsWhenUnsaved()
+    {
+        var vm = new MainViewModel(_root);
+        var start = Assert.IsType<StartViewModel>(vm.Page);
+        start.NewId = "pruefung";
+        start.CreateCommand.Execute(null);
+        var ws = Assert.IsType<WorkspaceViewModel>(vm.Page);
+
+        // Zwei neue Vereine, den ersten löschen, wieder einen anlegen: Schlüssel bleiben eindeutig
+        var clubs = ws.Sections.OfType<ClubsSectionViewModel>().Single();
+        clubs.AddCommand.Execute(null);
+        clubs.AddCommand.Execute(null);
+        clubs.SelectedRow = clubs.Rows[^2];
+        clubs.RemoveCommand.Execute(null);
+        clubs.AddCommand.Execute(null);
+        var keys = clubs.Rows.Select(r => r.Key).ToList();
+        Assert.Equal(keys.Count, keys.Distinct().Count());
+        ws.RunValidation();
+        // Keine doppelten Schlüssel; die Prüfung meldet nur die nun zu volle Liga (Ligagrößen stehen im Länder-Bereich)
+        Assert.DoesNotContain(ws.Validation.Errors, e => e.Contains("mehrfach"));
+        Assert.All(ws.Validation.Errors, e => Assert.Contains("braucht", e));
+        ws.SaveCommand.Execute(null);
+
+        // Name und Version des Pakets laufen über den Verlauf
+        var package = ws.Sections.OfType<PackageSectionViewModel>().Single();
+        package.Name = "Geänderter Name";
+        Assert.True(ws.Dirty);
+        ws.UndoCommand.Execute(null);
+        Assert.Equal("pruefung", package.Name);
+
+        // Schließen mit ungespeicherten Änderungen warnt zuerst
+        package.Version = "2.0.0";
+        ws.CloseCommand.Execute(null);
+        Assert.Same(ws, vm.Page);
+        Assert.Contains("Ungespeicherte", ws.Status);
+        ws.CloseCommand.Execute(null);
+        Assert.IsType<StartViewModel>(vm.Page);
+        Assert.Equal("1.0.0", PackageWorkspace.Open(_root, "pruefung").Manifest.Version);
     }
 }

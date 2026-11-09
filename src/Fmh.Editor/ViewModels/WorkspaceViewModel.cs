@@ -41,9 +41,12 @@ public sealed partial class WorkspaceViewModel : ViewModelBase
 
     public string Title => EditorState.F("editor.workspace.title", Workspace.Manifest.Name, Workspace.Manifest.Id);
 
+    private bool _closeArmed;
+
     private void OnChanged()
     {
         Dirty = true;
+        _closeArmed = false;
         Status = Workspace.UndoLabel ?? "";
         foreach (var s in Sections) s.Refresh();
         UndoCommand.NotifyCanExecuteChanged();
@@ -79,11 +82,22 @@ public sealed partial class WorkspaceViewModel : ViewModelBase
     {
         Workspace.Save();
         Dirty = false;
+        _closeArmed = false;
         Status = EditorState.F("editor.saved", Workspace.PackageDirectory);
     }
 
+    /// <summary>Schließen; bei ungespeicherten Änderungen erst warnen, ein zweiter Klick verwirft sie.</summary>
     [RelayCommand]
-    private void Close() => _close();
+    private void Close()
+    {
+        if (Dirty && !_closeArmed)
+        {
+            _closeArmed = true;
+            Status = EditorState.T["editor.closeUnsaved"];
+            return;
+        }
+        _close();
+    }
 }
 
 /// <summary>Ein Bereich im Arbeitsbereich (Navigation links).</summary>

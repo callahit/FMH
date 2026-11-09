@@ -15,19 +15,21 @@ public sealed class PackageSectionViewModel : SectionViewModel
     public string Name
     {
         get => Workspace.Manifest.Name;
-        set { Workspace.Manifest.Name = value; OnPropertyChanged(); }
+        set { if (value != Name) Workspace.Apply(new SetManifestField("name", value)); }
     }
 
     public string Version
     {
         get => Workspace.Manifest.Version;
-        set { Workspace.Manifest.Version = value; OnPropertyChanged(); }
+        set { if (value != Version) Workspace.Apply(new SetManifestField("version", value)); }
     }
 
     public ObservableCollection<string> ChangedFiles { get; } = new();
 
     public override void Refresh()
     {
+        OnPropertyChanged(nameof(Name));
+        OnPropertyChanged(nameof(Version));
         ChangedFiles.Clear();
         foreach (var f in Workspace.ChangedFiles) ChangedFiles.Add(f);
     }
