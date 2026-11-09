@@ -1,0 +1,18 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:s="using:Fmh.Editor.Services"
+             xmlns:vm="using:Fmh.Editor.ViewModels"
+             x:Class="Fmh.Editor.Views.LanguagesSectionView"
+             x:DataType="vm:LanguagesSectionViewModel">
+  <DockPanel>
+    <StackPanel DockPanel.Dock="Top" Spacing="8" Margin="0,0,0,10">
+      <TextBlock Classes="h1" Text="{Binding Title}" />
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <TextBox Text="{Binding Filter}" Watermark="{s:L editor.languages.search}" Width="320" />
+        <CheckBox IsChecked="{Binding OnlyProblems}" Content="{s:L editor.languages.onlyProblems}" />
+        <TextBlock VerticalAlignment="Center" Text="{Binding ProblemCount, StringFormat='⚠ {0}'}" />
+      </StackPanel>
+    </StackPanel>
+    <DataGrid ItemsSource="{Binding Rows}" AutoGenerateColumns="False" Name="Grid" GridLinesVisibility="Horizontal" />
+  </DockPanel>
+</UserControl>

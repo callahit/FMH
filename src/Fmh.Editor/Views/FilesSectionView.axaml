@@ -1,0 +1,25 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:s="using:Fmh.Editor.Services"
+             xmlns:vm="using:Fmh.Editor.ViewModels"
+             x:Class="Fmh.Editor.Views.FilesSectionView"
+             x:DataType="vm:FilesSectionViewModel">
+  <DockPanel>
+    <StackPanel DockPanel.Dock="Top" Spacing="8" Margin="0,0,0,10">
+      <TextBlock Classes="h1" Text="{Binding Title}" />
+      <TextBlock Classes="hint" Text="{s:L editor.files.hint}" />
+    </StackPanel>
+    <ListBox DockPanel.Dock="Left" Width="240" ItemsSource="{Binding Files}" SelectedItem="{Binding File}" Margin="0,0,12,0" />
+    <TreeView ItemsSource="{Binding Nodes}">
+      <TreeView.ItemTemplate>
+        <TreeDataTemplate ItemsSource="{Binding Items}" x:DataType="vm:JsonNodeItem">
+          <StackPanel Orientation="Horizontal" Spacing="10">
+            <TextBlock Text="{Binding Name}" MinWidth="200" VerticalAlignment="Center" />
+            <TextBlock Text="{Binding Summary}" Classes="hint" VerticalAlignment="Center" />
+            <TextBox Text="{Binding Value}" IsVisible="{Binding IsLeaf}" MinWidth="220" />
+          </StackPanel>
+        </TreeDataTemplate>
+      </TreeView.ItemTemplate>
+    </TreeView>
+  </DockPanel>
+</UserControl>

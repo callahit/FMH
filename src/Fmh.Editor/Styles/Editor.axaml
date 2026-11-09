@@ -1,0 +1,12 @@
+<Styles xmlns="https://github.com/avaloniaui" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+  <Style Selector="TextBlock.h1"><Setter Property="FontSize" Value="22" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
+  <Style Selector="TextBlock.h2"><Setter Property="FontSize" Value="16" /><Setter Property="FontWeight" Value="SemiBold" /></Style>
+  <Style Selector="TextBlock.hint"><Setter Property="Opacity" Value="0.7" /><Setter Property="TextWrapping" Value="Wrap" /></Style>
+  <Style Selector="TextBlock.error"><Setter Property="Foreground" Value="#FF8A80" /><Setter Property="TextWrapping" Value="Wrap" /></Style>
+  <Style Selector="Border.card">
+    <Setter Property="Background" Value="#1E2A3A" />
+    <Setter Property="CornerRadius" Value="8" />
+    <Setter Property="Padding" Value="14" />
+  </Style>
+  <Style Selector="ListBox.nav ListBoxItem"><Setter Property="Padding" Value="12,8" /></Style>
+</Styles>

@@ -1,0 +1,22 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:s="using:Fmh.Editor.Services"
+             xmlns:vm="using:Fmh.Editor.ViewModels"
+             x:Class="Fmh.Editor.Views.DiffSectionView"
+             x:DataType="vm:DiffSectionViewModel">
+  <DockPanel>
+    <StackPanel DockPanel.Dock="Top" Spacing="8" Margin="0,0,0,10">
+      <TextBlock Classes="h1" Text="{Binding Title}" />
+      <TextBlock Classes="hint" Text="{s:L editor.diff.hint}" />
+    </StackPanel>
+    <DataGrid ItemsSource="{Binding Lines}" AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="" Binding="{Binding Kind}" Width="40" />
+        <DataGridTextColumn Header="{s:L editor.diff.file}" Binding="{Binding File}" Width="200" />
+        <DataGridTextColumn Header="{s:L editor.diff.path}" Binding="{Binding Path}" Width="280" />
+        <DataGridTextColumn Header="{s:L editor.diff.old}" Binding="{Binding Old}" Width="*" />
+        <DataGridTextColumn Header="{s:L editor.diff.new}" Binding="{Binding New}" Width="*" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </DockPanel>
+</UserControl>
