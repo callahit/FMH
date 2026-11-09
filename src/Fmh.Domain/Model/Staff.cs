@@ -1,7 +1,12 @@
 namespace Fmh.Core.Model;
 
 /// <summary>Personal (Kapitel 8). Scouts haben eine eigene Klasse (Scouting).</summary>
-public enum StaffRole { AssistantManager, FitnessCoach, GoalkeepingCoach, YouthCoach, Physio, Doctor, Psychologist, PressOfficer, Groundsman }
+public enum StaffRole
+{
+    AssistantManager, FitnessCoach, GoalkeepingCoach, YouthCoach, Physio, Doctor, Psychologist, PressOfficer, Groundsman,
+    /// <summary>Verhandelt Ablösen und Verträge im Auftrag des Managers (E2-S5).</summary>
+    SportsDirector,
+}
 
 /// <summary>Angestellter mit eigenen Attributen 1–20 und Vertrag.</summary>
 public sealed class StaffMember
@@ -11,7 +16,7 @@ public sealed class StaffMember
     public string Name { get; set; } = "";
     public StaffRole Role { get; set; }
     public int Age { get; set; } = 40;
-    /// <summary>Hauptwert der Rolle (Training, Fitness, Torwart, Jugendförderung, Physiotherapie, Medizin, Psychologie, Medien, Rasenpflege).</summary>
+    /// <summary>Hauptwert der Rolle (Training, Fitness, Torwart, Jugend, Medizin, Psychologie, Medien, Rasen, Verhandlungsgeschick).</summary>
     public int Ability { get; set; } = 10;
     /// <summary>Motivation/Menschenführung, wirkt auf Moral.</summary>
     public int Motivation { get; set; } = 10;

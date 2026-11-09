@@ -72,14 +72,15 @@ public class CareerTests
     {
         var s = TestData.NewSession(7);
         var p = BuyTarget(s);
+        p.Transfer.Listed = true;
         var seller = s.World.Clubs[p.ClubId!.Value];
         var balance = s.HumanClub.Budget.Balance;
-        var (n, error) = s.StartNegotiation(p, DealType.Transfer);
-        Assert.Null(error);
+        var n = TestData.StartTalks(s, p, DealType.Transfer);
+        Assert.Equal(NegotiationStage.Talks, n.Stage);
         var ask = Negotiations.AskingPrice(p, seller, s.World, s.Data);
-        var r = s.SubmitClubOffer(n!, new ClubOffer { Fee = ask });
+        var r = s.SubmitClubOffer(n, new ClubOffer { Fee = ask });
         Assert.Equal(ResponseKind.Accept, r.Kind);
-        Assert.Equal(NegotiationStage.PlayerTalks, n!.Stage);
+        Assert.True(n.ClubAgreed);
         r = s.SubmitContract(n, n.Contract);
         Assert.Equal(ResponseKind.Accept, r.Kind);
         Assert.Equal(NegotiationStage.Completed, n.Stage);
@@ -97,13 +98,14 @@ public class CareerTests
     {
         var s = TestData.NewSession(8);
         var p = BuyTarget(s);
-        var (n, _) = s.StartNegotiation(p, DealType.Transfer);
+        p.Transfer.Listed = true;
+        var n = TestData.StartTalks(s, p, DealType.Transfer);
         for (var i = 0; i < Negotiations.MaxRounds; i++)
         {
-            var r = s.SubmitClubOffer(n!, new ClubOffer { Fee = 1_000 });
+            var r = s.SubmitClubOffer(n, new ClubOffer { Fee = 1_000 });
             if (i < Negotiations.MaxRounds - 1) Assert.Equal(ResponseKind.Counter, r.Kind);
         }
-        Assert.Equal(NegotiationStage.Failed, n!.Stage);
+        Assert.Equal(NegotiationStage.Failed, n.Stage);
         var (again, error) = s.StartNegotiation(p, DealType.Transfer);
         Assert.Null(again);
         Assert.Equal("neg.error.locked", error);
@@ -116,7 +118,8 @@ public class CareerTests
         var p = BuyTarget(s);
         p.Contract!.ReleaseClause = s.ValueOf(p) / 2;
         var (n, _) = s.StartNegotiation(p, DealType.Transfer);
-        var r = s.SubmitClubOffer(n!, new ClubOffer { Fee = p.Contract.ReleaseClause.Value });
+        Assert.Equal(NegotiationStage.Talks, n!.Stage); // Ausstiegsklausel überspringt die Anfrage
+        var r = s.SubmitClubOffer(n, new ClubOffer { Fee = p.Contract.ReleaseClause.Value });
         Assert.Equal(ResponseKind.Accept, r.Kind);
         Assert.Equal("neg.club.releaseClause", r.TextKey);
     }
@@ -128,9 +131,8 @@ public class CareerTests
         var p = BuyTarget(s);
         var parent = s.World.Clubs[p.ClubId!.Value];
         p.Transfer.LoanListed = true;
-        var (n, error) = s.StartNegotiation(p, DealType.Loan);
-        Assert.Null(error);
-        var r = s.SubmitClubOffer(n!, new ClubOffer { LoanMonths = 12, WageSharePercent = 60 });
+        var n = TestData.StartTalks(s, p, DealType.Loan);
+        var r = s.SubmitClubOffer(n, new ClubOffer { LoanMonths = 12, WageSharePercent = 60 });
         Assert.Equal(ResponseKind.Accept, r.Kind);
         Assert.Equal(s.HumanClub.Id, p.ClubId);
         Assert.Equal(parent.Id, p.Loan!.ParentClubId);
@@ -281,8 +283,8 @@ public class CareerTests
             var s = TestData.NewSession(17);
             var p = BuyTarget(s);
             p.Transfer.LoanListed = true;
-            var (n, _) = s.StartNegotiation(p, DealType.Loan);
-            s.SubmitClubOffer(n!, new ClubOffer { LoanMonths = 12, WageSharePercent = 80, RecallInWinter = true });
+            var n = TestData.StartTalks(s, p, DealType.Loan);
+            s.SubmitClubOffer(n, new ClubOffer { LoanMonths = 12, WageSharePercent = 80, RecallInWinter = true });
             s.ToggleShortlist(s.World.Players.Values.First(x => x.ClubId != s.HumanClub.Id));
             s.AssignScout(s.HumanScouts[0], ScoutTask.SearchRegion, leagueId: "DE2", position: Position.ST, maxAge: 25);
             s.HumanClub.Training.Sessions[0] = TrainingBlock.Finishing;

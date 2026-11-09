@@ -1,7 +1,9 @@
 using Fmh.Core.Data;
 using Fmh.Core.Game;
 using Fmh.Core.Logic;
+using Fmh.Core.Model;
 using Fmh.MatchEngine;
+using Xunit;
 
 namespace Fmh.Tests;
 
@@ -25,6 +27,24 @@ internal static class TestData
     {
         var world = WorldGenerator.Create(Data, new NewGameOptions { Seed = seed, ClubKey = club, ManagerName = "Test" });
         return new GameSession(world, Data, new TextMatchEngine());
+    }
+
+    /// <summary>Startet eine Verhandlung und überspringt die Anfrage (E2-S2), damit Tests deterministisch bieten können.</summary>
+    public static Negotiation StartTalks(GameSession s, Player p, DealType type)
+    {
+        var (n, error) = s.StartNegotiation(p, type);
+        Assert.Null(error);
+        Assert.NotNull(n);
+        if (n!.Stage == NegotiationStage.Enquiry)
+        {
+            n.Stage = NegotiationStage.Talks;
+            n.EnquiryDue = null;
+            n.Response = Fmh.Core.Data.TextRef.Of("neg.enquiry.accepted");
+            n.Contract = Negotiations.SuggestContract(p, s.World.Clubs[n.BuyerId], s.World, s.Data);
+        }
+        Assert.True(n.Stage is NegotiationStage.Talks or NegotiationStage.PlayerTalks or NegotiationStage.ClubTalks,
+            $"Anfrage nicht durch: {n.Stage} / {n.ResponseText(s.Data.Texts)}");
+        return n;
     }
 
     /// <summary>Spielt bis zum Ende der aktuellen Saison; eigene Spiele werden sofort berechnet.</summary>

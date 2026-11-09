@@ -125,6 +125,11 @@ public sealed partial class TransfersPageViewModel : PageViewModel, IRefreshable
     [ObservableProperty] private string _windowText = "";
     [ObservableProperty] private IBrush _windowBrush = Brushes.Gray;
     [ObservableProperty] private string? _message;
+    [ObservableProperty] private bool _directorDelegate;
+    [ObservableProperty] private long _directorMaxFee;
+    [ObservableProperty] private long _directorMaxWage;
+    [ObservableProperty] private string _directorInfo = "";
+    [ObservableProperty] private string? _directorMessage;
 
     partial void OnFilterChanged(FilterOption value) => Search();
     partial void OnLeagueChanged(ValueOption value) => Search();
@@ -136,12 +141,38 @@ public sealed partial class TransfersPageViewModel : PageViewModel, IRefreshable
     public void Refresh()
     {
         LoadBudget();
+        LoadDirector();
         Search();
         Shortlist = Session.HumanClub.Shortlist.Select(id => Session.World.Players[id]).Where(p => !p.Retired)
             .Select(p => new TransferRow(p)).ToList();
         LoadNegotiations();
         LoadScouts();
         LoadHistory();
+    }
+
+    private void LoadDirector()
+    {
+        var profile = Session.HumanManager.Profile;
+        DirectorDelegate = profile.DelegateTransfers;
+        DirectorMaxFee = profile.DirectorMaxFee;
+        DirectorMaxWage = profile.DirectorMaxWeeklyWage;
+        var director = Session.StaffOf(Session.HumanClub).FirstOrDefault(s => s.Role == StaffRole.SportsDirector);
+        DirectorInfo = director is null
+            ? T["transfer.directorNone"]
+            : T.Format("transfer.directorAbility", director.Name, director.Ability);
+    }
+
+    [RelayCommand]
+    private void SaveDirectorMandate()
+    {
+        if (Session.SetDirectorMandate(DirectorDelegate, DirectorMaxFee, (int)DirectorMaxWage) is { } err)
+        {
+            DirectorMessage = T[err];
+            return;
+        }
+        DirectorMessage = DirectorDelegate ? T["transfer.directorSaved"] : T["transfer.directorCleared"];
+        LoadDirector();
+        Shell.RefreshHeader();
     }
 
     private void LoadBudget()
@@ -193,7 +224,8 @@ public sealed partial class TransfersPageViewModel : PageViewModel, IRefreshable
         Negotiations = Session.OpenNegotiations.Concat(w.Negotiations.Where(n => n.BuyerId == Session.HumanClub.Id && n.Stage is NegotiationStage.Completed or NegotiationStage.Failed).TakeLast(8))
             .Distinct()
             .Select(n => new NegotiationRow(n, w.Players[n.PlayerId].Name, T["dealType." + n.Type] + (n.Incoming ? " · " + T["transfer.incoming"] : ""),
-                T["neg.stage." + n.Stage], n.ResponseText(T), !n.Incoming && n.Stage is NegotiationStage.ClubTalks or NegotiationStage.PlayerTalks))
+                T["neg.stage." + n.Stage], n.ResponseText(T),
+                !n.Incoming && n.Stage is NegotiationStage.Enquiry or NegotiationStage.Talks or NegotiationStage.ClubTalks or NegotiationStage.PlayerTalks))
             .ToList();
     }
 

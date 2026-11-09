@@ -30,18 +30,22 @@ public sealed partial class TransfersModule
         CheckExtensionOptions();
 
         _activeLoans = null;
+        // Fenster-Cache für Anfragen, Konkurrenz und Deadline Day (auch unter der Woche).
+        _openWindows = World.Clubs.Values.GroupBy(c => c.CountryCode).ToDictionary(g => g.Key, g => Season.IsTransferWindowOpen(g.First()));
+        MarketLifecycle();
+
         var monday = World.Date.DayOfWeek == DayOfWeek.Monday;
         if (!monday) return;
 
         CheckLoanGuarantees();
         ExpirePreemptionOffers();
-        var aiClubs = World.Clubs.Values.Where(c => !IsHuman(c)).ToList();
-        Rng.Shuffle(aiClubs);
         _loanPool = null;
         _market = null;
         _needs.Clear();
-        // Jedes Land hat eigene Wechselfristen: maßgeblich ist das Fenster des Vereins selbst, nicht das des Managers.
-        _openWindows = World.Clubs.Values.GroupBy(c => c.CountryCode).ToDictionary(g => g.Key, g => Season.IsTransferWindowOpen(g.First()));
+        // Sportdirektor des Menschen zuerst (E2-S5), damit die Beobachtungsliste nicht von der KI weggekauft wird.
+        TryDirectorSigning();
+        var aiClubs = World.Clubs.Values.Where(c => !IsHuman(c)).ToList();
+        Rng.Shuffle(aiClubs);
         foreach (var club in aiClubs)
         {
             var window = WindowOpen(club);
@@ -156,15 +160,24 @@ public sealed partial class TransfersModule
             var n = new Negotiation
             {
                 Id = World.NextNegotiationId++, PlayerId = p.Id, BuyerId = club.Id, SellerId = sellerId,
-                Type = DealType.Transfer, Offer = offer, Stage = NegotiationStage.ClubTalks, Started = World.Date,
+                Type = DealType.Transfer, Offer = offer, Stage = NegotiationStage.Talks, Started = World.Date,
+                Contract = contract,
             };
             var resp = Negotiations.EvaluateClubOffer(n, p, seller, World, Data);
-            if (resp.Kind == ResponseKind.Counter && resp.Amount <= budget) n.Offer.Fee = resp.Amount;
-            else if (resp.Kind != ResponseKind.Accept) continue;
+            if (resp.Kind == ResponseKind.Counter && resp.Amount <= budget)
+            {
+                n.Offer.Fee = resp.Amount;
+                resp = Negotiations.EvaluateClubOffer(n, p, seller, World, Data);
+            }
+            if (resp.Kind != ResponseKind.Accept) continue;
             World.Negotiations.Add(n);
             if (HoldForPreemption(n, p, n.Offer)) return;
-            // Der Verkäufer füllt die Lücke später selbst wieder auf.
-            ExecuteTransfer(p, club, seller, n.Offer, contract);
+            // Spielerzusage vorab, wenn der vorgeschlagene Vertrag passt (parallele Verhandlung der KI).
+            if (Negotiations.EvaluateContract(n, p, club, World, Data).Kind == ResponseKind.Accept)
+                n.PlayerAgreed = true;
+            MarkClubAgreed(n, p, club);
+            if (n.Stage == NegotiationStage.Completed) { Done(); return; }
+            // Konkurrenzfenster offen: späterer Tageslauf entscheidet; eine Verpflichtung reicht für heute.
             Done();
             return;
         }
@@ -207,8 +220,9 @@ public sealed partial class TransfersModule
             var n = World.Negotiations.FirstOrDefault(x => x.Id == offer.NegotiationId);
             if (n is null || n.Stage != NegotiationStage.Pending || n.Incoming) continue;
             var p = World.Players[offer.PlayerId];
-            n.Stage = NegotiationStage.PlayerTalks;
+            n.Stage = NegotiationStage.Talks;
             n.Contract = Negotiations.SuggestContract(p, World.Clubs[n.BuyerId], World, Data);
+            MarkClubAgreed(n, p, World.Clubs[n.BuyerId]);
         }
     }
 

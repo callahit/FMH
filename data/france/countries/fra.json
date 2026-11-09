@@ -384,7 +384,7 @@
           "income": {
             "total": 11200000
           },
-          "toleranceNote": "Gesamteinnahmen ±20 %: Auf-/Absteiger und TV-Verteilung schwanken stark gegenüber dem DNCG-Schnitt.",
+          "toleranceNote": "Gesamteinnahmen ±20 %: Auf-/Absteiger, TV-Verteilung und KI-Kaderauffüllung am Deadline Day streuen stärker als der DNCG-Schnitt ohne Transfererlöse.",
           "tolerances": {
             "income.total": 0.2
           }

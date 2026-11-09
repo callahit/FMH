@@ -20,6 +20,9 @@ public sealed partial class GameSession
     public void Withdraw(Negotiation n) => _transfers.Withdraw(n);
     public TextRef RespondIncoming(Negotiation n, ResponseKind answer, long counterFee = 0) => _transfers.RespondIncoming(n, answer, counterFee);
     public void DelegateDecisions() => _transfers.DelegateDecisions();
+    /// <summary>Transfermandat an den Sportdirektor (E2-S5).</summary>
+    public string? SetDirectorMandate(bool active, long maxFee, int maxWeeklyWage) =>
+        _transfers.SetDirectorMandate(active, maxFee, maxWeeklyWage);
     public void SetTransferListed(Player p, bool listed, long? askingPrice = null) => _transfers.SetTransferListed(p, listed, askingPrice);
     public void SetLoanListed(Player p, bool listed) => _transfers.SetLoanListed(p, listed);
     public void ToggleShortlist(Player p) => _transfers.ToggleShortlist(p);
