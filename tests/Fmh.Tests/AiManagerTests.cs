@@ -162,4 +162,16 @@ public sealed class AiManagerTests
         Assert.Null(displaced.ClubId);
         Assert.Equal("moved", displaced.Career.Stations[^1].Exit);
     }
+
+    /// <summary>Abweichende Grenze für Punktabzüge (Serie A) nur mit Begründung in den Ligazahlen.</summary>
+    [Fact]
+    public void DeductionLimitNeedsJustification()
+    {
+        var data = TestData.LoadAll();
+        var reference = data.Countries.First(c => c.Code == "ITA").Finance.Divisions["ITA1"].Reference!;
+        Assert.Equal(1.5, reference.MaxDeductionsPerSeason);
+        Assert.DoesNotContain(DataValidator.Validate(data), e => e.Contains("'ITA1'"));
+        reference.ToleranceNote = "";
+        Assert.Contains(DataValidator.Validate(data), e => e.Contains("Ligazahlen 'ITA1': abweichende Toleranzen ohne Begründung"));
+    }
 }
