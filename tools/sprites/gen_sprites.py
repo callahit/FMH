@@ -14,6 +14,7 @@ from iso import Sprite, rgb, shade, noise
 import buildings as B
 import specials as X
 import stadium as St
+import catalog_types as CT
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 OUT = os.path.join(ROOT, "src", "Fmh.Desktop", "Assets")
@@ -74,6 +75,15 @@ def sprites():
     out["chp_1x1"] = X.tank(chp=True)
     out["statue_1x1"] = X.monument()
     out["chapel_1x1"] = X.monument(chapel=True)
+    # Eigene Sprites je Gebäudetyp, Grundfläche (auch gedreht) und Stufe: b_<typ>_<B>x<H>_<stufe>
+    with open(os.path.join(ROOT, "data", "base", "rules", "buildings.json")) as f:
+        for b in json.load(f):
+            w, h = b.get("width", 1), b.get("height", 1)
+            for (sw, sh) in {(w, h), (h, w)}:
+                for level in range(1, b.get("maxLevel", 1) + 1):
+                    sp = CT.make(b, sw, sh, level)
+                    if sp is not None:
+                        out[f"b_{b['id']}_{sw}x{sh}_{level}"] = sp
     out["stadium_base"] = St.base()
     for side in ("North", "South", "West", "East"):
         for level in (1, 2, 3):
@@ -84,7 +94,20 @@ def sprites():
     return out
 
 
+def trim(sprites):
+    """Schneidet jedes Sprite auf seinen sichtbaren Bereich zu und verschiebt den Anker entsprechend."""
+    for s in sprites.values():
+        box_ = s.img.getbbox()
+        if box_ is None:
+            continue
+        x0, y0, x1, y1 = box_
+        s.img = s.img.crop((x0, y0, x1, y1))
+        s.ax -= x0
+        s.ay -= y0
+
+
 def pack(sprites, width=2048):
+    trim(sprites)
     items = sorted(sprites.items(), key=lambda kv: -kv[1].img.size[1])
     x = y = shelf = 0
     places = {}
@@ -112,6 +135,9 @@ def main():
     with open(os.path.join(OUT, "grounds.json"), "w") as f:
         json.dump(manifest, f, separators=(",", ":"), sort_keys=True)
     print(f"{len(manifest)} Sprites, Atlas {atlas.size[0]}x{atlas.size[1]}")
+    if "--sheet" in sys.argv:
+        import sheet
+        sheet.render(all_sprites, sys.argv[sys.argv.index("--sheet") + 1], ROOT)
     if "--preview" in sys.argv:
         import preview
         preview.render(all_sprites, sys.argv[sys.argv.index("--preview") + 1])

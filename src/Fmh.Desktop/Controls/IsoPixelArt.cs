@@ -15,8 +15,25 @@ public static class IsoPixelArt
     /// <summary>Stockwerke eines Hauses aus der Ausbaustufe (1–2: eins, 3–4: zwei, ab 5: drei).</summary>
     public static int Floors(int level) => level <= 2 ? 1 : level <= 4 ? 2 : 3;
 
-    /// <summary>Sprite-Name für ein Gebäude; Flächen ohne passende Größe werden aus 1×1-Kacheln gelegt (Name mit „_1x1“).</summary>
-    public static string SpriteFor(IsoBuildingVisual b)
+    /// <summary>
+    /// Sprite-Name für ein Gebäude: zuerst das eigene Sprite des Typs je Grundfläche und Stufe (b_&lt;typ&gt;_&lt;B&gt;x&lt;H&gt;_&lt;stufe&gt;),
+    /// sonst die allgemeine Grafik nach Art und Bereich (z. B. für Gebäude aus Community-Paketen).
+    /// </summary>
+    public static string SpriteFor(IsoBuildingVisual b, IsoAtlas? atlas)
+    {
+        if (!b.UnderConstruction && atlas is not null)
+        {
+            for (var level = Math.Max(1, b.Level); level >= 1; level--)
+            {
+                var own = $"b_{b.Type}_{b.Width}x{b.Height}_{level}";
+                if (atlas.Has(own)) return own;
+            }
+        }
+        return GenericSpriteFor(b);
+    }
+
+    /// <summary>Allgemeine Grafik nach Art, Bereich, Größe und Stockwerken; Flächen ohne passende Größe werden aus 1×1-Kacheln gelegt (Name mit „_1x1“).</summary>
+    public static string GenericSpriteFor(IsoBuildingVisual b)
     {
         var size = $"{b.Width}x{b.Height}";
         var cat = string.IsNullOrEmpty(b.Category) ? "none" : b.Category;
@@ -44,13 +61,13 @@ public static class IsoPixelArt
     }
 
     /// <summary>Zeichnet ein Gebäude; Rückgabe: Punkt über dem Dach für Beschriftung und Warnzeichen, null ohne passendes Sprite.</summary>
-    public static Point? Building(DrawingContext ctx, Vector o, IsoBuildingVisual b, IsoAtlas atlas)
+    public static Point? Building(DrawingContext ctx, Vector o, IsoBuildingVisual b, IsoAtlas atlas, Color? clubColor = null)
     {
-        var name = SpriteFor(b);
+        var name = SpriteFor(b, atlas);
         var top = P(o, b.X + b.Width / 2.0, b.Y + b.Height / 2.0);
         if (atlas.Has(name) && (!name.EndsWith("_1x1") || (b.Width == 1 && b.Height == 1)))
         {
-            atlas.Draw(ctx, name, P(o, b.X, b.Y));
+            atlas.Draw(ctx, name, P(o, b.X, b.Y), clubColor);
             return new Point(top.X, P(o, b.X, b.Y).Y - atlas.Above(name) + 14);
         }
         if (!name.EndsWith("_1x1") || !atlas.Has(name)) return null;
@@ -61,7 +78,7 @@ public static class IsoPixelArt
             {
                 var y = s - x;
                 if (y < 0 || y >= b.Height) continue;
-                atlas.Draw(ctx, name, P(o, b.X + x, b.Y + y));
+                atlas.Draw(ctx, name, P(o, b.X + x, b.Y + y), clubColor);
                 above = atlas.Above(name);
             }
         return new Point(top.X, P(o, b.X, b.Y).Y - above + 14);
