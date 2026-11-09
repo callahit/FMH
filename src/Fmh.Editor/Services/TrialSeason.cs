@@ -47,8 +47,9 @@ public static class TrialSeason
             var options = new NewGameOptions
             {
                 Seed = seed, ClubKey = club.Key, ManagerName = "Probelauf",
-                Activation = data.Countries.Select(c => c.Code).Distinct().Where(c => c != country.Code)
-                    .ToDictionary(c => c, _ => CountryActivation.Inactive),
+                // Gewähltes Land spielbar, auch wenn es in den Daten Hintergrund oder inaktiv ist; alle anderen ruhen
+                Activation = data.Countries.Select(c => c.Code).Distinct()
+                    .ToDictionary(c => c, c => c == country.Code ? CountryActivation.Playable : CountryActivation.Inactive),
             };
             var world = WorldGenerator.Create(data, options);
             var session = new GameSession(world, data, new TextMatchEngine());

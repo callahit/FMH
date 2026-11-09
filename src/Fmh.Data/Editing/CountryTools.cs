@@ -42,25 +42,42 @@ public static class CountryTools
         {
             var divisions = (level["divisions"] as JsonArray ?? new JsonArray()).OfType<JsonObject>().Select(d =>
             {
-                var groups = (d["groups"] as JsonArray ?? new JsonArray()).OfType<JsonObject>().Select(g => g["name"]?.ToString() ?? g["id"]?.ToString() ?? "").ToList();
+                var groupNodes = (d["groups"] as JsonArray ?? new JsonArray()).OfType<JsonObject>().ToList();
+                var groups = groupNodes.Select(g => g["name"]?.ToString() ?? g["id"]?.ToString() ?? "").ToList();
                 var teams = (int?)d["teams"] ?? 18;
-                var moves = Moves(d["movements"]);
-                if (moves.up == 0 && moves.down == 0) moves = ((int?)d["promotion"] ?? 0, (int?)d["relegation"] ?? 0);
-                return new PyramidDivision(d["id"]?.ToString() ?? "", d["name"]?.ToString() ?? "", teams, Math.Max(1, groups.Count), groups, moves.up, moves.down);
+                var own = Moves(d["movements"]);
+                if (own.up == 0 && own.down == 0) own = ((int?)d["promotion"] ?? 0, (int?)d["relegation"] ?? 0);
+                // Geteilte Division: Summe über die Staffeln, jede mit eigenen Regeln oder sonst denen der Division
+                double up = own.up, down = own.down;
+                if (groupNodes.Count > 0)
+                {
+                    up = down = 0;
+                    foreach (var g in groupNodes)
+                    {
+                        var m = g["movements"] is JsonArray { Count: > 0 } list ? Moves(list) : own;
+                        up += m.up;
+                        down += m.down;
+                    }
+                }
+                return new PyramidDivision(d["id"]?.ToString() ?? "", d["name"]?.ToString() ?? "", teams, Math.Max(1, groups.Count), groups,
+                    (int)Math.Round(up), (int)Math.Round(down));
             }).ToList();
             result.Add(new PyramidLevel((int?)level["level"] ?? 0, divisions));
         }
         return result;
     }
 
-    /// <summary>Direkte Auf- und Abstiegsplätze aus den Bewegungsregeln (ohne einmalige Übergangsregeln).</summary>
-    private static (int up, int down) Moves(JsonNode? movements)
+    /// <summary>
+    /// Direkte Auf- und Abstiegsplätze je Saison aus den Bewegungsregeln (ohne einmalige Übergangsregeln);
+    /// eine rotierende Regel (<c>cycle</c>) zählt anteilig, etwa ein Platz alle drei Jahre als ein Drittel.
+    /// </summary>
+    private static (double up, double down) Moves(JsonNode? movements)
     {
-        int up = 0, down = 0;
+        double up = 0, down = 0;
         foreach (var m in (movements as JsonArray ?? new JsonArray()).OfType<JsonObject>())
         {
             if (m["onlySeason"] is not null || (m["kind"]?.ToString() ?? "Direct") != "Direct") continue;
-            var n = new MovementRule { Positions = m["positions"]?.ToString() ?? "" }.PositionList().Count;
+            var n = new MovementRule { Positions = m["positions"]?.ToString() ?? "" }.PositionList().Count / (double)Math.Max(1, (int?)m["cycle"] ?? 1);
             if (m["to"]?.ToString() == "Up") up += n; else down += n;
         }
         return (up, down);
@@ -72,7 +89,10 @@ public sealed record PyramidLevel(int Level, IReadOnlyList<PyramidDivision> Divi
     public int Teams => Divisions.Sum(d => d.Teams * d.Leagues);
 }
 
-/// <summary>Division in der Übersicht; <see cref="Leagues"/> = Zahl der Staffeln (1 ohne Teilung).</summary>
+/// <summary>
+/// Division in der Übersicht; <see cref="Leagues"/> = Zahl der Staffeln (1 ohne Teilung). <see cref="Up"/> und
+/// <see cref="Down"/> sind die direkten Plätze je Saison über alle Staffeln.
+/// </summary>
 public sealed record PyramidDivision(string Id, string Name, int Teams, int Leagues, IReadOnlyList<string> Groups, int Up, int Down)
 {
     public string Shape => Leagues > 1 ? $"{Leagues} × {Teams}" : $"{Teams}";
