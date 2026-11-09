@@ -531,6 +531,10 @@
             "matchday": 10000000,
             "media": 22100000,
             "total": 45100000
+          },
+          "toleranceNote": "Deloitte-Schätzung ohne amtliche Ligazahl; Fallschirmzahlungen, Auf-/Abstieg und Spielertransfers machen die Championship zur Liga mit der stärksten Ertragsstreuung, der Fünf-Saison-Schnitt schwankt je nach Seed um mehr als ±10 %.",
+          "tolerances": {
+            "income.total": 0.15
           }
         }
       },
