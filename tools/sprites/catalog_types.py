@@ -131,14 +131,15 @@ def s_parking(c, bus=False, ev=False):
         r = random.Random(c.seed)
         L = max(c.w, c.h)
         n = max(1, int(L * (1.5 if bus else 3)))
+        fill = 0.35 if c.level <= 1 else 0.75  # Stufe 2: deutlich mehr Stellplätze belegt
         for k in range(n):
-            if not bus and r.random() > 0.5:
+            if not bus and r.random() > fill:
                 continue
             fx = 0.08 + 0.84 * k / n
             x, y = c.pt(fx + 0.02, 0.2)
             col = rgb("#E2B13C") if bus else r.choice(CARS)
             K.vehicle(s, x, y, not c.along, 0.55 if bus else 0.3, col, 9 if bus else 5)
-    if ev:
+    if ev or (c.stage == 4 and not bus):
         for k in range(3):
             a = s.p(*c.pt(0.2 + 0.3 * k, 0.5))
             s.line(a, (a[0], a[1] - 9), rgb("#1F9AAD"))
