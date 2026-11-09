@@ -142,6 +142,12 @@ public sealed class ManagerProfile
     public MediaStyle Style { get; set; } = MediaStyle.Balanced;
     /// <summary>Pressekonferenzen an den Pressesprecher abgeben.</summary>
     public bool DelegatePress { get; set; }
+    /// <summary>Transferverhandlungen an den Sportdirektor abgeben (E2-S5).</summary>
+    public bool DelegateTransfers { get; set; }
+    /// <summary>Höchstablöse für den Sportdirektor (sofortige Belastung des Transferbudgets).</summary>
+    public long DirectorMaxFee { get; set; }
+    /// <summary>Höchstwochengehalt für Neuzugänge des Sportdirektors.</summary>
+    public int DirectorMaxWeeklyWage { get; set; }
     /// <summary>Anzeigewährung (gerechnet wird in Euro) und eigene Kurse je Währung (Einheiten je Euro), leer = Standardkurse.</summary>
     public string DisplayCurrency { get; set; } = "EUR";
     public Dictionary<string, double> ExchangeRates { get; set; } = new();
