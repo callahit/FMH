@@ -2430,7 +2430,7 @@
  "build.connected": "Am Wegenetz",
  "build.showPaths": "Wegenetz anzeigen",
  "build.pathCost": "Wegkosten: {0}",
- "build.isoHelp": "Isometrische Karte: Gebäude aus der Leiste wählen, mit R drehen, klicken zum Platzieren. Wege-Werkzeug für das Wegenetz.",
+ "build.isoHelp": "Isometrische Karte: Gebäude aus der Leiste wählen, mit R drehen, klicken zum Platzieren. Wege-Werkzeug für das Wegenetz. Strg+Mausrad oder +/− zoomt.",
  "build.underConstruction": "im Bau",
  "build.until": "bis {0}",
  "build.upgrade": "Ausbau auf Stufe {0} ({1})",
