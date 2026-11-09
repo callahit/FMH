@@ -13,6 +13,8 @@ public interface IStaffService
     int StaffAbility(Club club, StaffRole role);
     /// <summary>Startpersonal nach Vereinsgröße; kleine Vereine besetzen nicht jede Stelle.</summary>
     void CreateStaff(Club club);
+    /// <summary>Vorgegebenes Personal ohne Verein zum Spielstart auf den Arbeitsmarkt (AP 6c).</summary>
+    void AddDefinedMarketStaff();
     /// <summary>Arbeitsmarkt für Personal: jedes Jahr frische Kandidaten.</summary>
     void RefreshStaffMarket();
     /// <summary>Überträgt Personal und Anlagen auf die Kennwerte, die Training und Jugend verwenden.</summary>

@@ -33,6 +33,7 @@ public static class DataValidator
         if (data.Currencies.Rates.Any(r => r.PerEuro <= 0) || data.Currencies.PerEuro(CurrencyConfig.Base) != 1.0)
             errors.Add("Währungskurse: Kurse müssen positiv sein, der Euro hat den Kurs 1.");
         errors.AddRange(PyramidValidator.Validate(data));
+        errors.AddRange(PeopleValidator.Validate(data));
         bool KnownDivision(string id) =>
             data.Countries.SelectMany(x => x.Divisions).Any(d => d.Id == id || d.Groups.Any(g => g.Id == id))
             || data.Countries.SelectMany(x => x.Pools).Any(p => p.Id == id);
