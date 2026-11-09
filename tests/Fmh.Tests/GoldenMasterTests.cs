@@ -1,3 +1,4 @@
+using System.Globalization;
 using System.Runtime.InteropServices;
 using System.Security.Cryptography;
 using System.Text;
@@ -73,7 +74,9 @@ public class GoldenMasterTests
             foreach (var e in sim.Events) sections["events"].Append(JsonSerializer.Serialize(e, Json.Compact)).Append('\n');
             foreach (var team in new[] { sim.Home, sim.Away })
                 foreach (var p in team.Participants)
-                    sections["players"].Append($"{i}:{p.Player.Id}:{p.Grade?.ToString("R")}:{p.Condition:R}:{p.Goals}:{p.Assists}:{p.Yellow}:{p.Red}:{p.Injured}\n");
+                    // Invariant formatiert: Oberflächentests stellen die Prozesskultur auf Deutsch (Dezimalkomma)
+                    sections["players"].Append(string.Create(CultureInfo.InvariantCulture,
+                        $"{i}:{p.Player.Id}:{p.Grade?.ToString("R", CultureInfo.InvariantCulture)}:{p.Condition:R}:{p.Goals}:{p.Assists}:{p.Yellow}:{p.Red}:{p.Injured}\n"));
             sections["results"].Append($"{i}:{sim.Home.Goals}:{sim.Away.Goals}:{sim.PenaltiesHome}:{sim.PenaltiesAway}:{sim.PlayerOfTheMatchId}\n");
         }
         Check("engine", sections.ToDictionary(kv => kv.Key, kv => Hash(kv.Value.ToString())));
