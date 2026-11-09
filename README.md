@@ -455,7 +455,7 @@ aktive Spieler höchstens +10 % gegenüber dem ersten Saisonende, Vereinslose h�
 | 9 Vereinsgelände | **83 Gebäude** mit Stufen, Lage und Synergien, Baufirmen, Genehmigungen | – |
 | 10 Umfeld, Karriere | **Vorstand, Fans, Presse, 166 Zufallsereignisse, Managerkarriere** mit Lizenzen und Erfolgen | Nationalmannschaft, Medienhaus |
 | 11 Oberfläche | Desktop-Oberfläche (Avalonia) mit Maus, Drag & Drop, sortierbaren Tabellen, Diagrammen (Radar, Formkurve, xG, Heatmap), Wappen, Farbthemen | Tastenbelegung |
-| 12 Nicht-funktional | Determinismus, **SQLite-Spielstände** mit Schemamigration, **Mehrsprachigkeit (Deutsch, Englisch, erweiterbar)**, Datenpakete mit Überlagerung, Datenvalidierung, Kalibrierungs-CLI mit Toleranzprüfung, **CI auf Linux und Windows**, Warnungen als Fehler, **Modulaufbau mit Golden Master und Architekturtest** | Editor (AP 6), Mod-Verwaltung (AP 14) |
+| 12 Nicht-funktional | Determinismus, **SQLite-Spielstände** mit Schemamigration, **Mehrsprachigkeit (Deutsch, Englisch, erweiterbar)**, Datenpakete mit Überlagerung, Datenvalidierung, Kalibrierungs-CLI mit Toleranzprüfung, **CI auf Linux und Windows**, Warnungen als Fehler, **Modulaufbau mit Golden Master und Architekturtest**, **Datenbank-Editor mit JSON-Schemas (AP 6)** | Spielstand-Modus des Editors (optional), Mod-Verwaltung (AP 14) |
 
 ## Sprachen
 
@@ -614,8 +614,9 @@ speichern sie Bildschirmfotos aller Seiten.
 ## Datenbank-Editor (AP 6)
 
 `fmh-editor` (Projekt `src/Fmh.Editor`, Start: `dotnet run --project src/Fmh.Editor [-- --data pfad --lang de|en]`)
-bearbeitet Datenpakete, ohne JSON von Hand zu schreiben. Umgesetzt sind 6a (Paket-Modus) und 6b (Länder,
-Probelauf, „Neues Land“); JSON-Schemas, Spieler und Personal folgen in 6c.
+bearbeitet Datenpakete, ohne JSON von Hand zu schreiben. Umgesetzt sind 6a (Paket-Modus), 6b (Länder, Probelauf,
+„Neues Land“) und 6c (JSON-Schemas, Spieler, Personal). Der Spielstand-Modus (Umsetzungskonzept 7.1) ist optional und
+noch offen.
 
 - **Eigenes Paket statt Eingriff:**
   - Ausgelieferte Pakete (`base`, Länderpakete) bleiben unverändert und lassen sich im Editor nicht öffnen.
@@ -634,11 +635,16 @@ Probelauf, „Neues Land“); JSON-Schemas, Spieler und Personal folgen in 6c.
       und Sponsoren. Saison-, Kader-, Wirtschafts- und Meldelistenregeln kommen je Ebene von der Vorlage
       Deutschland. Alles ist ein einziger Schritt.
   - Vereine: Tabelle zur Massenbearbeitung, hinzufügen und löschen, CSV-Import und -Export mit Semikolon und Kopfzeile.
+  - Spieler: Tabelle der vorgegebenen Spieler (`players/*.json`) mit CSV-Import und -Export. Spalten und Werttypen
+    kommen aus dem Schema; Positionen werden auf die Schreibweise des Schemas gebracht, ungültige Werte abgewiesen.
+    Attribute, Positionseignungen und Charakterwerte bearbeitet man im Baum.
+  - Personal: Personal, KI-Manager und Schiedsrichter (`staff/`, `managers/`, `referees/`) als Tabellen.
   - Regeln und Inhalte: jede Datendatei als Baum. Werte behalten ihren Typ, ungültige Zahlen werden abgewiesen.
     Listen bekommen neue Einträge als Kopie des letzten, Objekte neue Felder (Zahl, Wahrheitswert, `[]`, `{}` oder
-    Text), und jeder Eintrag lässt sich entfernen.
+    Text), und jeder Eintrag lässt sich entfernen. Mit Schema zeigt der Feldname die Beschreibung, „+ Feld“ schlägt
+    die noch fehlenden Felder vor, und der Wert bekommt den Typ des Feldes.
   - Sprachen: Sprachen nebeneinander; fehlende Texte und abweichende Platzhalter sind markiert und filterbar.
-  - Prüfung: Liste aller Fehler.
+  - Prüfung: Liste aller Fehler. Schemafehler in eigenen Dateien springen mit „Zur Stelle“ zum Feld im Baum.
   - Unterschiede: Änderungen je Datei und Feld. Listen mit `key`, `id` oder `code` werden über den Schlüssel verglichen.
   - Probelauf (`TrialSeason`):
     - Spielt mit dem ungespeicherten Stand im Hintergrund eine Saison des gewählten Landes. Die übrigen Länder
@@ -653,8 +659,16 @@ Probelauf, „Neues Land“); JSON-Schemas, Spieler und Personal folgen in 6c.
   - Der Paketlader nimmt bei gleicher Paket-Id die Fassung aus dem späteren Verzeichnis.
 - **Feste Schreibweise** (`CanonicalJson`): Schlüssel ordinal sortiert, zwei Leerzeichen Einrückung, LF, UTF-8 ohne
   BOM, Umlaute unmaskiert. Gleicher Inhalt ergibt byte-identische Dateien, und Git-Diffs bleiben lesbar.
+- **JSON-Schemas** (`data/schema/*.schema.json`, `SchemaCatalog` in `src/Fmh.Data/Schema`):
+  - Erzeugt aus den Datentypen, die der Paketlader liest; Schema und Spiel können so nicht auseinanderlaufen.
+    Beschreibungen kommen aus den XML-Kommentaren von `Fmh.Domain`, Wertebereiche aus `[Range]`.
+  - Der Datenvalidator prüft jede Paketdatei dagegen: unbekannte Felder (Tippfehler), falsche Typen, Bereiche,
+    Enum-Werte und Datumsformate, jeweils mit Datei und Pfad. Groß- und Kleinschreibung zählt wie beim Laden nicht.
+  - `.vscode/settings.json` ordnet die Schemas den Dateien zu; VS Code bietet damit Autovervollständigung.
+  - Nach einer Änderung an den Datentypen: `FMH_UPDATE_SCHEMAS=1 dotnet test --filter SchemaFilesAreUpToDate`
+    schreibt die Dateien neu. Ohne das schlägt der Test fehl.
 - Kern ohne Oberfläche in `src/Fmh.Data/Editing`: `PackageWorkspace`, `JsonEdit`, `CanonicalJson`, `JsonDiff`,
-  `ClubCsv`, `CountryTools`, `CountryWizard`. Der Editor darf laut Architekturtest die Daten- und Regelschichten
+  `ClubCsv`, `TableCsv`, `CountryTools`, `CountryWizard`. Der Editor darf laut Architekturtest die Daten- und Regelschichten
   referenzieren und für den Probelauf die Simulation, aber nicht das Spiel-Frontend.
 - Die Texte der Oberfläche stehen wie im Spiel in den Sprachdateien (`editor.*`, Deutsch und Englisch).
 
@@ -669,6 +683,8 @@ frühere, Sprachdateien werden schlüsselweise zusammengeführt.
 | `countries/*.json` | Pyramide, Ligaformat, Kalender, Kaderregeln, Amateur-Pools, Pokal, Relegation, Transferfenster, Jugend |
 | `clubs/*.json` | Vereine (fiktiv): Name, Liga oder Pool, Reputation, Farben, Stadion |
 | `names/*.json` | Namenslisten für Zufallsspieler je Land |
+| `players/*.json` | Vorgegebene Spieler (Rahmen): Schlüssel, Name, Verein, Position, optional Alter, Stärke, Potenzial, Attribute, Charakter, Vertrag |
+| `staff/*.json`, `managers/*.json`, `referees/*.json` | Vorgegebenes Personal, KI-Manager und Schiedsrichter |
 | `formations.json` | Formationen auf dem 5x7-Raster |
 | `rules/roles.json` | Rollen mit erlaubten Positionen, Aufgaben und Wirkung in der Engine |
 | `rules/positions.json`, `rules/injuries.json`, `rules/engine.json` | Attributgewichte, Verletzungen, Engine-Gewichte |
@@ -677,6 +693,19 @@ frühere, Sprachdateien werden schlüsselweise zusammengeführt.
 | `events/*.json` | Zufallsereignisse mit Bedingungen, Antworten, Wirkungen und Erfolgschance |
 | `sponsors/*.json` | Fiktive Sponsorenfirmen je Land mit Größe und Werbeplätzen |
 | `lang/<code>.json`, `lang/<code>.commentary.json` | Texte der Oberfläche und Kommentarbausteine je Sprache (`de`, `en`) |
+
+Zu jeder Datei gehört ein JSON-Schema unter `data/schema/` (siehe Datenbank-Editor).
+
+**Vorgegebene Personen (AP 6c):** Ohne diese Dateien erzeugt der Weltgenerator alle Personen zufällig, die Welt
+entsteht dann genau wie vorher.
+
+- Ein Spieler mit Verein ersetzt dort den schwächsten erzeugten Spieler seiner Hauptposition, damit die Kadergröße
+  stimmt. Ohne Verein ist er zum Spielstart vereinslos. Was fehlt, erzeugt der Generator wie bei Zufallsspielern.
+  Fähigkeit und Potenzial werden aus den Attributen neu berechnet. Vereine nicht spielbarer Länder werden übersprungen.
+- Personal ersetzt beim Verein das erzeugte Personal derselben Rolle. Ohne Verein kommt es auf den Arbeitsmarkt.
+- KI-Manager führen ihren Verein. Wechselt der Spieler zu diesem Verein, übernimmt der KI-Manager den alten. Eine
+  eigene Anzeige für KI-Manager gibt es im Spiel noch nicht.
+- Vorgegebene Schiedsrichter ersetzen die erzeugten.
 
 Beim Start prüft `DataValidator` die Pakete und bricht mit einer Fehlerliste ab. Geprüft werden unter
 anderem Teamzahlen, Pools, Pokaltermine und Relegationsplätze.

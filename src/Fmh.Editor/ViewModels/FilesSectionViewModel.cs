@@ -5,6 +5,7 @@ using System.Text.Json.Nodes;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Fmh.Core.Data.Editing;
+using Fmh.Core.Data.Schema;
 
 namespace Fmh.Editor.ViewModels;
 
@@ -36,12 +37,32 @@ public sealed partial class FilesSectionViewModel : SectionViewModel
         foreach (var item in JsonNodeItem.Children(this, doc, JsonPath.Root)) Nodes.Add(item);
     }
 
-    /// <summary>Datei im Baum öffnen (z. B. aus dem Länder-Bereich).</summary>
-    public void Open(string file)
+    [ObservableProperty] private JsonNodeItem? _selectedNode;
+
+    /// <summary>Datei im Baum öffnen (z. B. aus dem Länder-Bereich), optional mit Sprung zu einem Feld.</summary>
+    public void Open(string file, JsonPath? path = null)
     {
         if (!Files.Contains(file)) Files.Add(file);
         File = file;
+        if (path is null) return;
+        // Bis zum tiefsten vorhandenen Knoten aufklappen und auswählen
+        IEnumerable<JsonNodeItem> level = Nodes;
+        JsonNodeItem? found = null;
+        for (var depth = 1; depth <= path.Segments.Count; depth++)
+        {
+            var prefix = new JsonPath(path.Segments.Take(depth).ToList());
+            var next = level.FirstOrDefault(n => n.Path.Equals(prefix));
+            if (next is null) break;
+            if (found is not null) found.IsExpanded = true;
+            found = next;
+            level = next.Items;
+        }
+        SelectedNode = found;
     }
+
+    /// <summary>Teilschema eines Knotens (Beschreibung, Feldvorschläge, Werttyp); null ohne Schema.</summary>
+    internal System.Text.Json.Nodes.JsonObject? SchemaAt(JsonPath path) =>
+        Workspace.Schema(File) is { } schema ? SchemaNavigator.At(schema, path) : null;
 
     /// <summary>Werte nachziehen; hat sich der Aufbau geändert (Einträge dazu oder weg), Baum neu aufbauen.</summary>
     public override void Refresh()
@@ -94,6 +115,15 @@ public sealed partial class JsonNodeItem : ObservableObject
     public string NewField { get; set; } = "";
     public string NewValue { get; set; } = "";
 
+    [ObservableProperty] private bool _isExpanded;
+
+    /// <summary>Beschreibung aus dem JSON-Schema (Hinweis beim Feldnamen).</summary>
+    public string? Description => _owner.SchemaAt(Path)?["description"]?.GetValue<string>();
+
+    /// <summary>Felder, die das Objekt laut Schema noch haben kann.</summary>
+    public IReadOnlyList<string> FieldSuggestions =>
+        IsObject ? SchemaNavigator.Properties(_owner.SchemaAt(Path)).Where(p => Items.All(i => i.Name != p)).ToList() : Array.Empty<string>();
+
     /// <summary>Liste: Eintrag anhängen (Kopie des letzten, sonst leeres Objekt).</summary>
     [RelayCommand]
     private void AddItem()
@@ -109,6 +139,15 @@ public sealed partial class JsonNodeItem : ObservableObject
         var name = NewField.Trim();
         if (name.Length == 0 || _owner.Resolve(Path) is not JsonObject obj || obj.ContainsKey(name)) return;
         var text = NewValue.Trim();
+        // Mit Schema: Wert im Typ des Feldes (leere Liste bzw. leeres Objekt, wenn kein Wert angegeben ist)
+        if (_owner.SchemaAt(Path.Then(name)) is { } field)
+        {
+            var types = field["type"]?.ToJsonString() ?? "";
+            if (text.Length == 0 && types.Contains("\"array\"")) { _owner.Set(Path.Then(name), new JsonArray()); return; }
+            if (text.Length == 0 && types.Contains("\"object\"")) { _owner.Set(Path.Then(name), new JsonObject()); return; }
+            if (SchemaNavigator.TryParse(field, text, out var typed) && typed is not null) _owner.Set(Path.Then(name), typed);
+            return;
+        }
         JsonNode? value = long.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var n) ? JsonValue.Create(n)
             : double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var d) ? JsonValue.Create(d)
             : bool.TryParse(text, out var b) ? JsonValue.Create(b)
