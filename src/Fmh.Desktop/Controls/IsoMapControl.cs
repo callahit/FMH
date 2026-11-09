@@ -25,7 +25,11 @@ public sealed class IsoMapControl : Control
     {
         AffectsRender<IsoMapControl>(StateProperty);
         AffectsMeasure<IsoMapControl>(StateProperty);
+        StateProperty.Changed.AddClassHandler<IsoMapControl>((c, _) => c._crowd.Reset(c.State));
     }
+
+    /// <summary>Menschen auf dem Gelände (Besucher auf Wegen, Spieler auf Plätzen).</summary>
+    private readonly IsoCrowd _crowd = new();
 
     public IsoMapState? State
     {
@@ -91,7 +95,8 @@ public sealed class IsoMapControl : Control
             .OrderBy(i => i.key).ToList();
         var anchors = new Dictionary<int, Point>();
         var stadiumTop = default(Point);
-        var decos = atlas is null ? new() : IsoPixelArt.Decorations(s);
+        var decos = atlas is null ? new() : IsoPixelArt.Decorations(s).Concat(_crowd.Sprites())
+            .OrderBy(d => d.Key).ThenBy(d => d.X).ToList();
         var di = 0;
         foreach (var (key, b) in items)
         {
@@ -306,6 +311,7 @@ public sealed class IsoMapControl : Control
     protected override void OnAttachedToVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnAttachedToVisualTree(e);
+        _crowd.Start(InvalidateVisual);
         Focusable = true;
         _viewer = this.FindAncestorOfType<ScrollViewer>();
         if (_viewer is not null) _viewer.PropertyChanged += OnViewerChanged;
@@ -314,6 +320,7 @@ public sealed class IsoMapControl : Control
     protected override void OnDetachedFromVisualTree(VisualTreeAttachmentEventArgs e)
     {
         base.OnDetachedFromVisualTree(e);
+        _crowd.Stop();
         if (_viewer is not null) _viewer.PropertyChanged -= OnViewerChanged;
         _viewer = null;
     }
