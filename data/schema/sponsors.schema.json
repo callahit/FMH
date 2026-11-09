@@ -1,0 +1,45 @@
+{
+  "$id": "https://fmh.local/schema/sponsors.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "companies": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "industry": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "size": {
+            "description": "Größe 1–20: ab welcher Vereinsgröße der Sponsor passt.",
+            "type": "integer"
+          },
+          "slots": {
+            "description": "Für Trikot, Ärmel, Ausrüster, Banden oder Stadionnamen geeignet.",
+            "items": {
+              "description": "Werbeplätze (Kapitel 8): Trikot, Ärmel, Ausrüster, 10 Banden, Stadionname.",
+              "enum": [
+                "Shirt",
+                "Sleeve",
+                "Kit",
+                "Board",
+                "StadiumName"
+              ]
+            },
+            "type": "array"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "country": {
+      "type": "string"
+    }
+  },
+  "title": "FMH sponsors/*.json",
+  "type": "object"
+}

@@ -1,5 +1,8 @@
 <Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
+    <!-- XML-Kommentare als Beschreibungen in den JSON-Schemas (data/schema) -->
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
+    <NoWarn>$(NoWarn);CS1591</NoWarn>
     <RootNamespace>Fmh.Core</RootNamespace>
   </PropertyGroup>
 

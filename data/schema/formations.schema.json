@@ -1,0 +1,57 @@
+{
+  "$id": "https://fmh.local/schema/formations.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "items": {
+    "additionalProperties": false,
+    "description": "Formationsvorlage aus den Daten. Raster 5 Spalten (0 = links) x 7 Reihen (0 = eigenes Tor).",
+    "properties": {
+      "id": {
+        "type": "string"
+      },
+      "name": {
+        "type": "string"
+      },
+      "slots": {
+        "items": {
+          "additionalProperties": false,
+          "properties": {
+            "col": {
+              "type": "integer"
+            },
+            "duty": {
+              "enum": [
+                "Defend",
+                "Support",
+                "Attack"
+              ]
+            },
+            "position": {
+              "enum": [
+                "GK",
+                "DL",
+                "DC",
+                "DR",
+                "DM",
+                "ML",
+                "MC",
+                "MR",
+                "AML",
+                "AMC",
+                "AMR",
+                "ST"
+              ]
+            },
+            "row": {
+              "type": "integer"
+            }
+          },
+          "type": "object"
+        },
+        "type": "array"
+      }
+    },
+    "type": "object"
+  },
+  "title": "FMH formations.json",
+  "type": "array"
+}

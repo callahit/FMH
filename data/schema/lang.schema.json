@@ -1,0 +1,9 @@
+{
+  "$id": "https://fmh.local/schema/lang.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": {
+    "type": "string"
+  },
+  "title": "FMH lang/*.json",
+  "type": "object"
+}
