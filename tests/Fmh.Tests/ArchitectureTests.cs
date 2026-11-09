@@ -20,8 +20,8 @@ public class ArchitectureTests
         ["Fmh.Persistence"] = new[] { "Fmh.Domain", "Fmh.Rules", "Fmh.Simulation.Abstractions" },
         ["Fmh.MatchEngine"] = new[] { "Fmh.Domain" },
         ["Fmh.SceneTree"] = new[] { "Fmh.Domain" },
-        // Datenbank-Editor (AP 6): bearbeitet Datenpakete, kennt weder Spiel-Oberfläche noch Spielstände.
-        ["fmh-editor"] = new[] { "Fmh.Domain", "Fmh.Data" },
+        // Datenbank-Editor (AP 6): bearbeitet Datenpakete und startet den Probelauf; kennt weder Spiel-Oberfläche noch Spielstände.
+        ["fmh-editor"] = new[] { "Fmh.Domain", "Fmh.Data", "Fmh.Rules", "Fmh.Simulation.Abstractions", "Fmh.Modules", "Fmh.Simulation", "Fmh.MatchEngine" },
     };
 
     private static string Src => Path.Combine(TestData.RepoRoot(), "src");

@@ -186,4 +186,82 @@ public sealed class EditorUiTests : IDisposable
         Assert.IsType<StartViewModel>(vm.Page);
         Assert.Equal("1.0.0", PackageWorkspace.Open(_root, "pruefung").Manifest.Version);
     }
+
+    [AvaloniaFact]
+    public void CountriesPyramidWizardFormatVersionTreeEditingAndTrialRun()
+    {
+        var vm = new MainViewModel(_root);
+        var window = new Window { Width = 1280, Height = 900, Content = new MainView { DataContext = vm } };
+        window.Show();
+        var start = Assert.IsType<StartViewModel>(vm.Page);
+        start.NewId = "laender";
+        start.CreateCommand.Execute(null);
+        var ws = Assert.IsType<WorkspaceViewModel>(vm.Page);
+
+        // Pyramide Deutschlands, dann neues Land per Assistent
+        var countries = ws.Countries;
+        ws.Selected = countries;
+        Pump();
+        Assert.Equal(4, countries.Levels.Count);
+        Assert.Equal(90, countries.Levels[3].Teams);
+        countries.WizardCode = "NL";
+        countries.WizardName = "Neuland";
+        countries.WizardTeams = "16, 16, 16, 16";
+        countries.CreateCountryCommand.Execute(null);
+        Assert.Equal("countries/nl.json", countries.File);
+        Assert.Equal(new[] { 16, 16, 16, 16 }, countries.Levels.Select(l => l.Teams));
+        countries.WizardTeams = "16, viele";
+        countries.CreateCountryCommand.Execute(null);
+        Assert.Contains("Komma", countries.Message);
+        ws.RunValidation();
+        Assert.Equal("Keine Fehler.", ws.ErrorSummary);
+        Shot(window, "76_editor_countries");
+
+        // Neue Formatversion für Deutschland
+        countries.File = "countries/de.json";
+        countries.NewVersionSeason = "2030";
+        countries.NewVersionCommand.Execute(null);
+        Assert.Equal("countries/de-2030.json", countries.File);
+        ws.RunValidation();
+        Assert.Empty(countries.Problems);
+
+        // Baum: Feld hinzufügen, Eintrag anhängen und wieder entfernen
+        countries.EditInTreeCommand.Execute(null);
+        var files = Assert.IsType<FilesSectionViewModel>(ws.Selected);
+        Assert.Equal("countries/de-2030.json", files.File);
+        files.Nodes.First(n => n.Name == "pools").AddItemCommand.Execute(null);
+        Assert.Equal(2, files.Nodes.First(n => n.Name == "pools").Items.Count);
+        files.Nodes.First(n => n.Name == "pools").Items[1].RemoveCommand.Execute(null);
+        var cup = files.Nodes.First(n => n.Name == "cups").Items[0];
+        cup.NewField = "testFeld";
+        cup.NewValue = "3";
+        cup.AddFieldCommand.Execute(null);
+        Assert.Contains(files.Nodes.First(n => n.Name == "cups").Items[0].Items, i => i.Name == "testFeld" && i.Value == "3");
+        files.Nodes.First(n => n.Name == "cups").Items[0].Items.First(i => i.Name == "testFeld").RemoveCommand.Execute(null);
+        ws.RunValidation();
+        Assert.Equal("Keine Fehler.", ws.ErrorSummary);
+        Shot(window, "77_editor_tree");
+
+        // Probelauf mit dem neuen Land
+        var trial = ws.Sections.OfType<TrialSectionViewModel>().Single();
+        ws.Selected = trial;
+        Pump();
+        Assert.Contains("NL", trial.Countries);
+        trial.Country = "NL";
+        trial.RunCommand.Execute(null);
+        var until = DateTime.UtcNow.AddMinutes(5);
+        while (trial.Running && DateTime.UtcNow < until)
+        {
+            Dispatcher.UIThread.RunJobs();
+            Thread.Sleep(50);
+        }
+        Pump();
+        Assert.Empty(trial.Errors);
+        Assert.Equal(4, trial.Leagues.Count);
+        Assert.All(trial.Leagues, l => Assert.Equal(16, l.Clubs));
+        Assert.All(trial.Leagues, l => Assert.InRange(l.GoalsPerMatch, 1.5, 4.5));
+        Assert.Equal(new[] { 0, 2, 2, 2 }, trial.Leagues.Select(l => l.Up.Count));
+        Assert.Equal(new[] { 2, 2, 2, 0 }, trial.Leagues.Select(l => l.Down.Count));
+        Shot(window, "78_editor_trial");
+    }
 }

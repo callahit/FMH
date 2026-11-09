@@ -40,6 +40,13 @@ public sealed class MovementRule
     public string? Playoff { get; set; }
     /// <summary>Übergangsregel, die nur in dieser Saison (Startjahr) gilt, z. B. Sonderabsteiger vor einer Reform.</summary>
     public int? OnlySeason { get; set; }
+    /// <summary>
+    /// Abstieg in den Pool ohne Nachrücker (nur unterste Ebene mit Pool): verkleinert die Ebene, etwa vor einer Reform
+    /// mit weniger Staffeln. Meist zusammen mit <see cref="OnlySeason"/>.
+    /// </summary>
+    // Nur geschrieben, wenn gesetzt: Spielstände und Golden Master bleiben für Regeln ohne das Feld unverändert
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingDefault)]
+    public bool WithoutReplacement { get; set; }
     /// <summary>Rotation: Die Regel gilt nur alle <see cref="Cycle"/> Saisons, erstmals in <see cref="CycleStart"/> (Startjahr).</summary>
     public int? Cycle { get; set; }
     public int CycleStart { get; set; }

@@ -3,6 +3,7 @@ using System.Globalization;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using CommunityToolkit.Mvvm.ComponentModel;
+using CommunityToolkit.Mvvm.Input;
 using Fmh.Core.Data.Editing;
 
 namespace Fmh.Editor.ViewModels;
@@ -35,18 +36,37 @@ public sealed partial class FilesSectionViewModel : SectionViewModel
         foreach (var item in JsonNodeItem.Children(this, doc, JsonPath.Root)) Nodes.Add(item);
     }
 
+    /// <summary>Datei im Baum öffnen (z. B. aus dem Länder-Bereich).</summary>
+    public void Open(string file)
+    {
+        if (!Files.Contains(file)) Files.Add(file);
+        File = file;
+    }
+
     /// <summary>Werte nachziehen; hat sich der Aufbau geändert (Einträge dazu oder weg), Baum neu aufbauen.</summary>
     public override void Refresh()
     {
+        foreach (var f in Workspace.Files.Where(f => !f.StartsWith("clubs/", StringComparison.Ordinal) && !f.StartsWith("lang/", StringComparison.Ordinal) && !Files.Contains(f)))
+            Files.Add(f);
         var doc = Workspace.Document(File);
         if (!Nodes.All(n => n.Sync(doc))) Rebuild();
     }
 
     internal void Set(JsonPath path, JsonNode? value) => Workspace.Apply(new SetValue(File, path, value));
+
+    internal JsonNode? Resolve(JsonPath path) => path.Resolve(Workspace.Document(File));
+
+    internal void Insert(JsonPath list, int index, JsonNode? item) => Workspace.Apply(new InsertItem(File, list, index, item));
+
+    internal void Remove(JsonPath path)
+    {
+        if (path.Last is int i) Workspace.Apply(new RemoveItem(File, path.Parent, i));
+        else Workspace.Apply(new SetValue(File, path, null, Remove: true));
+    }
 }
 
-/// <summary>Knoten im Datei-Baum: Objekt, Liste oder Wert.</summary>
-public sealed class JsonNodeItem : ObservableObject
+/// <summary>Knoten im Datei-Baum: Objekt, Liste oder Wert; Listen bekommen Einträge, Objekte Felder, alles lässt sich entfernen.</summary>
+public sealed partial class JsonNodeItem : ObservableObject
 {
     private readonly FilesSectionViewModel _owner;
     private JsonValueKind _kind;
@@ -66,6 +86,38 @@ public sealed class JsonNodeItem : ObservableObject
     public ObservableCollection<JsonNodeItem> Items { get; } = new();
     public bool IsLeaf => _kind is not (JsonValueKind.Object or JsonValueKind.Array);
     public string Summary => _kind == JsonValueKind.Array ? $"[{Items.Count}]" : _kind == JsonValueKind.Object ? "{…}" : "";
+    public bool IsArray => _kind == JsonValueKind.Array;
+    public bool IsObject => _kind == JsonValueKind.Object;
+    public bool CanRemove => Path.Segments.Count > 0;
+
+    /// <summary>Name und Wert für ein neues Feld (nur Objekte).</summary>
+    public string NewField { get; set; } = "";
+    public string NewValue { get; set; } = "";
+
+    /// <summary>Liste: Eintrag anhängen (Kopie des letzten, sonst leeres Objekt).</summary>
+    [RelayCommand]
+    private void AddItem()
+    {
+        if (_owner.Resolve(Path) is not JsonArray list) return;
+        _owner.Insert(Path, list.Count, list.Count > 0 ? list[^1]?.DeepClone() : new JsonObject());
+    }
+
+    /// <summary>Objekt: Feld hinzufügen; der Wert wird als Zahl, Wahrheitswert oder Text gelesen.</summary>
+    [RelayCommand]
+    private void AddField()
+    {
+        var name = NewField.Trim();
+        if (name.Length == 0 || _owner.Resolve(Path) is not JsonObject obj || obj.ContainsKey(name)) return;
+        var text = NewValue.Trim();
+        JsonNode? value = long.TryParse(text, NumberStyles.Integer, CultureInfo.InvariantCulture, out var n) ? JsonValue.Create(n)
+            : double.TryParse(text, NumberStyles.Float, CultureInfo.InvariantCulture, out var d) ? JsonValue.Create(d)
+            : bool.TryParse(text, out var b) ? JsonValue.Create(b)
+            : text == "[]" ? new JsonArray() : text == "{}" ? new JsonObject() : JsonValue.Create(text);
+        _owner.Set(Path.Then(name), value);
+    }
+
+    [RelayCommand]
+    private void Remove() => _owner.Remove(Path);
 
     public static IEnumerable<JsonNodeItem> Children(FilesSectionViewModel owner, JsonNode? node, JsonPath path) => node switch
     {
