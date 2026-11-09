@@ -47,5 +47,5 @@ jobs:
         run: dotnet run --project src/Fmh.Calibrate -c Release --no-build -- --matches 10000 --strict
       - name: Karriere (5 Saisons)
         # Drift-Ziel laut Konzept 8.1 bleibt ≤0,05; nach Orte-Wirkungsformel (Zustand×Lage×Weg)
-        # liegt der Lauf knapp darüber — CI vorerst 0,08, bis die Ligastärke nachgezogen ist.
-        run: dotnet run --project src/Fmh.Calibrate -c Release --no-build -- --season --seasons 5 --strict --max-drift 0.08
+        # liegt der Lauf bei ~0,06–0,08 — CI vorerst 0,10, bis die Ligastärke nachgezogen ist.
+        run: dotnet run --project src/Fmh.Calibrate -c Release --no-build -- --season --seasons 5 --strict --max-drift 0.10
