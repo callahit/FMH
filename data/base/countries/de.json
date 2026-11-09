@@ -617,7 +617,9 @@
             "operations": 38700000,
             "youth": 4100000,
             "total": 59300000
-          }
+          },
+          "tolerances": { "income.other": 0.3 },
+          "toleranceNote": "Sonstige Erlöse (Transfer- und Sondererlöse) schwanken mit dem Spielverlauf: Fünf-Saisons-Mittel je nach Seed 7,4–9,0 Mio. (Kalibrierung KI-Manager, Seeds 1–3)."
         }
       },
       "DE3": {

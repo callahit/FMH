@@ -1,0 +1,141 @@
+{
+  "$id": "https://fmh.local/schema/manager-rules.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Regeln des Trainerkarussells (Datei rules/managers.json).",
+  "properties": {
+    "inSeason": {
+      "additionalProperties": false,
+      "properties": {
+        "belowShare": {
+          "description": "Plätze unter dem erwarteten Platz (nach Ruf): mindestens MinBelow bzw. dieser Anteil der Liga.",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "earliestShare": {
+          "description": "Frühestens nach diesem Anteil der Spieltage, mindestens nach MinMatchday.",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "maxFormPoints": {
+          "description": "Höchstens so viele Punkte aus den letzten fünf Spielen.",
+          "maximum": 15,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "minBelow": {
+          "maximum": 40,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "minMatchday": {
+          "maximum": 60,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "minTenureDays": {
+          "description": "Mindestamtszeit in Tagen.",
+          "maximum": 1000,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "newcomerDays": {
+          "description": "Wer später als so viele Tage nach Saisonbeginn kam, wird in dieser Saison nicht mehr entlassen.",
+          "maximum": 365,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "mentalityBias": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "description": "Verschiebung der Grundhaltung je Spielidee (positiv = offensiver).",
+      "propertyNames": {
+        "enum": [
+          "Balanced",
+          "Attacking",
+          "Defensive",
+          "Counter",
+          "Pressing"
+        ]
+      },
+      "type": "object"
+    },
+    "poolMinimum": {
+      "maximum": 200,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "poolShare": {
+      "description": "Vereinslose Trainer: Anteil an den Ligavereinen, mindestens PoolMinimum.",
+      "maximum": 1,
+      "minimum": 0,
+      "type": "number"
+    },
+    "retirementAge": {
+      "description": "Vereinslose Trainer ab diesem Alter gehen zum Saisonende in den Ruhestand.",
+      "maximum": 90,
+      "minimum": 50,
+      "type": "integer"
+    },
+    "sackingsPerTopLeague": {
+      "description": "Kalibrierung: Entlassungen je Saison in einer 1. Liga (von–bis, Mittel über Saisons und Länder).",
+      "items": {
+        "type": "number"
+      },
+      "type": "array"
+    },
+    "seasonEnd": {
+      "additionalProperties": false,
+      "properties": {
+        "belowShare": {
+          "description": "Sonst: mindestens MinBelow Plätze bzw. dieser Anteil der Liga unter der Erwartung.",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "minBelow": {
+          "maximum": 40,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "praiseShare": {
+          "description": "Ruf +1 für Meister und Vereine mindestens so weit (Anteil der Liga, mind. 2 Plätze) über der Erwartung.",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        },
+        "relegatedBelow": {
+          "description": "Absteiger mit mindestens so vielen Plätzen unter der Erwartung.",
+          "maximum": 40,
+          "minimum": 0,
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
+    "styleWeights": {
+      "additionalProperties": {
+        "type": "number"
+      },
+      "description": "Häufigkeit der Spielideen bei neuen Trainern (Gewichte).",
+      "propertyNames": {
+        "enum": [
+          "Balanced",
+          "Attacking",
+          "Defensive",
+          "Counter",
+          "Pressing"
+        ]
+      },
+      "type": "object"
+    }
+  },
+  "title": "FMH rules/managers.json",
+  "type": "object"
+}

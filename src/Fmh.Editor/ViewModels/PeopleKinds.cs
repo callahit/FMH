@@ -19,7 +19,7 @@ public static class PeopleKinds
         n => new JsonObject { ["name"] = EditorState.F("editor.people.newStaff", n), ["role"] = "AssistantManager", ["ability"] = 10, ["age"] = 45 });
 
     public static readonly TableKind Managers = new("managers", "editor.kind.managers", "name",
-        new[] { "name", "club", "reputation" },
+        new[] { "name", "club", "reputation", "style", "tactics", "motivation", "age", "nationality" },
         n => new JsonObject { ["name"] = EditorState.F("editor.people.newManager", n), ["reputation"] = 8 });
 
     public static readonly TableKind Referees = new("referees", "editor.kind.referees", "name",
