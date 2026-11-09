@@ -344,7 +344,7 @@
         "academyBudgetFactor": 2.8,
         "operatingCostShare": 0.2,
         "maxAnnualWage": 25000000,
-        "targetAnnualWage": 3400000,
+        "targetAnnualWage": 2500000,
         "relegationWagePercent": 50,
         "squadSize": 28,
         "reference": {
@@ -383,6 +383,10 @@
           "official": true,
           "income": {
             "total": 11200000
+          },
+          "toleranceNote": "Gesamteinnahmen ±20 %: Auf-/Absteiger und TV-Verteilung schwanken stark gegenüber dem DNCG-Schnitt.",
+          "tolerances": {
+            "income.total": 0.2
           }
         }
       },
