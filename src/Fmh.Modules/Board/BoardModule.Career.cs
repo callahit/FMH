@@ -117,6 +117,12 @@ public sealed partial class BoardModule
         var newClub = World.Clubs[offer.ClubId];
         if (m.Career.Stations.LastOrDefault() is { } st && st.To is null) { st.To = World.Date; st.Exit = "moved"; }
         oldClub.ManagerId = null;
+        // Ein KI-Manager des neuen Vereins übernimmt den alten (AP 6c)
+        if (newClub.ManagerId is { } ai && World.Managers.FirstOrDefault(x => x.Id == ai) is { Human: false } aiManager)
+        {
+            aiManager.ClubId = oldClub.Id;
+            oldClub.ManagerId = aiManager.Id;
+        }
         newClub.ManagerId = m.Id;
         m.ClubId = newClub.Id;
         m.Career.Offers.Clear();

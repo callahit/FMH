@@ -14,6 +14,11 @@ public sealed class GameData
     public List<PackageManifest> Packages { get; init; } = new();
     public List<CountryConfig> Countries { get; init; } = new();
     public List<ClubDefinition> Clubs { get; init; } = new();
+    /// <summary>Vorgegebene Personen (Editor, AP 6c); ohne Dateien erzeugt der Weltgenerator alle zufällig.</summary>
+    public List<PlayerDefinition> Players { get; init; } = new();
+    public List<StaffDefinition> Staff { get; init; } = new();
+    public List<ManagerDefinition> Managers { get; init; } = new();
+    public List<RefereeDefinition> Referees { get; init; } = new();
     public Dictionary<string, NameList> Names { get; init; } = new();
     public List<Formation> Formations { get; init; } = new();
     public PositionProfiles PositionProfiles { get; init; } = new();
