@@ -40,6 +40,7 @@
     "mentorPerProfessionalism": 0.015,
     "mentorPerLeadership": 0.008
   },
+  "trainingMoralePerStep": 0.0167,
   "unhappyShare": [
     5,
     20
