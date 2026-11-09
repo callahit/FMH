@@ -139,14 +139,16 @@ def gable(s, x0, y0, x1, y1, z, roof_hex, tier, seed):
     return z + rise
 
 
-def flat(s, x0, y0, x1, y1, z, tier, edge_hex, seed, green=False):
-    """Flachdach mit Attika: Kies, oder (modern) Gründach mit einem Streifen Solarmodule."""
+def flat(s, x0, y0, x1, y1, z, tier, edge_hex, seed, green=False, solar=False):
+    """Flachdach mit Attika: Kies, (modern) Gründach mit einem Streifen Solarmodule oder ganz mit Solarmodulen."""
     edge = rgb(edge_hex)
     s.wall_left(x0, x1, y1, z, z + 3, lambda u, v: shade(edge, 0.95))
     s.wall_right(x1, y0, y1, z, z + 3, lambda u, v: shade(edge, 0.75))
     n = noise(seed + 33)
     def tex(u, v):
         k = n(int(u * 50), int(v * 50))
+        if solar and 0.12 < u < 0.88 and 0.12 < v < 0.88:
+            return rgb("#A9C3E8") if (u * 10) % 1 < 0.1 or (v * 6) % 1 < 0.12 else rgb("#22447F")
         if green:
             if 0.3 < u < 0.7 and 0.18 < v < 0.82:
                 return rgb("#A9C3E8") if (u * 12) % 1 < 0.1 or (v * 6) % 1 < 0.12 else rgb("#22447F")
