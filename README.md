@@ -294,7 +294,27 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
   - Antworten mit Erfolgschance; Häufigkeit und Tonfall sind einstellbar.
 - **Managerkarriere:** Trainerlizenzen C bis Pro mit Lehrgängen im Sommer, Stationen mit Bilanz, 25
   Erfolge in der Ruhmeshalle, Jobangebote, Rücktritt, Entlassung und Vereinswechsel. Während der
-  Vereinslosigkeit spielt ein Interimstrainer weiter.
+  Vereinslosigkeit übernimmt ein KI-Manager als Interimstrainer.
+- **KI-Manager und Trainerkarussell:**
+  - Jeder Ligaverein (ohne zweite Mannschaften) hat einen KI-Manager mit Spielidee (ausgewogen, offensiv,
+    defensiv, Konter, Pressing), Taktik, Menschenführung, Alter, Herkunft und Ruf. Dazu kommt ein Pool
+    vereinsloser Trainer.
+  - Die Spielidee verschiebt die Grundhaltung der KI-Mannschaft und wirkt auf Konter und Pressing.
+  - Entlassungen folgen festen Regeln ohne Spielzufall. Während der Saison wird ein Trainer entlassen, wenn
+    der Verein auf einem direkten Abstiegsplatz deutlich unter der Erwartung nach Ruf steht und aus den
+    letzten fünf Spielen höchstens drei Punkte holte. Das gilt frühestens nach einem Drittel der Saison,
+    nach mindestens 120 Tagen im Amt und höchstens einmal je Verein und Saison. Zum Saisonende trifft es
+    Absteiger mit klarer Enttäuschung oder Vereine weit unter der Erwartung.
+  - Nachfolger kommen aus dem Pool (Ruf nah am Verein), sonst wird ein neuer Trainer erzeugt.
+    Erfolgreiche Trainer gewinnen an Ruf, ältere vereinslose gehen in den Ruhestand.
+  - Alle Werte stehen in `data/base/rules/managers.json`.
+  - Neue Trainer entstehen aus einem eigenen, aus dem Weltseed abgeleiteten Zufallsstrom; Spiele,
+    Transfers und Entwicklung bleiben davon unberührt.
+  - Wechselt der Spieler zu einem Verein, wird dessen KI-Manager frei. Er übernimmt den alten Verein,
+    wenn dort kein Interimstrainer ist.
+  - Liga-Seite, Ansicht „Trainer“ (Taste M): Trainer je Verein mit Amtsbeginn, Bilanz, Punkten je Spiel,
+    Ruf, Spielidee und Alter; dazu die Trainerwechsel der Saison und die vereinslosen Trainer.
+    Wechsel in der eigenen Liga meldet die Zeitung im Posteingang.
 - **Konferenz:** Anzeigemodus, in dem die anderen Spiele des Spieltags minutengenau mitlaufen, mit
   Torblitz im Ticker und Live-Tabelle.
 - **Einstellungen:** Schwierigkeit (Leicht, Normal, Schwer, Realistisch) beim Spielstart;
@@ -514,6 +534,8 @@ danach je Abschnitt angehoben:
   und die Tabelle `european_entries`.
 - Abschnitt `world` Version 6 bekommt die Tabelle `teams`: jeder Verein erhält seine erste Mannschaft.
 - Abschnitt `world` Version 7 bekommt die Vereinsspalten `reserve_of`, `region`, `latitude` und `longitude`.
+- Abschnitt `world` Version 8 bekommt die Spalte `managers.traits` (Eigenschaften der KI-Manager). Die
+  KI-Manager selbst ergänzt die Spielsitzung beim Laden.
 
 Ein Spielstand mit einem neueren oder unbekannten Abschnitt wird abgelehnt.
 
@@ -541,7 +563,8 @@ Weitere Prüfungen:
   KI-Taktik, der Rest Engine).
 - `--season --seasons 5 --strict` prüft den Karrierelauf: Der langsamste Spieltag muss unter 5 s
   liegen, alle Saisons müssen durchlaufen, Gehälter und Ligazahlen müssen passen und Insolvenzen sowie
-  Lizenz-Punktabzüge unter den Grenzen bleiben (siehe Finanzen).
+  Lizenz-Punktabzüge unter den Grenzen bleiben (siehe Finanzen). Dazu kommen die Entlassungen je Saison in den
+  1. Ligen, mit dem Zielbereich aus `rules/managers.json`.
 - `--max-drift 0.05` prüft zusätzlich die Ligastärke-Drift (Durchschnitt der besten elf je Verein der 1. Liga);
   die CI ruft den Karrierelauf damit auf. Gemessen: +0,024 je Saison. Dafür holen junge Spieler im Mittel nur ihren
   Altersabschlag auf, Akademietalente erreichen etwa die Stärke ihres Vereins, und der Abbau ab 30 nimmt mit dem
