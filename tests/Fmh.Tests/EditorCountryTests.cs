@@ -165,4 +165,16 @@ public sealed class EditorCountryTests : IDisposable
         Assert.All(world.Leagues, l => Assert.Equal(16, l.ClubIds.Count));
         Assert.Contains(world.Cups, c => c.Id.StartsWith("NL-CUP", StringComparison.Ordinal));
     }
+
+    /// <summary>Das neue Feld wird nur geschrieben, wenn es gesetzt ist; ältere Spielstände ohne das Feld laden unverändert.</summary>
+    [Fact]
+    public void WithoutReplacementIsOnlySerializedWhenSet()
+    {
+        var options = new System.Text.Json.JsonSerializerOptions(System.Text.Json.JsonSerializerDefaults.Web);
+        var plain = System.Text.Json.JsonSerializer.Serialize(new MovementRule { Positions = "17-18" }, options);
+        Assert.DoesNotContain("withoutReplacement", plain);
+        Assert.False(System.Text.Json.JsonSerializer.Deserialize<MovementRule>(plain, options)!.WithoutReplacement);
+        var set = System.Text.Json.JsonSerializer.Serialize(new MovementRule { Positions = "17-18", WithoutReplacement = true }, options);
+        Assert.True(System.Text.Json.JsonSerializer.Deserialize<MovementRule>(set, options)!.WithoutReplacement);
+    }
 }

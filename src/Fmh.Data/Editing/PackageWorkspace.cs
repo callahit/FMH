@@ -193,6 +193,9 @@ public sealed class PackageWorkspace
     /// <summary>Paket schreiben: Manifest und alle geänderten Dateien in fester Schreibweise; unveränderte Dateien entfallen.</summary>
     public void Save() => WriteTo(PackageDirectory);
 
+    /// <summary>Paket mit dem aktuellen (auch ungespeicherten) Stand in ein anderes Verzeichnis schreiben, z. B. für den Probelauf.</summary>
+    public void Export(string dir) => WriteTo(dir);
+
     private void WriteTo(string dir)
     {
         Directory.CreateDirectory(dir);

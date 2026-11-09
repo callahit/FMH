@@ -1,0 +1,83 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:s="using:Fmh.Editor.Services"
+             xmlns:vm="using:Fmh.Editor.ViewModels"
+             xmlns:ed="using:Fmh.Core.Data.Editing"
+             x:Class="Fmh.Editor.Views.CountriesSectionView"
+             x:DataType="vm:CountriesSectionViewModel">
+  <ScrollViewer>
+    <StackPanel Spacing="14">
+      <TextBlock Classes="h1" Text="{Binding Title}" />
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <ComboBox ItemsSource="{Binding Files}" SelectedItem="{Binding File}" MinWidth="240" />
+        <Button Content="{s:L editor.countries.editInTree}" Command="{Binding EditInTreeCommand}" />
+      </StackPanel>
+      <TextBlock Classes="hint" Text="{Binding Info}" />
+      <!-- Pyramide: je Ebene eine Zeile, Ligen als Kästen mit Teams/Staffeln und Auf-/Abstieg -->
+      <ItemsControl ItemsSource="{Binding Levels}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="ed:PyramidLevel">
+            <Grid ColumnDefinitions="90,*" Margin="0,4">
+              <StackPanel VerticalAlignment="Center">
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                  <TextBlock Text="{s:L editor.countries.level}" FontWeight="SemiBold" /><TextBlock Text="{Binding Level}" FontWeight="SemiBold" />
+                </StackPanel>
+                <StackPanel Orientation="Horizontal" Spacing="4">
+                  <TextBlock Classes="hint" Text="{Binding Teams}" /><TextBlock Classes="hint" Text="{s:L editor.countries.teamsUnit}" />
+                </StackPanel>
+              </StackPanel>
+              <ItemsControl Grid.Column="1" ItemsSource="{Binding Divisions}">
+                <ItemsControl.ItemsPanel><ItemsPanelTemplate><StackPanel Orientation="Horizontal" Spacing="8" /></ItemsPanelTemplate></ItemsControl.ItemsPanel>
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="ed:PyramidDivision">
+                    <Border Classes="card" MinWidth="220" Padding="12,8">
+                      <StackPanel Spacing="2">
+                        <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                        <TextBlock Classes="hint" Text="{Binding Id}" />
+                        <StackPanel Orientation="Horizontal" Spacing="4">
+                          <TextBlock Text="{Binding Shape}" /><TextBlock Classes="hint" Text="{s:L editor.countries.teamsUnit}" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Spacing="12">
+                          <TextBlock Text="{Binding Up, StringFormat='▲ {0}'}" Foreground="#7ED69A" />
+                          <TextBlock Text="{Binding Down, StringFormat='▼ {0}'}" Foreground="#FF8A80" />
+                        </StackPanel>
+                        <ItemsControl ItemsSource="{Binding Groups}" />
+                      </StackPanel>
+                    </Border>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <ItemsControl ItemsSource="{Binding Problems}">
+        <ItemsControl.ItemTemplate><DataTemplate x:DataType="x:String"><TextBlock Classes="error" Text="{Binding}" /></DataTemplate></ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <Border Classes="card">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="h2" Text="{s:L editor.countries.newVersion}" />
+          <TextBlock Classes="hint" Text="{s:L editor.countries.newVersionHint}" />
+          <StackPanel Orientation="Horizontal" Spacing="8">
+            <TextBox Text="{Binding NewVersionSeason}" Width="100" />
+            <Button Content="{s:L editor.countries.createVersion}" Command="{Binding NewVersionCommand}" />
+          </StackPanel>
+        </StackPanel>
+      </Border>
+      <Border Classes="card">
+        <StackPanel Spacing="8">
+          <TextBlock Classes="h2" Text="{s:L editor.countries.wizard}" />
+          <TextBlock Classes="hint" Text="{s:L editor.countries.wizardHint}" />
+          <Grid ColumnDefinitions="200,*" RowDefinitions="Auto,Auto,Auto,Auto" RowSpacing="8">
+            <TextBlock Text="{s:L editor.countries.code}" VerticalAlignment="Center" /><TextBox Grid.Column="1" Text="{Binding WizardCode}" Width="100" HorizontalAlignment="Left" />
+            <TextBlock Grid.Row="1" Text="{s:L editor.start.name}" VerticalAlignment="Center" /><TextBox Grid.Row="1" Grid.Column="1" Text="{Binding WizardName}" />
+            <TextBlock Grid.Row="2" Text="{s:L editor.countries.teams}" VerticalAlignment="Center" /><TextBox Grid.Row="2" Grid.Column="1" Text="{Binding WizardTeams}" />
+            <CheckBox Grid.Row="3" Grid.Column="1" IsChecked="{Binding WizardCup}" Content="{s:L editor.countries.cup}" />
+          </Grid>
+          <Button Content="{s:L editor.countries.createCountry}" Command="{Binding CreateCountryCommand}" />
+        </StackPanel>
+      </Border>
+      <TextBlock Classes="error" Text="{Binding Message}" />
+    </StackPanel>
+  </ScrollViewer>
+</UserControl>

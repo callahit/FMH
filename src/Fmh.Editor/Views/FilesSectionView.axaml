@@ -17,6 +17,13 @@
             <TextBlock Text="{Binding Name}" MinWidth="200" VerticalAlignment="Center" />
             <TextBlock Text="{Binding Summary}" Classes="hint" VerticalAlignment="Center" />
             <TextBox Text="{Binding Value}" IsVisible="{Binding IsLeaf}" MinWidth="220" />
+            <Button Content="{s:L editor.files.addItem}" Command="{Binding AddItemCommand}" IsVisible="{Binding IsArray}" Padding="8,2" />
+            <StackPanel Orientation="Horizontal" Spacing="4" IsVisible="{Binding IsObject}">
+              <TextBox Text="{Binding NewField}" Watermark="{s:L editor.files.fieldName}" Width="120" />
+              <TextBox Text="{Binding NewValue}" Watermark="{s:L editor.files.fieldValue}" Width="90" />
+              <Button Content="{s:L editor.files.addField}" Command="{Binding AddFieldCommand}" Padding="8,2" />
+            </StackPanel>
+            <Button Content="✕" Command="{Binding RemoveCommand}" IsVisible="{Binding CanRemove}" Padding="6,2" ToolTip.Tip="{s:L editor.files.remove}" />
           </StackPanel>
         </TreeDataTemplate>
       </TreeView.ItemTemplate>
