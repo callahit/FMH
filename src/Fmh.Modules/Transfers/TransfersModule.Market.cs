@@ -187,16 +187,20 @@ public sealed partial class TransfersModule
             var agreed = g.ToList();
             if (agreed.Count == 0) continue;
             var p = World.Players[g.Key];
-            var othersOpen = Negotiations.ActiveBids(World, g.Key).Any(b => !b.ClubAgreed);
+            var openBids = Negotiations.ActiveBids(World, g.Key).ToList();
+            var othersOpen = openBids.Any(b => !b.ClubAgreed);
             var firstAgree = agreed.Min(a => a.ClubAgreedOn ?? a.Started);
-            // Ein Bieter ohne Konkurrenz: sofort. Sonst bis zu 3 Tage auf weitere Zusagen warten (E2-S1).
+            // Ein Bieter ohne Konkurrenz: sofort.
             if (agreed.Count == 1 && !othersOpen)
             {
                 agreed[0].SellerChosen = true;
                 TryFinishNegotiation(agreed[0]);
                 continue;
             }
-            if (World.Date < firstAgree.AddDays(CompetitionDays)) continue;
+            // 3-Tage-Fenster nur, wenn der Mensch mitbietet oder verkauft – reine KI-Konkurrenz sofort,
+            // damit der Markt und die Lizenzkalibrierung nicht stocken.
+            var humanInvolved = openBids.Any(b => b.BuyerId == HumanClub.Id || b.SellerId == HumanClub.Id);
+            if (humanInvolved && World.Date < firstAgree.AddDays(CompetitionDays)) continue;
             if (agreed.Count == 1)
             {
                 agreed[0].SellerChosen = true;
