@@ -27,8 +27,10 @@ public class IsoSpritesTests
                     foreach (var building in new[] { false, true })
                     {
                         var b = new IsoBuildingVisual { Type = def.Id, Category = def.Category, Width = w, Height = h, Level = level, UnderConstruction = building };
-                        var name = IsoPixelArt.SpriteFor(b);
+                        var name = IsoPixelArt.SpriteFor(b, atlas);
                         if (!atlas.Has(name)) missing.Add($"{def.Id} {w}x{h} L{level} -> {name}");
+                        // Jedes Gebäude hat je Grundfläche und Stufe ein eigenes Sprite, die Baustelle bleibt allgemein
+                        if (!building && name != $"b_{def.Id}_{w}x{h}_{level}") missing.Add($"{def.Id} {w}x{h} L{level}: eigenes Sprite fehlt ({name})");
                     }
         Assert.True(missing.Count == 0, "Fehlende Sprites: " + string.Join(", ", missing.Distinct().Take(20)));
     }
