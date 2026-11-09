@@ -78,6 +78,7 @@ public sealed class DefinedPeopleTests : IDisposable
         Assert.Null(free.ClubId);
         Assert.Null(free.Contract);
         Assert.Equal(new DateOnly(2004, 3, 15), free.BirthDate);
+        Assert.Equal(7, Assert.Single(free.Registration.Formative).Value); // sieben Ausbildungsjahre (15–21) für die Meldequoten
 
         // Nur der Rahmen (Verein und Position): Rest erzeugt, Stärke nach Verein
         var frame = world.Players.Values.Single(x => x.LastName == "Rahmen");

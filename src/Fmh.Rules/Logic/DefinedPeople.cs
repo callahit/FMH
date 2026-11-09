@@ -32,7 +32,9 @@ public static class DefinedPeople
             world.Players[p.Id] = p;
             if (club is null)
             {
+                // Wie erzeugte Vereinslose: Ausbildungsjahre im Land oder im Ausland, sonst zählt er für keine Meldequote
                 p.Contract = null;
+                Registration.InitFormative(p, world, null, rng);
                 continue;
             }
 
