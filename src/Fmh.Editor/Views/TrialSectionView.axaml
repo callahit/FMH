@@ -1,0 +1,34 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:s="using:Fmh.Editor.Services"
+             xmlns:vm="using:Fmh.Editor.ViewModels"
+             x:Class="Fmh.Editor.Views.TrialSectionView"
+             x:DataType="vm:TrialSectionViewModel">
+  <DockPanel>
+    <StackPanel DockPanel.Dock="Top" Spacing="8" Margin="0,0,0,10">
+      <TextBlock Classes="h1" Text="{Binding Title}" />
+      <TextBlock Classes="hint" Text="{s:L editor.trial.hint}" />
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <ComboBox ItemsSource="{Binding Countries}" SelectedItem="{Binding Country}" MinWidth="120" />
+        <Button Content="{s:L editor.trial.run}" Command="{Binding RunCommand}" Classes="accent" />
+        <Button Content="{s:L editor.trial.cancel}" Command="{Binding CancelCommand}" IsVisible="{Binding Running}" />
+        <TextBlock Text="{Binding Status}" VerticalAlignment="Center" />
+      </StackPanel>
+      <ItemsControl ItemsSource="{Binding Errors}">
+        <ItemsControl.ItemTemplate><DataTemplate x:DataType="x:String"><TextBlock Classes="error" Text="{Binding}" /></DataTemplate></ItemsControl.ItemTemplate>
+      </ItemsControl>
+    </StackPanel>
+    <DataGrid ItemsSource="{Binding Leagues}" AutoGenerateColumns="False" IsReadOnly="True" GridLinesVisibility="Horizontal">
+      <DataGrid.Columns>
+        <DataGridTextColumn Header="{s:L editor.trial.level}" Binding="{Binding Level}" Width="80" />
+        <DataGridTextColumn Header="{s:L editor.trial.league}" Binding="{Binding Name}" Width="180" />
+        <DataGridTextColumn Header="{s:L editor.trial.clubs}" Binding="{Binding Clubs}" Width="90" />
+        <DataGridTextColumn Header="{s:L editor.trial.goals}" Binding="{Binding GoalsPerMatch, StringFormat='{}{0:F2}'}" Width="90" />
+        <DataGridTextColumn Header="{s:L editor.trial.champion}" Binding="{Binding Champion}" Width="180" />
+        <DataGridTextColumn Header="{s:L editor.trial.up}" Binding="{Binding Up.Count}" Width="60" />
+        <DataGridTextColumn Header="{s:L editor.trial.down}" Binding="{Binding Down.Count}" Width="60" />
+        <DataGridTextColumn Header="{s:L editor.trial.balance}" Binding="{Binding AverageBalanceChange, StringFormat='{}{0:N0}'}" Width="*" />
+      </DataGrid.Columns>
+    </DataGrid>
+  </DockPanel>
+</UserControl>

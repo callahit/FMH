@@ -614,8 +614,8 @@ speichern sie Bildschirmfotos aller Seiten.
 ## Datenbank-Editor (AP 6)
 
 `fmh-editor` (Projekt `src/Fmh.Editor`, Start: `dotnet run --project src/Fmh.Editor [-- --data pfad --lang de|en]`)
-bearbeitet Datenpakete, ohne JSON von Hand zu schreiben. Umgesetzt ist Schritt 6a (Paket-Modus); Länder und
-Wettbewerbe mit Pyramide, Probelauf und „Neues Land“ folgen in 6b, JSON-Schemas, Spieler und Personal in 6c.
+bearbeitet Datenpakete, ohne JSON von Hand zu schreiben. Umgesetzt sind 6a (Paket-Modus) und 6b (Länder,
+Probelauf, „Neues Land“); JSON-Schemas, Spieler und Personal folgen in 6c.
 
 - **Eigenes Paket statt Eingriff:**
   - Ausgelieferte Pakete (`base`, Länderpakete) bleiben unverändert und lassen sich im Editor nicht öffnen.
@@ -624,11 +624,26 @@ Wettbewerbe mit Pyramide, Probelauf und „Neues Land“ folgen in 6b, JSON-Sche
     schlüsselweise zusammenführt.
 - **Bereiche:**
   - Paket: Name, Version, geänderte Dateien.
+  - Länder und Wettbewerbe:
+    - Pyramide je Formatversion: Ebenen mit Divisionen, Staffeln, Teams sowie Auf- und Abstiegsplätzen.
+    - Fehler aus der Prüfung erscheinen direkt darunter.
+    - „Neue Formatversion“: kopiert die Länderdatei ab einer Saison (`{code}-{jahr}.json` mit `validFrom`) und setzt
+      bei der alten Version `validTo`. Danach passt man Staffeln und Regeln im Baum an.
+    - „Neues Land“ (`CountryWizard`): Ländercode, Name, Teams je Ebene und Pokal genügen. Daraus entstehen Ligen,
+      Auf- und Abstieg (je 1–2 Plätze), ein Landespokal aller Ligen, fiktive Vereine aus Silbennamen, Namensliste
+      und Sponsoren. Saison-, Kader-, Wirtschafts- und Meldelistenregeln kommen je Ebene von der Vorlage
+      Deutschland. Alles ist ein einziger Schritt.
   - Vereine: Tabelle zur Massenbearbeitung, hinzufügen und löschen, CSV-Import und -Export mit Semikolon und Kopfzeile.
   - Regeln und Inhalte: jede Datendatei als Baum. Werte behalten ihren Typ, ungültige Zahlen werden abgewiesen.
+    Listen bekommen neue Einträge als Kopie des letzten, Objekte neue Felder (Zahl, Wahrheitswert, `[]`, `{}` oder
+    Text), und jeder Eintrag lässt sich entfernen.
   - Sprachen: Sprachen nebeneinander; fehlende Texte und abweichende Platzhalter sind markiert und filterbar.
   - Prüfung: Liste aller Fehler.
   - Unterschiede: Änderungen je Datei und Feld. Listen mit `key`, `id` oder `code` werden über den Schlüssel verglichen.
+  - Probelauf (`TrialSeason`):
+    - Spielt mit dem ungespeicherten Stand im Hintergrund eine Saison des gewählten Landes. Die übrigen Länder
+      ruhen, und der Lauf lässt sich abbrechen.
+    - Ergebnis je Liga: Vereine, Tore je Spiel, Meister, Auf- und Absteiger, durchschnittliche Kontoveränderung.
 - **Rückgängig und Wiederholen** über alle Bereiche (Strg+Z, Strg+Y). Ein CSV-Import ist ein einziger Schritt.
   Speichern mit Strg+S.
 - **Prüfung wie beim Spielstart:**
@@ -639,7 +654,8 @@ Wettbewerbe mit Pyramide, Probelauf und „Neues Land“ folgen in 6b, JSON-Sche
 - **Feste Schreibweise** (`CanonicalJson`): Schlüssel ordinal sortiert, zwei Leerzeichen Einrückung, LF, UTF-8 ohne
   BOM, Umlaute unmaskiert. Gleicher Inhalt ergibt byte-identische Dateien, und Git-Diffs bleiben lesbar.
 - Kern ohne Oberfläche in `src/Fmh.Data/Editing`: `PackageWorkspace`, `JsonEdit`, `CanonicalJson`, `JsonDiff`,
-  `ClubCsv`. Der Editor darf laut Architekturtest nur `Fmh.Domain` und `Fmh.Data` referenzieren.
+  `ClubCsv`, `CountryTools`, `CountryWizard`. Der Editor darf laut Architekturtest die Daten- und Regelschichten
+  referenzieren und für den Probelauf die Simulation, aber nicht das Spiel-Frontend.
 - Die Texte der Oberfläche stehen wie im Spiel in den Sprachdateien (`editor.*`, Deutsch und Englisch).
 
 ## Datenpakete und Modding
@@ -674,7 +690,9 @@ Ein Land beschreibt seine Pyramide als Ebenen mit Divisionen. Formate ändern si
   nächstgelegene), `Geographic` (jede Saison neu nach `longitude`/`latitude`) oder `Rotating` (ausgelost).
   Vereine stehen in `clubs/*.json` mit der Staffel oder nur der Division als `division`.
 - **Bewegungsregeln:** `movements: [{ "positions": "1-2", "to": "Up" }, { "positions": "17-18", "to": "Down" }]`,
-  optional `onlySeason` für Übergangsregeln. Die älteren Felder `promotion`/`relegation` werden beim Laden
+  optional `onlySeason` für Übergangsregeln. `withoutReplacement: true` (nur in der untersten Ebene mit Pool) lässt
+  Vereine ohne Nachrücker in den Pool absteigen. So schrumpft die Ebene zu einer neuen Formatversion, etwa die
+  Regionalliga von fünf auf vier Staffeln. Die älteren Felder `promotion`/`relegation` werden beim Laden
   darauf abgebildet. Wer keine Lizenz hat oder als zweite Mannschaft nicht aufsteigen darf, gibt seinen Platz an
   den Nächsten ab; Zwangsabsteiger ersetzt der bestplatzierte sportliche Absteiger bzw. ein Nachrücker. Zu- und
   Abgänge je Ebene gleichen sich immer aus.
