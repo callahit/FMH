@@ -321,6 +321,17 @@ public class UiTests
         var buy = profile.Actions.First(a => a.Label == AppState.Current.T["player.action.buy"]);
         buy.Command.Execute(null);
         var neg = Assert.IsType<NegotiationViewModel>(vm.Dialog);
+        // Anfrage (E2-S2) für den UI-Test überspringen und Dialog neu öffnen.
+        var open = session.OpenNegotiationFor(row.Player)!;
+        if (open.Stage == NegotiationStage.Enquiry)
+        {
+            open.Stage = NegotiationStage.Talks;
+            open.EnquiryDue = null;
+            open.Response = Fmh.Core.Data.TextRef.Of("neg.enquiry.accepted");
+            neg.CloseCommand.Execute(null);
+            buy.Command.Execute(null);
+            neg = Assert.IsType<NegotiationViewModel>(vm.Dialog);
+        }
         Assert.True(neg.ClubStage);
         Pump();
         AssertNoMissingTexts(w);

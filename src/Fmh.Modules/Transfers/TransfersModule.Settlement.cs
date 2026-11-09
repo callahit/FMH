@@ -15,7 +15,16 @@ public sealed partial class TransfersModule
     {
         var p = World.Players[n.PlayerId];
         var buyer = World.Clubs[n.BuyerId];
+        // Nach Fristende keine Abschlüsse mehr (E2-S4); Verlängerungen und Vorverträge bleiben möglich.
+        if ((n.Type is DealType.Transfer or DealType.Loan) && !Season.IsTransferWindowOpen(buyer))
+        {
+            n.Stage = NegotiationStage.Failed;
+            n.Response = TR("neg.error.window");
+            return;
+        }
         n.Stage = NegotiationStage.Completed;
+        n.ClubAgreed = true;
+        n.PlayerAgreed = n.Type != DealType.Loan || n.PlayerAgreed;
         switch (n.Type)
         {
             case DealType.Transfer:
