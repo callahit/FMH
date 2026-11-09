@@ -7,7 +7,7 @@ import math
 from iso import Sprite, rgb, shade, mix, noise
 from buildings import box, chimney, CATEGORIES
 import kit as K
-from kit import tier_of
+from kit import tier_of, stage_of
 from stadium import mask
 import specials as X
 
@@ -15,7 +15,8 @@ import specials as X
 class Ctx:
     def __init__(self, w, h, level, max_level, cat, seed):
         self.w, self.h, self.level, self.max = w, h, level, max_level
-        self.tier = tier_of(level, max_level)
+        self.stage = stage_of(level, max_level)  # Bauweise 0–4
+        self.tier = tier_of(level, max_level)    # grobe Epoche 1–3
         self.cat = cat
         self.seed = seed
         self.along = w >= h
@@ -41,21 +42,21 @@ def block(c, s, rect, floors, glyph=None, roof=None, wall=None, roof_hex=None, f
     """Baukörper auf relativer Fläche mit Dach nach Epoche, Schild und (modern) Vordach. Rückgabe: Oberkante."""
     x0, y0, x1, y1 = c.r(*rect)
     z = floors * floor_h + 2
-    K.walls(s, x0, y0, x1, y1, z, c.tier, wall or c.wall, c.seed, floors)
-    roof = roof or ("gable" if c.tier < 3 else "flat")
+    K.walls(s, x0, y0, x1, y1, z, c.stage, wall or c.wall, c.seed, floors)
+    roof = roof or ("gable" if c.stage <= 2 else "flat")
     if glyph:
         sx0 = x0 + (x1 - x0) * 0.25; sx1 = x0 + (x1 - x0) * 0.75
-        K.sign(s, sx0, sx1, y1, z - 9, glyph, c.tier, led=c.tier == 3)
-    if c.tier == 3:
+        K.sign(s, sx0, sx1, y1, z - 9, glyph, c.tier, led=c.stage >= 3)
+    if c.stage == 4:
         K.canopy(s, x0 + (x1 - x0) * 0.55, x0 + (x1 - x0) * 0.9, y1, 9)
     if roof == "gable":
         top = K.gable(s, x0, y0, x1, y1, z, roof_hex or c.roof, c.tier, c.seed)
-        if c.tier == 1:
+        if c.stage <= 1:
             chimney(s, x0 + (x1 - x0) * 0.25, y0 + 0.1, z + 4, None)
         return top
     if roof == "barrel":
         return K.barrel(s, x0, y0, x1, y1, z, roof_hex or "#B8C2C9", c.tier)
-    return K.flat(s, x0, y0, x1, y1, z, c.tier, roof_hex or c.roof, c.seed)
+    return K.flat(s, x0, y0, x1, y1, z, c.tier, roof_hex or c.roof, c.seed, green=c.stage == 4)
 
 
 def new(c, height, ground="grass"):
@@ -69,14 +70,15 @@ def new(c, height, ground="grass"):
 def pitch_area(c, s, rect, turf=False, lines=True, small=False):
     x0, y0, x1, y1 = c.r(*rect)
     base = rgb("#2F9078") if turf else rgb("#4C9A50")
-    if c.tier == 1 and not turf:
-        base = mix(base, rgb("#8A8A4E"), 0.3)
+    if c.tier == 1:
+        # alter Naturrasen vergilbt mit kahlen Stellen, alter Kunstrasen ist ausgeblichen
+        base = mix(base, rgb("#8A8A4E"), 0.3) if not turf else mix(base, rgb("#9FB8A8"), 0.45)
     n = noise(c.seed + 7)
     L, S = (x1 - x0, y1 - y0) if c.along else (y1 - y0, x1 - x0)
     def tex(u, v):
         a, b = (u, v) if c.along else (v, u)
         col = base if (turf or int(a * 10) % 2) else shade(base, 0.9)
-        if c.tier == 1 and n(int(u * 30), int(v * 30)) > 0.9:
+        if c.tier == 1 and not turf and n(int(u * 30), int(v * 30)) > 0.9:
             col = rgb("#9C8A5E")
         if lines and (c.tier > 1 or c.level >= 2 or small):
             x, y = a * L, b * S
