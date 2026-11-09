@@ -22,7 +22,15 @@
     "yellowCardsForSuspension": 5,
     "redCardBanMin": 1,
     "redCardBanMax": 3,
-    "secondYellowBan": 1
+    "secondYellowBan": 1,
+    "resetYellowsOnSeason": true,
+    "carryYellowBansOnSeason": false,
+    "carryRedBansOnSeason": true,
+    "scopes": {
+      "league": { "yellowCardsForSuspension": 5 },
+      "cup": { "yellowCardsForSuspension": 3 },
+      "ES1": { "clearYellowsAfterRound": 19 }
+    }
   },
   "levels": [
     {

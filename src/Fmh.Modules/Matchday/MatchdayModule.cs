@@ -36,8 +36,9 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
     {
         var home = World.Clubs[f.HomeId];
         var away = World.Clubs[f.AwayId];
-        PrepareClub(home, away, true);
-        PrepareClub(away, home, false);
+        var scope = DisciplineRules.ScopeOf(f, World);
+        PrepareClub(home, away, true, scope);
+        PrepareClub(away, home, false, scope);
 
         var country = World.Country(home.CountryCode);
         var referee = World.Referees.FirstOrDefault(r => r.Id == f.RefereeId);
@@ -46,8 +47,8 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
                       && cup.Kind is CompetitionKind.Cup or CompetitionKind.Europe;
         var setup = new MatchSetup
         {
-            Home = TeamSetupFor(home, humanControlled && home.Id == HumanClub.Id),
-            Away = TeamSetupFor(away, humanControlled && away.Id == HumanClub.Id),
+            Home = TeamSetupFor(home, humanControlled && home.Id == HumanClub.Id, scope),
+            Away = TeamSetupFor(away, humanControlled && away.Id == HumanClub.Id, scope),
             Config = Data.Engine,
             Profiles = Data.PositionProfiles,
             Roles = Data.Roles,
@@ -73,23 +74,23 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
     /// <summary>Spiel, das der Mensch selbst bestreitet (nicht während er ohne Verein ist).</summary>
     private bool HumanPlays(Fixture f) => !Board.AwaitingNewJob && f.Involves(HumanClub.Id);
 
-    private void PrepareClub(Club club, Club opponent, bool home)
+    private void PrepareClub(Club club, Club opponent, bool home, string scope)
     {
         if (IsHuman(club))
-            LineupSelector.Repair(club, World, Data, BenchSize(club), AiTactics.MatchEligibility(club, World, Data));
+            LineupSelector.Repair(club, World, Data, BenchSize(club), AiTactics.MatchEligibility(club, World, Data, scope), scope);
         else
-            AiTactics.Prepare(club, opponent, home, World, Data, BenchSize(club));
-        EnsureEleven(club);
-        AiTactics.EnsureYoungPlayers(club, World, Data);
+            AiTactics.Prepare(club, opponent, home, World, Data, BenchSize(club), scope);
+        EnsureEleven(club, scope);
+        AiTactics.EnsureYoungPlayers(club, World, Data, scope);
     }
 
     /// <summary>Notfall: zu wenige einsatzfähige Spieler. Erst Talente aus der Jugend, dann Spieler aus dem Umfeld des Vereins.</summary>
-    private void EnsureEleven(Club club)
+    private void EnsureEleven(Club club, string scope)
     {
         var guard = 0;
         while (club.Tactic.Lineup.Any(id => id is null) && guard++ < 11)
         {
-            var youth = Youth.YouthOf(club).Where(p => p.IsAvailable).OrderByDescending(Transfers.Rating).FirstOrDefault();
+            var youth = Youth.YouthOf(club).Where(p => p.IsAvailableFor(scope)).OrderByDescending(Transfers.Rating).FirstOrDefault();
             Player p;
             if (youth is not null)
             {
@@ -112,11 +113,11 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
             p.Registration.ClubId = club.Id;
             if (club.Id == HumanClub.Id)
                 Notify(MessageType.Info, "msg.sender.assistant", TR("msg.emergency.subject", p.Name), TR("msg.emergency.body", p.Name));
-            LineupSelector.Repair(club, World, Data, BenchSize(club), AiTactics.MatchEligibility(club, World, Data));
+            LineupSelector.Repair(club, World, Data, BenchSize(club), AiTactics.MatchEligibility(club, World, Data, scope), scope);
         }
     }
 
-    private TeamSetup TeamSetupFor(Club club, bool human)
+    private TeamSetup TeamSetupFor(Club club, bool human, string scope)
     {
         var formation = TacticResolver.Resolve(club.Tactic, Data);
         return new TeamSetup
@@ -127,7 +128,7 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
             Orders = TacticResolver.Orders(club.Tactic, formation, Data),
             Familiarity = Training.Familiarity(club, club.Tactic.FormationId),
             Starting = club.Tactic.Lineup.Select(id => World.Players[id!.Value]).ToList(),
-            Bench = club.Tactic.Bench.Select(id => World.Players[id]).Where(p => p.IsAvailable).ToList(),
+            Bench = club.Tactic.Bench.Select(id => World.Players[id]).Where(p => p.IsAvailableFor(scope)).ToList(),
             HumanControlled = human,
         };
     }
@@ -189,11 +190,11 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
             Relations.RecalculateClub(club);
         }
 
-        ServeSuspensions(home);
-        ServeSuspensions(away);
+        ServeSuspensions(home, f);
+        ServeSuspensions(away, f);
         var minutes = sim.Minute;
-        ApplyPlayers(sim.Home, home, sim.Home.Goals - sim.Away.Goals, minutes);
-        ApplyPlayers(sim.Away, away, sim.Away.Goals - sim.Home.Goals, minutes);
+        ApplyPlayers(sim.Home, home, sim.Home.Goals - sim.Away.Goals, minutes, f);
+        ApplyPlayers(sim.Away, away, sim.Away.Goals - sim.Home.Goals, minutes, f);
         Training.AddFamiliarity(home, home.Tactic.FormationId, 2.5);
         Training.AddFamiliarity(away, away.Tactic.FormationId, 2.5);
 
@@ -201,21 +202,21 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
         Bus.Publish(new MatchPlayed(f, f.Involves(HumanClub.Id) && !Board.AwaitingNewJob, participants));
     }
 
-    private void ServeSuspensions(Club club)
+    private void ServeSuspensions(Club club, Fixture fixture)
     {
+        var scope = DisciplineRules.ScopeOf(fixture, World);
+        var human = club.Id == HumanClub.Id;
         foreach (var p in World.SquadOf(club))
         {
-            if (p.State.SuspendedMatches <= 0) continue;
-            p.State.SuspendedMatches--;
-            if (p.State.SuspendedMatches == 0 && club.Id == HumanClub.Id)
-                Notify(MessageType.Discipline, "msg.sender.assistant",
-                    TR("msg.suspensionOver.subject", p.Name), TR("msg.suspensionOver.body", p.Name));
+            if (!DisciplineRules.Serve(p.State, scope) || !human) continue;
+            Notify(MessageType.Discipline, "msg.sender.assistant",
+                TR("msg.suspensionOver.subject", p.Name), TR("msg.suspensionOver.body", p.Name, DisciplineRules.ScopeLabel(World, scope)));
         }
     }
 
-    private void ApplyPlayers(MatchTeamState team, Club club, int goalDiff, int matchMinutes)
+    private void ApplyPlayers(MatchTeamState team, Club club, int goalDiff, int matchMinutes, Fixture fixture)
     {
-        var discipline = World.Country(club.CountryCode).Discipline;
+        var discipline = DisciplineRules.ForMatch(World, Data, fixture, club);
         var participants = team.Participants.Select(mp => mp.Player.Id).ToHashSet();
         var human = club.Id == HumanClub.Id;
 
@@ -247,30 +248,24 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
             if (mp.Grade is >= 5.0) moraleDelta--;
             p.State.Morale = (Morale)Math.Clamp((int)p.State.Morale + Math.Sign(moraleDelta), 0, 6);
 
-            if (mp.Red)
+            if (mp.Red || mp.Yellow)
             {
-                var secondYellow = mp.Yellow;
-                p.State.SuspendedMatches += secondYellow ? discipline.SecondYellowBan : Rng.Next(discipline.RedCardBanMin, discipline.RedCardBanMax);
-                if (human)
+                var outcome = DisciplineRules.ApplyCard(p.State, discipline, mp.Yellow, mp.Red, fixture.Matchday, (a, b) => Rng.Next(a, b));
+                if (human && outcome.SendingOff)
                     Notify(MessageType.Discipline, "msg.sender.association",
-                        TR("msg.suspension.subject", p.Name), TR("msg.suspension.body", p.Name, p.State.SuspendedMatches));
-            }
-            else if (mp.Yellow)
-            {
-                p.State.YellowCardsAccumulated++;
-                if (discipline.YellowCardsForSuspension > 0 && p.State.YellowCardsAccumulated >= discipline.YellowCardsForSuspension)
-                {
-                    p.State.YellowCardsAccumulated = 0;
-                    p.State.SuspendedMatches += 1;
-                    if (human)
-                        Notify(MessageType.Discipline, "msg.sender.association",
-                            TR("msg.yellowBan.subject", p.Name), TR("msg.yellowBan.body", p.Name, discipline.YellowCardsForSuspension));
-                }
+                        TR("msg.suspension.subject", p.Name), TR("msg.suspension.body", p.Name, p.State.Ban(discipline.Scope), DisciplineRules.ScopeLabel(World, discipline.Scope)));
+                else if (human && outcome.YellowBan)
+                    Notify(MessageType.Discipline, "msg.sender.association",
+                        TR("msg.yellowBan.subject", p.Name), TR("msg.yellowBan.body", p.Name, outcome.AtCards, DisciplineRules.ScopeLabel(World, discipline.Scope)));
             }
 
             if (mp.Injured && mp.InjuryType is { } type)
                 InjurePlayer(p, type, mp.InjuryDays, human);
         }
+
+        if (discipline.Rules.ClearYellowsAfterRound == fixture.Matchday)
+            foreach (var p in World.SquadOf(club))
+                DisciplineRules.ClearYellowsIfRoundEnds(p.State, discipline, fixture.Matchday);
 
         foreach (var p in World.SquadOf(club).Where(p => !participants.Contains(p.Id)))
             p.State.MatchPractice = Math.Max(0, p.State.MatchPractice - 4);

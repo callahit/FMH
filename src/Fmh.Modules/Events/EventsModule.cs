@@ -166,7 +166,7 @@ public sealed partial class EventsModule : GameModule, IEventsService
                 case "playerInjury" when player is not null:
                     Matchday.InjurePlayer(player, "bruise", (int)value, notify: false); break;
                 case "playerSuspend" when player is not null:
-                    player.State.SuspendedMatches += (int)value; break;
+                    player.State.PersonalBan += (int)value; break;
                 case "playerFine" when player is not null:
                     var fine = (long)(player.Contract?.WeeklyWage ?? 0) * (long)value;
                     if (fine > 0) Finance.Book(club, TransactionType.Event, fine, TR("tx.playerFine", player.Name));

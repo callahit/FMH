@@ -42,11 +42,34 @@ public static class UiText
     public static string Status(Player p, Club club)
     {
         if (p.State.Injury is { } inj) return T.Format("status.injured", inj.DaysRemaining);
-        if (p.State.SuspendedMatches > 0) return T.Format("status.suspended", p.State.SuspendedMatches);
+        if (Suspension(p) is { Length: > 0 } suspension) return suspension;
         if (club.Tactic.Lineup.Contains(p.Id)) return T["status.lineup"];
         if (club.Tactic.Bench.Contains(p.Id)) return T["status.bench"];
         return "";
     }
+
+    /// <summary>Sichtbare Sperren je Wettbewerb, z. B. "gesperrt Liga (1), Pokal (2)".</summary>
+    public static string Suspension(Player p)
+    {
+        var parts = new List<string>();
+        if (p.State.PersonalBan > 0)
+            parts.Add(T.Format("status.scopeBan", T["discipline.scope.personal"], p.State.PersonalBan));
+        foreach (var scope in p.State.ScopeKeys().OrderBy(s => s, StringComparer.Ordinal))
+        {
+            var matches = p.State.Ban(scope);
+            if (matches <= 0) continue;
+            parts.Add(T.Format("status.scopeBan", ScopeName(scope), matches));
+        }
+        return parts.Count == 0 ? "" : T.Format("status.suspendedList", string.Join(", ", parts));
+    }
+
+    private static string ScopeName(string scope) => scope switch
+    {
+        PlayerState.LeagueScope => T["discipline.scope.league"],
+        PlayerState.CupScope => T["discipline.scope.cup"],
+        PlayerState.InternationalScope => T["discipline.scope.international"],
+        _ => Competition(scope),
+    };
 
     public static string Stars(double stars)
     {

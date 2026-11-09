@@ -7,11 +7,14 @@ namespace Fmh.Core.Logic;
 public static class AiTactics
 {
     public static Formation BestFormation(Club club, World world, GameData data) =>
-        BestFormation(club, world, data, new SlotScores(data.PositionProfiles), null);
+        BestFormation(club, world, data, null);
 
-    private static Formation BestFormation(Club club, World world, GameData data, SlotScores scores, Func<Player, bool>? eligible)
+    public static Formation BestFormation(Club club, World world, GameData data, string? scope) =>
+        BestFormation(club, world, data, new SlotScores(data.PositionProfiles), null, scope);
+
+    private static Formation BestFormation(Club club, World world, GameData data, SlotScores scores, Func<Player, bool>? eligible, string? scope)
     {
-        var available = world.SquadOf(club).Where(p => p.IsAvailable && (eligible is null || eligible(p))).ToList();
+        var available = world.SquadOf(club).Where(p => p.IsAvailableFor(scope) && (eligible is null || eligible(p))).ToList();
         Formation? best = null;
         var bestScore = double.MinValue;
         foreach (var f in data.Formations)
@@ -29,16 +32,16 @@ public static class AiTactics
     }
 
     /// <summary>Formation, Aufstellung und Grundanweisungen für einen KI-Verein vor einem Spiel.</summary>
-    public static void Prepare(Club club, Club opponent, bool home, World world, GameData data, int benchSize)
+    public static void Prepare(Club club, Club opponent, bool home, World world, GameData data, int benchSize, string? scope = null)
     {
         var scores = new SlotScores(data.PositionProfiles);
-        var eligible = MatchEligibility(club, world, data);
-        var formation = BestFormation(club, world, data, scores, eligible);
+        var eligible = MatchEligibility(club, world, data, scope);
+        var formation = BestFormation(club, world, data, scores, eligible, scope);
         club.Tactic.FormationId = formation.Id;
-        LineupSelector.PickBest(club, world, data, benchSize, scores, eligible);
+        LineupSelector.PickBest(club, world, data, benchSize, scores, eligible, scope);
 
-        var own = TeamStrength(club, world, data);
-        var opp = TeamStrength(opponent, world, data);
+        var own = TeamStrength(club, world, data, scope);
+        var opp = TeamStrength(opponent, world, data, scope);
         var diff = own - opp + (home ? 0.6 : -0.4);
         club.Tactic.Mentality = (Mentality)Math.Clamp((int)Math.Round(diff * 0.7), -2, 2);
 
@@ -57,22 +60,22 @@ public static class AiTactics
     /// Spielrecht zweiter Mannschaften: Spieler bis zur Altersgrenze (Alter am Saisonstart) und die besten
     /// Älteren bis zur erlaubten Zahl. Null für erste Mannschaften.
     /// </summary>
-    public static Func<Player, bool>? ReserveEligibility(Club club, World world, GameData data)
+    public static Func<Player, bool>? ReserveEligibility(Club club, World world, GameData data, string? scope = null)
     {
         if (club.ReserveOf is null) return null;
         var country = world.Country(club.CountryCode);
         var rules = country.Reserves;
         var start = new DateOnly(world.SeasonYear, country.Season.StartMonth, 1);
-        var older = world.SquadOf(club).Where(p => p.IsAvailable && p.Age(start) > rules.AgeLimit)
+        var older = world.SquadOf(club).Where(p => p.IsAvailableFor(scope) && p.Age(start) > rules.AgeLimit)
             .OrderByDescending(p => Ratings.PositionRating(p, p.MainPosition, data.PositionProfiles)).ThenBy(p => p.Id)
             .Take(rules.OverAgePlayers).Select(p => p.Id).ToHashSet();
         return p => p.Age(start) <= rules.AgeLimit || older.Contains(p.Id);
     }
 
     /// <summary>Spielberechtigung im Pflichtspiel: Meldeliste (oder Ausnahme) und bei zweiten Mannschaften das Spielrecht.</summary>
-    public static Func<Player, bool> MatchEligibility(Club club, World world, GameData data)
+    public static Func<Player, bool> MatchEligibility(Club club, World world, GameData data, string? scope = null)
     {
-        var reserve = ReserveEligibility(club, world, data);
+        var reserve = ReserveEligibility(club, world, data, scope);
         return p => Registration.IsEligible(p, world) && (reserve is null || reserve(p));
     }
 
@@ -80,16 +83,16 @@ public static class AiTactics
     /// Mindestzahl junger Spieler im Spieltagskader (z. B. vier U23 in der 3. Liga): Fehlende ersetzen die schwächsten älteren
     /// Bankspieler, soweit junge, spielberechtigte Spieler verfügbar sind.
     /// </summary>
-    public static void EnsureYoungPlayers(Club club, World world, GameData data)
+    public static void EnsureYoungPlayers(Club club, World world, GameData data, string? scope = null)
     {
         if (Registration.RulesFor(world, club) is not { MatchdayMinYoung: > 0 } r) return;
         bool Young(Player p) => Registration.SeasonAge(p, world) <= r.MatchdayYoungAge;
-        var eligible = MatchEligibility(club, world, data);
+        var eligible = MatchEligibility(club, world, data, scope);
         var inSquad = club.Tactic.Lineup.OfType<int>().Concat(club.Tactic.Bench).ToHashSet();
         var missing = r.MatchdayMinYoung - inSquad.Count(id => Young(world.Players[id]));
         if (missing <= 0) return;
         double Rating(Player p) => Ratings.PositionRating(p, p.MainPosition, data.PositionProfiles);
-        var extra = world.SquadOf(club).Where(p => p.IsAvailable && eligible(p) && Young(p) && !inSquad.Contains(p.Id))
+        var extra = world.SquadOf(club).Where(p => p.IsAvailableFor(scope) && eligible(p) && Young(p) && !inSquad.Contains(p.Id))
             .OrderByDescending(Rating).ThenBy(p => p.Id).Take(missing).ToList();
         var outgoing = club.Tactic.Bench.Select(id => world.Players[id]).Where(p => !Young(p) && p.MainPosition != Position.GK)
             .OrderBy(Rating).ThenBy(p => p.Id).Take(extra.Count).ToList();
@@ -97,10 +100,10 @@ public static class AiTactics
             club.Tactic.Bench[club.Tactic.Bench.IndexOf(outgoing[i].Id)] = extra[i].Id;
     }
 
-    public static double TeamStrength(Club club, World world, GameData data)
+    public static double TeamStrength(Club club, World world, GameData data, string? scope = null)
     {
         var top = world.SquadOf(club)
-            .Where(p => p.IsAvailable)
+            .Where(p => scope is null ? p.IsAvailable : p.IsAvailableFor(scope))
             .Select(p => Ratings.PositionRating(p, p.MainPosition, data.PositionProfiles))
             .OrderByDescending(r => r)
             .Take(14)

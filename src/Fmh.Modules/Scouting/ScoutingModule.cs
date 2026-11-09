@@ -180,8 +180,9 @@ public sealed partial class ScoutingModule : GameModule, IScoutingService
         var squad = World.SquadOf(opp).ToList();
         foreach (var p in squad) AddKnowledge(p, 15 + (int)Facilities.Effect(HumanClub, "analysis"));
         var formation = Data.Formation(opp.Tactic.FormationId).Name;
-        var best = squad.Where(p => p.IsAvailable).OrderByDescending(Transfers.Rating).Take(3).Select(p => p.Name);
-        var absent = squad.Where(p => !p.IsAvailable).OrderByDescending(Transfers.Rating).Take(3).Select(p => p.Name).ToList();
+        var scope = DisciplineRules.ScopeOf(f, World);
+        var best = squad.Where(p => p.IsAvailableFor(scope)).OrderByDescending(Transfers.Rating).Take(3).Select(p => p.Name);
+        var absent = squad.Where(p => !p.IsAvailableFor(scope)).OrderByDescending(Transfers.Rating).Take(3).Select(p => p.Name).ToList();
         Notify(MessageType.Scouting, "msg.sender.scout", TR("msg.opponentReport.subject", opp.Name),
             TR("msg.opponentReport.body", scout.Name, opp.Name, formation, TR("mentality." + opp.Tactic.Mentality),
                 string.Join(", ", best), absent.Count == 0 ? TR("ui.none") : TextRef.Literal(string.Join(", ", absent))));
