@@ -100,25 +100,42 @@
 
       <!-- Verhandlungen -->
       <TabItem Header="{s:L transfer.tab.negotiations}">
-        <Border Classes="card" Margin="0,4,0,0">
-          <Panel>
-            <TextBlock Text="{s:L transfer.noNegotiations}" Classes="muted" IsVisible="{Binding !Negotiations.Count}" />
-            <ItemsControl ItemsSource="{Binding Negotiations}">
-              <ItemsControl.ItemTemplate>
-                <DataTemplate x:DataType="vm:NegotiationRow">
-                  <Grid ColumnDefinitions="200,170,180,*,Auto" Margin="0,6" ColumnSpacing="12">
-                    <TextBlock Text="{Binding Player}" FontWeight="SemiBold" VerticalAlignment="Center" />
-                    <TextBlock Grid.Column="1" Text="{Binding Type}" Classes="muted" VerticalAlignment="Center" />
-                    <TextBlock Grid.Column="2" Text="{Binding Stage}" VerticalAlignment="Center" />
-                    <TextBlock Grid.Column="3" Text="{Binding Response}" Classes="muted small" TextWrapping="Wrap" VerticalAlignment="Center" />
-                    <Button Grid.Column="4" Content="{s:L transfer.continue}" IsVisible="{Binding CanOpen}"
-                            Command="{Binding $parent[ItemsControl].((vm:TransfersPageViewModel)DataContext).ContinueNegotiationCommand}" CommandParameter="{Binding}" />
-                  </Grid>
-                </DataTemplate>
-              </ItemsControl.ItemTemplate>
-            </ItemsControl>
-          </Panel>
-        </Border>
+        <DockPanel Margin="0,4,0,0">
+          <Border DockPanel.Dock="Top" Classes="card" Margin="0,0,0,10">
+            <StackPanel Spacing="10">
+              <TextBlock Text="{s:L transfer.director}" Classes="h3" />
+              <TextBlock Text="{Binding DirectorInfo}" Classes="muted small" />
+              <StackPanel Orientation="Horizontal" Spacing="12">
+                <CheckBox Content="{s:L transfer.directorDelegate}" IsChecked="{Binding DirectorDelegate}" VerticalAlignment="Center" />
+                <TextBlock Text="{s:L transfer.directorMaxFee}" VerticalAlignment="Center" Classes="muted" />
+                <NumericUpDown Value="{Binding DirectorMaxFee, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="100000" FormatString="N0" Width="140" />
+                <TextBlock Text="{s:L transfer.directorMaxWage}" VerticalAlignment="Center" Classes="muted" />
+                <NumericUpDown Value="{Binding DirectorMaxWage, Converter={x:Static s:Converters.Money}}" Minimum="0" Increment="500" FormatString="N0" Width="120" />
+                <Button Content="{s:L transfer.directorApply}" Classes="primary" Command="{Binding SaveDirectorMandateCommand}" />
+              </StackPanel>
+              <TextBlock Text="{Binding DirectorMessage}" Foreground="{DynamicResource AccentBrush}" />
+            </StackPanel>
+          </Border>
+          <Border Classes="card">
+            <Panel>
+              <TextBlock Text="{s:L transfer.noNegotiations}" Classes="muted" IsVisible="{Binding !Negotiations.Count}" />
+              <ItemsControl ItemsSource="{Binding Negotiations}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="vm:NegotiationRow">
+                    <Grid ColumnDefinitions="200,170,180,*,Auto" Margin="0,6" ColumnSpacing="12">
+                      <TextBlock Text="{Binding Player}" FontWeight="SemiBold" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="1" Text="{Binding Type}" Classes="muted" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="2" Text="{Binding Stage}" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="3" Text="{Binding Response}" Classes="muted small" TextWrapping="Wrap" VerticalAlignment="Center" />
+                      <Button Grid.Column="4" Content="{s:L transfer.continue}" IsVisible="{Binding CanOpen}"
+                              Command="{Binding $parent[ItemsControl].((vm:TransfersPageViewModel)DataContext).ContinueNegotiationCommand}" CommandParameter="{Binding}" />
+                    </Grid>
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+            </Panel>
+          </Border>
+        </DockPanel>
       </TabItem>
 
       <!-- Scouts -->

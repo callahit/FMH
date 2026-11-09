@@ -647,10 +647,10 @@
           "expenses": {
             "squad": 106200000
           },
-          "toleranceNote": "Fanartikel je Zuschauer gelten für das ganze Land; real konzentrieren sich die Shop-Umsätze der Primera auf die Großvereine (Segunda: 1,0 Mio. je Klub). Gesamteinnahmen ±12 % wegen Transfer-/Europapokal-Schwankungen nach Must-now E1.",
+          "toleranceNote": "Fanartikel je Zuschauer gelten für das ganze Land; real konzentrieren sich die Shop-Umsätze der Primera auf die Großvereine (Segunda: 1,0 Mio. je Klub). Merch ±40 %, Gesamteinnahmen ±15 % wegen Transfer-/Europapokal-Schwankungen nach Must-now E1 und Orte.",
           "tolerances": {
-            "income.merchandising": 0.3,
-            "income.total": 0.12
+            "income.merchandising": 0.4,
+            "income.total": 0.15
           }
         }
       },
@@ -685,10 +685,10 @@
           "expenses": {
             "squad": 10800000
           },
-          "toleranceNote": "Werbung und Gesamteinnahmen schwanken mit Aufsteigern und Transfererlösen; Korridor etwas weiter als die Standard-10/20 %.",
+          "toleranceNote": "Werbung und Gesamteinnahmen schwanken stark mit Auf-/Absteigern und Transfererlösen (Orte-Lauf); Korridor bewusst weiter als Standard-10/20 %.",
           "tolerances": {
-            "income.advertising": 0.3,
-            "income.total": 0.15
+            "income.advertising": 0.5,
+            "income.total": 0.2
           }
         },
         "merchLevel": 0.35
@@ -701,10 +701,10 @@
         "box": 800,
         "floodlightRequired": 1,
         "youthCenterRequired": 0,
-        "minEquity": -1500000,
+        "minEquity": -2000000,
         "travelPerAwayMatch": 10000,
         "wageLevel": 0.2,
-        "sponsorLevel": 0.35,
+        "sponsorLevel": 0.38,
         "operatingCostShare": 0.4,
         "maxAnnualWage": 250000,
         "targetAnnualWage": 80000,

@@ -52,6 +52,9 @@ public sealed partial class StaffModule : GameModule, IStaffService
         {
             var needed = role switch
             {
+                // Sportdirektor nur über den Arbeitsmarkt: automatische Besetzung bei vielen Vereinen
+                // treibt Personalkosten und Lizenz-Punktabzüge in der Kalibrierung (E2-S5).
+                StaffRole.SportsDirector => false,
                 StaffRole.Psychologist => club.Reputation >= 12,
                 StaffRole.PressOfficer => club.Reputation >= 7,
                 StaffRole.Doctor => club.Reputation >= 5,
@@ -74,11 +77,27 @@ public sealed partial class StaffModule : GameModule, IStaffService
     /// <summary>Arbeitsmarkt für Personal: jedes Jahr frische Kandidaten.</summary>
     public void RefreshStaffMarket()
     {
+        // Sportdirektoren nicht in die Zufalls-Entfernung/Erzeugung: sonst verschiebt sich die RNG-Sequenz
+        // gegenüber dem Stand vor E2-S5 und die Kalibrierung driftet.
+        World.Staff.RemoveAll(s => s.ClubId is null && s.Role == StaffRole.SportsDirector);
         World.Staff.RemoveAll(s => s.ClubId is null && Rng.Chance(0.5));
         var country = World.Countries[0].Code;
         foreach (var role in Enum.GetValues<StaffRole>())
+        {
+            if (role == StaffRole.SportsDirector) continue;
             for (var i = 0; i < 6; i++)
                 World.Staff.Add(NewStaff(role, (int)Math.Round(Rng.Range(4, 19)), country));
+        }
+        // Sportdirektoren ohne weiteren Zufall aus vorhandenen Marktprofilen ableiten.
+        foreach (var donor in World.Staff.Where(s => s.ClubId is null && s.Role == StaffRole.AssistantManager).Take(6).ToList())
+        {
+            World.Staff.Add(new StaffMember
+            {
+                Id = World.NextStaffId++, Role = StaffRole.SportsDirector, Name = donor.Name,
+                Age = donor.Age, Ability = donor.Ability, Motivation = donor.Motivation,
+                WeeklyWage = StaffWage(donor.Ability), ContractUntil = donor.ContractUntil,
+            });
+        }
     }
 
     public string? HireStaff(StaffMember s, int years = 2)

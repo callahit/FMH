@@ -218,4 +218,50 @@ public static class Negotiations
         var factor = 1 + 0.003 * ((o.RelegationPercent ?? rel) - rel) - 0.001 * ((o.PromotionPercent ?? pro) - pro);
         return Math.Clamp(factor, 0.85, 1.3);
     }
+
+    /// <summary>Aktive Bieter um denselben Spieler (E2-S1).</summary>
+    public static IEnumerable<Negotiation> ActiveBids(World world, int playerId) =>
+        world.Negotiations.Where(n => n.PlayerId == playerId && !n.Incoming
+            && n.Stage is NegotiationStage.Enquiry or NegotiationStage.Talks or NegotiationStage.ClubTalks or NegotiationStage.PlayerTalks);
+
+    /// <summary>Verkäufer wählt unter den Vereinszusagen nach Angebotswert (E2-S1).</summary>
+    public static Negotiation PickSellerFavourite(IEnumerable<Negotiation> agreed, Player p, World world, GameData data) =>
+        agreed.OrderByDescending(n => EffectiveValue(n.Offer, p, world, data))
+            .ThenByDescending(n => world.Clubs[n.BuyerId].Reputation)
+            .ThenBy(n => n.Id)
+            .First();
+
+    /// <summary>Spieler wählt unter den Vereinen mit Einigung nach Ruf, Rolle und Gehalt (E2-S1).</summary>
+    public static Negotiation PickPlayerFavourite(IEnumerable<Negotiation> ready, Player p, World world, GameData data) =>
+        ready.OrderByDescending(n => PlayerAttraction(n, p, world, data))
+            .ThenByDescending(n => n.Contract.WeeklyWage)
+            .ThenBy(n => n.Id)
+            .First();
+
+    /// <summary>Attraktivität eines Käufers aus Spielersicht: Ruf, erwartete Rolle, Gehalt.</summary>
+    public static double PlayerAttraction(Negotiation n, Player p, World world, GameData data)
+    {
+        var buyer = world.Clubs[n.BuyerId];
+        var status = n.Contract.Status;
+        var role = status switch
+        {
+            SquadStatus.Star => 1.25,
+            SquadStatus.Regular => 1.1,
+            SquadStatus.Rotation => 1.0,
+            SquadStatus.Backup => 0.85,
+            _ => 0.7,
+        };
+        return buyer.Reputation * 10 + role * 20 + n.Contract.WeeklyWage / 1000.0
+               + (ExpectedStatus(p, buyer, world, data) <= status ? 5 : 0);
+    }
+
+    public static bool CanSubmitClub(Negotiation n) =>
+        !n.ClubAgreed && n.Stage is NegotiationStage.ClubTalks or NegotiationStage.Talks;
+
+    public static bool CanSubmitPlayer(Negotiation n) =>
+        !n.PlayerAgreed && n.Stage is NegotiationStage.PlayerTalks or NegotiationStage.Talks;
+
+    public static bool IsOpenStage(NegotiationStage stage) =>
+        stage is NegotiationStage.Enquiry or NegotiationStage.Talks or NegotiationStage.ClubTalks
+            or NegotiationStage.PlayerTalks or NegotiationStage.Pending;
 }

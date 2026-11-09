@@ -28,12 +28,11 @@ public class DealModelTests
         var value = s.ValueOf(p);
         var fee = (long)Math.Ceiling(value * 0.2);
         Assert.True(TransferTerms.WageShareFromLoanFee(fee, value) >= 20);
-        var (n, error) = s.StartNegotiation(p, DealType.Loan);
-        Assert.Null(error);
+        var n = TestData.StartTalks(s, p, DealType.Loan);
         s.HumanClub.Budget.TransferBudget = Math.Max(s.HumanClub.Budget.TransferBudget, fee);
         var low = new ClubOffer { LoanMonths = 12, WageSharePercent = 30 };
         Assert.Equal(ResponseKind.Counter, s.SubmitClubOffer(n!, low).Kind);
-        n!.Stage = NegotiationStage.ClubTalks;
+        n!.Stage = NegotiationStage.Talks;
         n.ClubRounds = 1;
         Assert.Equal(ResponseKind.Accept, s.SubmitClubOffer(n, new ClubOffer { LoanMonths = 12, WageSharePercent = 30, LoanFee = fee }).Kind);
         Assert.Equal(fee, p.Loan!.Fee);
@@ -63,8 +62,7 @@ public class DealModelTests
         var ask = Negotiations.AskingPrice(p, seller, s.World, s.Data);
         var fee = ask * 2;
         s.HumanClub.Budget.TransferBudget = Math.Max(s.HumanClub.Budget.TransferBudget, fee);
-        var (n, error) = s.StartNegotiation(p, DealType.Transfer);
-        Assert.Null(error);
+        var n = TestData.StartTalks(s, p, DealType.Transfer);
         Assert.Equal(ResponseKind.Accept, s.SubmitClubOffer(n!, new ClubOffer { Fee = fee, SellOnPercent = 30, InstallmentYears = 1 }).Kind);
         Assert.Equal(ResponseKind.Accept, s.SubmitContract(n!, n!.Contract).Kind);
 

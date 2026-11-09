@@ -210,7 +210,11 @@ public sealed class TransferRecord
 }
 
 public enum DealType { Transfer, Loan, FreeAgent, PreContract, Renewal }
-public enum NegotiationStage { ClubTalks, PlayerTalks, Completed, Failed, Withdrawn, Pending }
+/// <summary>
+/// Verhandlungsstufe. <see cref="Enquiry"/> = Anfrage (E2-S2); <see cref="Talks"/> = parallele Vereins- und Spielergespräche;
+/// <see cref="ClubTalks"/>/<see cref="PlayerTalks"/> bleiben für ältere Spielstände und freie Agenten.
+/// </summary>
+public enum NegotiationStage { Enquiry, Talks, ClubTalks, PlayerTalks, Completed, Failed, Withdrawn, Pending }
 
 /// <summary>Angebot an den abgebenden Verein (Kapitel 7).</summary>
 public sealed class ClubOffer
@@ -278,7 +282,7 @@ public sealed class ContractOffer
     public ContractOffer Clone() => (ContractOffer)MemberwiseClone();
 }
 
-/// <summary>Laufende Verhandlung: erst mit dem Verein, dann mit dem Spieler (und Berater).</summary>
+/// <summary>Laufende Verhandlung: Anfrage, danach parallel Verein und Spieler (E2), mit Berater.</summary>
 public sealed class Negotiation
 {
     public int Id { get; set; }
@@ -303,4 +307,19 @@ public sealed class Negotiation
     public string ResponseText(Data.Texts t) => Response is { } r ? t.Render(r) : LastResponse;
     /// <summary>Angebot eines KI-Vereins an den menschlichen Manager (wartet auf Entscheidung).</summary>
     public bool Incoming { get; set; }
+    /// <summary>Tag, an dem der Verkäufer auf die Anfrage antwortet (E2-S2).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public DateOnly? EnquiryDue { get; set; }
+    /// <summary>Verein hat dem Angebot zugestimmt (parallel zu Spielergesprächen).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool ClubAgreed { get; set; }
+    /// <summary>Spieler hat dem Vertrag zugestimmt.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool PlayerAgreed { get; set; }
+    /// <summary>Tag der Vereinszusage; steuert das 3-Tage-Bieterfenster (E2-S1).</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public DateOnly? ClubAgreedOn { get; set; }
+    /// <summary>Verkäufer hat diesen Bieter aus der Konkurrenz ausgewählt.</summary>
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public bool SellerChosen { get; set; }
 }
