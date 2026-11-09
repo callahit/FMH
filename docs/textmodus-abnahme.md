@@ -128,7 +128,7 @@ Lokal `dotnet test` Release: **283 bestanden, 0 fehlgeschlagen, 0 übersprungen*
 | `WatchedCareerMatchUsesTheTextEngine` | ein beobachtetes Karrierespiel |
 | Golden Master | Referenz unverändert, nicht neu gesetzt |
 
-Ubuntu- und Windows-CI laufen auf dem Pull Request.
+Ubuntu-CI dieses Stands ist grün. Der Windows-Lauf scheitert zusätzlich an `AllPackagesOverTwoSeasonsAreUnchanged`: `clubs` und `players` weichen mit denselben Hashes ab wie auf `master` nach #51 (E2). Die Ligatabellen und der Engine-Golden über 10.000 Spiele bleiben gleich. Die Referenzhashes werden deshalb nicht angefasst.
 
 ## Offen
 
