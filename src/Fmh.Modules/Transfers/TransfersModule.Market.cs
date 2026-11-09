@@ -274,14 +274,18 @@ public sealed partial class TransfersModule
                 ? TR("msg.deadline.empty")
                 : TR("msg.deadline.body", TextArg.Join(" · ", lines.Cast<object?>().ToList())));
 
-        // KI: unter Mindestkader dringend verpflichten.
+        // KI: unter Mindestkader nachziehen – Gehaltsbudget nur bei kritisch dünnem Spieltagskader überschreiten (wie am Montag).
         foreach (var club in World.Clubs.Values.Where(c => !IsHuman(c) && WindowOpen(c)))
         {
-            var min = Finance.DivisionFinance(club).MinSquad;
-            for (var guard = 0; guard < min && club.PlayerIds.Count < min; guard++)
+            var division = Finance.DivisionFinance(club);
+            var bench = World.Country(club.CountryCode).Squad.BenchSize;
+            for (var guard = 0; guard <= division.MinSquad && club.PlayerIds.Count < division.MinSquad; guard++)
             {
-                if (!SignBestFreeAgent(club, Season.NeededPosition(club), withinBudget: false))
+                var below = club.PlayerIds.Count < division.MinSquad;
+                var critical = club.PlayerIds.Count < 11 + bench;
+                if (!SignBestFreeAgent(club, Season.NeededPosition(club), withinBudget: !critical) && below)
                     Season.AddEmergencyPlayer(club);
+                if (!below) break;
             }
         }
     }

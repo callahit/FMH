@@ -383,6 +383,10 @@
           "official": true,
           "income": {
             "total": 11200000
+          },
+          "toleranceNote": "DNCG-Schnitt ohne Transfererlöse; Auf-/Abstieg und KI-Kaderauffüllung am Deadline Day (ohne Gehaltsbudget-Überschreitung außer bei kritisch dünnem Spieltagskader) streuen die Erträge stärker als ±10 %.",
+          "tolerances": {
+            "income.total": 0.2
           }
         }
       },

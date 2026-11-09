@@ -556,6 +556,10 @@
           "official": false,
           "income": {
             "total": 13400000
+          },
+          "toleranceNote": "Deloitte-Schätzung ohne amtliche Ligazahl; Auf-/Abstieg und KI-Kaderauffüllung am Deadline Day streuen die Erträge der dritten Profi-Ebene stärker als ±10 %.",
+          "tolerances": {
+            "income.total": 0.15
           }
         }
       },
