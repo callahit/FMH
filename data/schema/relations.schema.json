@@ -126,6 +126,12 @@
       "minimum": 0,
       "type": "integer"
     },
+    "trainingMoralePerStep": {
+      "description": "Wirkung der Moral auf den Trainingsfortschritt je Stufe über bzw. unter „Okay“ (sieben Stufen; 0,0167 = ±5 % an den Enden). Zufriedenere Kader entwickeln sich schneller; zu viel davon lässt die Ligastärke wachsen (Drift).",
+      "maximum": 0.1,
+      "minimum": 0,
+      "type": "number"
+    },
     "transferRequest": {
       "additionalProperties": false,
       "properties": {
