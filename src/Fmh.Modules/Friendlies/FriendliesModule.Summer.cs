@@ -23,8 +23,18 @@ public sealed partial class FriendliesModule
         .Where(r => SummerDate(r) > World.Date.AddDays(1) && World.SummerTournaments.All(t => t.Id != Key(r, World.SeasonYear)))
         .OrderBy(SummerDate).ToList();
 
-    private bool BusyBetween(Club club, DateOnly from, DateOnly to) =>
-        World.AllMatches.Any(f => f.Involves(club.Id) && f.Date >= from.AddDays(-Rules.MinRestDays) && f.Date <= to.AddDays(Rules.MinRestDays));
+    /// <summary>
+    /// Belegt: ein angesetztes Spiel im Zeitraum oder eine Pokalrunde, an der der Verein teilnimmt und deren Termine im
+    /// Zeitraum liegen (z. B. Europapokal-Qualifikation, die erst später ausgelost wird).
+    /// </summary>
+    private bool BusyBetween(Club club, DateOnly from, DateOnly to)
+    {
+        var a = from.AddDays(-Rules.MinRestDays);
+        var b = to.AddDays(Rules.MinRestDays);
+        return World.AllMatches.Any(f => f.Involves(club.Id) && f.Date >= a && f.Date <= b)
+               || World.Cups.Any(c => !c.IsFinished && (c.ParticipantIds.Contains(club.Id) || c.Rounds.Any(r => r.Entrants.Contains(club.Id)))
+                                      && c.Rounds.Any(r => !r.Drawn && r.Dates.Any(d => d >= a && d <= b)));
+    }
 
     /// <summary>Anmeldung: drei Gegner mit ähnlichem Ruf, Halbfinals ausgelost. Fehlertext-Schlüssel oder null.</summary>
     public string? EnterSummerTournament(string ruleId)

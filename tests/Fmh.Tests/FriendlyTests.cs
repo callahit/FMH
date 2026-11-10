@@ -155,6 +155,23 @@ public sealed class FriendlyTests
     }
 
     [Fact]
+    public void ClubsWithAnOpenCupRoundInTheSpanAreNotInvited()
+    {
+        var s = TestData.NewSession(907);
+        var w = s.World;
+        var rule = s.OpenSummerTournaments()[0];
+        var semi = ScheduleGenerator.ParseDate(rule.Date, w.SeasonYear, w.Countries[0].Season.StartMonth);
+        // Eine noch nicht ausgeloste Pokalrunde liegt im Turnierzeitraum: ihre Teilnehmer sind belegt.
+        var near = s.FriendlyCandidates().Where(c => Math.Abs(c.Reputation - s.HumanClub.Reputation) <= rule.ReputationRange).Take(4).Select(c => c.Id).ToList();
+        var cup = new Cup { Id = "TEST-CUP", Kind = CompetitionKind.Cup, ParticipantIds = near };
+        cup.Rounds.Add(new CupRound { Number = 1, Dates = { semi } });
+        w.Cups.Add(cup);
+        Assert.Null(s.EnterSummerTournament(rule.Id));
+        var t = s.OwnSummerTournaments.Single();
+        Assert.DoesNotContain(t.ClubIds, id => cup.ParticipantIds.Contains(id));
+    }
+
+    [Fact]
     public void FriendliesSurviveSavingAndOldSavesLoad()
     {
         var s = TestData.NewSession(904);
