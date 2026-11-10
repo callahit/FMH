@@ -42,6 +42,8 @@ public sealed partial class TrainingModule : GameModule, ITrainingService
     private void RunTraining(IReadOnlySet<int> playing)
     {
         var monday = World.Date.DayOfWeek == DayOfWeek.Monday;
+        // Nationalspieler sind während des Länderspielfensters beim Verband und trainieren nicht im Verein (AP 8).
+        var onDuty = World.NationalTeams.SelectMany(t => t.Squad).ToHashSet();
         foreach (var club in World.Clubs.Values)
         {
             if (monday) DecayFamiliarity(club);
@@ -49,7 +51,7 @@ public sealed partial class TrainingModule : GameModule, ITrainingService
             if (club.Camp is { } old && old.End < World.Date) club.Camp = null;
             if (playing.Contains(club.Id)) continue;
 
-            var squad = World.SquadOf(club).Where(p => p.State.Injury is null).ToList();
+            var squad = World.SquadOf(club).Where(p => p.State.Injury is null && !onDuty.Contains(p.Id)).ToList();
             if (camp is not null)
             {
                 RunCampDay(club, camp, squad);
