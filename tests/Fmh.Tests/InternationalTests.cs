@@ -53,6 +53,29 @@ public sealed class InternationalTests
     }
 
     [Fact]
+    public void LeaguesStillEndInMayDespiteTheWindows()
+    {
+        // Ohne letzten Spieltag liefe die 3. Liga mit 38 Spieltagen bis Ende Juni; mit ihm gibt es Englische Wochen.
+        var w = AllCountries(815).World;
+        Assert.All(w.Leagues, l => Assert.True(l.Fixtures.Max(f => f.Date) <= new DateOnly(w.SeasonYear + 1, 5, 31), $"{l.Id} endet {l.Fixtures.Max(f => f.Date)}"));
+        Assert.Contains(w.League("DE3").Fixtures, f => f.Date.DayOfWeek == DayOfWeek.Tuesday);
+    }
+
+    [Fact]
+    public void LateSeasonEndStillStartsTheNextSeason()
+    {
+        // Endet ein Wettbewerb erst nach dem 1. Juli, beginnt die neue Saison sofort statt ein Jahr später.
+        var s = TestData.NewSession(816);
+        var w = s.World;
+        TestData.PlayUntil(s, _ => w.SeasonFinished, 5000);
+        var year = w.SeasonYear;
+        w.Date = new DateOnly(year + 1, 7, 3);
+        s.Advance(1);
+        Assert.Equal(year + 1, w.SeasonYear);
+        Assert.False(w.SeasonFinished);
+    }
+
+    [Fact]
     public void AiNominatesTheBestHealthyNationals()
     {
         var s = TestData.NewSession(812);
