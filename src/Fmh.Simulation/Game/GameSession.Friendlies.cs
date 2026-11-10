@@ -10,5 +10,8 @@ public sealed partial class GameSession
     public string? ArrangeFriendly(Club opponent, DateOnly date, bool home, int homeSharePercent) =>
         _friendlies.Arrange(opponent, date, home, homeSharePercent);
     public void CancelFriendly(Friendly friendly) => _friendlies.Cancel(friendly);
+    public IReadOnlyList<Fmh.Core.Data.SummerTournamentRule> OpenSummerTournaments() => _friendlies.OpenSummerTournaments();
+    public string? EnterSummerTournament(string ruleId) => _friendlies.EnterSummerTournament(ruleId);
+    public IEnumerable<SummerTournament> OwnSummerTournaments => World.SummerTournaments.Where(t => t.ClubIds.Contains(HumanClub.Id));
     public IEnumerable<Friendly> OwnFriendlies => World.Friendlies.Where(f => f.Fixture.Involves(HumanClub.Id)).OrderBy(f => f.Fixture.Date);
 }

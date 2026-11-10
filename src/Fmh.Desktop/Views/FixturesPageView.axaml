@@ -59,6 +59,18 @@
               </StackPanel>
             </Grid>
             <TextBlock Text="{Binding FriendlyMessage}" TextWrapping="Wrap" />
+            <TextBlock Classes="h2" Text="{s:L summer.title}" Margin="0,8,0,0" />
+            <ItemsControl ItemsSource="{Binding SummerTournaments}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:SummerTournamentVm">
+                  <Grid ColumnDefinitions="*,260,Auto" Margin="0,2">
+                    <TextBlock Text="{Binding Name}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="1" Text="{Binding Detail}" Classes="muted small" VerticalAlignment="Center" />
+                    <Button Grid.Column="2" Content="{s:L summer.enter}" Command="{Binding Enter}" IsVisible="{Binding CanEnter}" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
             <TextBlock Classes="h2" Text="{s:L friendly.list}" Margin="0,8,0,0" />
             <TextBlock Classes="muted" Text="{s:L friendly.none}" IsVisible="{Binding NoFriendlies}" />
           </StackPanel>

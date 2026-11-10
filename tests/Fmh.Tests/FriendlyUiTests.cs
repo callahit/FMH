@@ -55,5 +55,12 @@ public class FriendlyUiTests
         page.Friendlies[0].Cancel.Execute(null);
         Assert.True(page.NoFriendlies);
         Assert.Empty(s.OwnFriendlies);
+
+        // AP 9b: Anmeldung zu einem Sommerturnier
+        Assert.Equal(2, page.SummerTournaments.Count(t => t.CanEnter));
+        page.SummerTournaments.First(t => t.CanEnter).Enter.Execute(null);
+        Assert.StartsWith("Angemeldet", page.FriendlyMessage);
+        Assert.Contains(page.SummerTournaments, t => !t.CanEnter && t.Detail == "läuft");
+        Assert.Single(page.Friendlies); // das eigene Halbfinale
     }
 }

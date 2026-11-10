@@ -8,7 +8,7 @@ namespace Fmh.Core.Modules;
 /// Testspiele (AP 9): Der Manager vereinbart Gegner, Datum, Ort und Einnahmenteilung. Bekannte Vereine kommen nur
 /// auswärts und nur bis zu einem Rufabstand. Im Trainingslager findet das Spiel auf neutralem Platz statt.
 /// </summary>
-public sealed class FriendliesModule : GameModule
+public sealed partial class FriendliesModule : GameModule
 {
     public override string Id => "friendlies";
     public override IReadOnlyList<string> DependsOn => new[] { "matchday" };
@@ -80,8 +80,11 @@ public sealed class FriendliesModule : GameModule
     {
         var start = new DateOnly(World.SeasonYear, World.Countries[0].Season.StartMonth, 1);
         World.Friendlies.RemoveAll(f => f.Fixture.Result is not null && f.Fixture.Date < start);
+        World.SummerTournaments.RemoveAll(t => t.Year < World.SeasonYear);
+        AdvanceSummerTournaments();
         var rest = Rules.MinRestDays;
-        foreach (var friendly in World.Friendlies.Where(f => f.Fixture.Result is null && f.Fixture.Date >= World.Date).ToList())
+        // Sommerturniere liegen in der Vorbereitung und behalten ihre Termine.
+        foreach (var friendly in World.Friendlies.Where(f => f.Fixture.Result is null && f.Fixture.Date >= World.Date && f.TournamentId is null).ToList())
         {
             var f = friendly.Fixture;
             if (!World.AllFixtures.Any(c => (c.Involves(f.HomeId) || c.Involves(f.AwayId)) && Math.Abs(c.Date.DayNumber - f.Date.DayNumber) < Math.Max(1, rest)))
