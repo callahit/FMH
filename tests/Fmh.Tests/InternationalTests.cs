@@ -181,7 +181,7 @@ public sealed class InternationalTests
             }
             var old = SqliteStore.Load(path);
             Assert.Empty(old.InternationalWindows);
-            Assert.Equal("7", SqliteStore.ReadMetaTable(path)["schema.internationals"]);
+            Assert.Equal("8", SqliteStore.ReadMetaTable(path)["schema.internationals"]);
             var session = new GameSession(old, TestData.Data, new TextMatchEngine());
             session.Advance(3);
             Assert.Empty(old.InternationalFixtures);

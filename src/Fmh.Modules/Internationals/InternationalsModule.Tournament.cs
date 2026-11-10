@@ -126,7 +126,7 @@ public sealed partial class InternationalsModule
         var taken = new HashSet<int>();
         foreach (var team in t.Qualified.Select(c => NationalSquads.TeamOf(World, c)!).Where(n => !n.Background).OrderBy(n => n.Code, StringComparer.Ordinal))
         {
-            NationalSquads.Call(World, team, NationalSquads.Nominate(World, Data, team, taken));
+            NationalSquads.Call(World, team, SquadFor(team, taken));
             taken.UnionWith(team.Squad);
         }
         NotifyCallups(TR("intl.tournamentCallup.body", CallupLines(), t.Name));
@@ -157,6 +157,7 @@ public sealed partial class InternationalsModule
         t.Champion = winners[0];
         t.Phase = TournamentPhase.Done;
         ReleaseAll(winners);
+        SettleCoaches(t);
         var final = last[0];
         News(TR("intl.champion.subject", NationalSquads.TeamOf(World, t.Champion)!.Name, t.Name),
             TR("intl.champion.body", t.Name, NationalSquads.TeamOf(World, final.HomeCode)!.Name, final.Result!.HomeGoals,
