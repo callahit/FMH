@@ -6,17 +6,22 @@ namespace Fmh.Core.Modules;
 
 public sealed partial class InternationalsModule
 {
-    private void PlayDay(InternationalWindowDates w)
+    /// <summary>Alle Länderspiele des Tages (Freundschaftsspiele, Qualifikation, Endrunde).</summary>
+    private void PlayToday()
     {
         foreach (var f in World.InternationalFixtures.Where(f => f.Date == World.Date && f.Result is null).OrderBy(f => f.Id).ToList())
             Play(f);
     }
 
-    /// <summary>Länderspiel mit der Engine im Schnellmodus; eigener Seed je Saison und Spiel.</summary>
+    /// <summary>
+    /// Länderspiel mit der Engine im Schnellmodus; eigener Seed je Saison und Spiel. Endrundenspiele finden auf
+    /// neutralem Platz statt, K.-o.-Spiele gehen in Verlängerung und Elfmeterschießen.
+    /// </summary>
     public void Play(InternationalFixture f)
     {
         var home = NationalSquads.TeamOf(World, f.HomeCode)!;
         var away = NationalSquads.TeamOf(World, f.AwayCode)!;
+        var knockout = f.Stage.StartsWith("KO", StringComparison.Ordinal);
         var setup = new MatchSetup
         {
             Home = SetupFor(home, -1),
@@ -29,6 +34,8 @@ public sealed partial class InternationalsModule
             InjuryFrequency = World.Rules.InjuryFrequency,
             Substitutions = Data.Internationals.Substitutions,
             Floodlit = f.Date.Month is 11 or 12 or 1 or 2 or 3,
+            NeutralGround = f.TournamentId is not null && !f.Stage.StartsWith("Q", StringComparison.Ordinal),
+            Knockout = knockout ? new KnockoutContext() : null,
         };
         var sim = Engine.Create(setup);
         sim.RunToEnd();
@@ -44,6 +51,13 @@ public sealed partial class InternationalsModule
         foreach (var e in sim.Events.Where(e => e.Type == MatchEventType.Goal && e.PlayerId is > 0))
             f.Result.Goals.Add(new GoalRecord { Minute = e.Minute + e.Stoppage, Home = e.Side == Side.Home, ScorerId = e.PlayerId!.Value,
                 AssistId = e.OtherPlayerId is > 0 ? e.OtherPlayerId : null, Penalty = e.Kind == ShotKind.Penalty, OwnGoal = e.Value == 1 });
+        if (knockout)
+        {
+            var homeWins = sim.Home.Goals != sim.Away.Goals
+                ? sim.Home.Goals > sim.Away.Goals
+                : sim.Events.LastOrDefault(e => e.Type == MatchEventType.ShootoutEnd)?.Side == Side.Home;
+            f.WinnerCode = homeWins ? f.HomeCode : f.AwayCode;
+        }
         Record(home, sim.Home.Goals, sim.Away.Goals);
         Record(away, sim.Away.Goals, sim.Home.Goals);
         ApplyPlayers(sim.Home, home, sim.Minute);
@@ -54,7 +68,7 @@ public sealed partial class InternationalsModule
     {
         var players = team.Background
             ? NationalSquads.BackgroundSquad(World, Data, team)
-            : team.Squad.Select(id => World.Players[id]).Where(p => p.IsAvailable).ToList();
+            : team.Squad.Select(id => World.Players[id]).Where(p => p.State.Injury is null).ToList();
         var tactic = new Tactic { FormationId = Data.Internationals.Formation };
         var formation = TacticResolver.Resolve(tactic, Data);
         tactic.Lineup = LineupSelector.Assign(formation, players, Data.PositionProfiles);

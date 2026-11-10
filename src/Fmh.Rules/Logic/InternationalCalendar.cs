@@ -33,7 +33,9 @@ public static class InternationalCalendar
     public static void Plan(World world, GameData data)
     {
         world.InternationalWindows = Windows(data.Internationals, world.SeasonYear);
-        world.InternationalFixtures.Clear();
+        // Freundschaftsspiele der Vorsaison entfallen; Turnierspiele bleiben bis zum Ende der folgenden Saison sichtbar.
+        var keep = world.Tournaments.Where(t => t.Phase != TournamentPhase.Done || t.Year >= world.SeasonYear).Select(t => t.Id).ToHashSet();
+        world.InternationalFixtures.RemoveAll(f => f.TournamentId is null || !keep.Contains(f.TournamentId));
     }
 
     /// <summary>Verschiebt einen Vereinstermin aus einem Fenster um ganze Wochen nach hinten (gleicher Wochentag).</summary>

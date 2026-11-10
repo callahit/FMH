@@ -3050,5 +3050,8 @@
  "intl.callup.body": "Für das Länderspielfenster sind nominiert: {0}. Die Spieler sind ab {1} zurück und kommen mit Reisestrapazen.",
  "player.caps": "Länderspiele",
  "player.capsValue": "{0} ({1} Tore) für {2}",
- "player.onDuty": "Beim Nationalteam"
+ "player.onDuty": "Beim Nationalteam",
+ "intl.tournamentCallup.body": "Für die Endrunde der {1} sind nominiert: {0}. Sie fehlen dem Verein bis zum Ausscheiden ihres Landes.",
+ "intl.champion.subject": "{0} gewinnt die {1}",
+ "intl.champion.body": "Finale der {0}: {1} {2}:{3} {4}. {5} ist Turniersieger."
 }

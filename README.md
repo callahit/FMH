@@ -363,6 +363,19 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
     die Spieler; nach der Rückkehr kostet die Reise zusätzlich Kondition.
   - **Anzeige:** Der eigene Verein bekommt eine Meldung mit seinen Nominierten. Auf der Spielerseite stehen
     Länderspiele und Tore sowie der Hinweis „Beim Nationalteam“.
+- **Turniere (AP 8b):** EM und WM stehen als Daten in `tournaments` (`data/base/rules/internationals.json`):
+  Rhythmus, erstes Jahr, Starttag, Teilnehmer, Gruppengröße, Weiterkommende, Tage zwischen den Spielen und Größe der
+  Qualifikationsgruppen. Die EM beginnt 2028, die WM 2030, beide alle vier Jahre.
+  - **Qualifikation:** in den Länderspielfenstern der Saison vor dem Turnier, Gruppen mit Hin- und Rückspiel. Die
+    Auslosung erfolgt nach Stärke in Töpfen. Je Gruppe gleich viele Plätze, Restplätze an die besten Nächstplatzierten
+    (Punkte je Spiel). Freundschaftsspiele entfallen in dieser Saison. Bei zu wenigen Ländern oder Terminen fahren die
+    Stärksten direkt zur Endrunde.
+  - **Endrunde:** im Juni auf neutralem Platz. Gruppen mit einfacher Runde, danach K.-o.-Runden über Kreuz (A1–B2,
+    B1–A2) mit Verlängerung und Elfmeterschießen. Der Sieger wird allen gemeldet.
+  - **Abstellung:** Die Kader reisen eine Woche vor dem ersten Spiel an und fehlen ihrem Verein bis zum Ausscheiden
+    ihres Landes. Danach kehren sie mit Reisebelastung zurück.
+  - **Kalibrierung:** Der Saisonlauf prüft, dass jede Endrunde im Zeitraum vollständig gespielt wurde und einen Sieger
+    hat.
 - **Konferenz:** Anzeigemodus, in dem die anderen Spiele des Spieltags minutengenau mitlaufen, mit
   Torblitz im Ticker und Live-Tabelle.
 - **Einstellungen:** Schwierigkeit (Leicht, Normal, Schwer, Realistisch) beim Spielstart;
@@ -521,7 +534,7 @@ aktive Spieler höchstens +10 % gegenüber dem ersten Saisonende, Vereinslose h�
 | 7 Transfers, Verträge, Scouting | **vollständig** inkl. Anfrage, Konkurrenz, Deadline Day, Sportdirektor-Delegation (E2), **Berater als Akteure** | – |
 | 8 Finanzen, Stadion, Personal | **vollständig**: Einnahmen und Ausgaben, Bank, Lizenz, Insolvenz, Stadionausbau, Personal, Sponsoren | – |
 | 9 Vereinsgelände | **83 Gebäude** mit Stufen, Lage und Synergien, Baufirmen, Genehmigungen | – |
-| 10 Umfeld, Karriere | **Vorstand, Fans, Presse, 166 Zufallsereignisse, Managerkarriere** mit Lizenzen und Erfolgen, **Nationalmannschaften mit Länderspielfenstern und KI-Nominierung** | Turniere und Nationaltrainer (AP 8b/8c), Medienhaus |
+| 10 Umfeld, Karriere | **Vorstand, Fans, Presse, 166 Zufallsereignisse, Managerkarriere** mit Lizenzen und Erfolgen, **Nationalmannschaften mit Länderspielfenstern, KI-Nominierung, EM und WM mit Qualifikation** | Nationaltrainer (AP 8c), Medienhaus |
 | 11 Oberfläche | Desktop-Oberfläche (Avalonia) mit Maus, Drag & Drop, sortierbaren Tabellen, Diagrammen (Radar, Formkurve, xG, Heatmap), Wappen, Farbthemen | Tastenbelegung |
 | 12 Nicht-funktional | Determinismus, **SQLite-Spielstände** mit Schemamigration, **Mehrsprachigkeit (Deutsch, Englisch, erweiterbar)**, Datenpakete mit Überlagerung, Datenvalidierung, Kalibrierungs-CLI mit Toleranzprüfung, **CI auf Linux und Windows**, Warnungen als Fehler, **Modulaufbau mit Golden Master und Architekturtest**, **Datenbank-Editor mit JSON-Schemas (AP 6)** | Spielstand-Modus des Editors (optional), Mod-Verwaltung (AP 14) |
 
@@ -589,6 +602,8 @@ danach je Abschnitt angehoben:
 - Abschnitt `internationals` (Version 6, neu) bekommt die Tabellen `national_teams`, `international_fixtures`,
   `international_windows` und `international_caps`. Ältere Spielstände haben in der laufenden Saison keine
   Länderspielfenster, damit die angesetzten Termine gültig bleiben; ab der nächsten Saison gelten sie.
+- Abschnitt `internationals` Version 7 bekommt die Tabelle `international_tournaments`. Ältere Spielstände legen
+  das nächste Turnier neu an. Wer gerade beim Nationalteam ist, wird beim Laden aus den Kadern abgeleitet.
 
 Ein Spielstand mit einem neueren oder unbekannten Abschnitt wird abgelehnt.
 
