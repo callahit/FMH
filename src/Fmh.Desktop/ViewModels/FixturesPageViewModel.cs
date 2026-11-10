@@ -34,6 +34,7 @@ public sealed partial class FixturesPageViewModel : PageViewModel, IRefreshable
     {
         var league = Session.World.LeagueOf(Session.HumanClub);
         _matchday = Math.Max(1, Math.Min(league.MatchdayCount, league.CurrentMatchday + 1));
+        InitFriendlies();
         Refresh();
     }
 
@@ -52,7 +53,8 @@ public sealed partial class FixturesPageViewModel : PageViewModel, IRefreshable
     {
         var world = Session.World;
         var club = Session.HumanClub;
-        Own = Session.AllFixtures.Where(f => f.Involves(club.Id)).OrderBy(f => f.Date).Select(f => Make(f, club.Id)).ToList();
+        Own = Session.World.AllMatches.Where(f => f.Involves(club.Id)).OrderBy(f => f.Date).Select(f => Make(f, club.Id)).ToList();
+        RefreshFriendlies();
         var league = world.LeagueOf(club);
         var fixtures = league.Fixtures.Where(f => f.Matchday == Matchday).ToList();
         Day = fixtures.Select(f => Make(f, club.Id)).ToList();
@@ -84,7 +86,7 @@ public sealed partial class FixturesPageViewModel : PageViewModel, IRefreshable
         return new FixtureVm
         {
             Fixture = f, Home = world.Clubs[f.HomeId], Away = world.Clubs[f.AwayId], Own = f.Involves(own),
-            Matchday = T.Format("fixtures.md", f.Matchday), ResultBrush = new SolidColorBrush(brush), Detail = detail,
+            Matchday = f.Kind == CompetitionKind.Friendly ? T["competition.FRIENDLY"] : T.Format("fixtures.md", f.Matchday), ResultBrush = new SolidColorBrush(brush), Detail = detail,
         };
     }
 
@@ -95,7 +97,7 @@ public sealed partial class FixturesPageViewModel : PageViewModel, IRefreshable
 
     public override bool HandleKey(Avalonia.Input.Key key, Avalonia.Input.KeyModifiers modifiers)
     {
-        if (key == Avalonia.Input.Key.L) { LeagueView = !LeagueView; return true; }
+        if (key == Avalonia.Input.Key.L) { LeagueView = !LeagueView; if (LeagueView) FriendlyView = false; return true; }
         if (LeagueView && key == Avalonia.Input.Key.Left) { PreviousDay(); return true; }
         if (LeagueView && key == Avalonia.Input.Key.Right) { NextDay(); return true; }
         return false;

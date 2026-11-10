@@ -1,0 +1,13 @@
+{
+  "minRestDays": 2,
+  "maxDaysAhead": 120,
+  "maxOpen": 6,
+  "attendanceFactor": 0.35,
+  "homeShares": [100, 70, 50],
+  "familiarityGain": 5,
+  "matchPracticeGain": 25,
+  "physicalGain": 0.6,
+  "campBonus": 1.5,
+  "acceptReputationGap": 3,
+  "substitutions": 9
+}
