@@ -30,6 +30,9 @@ public sealed class World
     public List<League> Leagues { get; set; } = new();
     public List<Referee> Referees { get; set; } = new();
     public List<Manager> Managers { get; set; } = new();
+    /// <summary>Spielerberater (AP 7) und die Zuordnung Spieler-Id → Berater-Id.</summary>
+    public List<Agent> Agents { get; set; } = new();
+    public Dictionary<int, int> PlayerAgents { get; set; } = new();
     public List<Message> Messages { get; set; } = new();
     public List<SeasonRecord> History { get; set; } = new();
     public List<Cup> Cups { get; set; } = new();

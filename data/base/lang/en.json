@@ -3041,5 +3041,9 @@
  "tier.Follower": "Follower",
  "relations.council": "Players' committee",
  "relations.trust": "Squad trust",
- "relations.tier": "Hierarchy"
+ "relations.tier": "Hierarchy",
+ "player.agent": "Agent",
+ "player.agentValue": "{0} (reputation {1}, greed {2}, influence {3})",
+ "agent.unsettle.subject": "Agent floats a move: {0}",
+ "agent.unsettle.body": "{0}, agent of {1}, hints that the client is wasted at {2}. The player has seemed restless since."
 }

@@ -128,6 +128,12 @@
     },
     {
       "fileMatch": [
+        "data/*/rules/agents.json"
+      ],
+      "url": "./data/schema/agents.schema.json"
+    },
+    {
+      "fileMatch": [
         "data/*/competitions/europe.json"
       ],
       "url": "./data/schema/europe.schema.json"

@@ -42,6 +42,7 @@ public sealed partial class GameSession
     private readonly SeasonModule _season = new();
     private readonly RelationsModule _relations = new();
     private readonly ManagersModule _managers = new();
+    private readonly AgentsModule _agents = new();
 
     public GameSession(World world, GameData data, IMatchEngine engine)
     {
@@ -49,7 +50,7 @@ public sealed partial class GameSession
         CountryDataMigration.Refresh(world, data);
         var rng = world.RngState.Length == 4 ? Rng.FromState(world.RngState) : new Rng(world.Seed);
         _kernel = new GameKernel(world, data, engine, rng);
-        IGameModule[] modules = { _training, _matchday, _transfers, _scouting, _youth, _facilities, _finance, _license, _economy, _cups, _europe, _board, _press, _events, _sponsors, _staff, _stadiumPlans, _season, _relations, _managers };
+        IGameModule[] modules = { _training, _matchday, _transfers, _scouting, _youth, _facilities, _finance, _license, _economy, _cups, _europe, _board, _press, _events, _sponsors, _staff, _stadiumPlans, _season, _relations, _managers, _agents };
         var ctx = new ModuleContext(_kernel);
         foreach (var m in modules) m.Register(ctx);
         Modules = ModuleRegistry.Order(modules);
@@ -66,6 +67,7 @@ public sealed partial class GameSession
         WorldGenerator.InitCareer(World, Data, _kernel.Rng);
         // KI-Manager für ältere Spielstände (eigener Zufallsstrom, der Spielzufall bleibt unverändert)
         ManagerGenerator.Ensure(World, Data);
+        AgentGenerator.Ensure(World, Data);
         if (!World.Scouts.Any(s => s.ClubId == HumanClub.Id)) ScoutGenerator.CreateScouts(World, HumanClub, Data, _kernel.Rng, 2);
         _economy.InitEconomy();
         EnsureRegistration();

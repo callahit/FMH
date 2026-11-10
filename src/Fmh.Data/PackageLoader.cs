@@ -90,6 +90,7 @@ public static class PackageLoader
             TransferRules = Path1("rules/transfers.json") is { } tr ? Json.Load<TransferRules>(tr) : new(),
             ManagerRules = Path1("rules/managers.json") is { } mr ? Json.Load<ManagerRules>(mr) : new(),
             Relations = Path1("rules/relations.json") is { } rel ? Json.Load<RelationsConfig>(rel) : new(),
+            Agents = Path1("rules/agents.json") is { } ag ? Json.Load<AgentRules>(ag) : new(),
             Europe = Path1("competitions/europe.json") is { } eu ? Json.Load<EuropeFormat>(eu) : null,
             Languages = languages,
             DefaultLanguage = defaultLanguage,

@@ -154,7 +154,7 @@ internal static class WorldFingerprint
             ["transfers"] = J(new { w.Transfers, w.Transactions, w.Installments, w.TransferConditions, w.ContractHistory, w.Clauses, w.PreemptionOffers, w.Negotiations, w.NegotiationLocks }),
             ["scouting"] = J(new { w.Scouts, w.ScoutAssignments, w.ScoutReports, w.Knowledge }),
             ["environment"] = J(new { w.Staff, w.Events, w.EventHistory, w.PendingPress, w.EuropeanEntries, w.CountryCoefficients, w.ClubCoefficients }),
-            ["relations"] = J(new { w.PlayerRelations, w.Promises, w.ClubRelations }),
+            ["relations"] = J(new { w.PlayerRelations, w.Promises, w.ClubRelations, w.Agents, w.PlayerAgents }),
             ["history"] = J(w.History),
             // Länder- und Weltregeln im Spielstand: auch Datenänderungen ohne Wirkung im Testlauf schlagen an.
             ["config"] = J(new { w.Seed, w.Packages, w.Countries, w.Rules, w.MarketLevels, w.MarketBases, w.Referees }),
