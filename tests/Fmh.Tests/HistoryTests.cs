@@ -38,7 +38,7 @@ public sealed class HistoryTests
         Assert.Equal(2, defeat.Date.Day);
         // Niederlagen gibt es nur je Verein, nicht je Wettbewerb.
         Assert.Null(RecordBook.Find(w, MatchRecord.CompetitionScope("liga"), RecordKinds.BiggestDefeat));
-        Assert.DoesNotContain(w.Records, r => r.Scope == MatchRecord.ClubScope(5));
+        Assert.DoesNotContain(w.Records.Values, r => r.Scope == MatchRecord.ClubScope(5));
     }
 
     [Fact]

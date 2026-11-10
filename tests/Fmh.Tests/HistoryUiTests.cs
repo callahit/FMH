@@ -43,11 +43,11 @@ public class HistoryUiTests
         var rival = world.Clubs[world.LeagueOf(own).ClubIds.First(id => id != own.Id)];
 
         // Ein Rekordspiel und eine abgeschlossene Saison in der Welt
-        world.Records.Add(new MatchRecord
+        world.Records[MatchRecord.Key(MatchRecord.ClubScope(own.Id), RecordKinds.BiggestWin)] = new MatchRecord
         {
             Scope = MatchRecord.ClubScope(own.Id), Kind = RecordKinds.BiggestWin, SeasonYear = world.SeasonYear, Date = world.Date,
             CompetitionId = own.LeagueId, HomeId = own.Id, AwayId = rival.Id, HomeGoals = 6, AwayGoals = 0, Attendance = 12_345,
-        });
+        };
         world.History.Add(new SeasonRecord { SeasonYear = world.SeasonYear - 1, LeagueId = own.LeagueId, LeagueName = "Liga", ChampionId = rival.Id, ChampionName = rival.Name });
 
         shell.OpenPage<HistoryPageViewModel>();

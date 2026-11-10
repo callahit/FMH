@@ -48,6 +48,9 @@ public sealed class MatchRecord
     public int AwayGoals { get; set; }
     public int Attendance { get; set; }
 
+    /// <summary>Schlüssel im Rekordbuch der Welt: Geltungsbereich und Art.</summary>
+    public static string Key(string scope, string kind) => scope + "/" + kind;
+
     public static string ClubScope(int clubId) => "club:" + clubId.ToString(System.Globalization.CultureInfo.InvariantCulture);
     public static string CompetitionScope(string competitionId) => "comp:" + competitionId;
 }

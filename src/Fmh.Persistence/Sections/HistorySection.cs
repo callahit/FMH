@@ -31,7 +31,7 @@ public sealed class HistorySection : SaveSection
         for (var i = 0; i < w.ClubSeasons.Count; i++)
             Run(cs, i, w.ClubSeasons[i].ClubId, w.ClubSeasons[i].SeasonYear, J(w.ClubSeasons[i]));
         using var mr = Insert(con, tx, "match_records", 3);
-        foreach (var r in w.Records)
+        foreach (var r in w.Records.Values)
             Run(mr, r.Scope, r.Kind, J(r));
     }
 
@@ -40,6 +40,9 @@ public sealed class HistorySection : SaveSection
         foreach (var r in Rows(con, "SELECT data FROM club_seasons ORDER BY ord"))
             w.ClubSeasons.Add(PJ<ClubSeason>(r.GetString(0))!);
         foreach (var r in Rows(con, "SELECT data FROM match_records ORDER BY rowid"))
-            w.Records.Add(PJ<MatchRecord>(r.GetString(0))!);
+        {
+            var record = PJ<MatchRecord>(r.GetString(0))!;
+            w.Records[MatchRecord.Key(record.Scope, record.Kind)] = record;
+        }
     }
 }
