@@ -12,7 +12,7 @@ using Fmh.Desktop.Services;
 
 namespace Fmh.Desktop.ViewModels;
 
-/// <summary>Ein Bereich des Hauptfensters (F1–F10).</summary>
+/// <summary>Ein Bereich des Hauptfensters (F1–F11).</summary>
 public abstract class PageViewModel : ViewModelBase
 {
     protected PageViewModel(ShellViewModel shell) => Shell = shell;
@@ -60,6 +60,7 @@ public sealed partial class ShellViewModel : ViewModelBase
             ("menu.stadium", "IconStadium", typeof(StadiumPageViewModel), () => new StadiumPageViewModel(this), false),
             ("menu.club", "IconClub", typeof(ClubPageViewModel), () => new ClubPageViewModel(this), false),
             ("menu.league", "IconLeague", typeof(LeaguePageViewModel), () => new LeaguePageViewModel(this), false),
+            ("menu.national", "IconNational", typeof(NationalPageViewModel), () => new NationalPageViewModel(this), false),
         };
         Nav = defs.Select((d, i) => new NavItem { Label = T[d.key], Icon = Icon(d.icon), PageType = d.type, Create = d.create, Index = i, Later = d.later }).ToList();
         Open(Nav[0]);
@@ -277,7 +278,7 @@ public sealed partial class ShellViewModel : ViewModelBase
 
     public override bool HandleKey(Key key, KeyModifiers modifiers)
     {
-        if (key >= Key.F1 && key <= Key.F10)
+        if (key >= Key.F1 && key <= Key.F12 && key - Key.F1 < Nav.Count)
         {
             Open(Nav[key - Key.F1]);
             return true;

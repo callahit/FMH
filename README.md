@@ -49,7 +49,7 @@ Zusätzlich gibt es Tastenkürzel:
 | Taste | Wirkung |
 |---|---|
 | Leertaste | **Weiter** bis zum nächsten Ereignis (Spieltag, Nachricht, Entscheidung, Saisonende) |
-| F1–F10 | Posteingang, Kader, Taktik, Training, Spielplan, Transfers, Finanzen, Stadion, Verein, Liga |
+| F1–F11 | Posteingang, Kader, Taktik, Training, Spielplan, Transfers, Finanzen, Stadion, Verein, Liga, Nationalteam |
 | Strg+S | Speichern |
 | Kader / Transfers | Enter oder Doppelklick: Spielerprofil, ←→ im Profil: voriger/nächster Spieler |
 | Taktik | A automatisch aufstellen, Esc Auswahl aufheben, Umschalt+Pfeile gewählten Platz verschieben |
@@ -376,6 +376,16 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
     ihres Landes. Danach kehren sie mit Reisebelastung zurück.
   - **Kalibrierung:** Der Saisonlauf prüft, dass jede Endrunde im Zeitraum vollständig gespielt wurde und einen Sieger
     hat.
+- **Nationaltrainer (AP 8c):** Jedes Land mit Spielern hat einen Trainer.
+  - **Besetzung:** Freie Posten bietet der Verband zuerst dem Manager an, ab einem Ruf von 10 (`coach` in
+    `data/base/rules/internationals.json`). Er kann das Amt neben seinem Verein übernehmen. Sonst übernimmt ein
+    vereinsloser KI-Manager, Landsleute zuerst.
+  - **Ziel und Vertrag:** Das Ziel richtet sich nach der Stärkerangliste: Finale, Halbfinale oder Endrunde. Der Vertrag
+    läuft bis zum nächsten Turnier. Danach wird abgerechnet: Ziel erreicht verlängert, verfehlt kostet den Posten (beim
+    Manager auch einen Punkt Ruf).
+  - **Seite Nationalteam (F11):** Vormerkliste mit Haken, KI-Vorschlag, Spielsystem und Rücktritt. Dazu das laufende
+    Turnier mit Gruppen und K.-o.-Runde, die Länderspiele und die bisherigen Turniersieger. Fehlende Plätze der
+    Vormerkliste füllt die KI bei der Berufung auf.
 - **Konferenz:** Anzeigemodus, in dem die anderen Spiele des Spieltags minutengenau mitlaufen, mit
   Torblitz im Ticker und Live-Tabelle.
 - **Einstellungen:** Schwierigkeit (Leicht, Normal, Schwer, Realistisch) beim Spielstart;
@@ -534,7 +544,7 @@ aktive Spieler höchstens +10 % gegenüber dem ersten Saisonende, Vereinslose h�
 | 7 Transfers, Verträge, Scouting | **vollständig** inkl. Anfrage, Konkurrenz, Deadline Day, Sportdirektor-Delegation (E2), **Berater als Akteure** | – |
 | 8 Finanzen, Stadion, Personal | **vollständig**: Einnahmen und Ausgaben, Bank, Lizenz, Insolvenz, Stadionausbau, Personal, Sponsoren | – |
 | 9 Vereinsgelände | **83 Gebäude** mit Stufen, Lage und Synergien, Baufirmen, Genehmigungen | – |
-| 10 Umfeld, Karriere | **Vorstand, Fans, Presse, 166 Zufallsereignisse, Managerkarriere** mit Lizenzen und Erfolgen, **Nationalmannschaften mit Länderspielfenstern, KI-Nominierung, EM und WM mit Qualifikation** | Nationaltrainer (AP 8c), Medienhaus |
+| 10 Umfeld, Karriere | **Vorstand, Fans, Presse, 166 Zufallsereignisse, Managerkarriere** mit Lizenzen und Erfolgen, **Nationalmannschaften mit Länderspielfenstern, KI-Nominierung, EM und WM mit Qualifikation, Manager als Nationaltrainer** | Medienhaus |
 | 11 Oberfläche | Desktop-Oberfläche (Avalonia) mit Maus, Drag & Drop, sortierbaren Tabellen, Diagrammen (Radar, Formkurve, xG, Heatmap), Wappen, Farbthemen | Tastenbelegung |
 | 12 Nicht-funktional | Determinismus, **SQLite-Spielstände** mit Schemamigration, **Mehrsprachigkeit (Deutsch, Englisch, erweiterbar)**, Datenpakete mit Überlagerung, Datenvalidierung, Kalibrierungs-CLI mit Toleranzprüfung, **CI auf Linux und Windows**, Warnungen als Fehler, **Modulaufbau mit Golden Master und Architekturtest**, **Datenbank-Editor mit JSON-Schemas (AP 6)** | Spielstand-Modus des Editors (optional), Mod-Verwaltung (AP 14) |
 
@@ -604,6 +614,8 @@ danach je Abschnitt angehoben:
   Länderspielfenster, damit die angesetzten Termine gültig bleiben; ab der nächsten Saison gelten sie.
 - Abschnitt `internationals` Version 7 bekommt die Tabelle `international_tournaments`. Ältere Spielstände legen
   das nächste Turnier neu an. Wer gerade beim Nationalteam ist, wird beim Laden aus den Kadern abgeleitet.
+- Abschnitt `internationals` Version 8 ergänzt in den Team-Daten Trainer, Ziel, Vertrag, Spielsystem, Vormerkliste und
+  offenes Angebot. Ältere Spielstände haben keine Trainer; das Modul besetzt die Posten am nächsten Spieltag.
 
 Ein Spielstand mit einem neueren oder unbekannten Abschnitt wird abgelehnt.
 
