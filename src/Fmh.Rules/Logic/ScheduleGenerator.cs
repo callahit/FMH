@@ -49,9 +49,10 @@ public static class ScheduleGenerator
     /// Termine der Spieltage: wöchentlich am konfigurierten Spieltag, ohne Winterpause. Reichen die Wochen bis zum letzten
     /// Spieltag (<see cref="SeasonConfig.LastMatchday"/>) nicht, kommen Englische Wochen gleichmäßig verteilt hinzu.
     /// </summary>
-    public static List<DateOnly> MatchdayDates(SeasonConfig cfg, int seasonYear, int count)
+    public static List<DateOnly> MatchdayDates(SeasonConfig cfg, int seasonYear, int count, Func<DateOnly, bool>? blocked = null)
     {
-        var weekly = WeeklyDates(cfg, seasonYear, ParseDate(cfg.FirstMatchday, seasonYear, cfg.StartMonth), count);
+        blocked ??= _ => false;
+        var weekly = WeeklyDates(cfg, seasonYear, ParseDate(cfg.FirstMatchday, seasonYear, cfg.StartMonth), count, blocked);
         if (cfg.LastMatchday is not { Length: > 0 } last) return weekly;
         var end = ParseDate(last, seasonYear, cfg.StartMonth);
         var fit = weekly.Where(d => d <= end).ToList();
@@ -64,15 +65,18 @@ public static class ScheduleGenerator
             var anchor = fit[Math.Min(fit.Count - 1, (int)Math.Round(k * fit.Count / (double)(missing + 1)))];
             var midweek = anchor.AddDays(-(((int)anchor.DayOfWeek - (int)cfg.MidweekDay + 7) % 7));
             if (midweek == anchor) midweek = anchor.AddDays(-7);
-            while (dates.Contains(midweek)) midweek = midweek.AddDays(-7);
+            while (dates.Contains(midweek) || blocked(midweek)) midweek = midweek.AddDays(-7);
             dates.Add(midweek);
         }
         dates.Sort();
         return dates;
     }
 
-    /// <summary>Wöchentliche Termine ab <paramref name="from"/> am Spieltag des Landes; Wochen der Winterpause entfallen.</summary>
-    public static List<DateOnly> WeeklyDates(SeasonConfig cfg, int seasonYear, DateOnly from, int count)
+    /// <summary>
+    /// Wöchentliche Termine ab <paramref name="from"/> am Spieltag des Landes; Wochen der Winterpause und gesperrte Tage
+    /// (Länderspielfenster) entfallen.
+    /// </summary>
+    public static List<DateOnly> WeeklyDates(SeasonConfig cfg, int seasonYear, DateOnly from, int count, Func<DateOnly, bool>? blocked = null)
     {
         var d = from;
         while (d.DayOfWeek != cfg.MatchDay) d = d.AddDays(1);
@@ -82,7 +86,7 @@ public static class ScheduleGenerator
         var dates = new List<DateOnly>();
         while (dates.Count < count)
         {
-            if (breakStart < breakEnd && d >= breakStart && d <= breakEnd)
+            if (breakStart < breakEnd && d >= breakStart && d <= breakEnd || blocked?.Invoke(d) == true)
             {
                 d = d.AddDays(7);
                 continue;
@@ -106,7 +110,7 @@ public static class ScheduleGenerator
     public static void CreateFixtures(World world, League league, CountryConfig country, Rng rng)
     {
         var days = RoundRobin(league.ClubIds, league.Format.Rounds, rng);
-        var dates = MatchdayDates(country.Season, world.SeasonYear, days.Count);
+        var dates = MatchdayDates(country.Season, world.SeasonYear, days.Count, world.InInternationalWindow);
         league.Fixtures.Clear();
         for (var i = 0; i < days.Count; i++)
         {

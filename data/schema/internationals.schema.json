@@ -1,0 +1,97 @@
+{
+  "$id": "https://fmh.local/schema/internationals.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Nationalmannschaften (Datei rules/internationals.json, AP 8): Fenster, Nominierung, Belastung.",
+  "properties": {
+    "backgroundNations": {
+      "description": "Fiktive Länder ohne spielbare Ligen; sie stellen Gegner mit erzeugten Kadern.",
+      "items": {
+        "additionalProperties": false,
+        "description": "Fiktives Land ohne spielbare Ligen; Spielstärke 1–20 wie bei Vereinen.",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "strength": {
+            "maximum": 20,
+            "minimum": 1,
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "formWeight": {
+      "description": "Gewicht der Form: Aufschlag auf die Spielstärke je Formpunkt über 5 (Form 1–10 aus den letzten Noten).",
+      "maximum": 3,
+      "minimum": 0,
+      "type": "number"
+    },
+    "formation": {
+      "description": "Spielsystem der Nationalteams.",
+      "type": "string"
+    },
+    "minAge": {
+      "description": "Mindestalter für eine Nominierung.",
+      "maximum": 30,
+      "minimum": 14,
+      "type": "integer"
+    },
+    "squadSize": {
+      "description": "Kadergröße einer Nominierung.",
+      "maximum": 40,
+      "minimum": 11,
+      "type": "integer"
+    },
+    "substitutions": {
+      "description": "Wechsel je Länderspiel.",
+      "maximum": 11,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "travelFatigue": {
+      "description": "Konditionsverlust durch die Reise, wenn ein Spieler zum Verein zurückkehrt (zusätzlich zur Belastung der Spiele).",
+      "maximum": 50,
+      "minimum": 0,
+      "type": "number"
+    },
+    "windows": {
+      "description": "Länderspielfenster der Saison; in diesen Wochen ruht der Ligabetrieb.",
+      "items": {
+        "additionalProperties": false,
+        "description": "Ein Länderspielfenster: beginnt am ersten Montag ab Start und dauert Days Tage.",
+        "properties": {
+          "days": {
+            "description": "Dauer in Tagen ab dem Montag; der letzte Tag ist der Rückreisetag.",
+            "maximum": 21,
+            "minimum": 3,
+            "type": "integer"
+          },
+          "id": {
+            "type": "string"
+          },
+          "matchOffsets": {
+            "description": "Spieltage als Abstand in Tagen vom Montag (3 = Donnerstag, 6 = Sonntag).",
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "start": {
+            "description": "Frühester Beginn (MM-TT); das Fenster beginnt am ersten Montag ab diesem Tag.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "title": "FMH rules/internationals.json",
+  "type": "object"
+}

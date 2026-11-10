@@ -35,7 +35,9 @@ public static class CupLogic
         for (var r = 0; r < sizes.Count; r++)
         {
             var dates = r < cfg.Dates.Count ? cfg.Dates[r].Split(',') : new[] { "06-01" };
-            var days = dates.Select(d => ToWeekday(ScheduleGenerator.ParseDate(d.Trim(), world.SeasonYear, country.Season.StartMonth), DayOfWeek.Wednesday)).ToList();
+            // Länderspielfenster: Pokaltermine rücken um ganze Wochen nach hinten.
+            var days = dates.Select(d => InternationalCalendar.Avoid(world,
+                ToWeekday(ScheduleGenerator.ParseDate(d.Trim(), world.SeasonYear, country.Season.StartMonth), DayOfWeek.Wednesday))).ToList();
             // Zwei Termine in derselben Woche fallen auf denselben Mittwoch: Die Folgerunde rückt dann um Wochen nach hinten,
             // sonst läge sie beim Auslosen schon in der Vergangenheit und die Saison endete nie.
             if (cup.Rounds.Count > 0 && cup.Rounds[^1].Dates[^1] is var last)

@@ -3045,5 +3045,10 @@
  "player.agent": "Berater",
  "player.agentValue": "{0} (Ruf {1}, Gier {2}, Einfluss {3})",
  "agent.unsettle.subject": "Berater bringt Wechsel ins Gespräch: {0}",
- "agent.unsettle.body": "{0}, Berater von {1}, lässt durchblicken, dass {1} bei {2} unter Wert spielt. Seither wirkt der Spieler unruhiger."
+ "agent.unsettle.body": "{0}, Berater von {1}, lässt durchblicken, dass {1} bei {2} unter Wert spielt. Seither wirkt der Spieler unruhiger.",
+ "intl.callup.subject": "Abstellung für Länderspiele: {0} Spieler",
+ "intl.callup.body": "Für das Länderspielfenster sind nominiert: {0}. Die Spieler sind ab {1} zurück und kommen mit Reisestrapazen.",
+ "player.caps": "Länderspiele",
+ "player.capsValue": "{0} ({1} Tore) für {2}",
+ "player.onDuty": "Beim Nationalteam"
 }

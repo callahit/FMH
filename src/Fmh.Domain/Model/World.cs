@@ -33,6 +33,17 @@ public sealed class World
     /// <summary>Spielerberater (AP 7) und die Zuordnung Spieler-Id → Berater-Id.</summary>
     public List<Agent> Agents { get; set; } = new();
     public Dictionary<int, int> PlayerAgents { get; set; } = new();
+    /// <summary>Nationalmannschaften (AP 8).</summary>
+    public List<NationalTeam> NationalTeams { get; set; } = new();
+    /// <summary>Länderspiele der laufenden Saison.</summary>
+    public List<InternationalFixture> InternationalFixtures { get; set; } = new();
+    /// <summary>Länderspielfenster der laufenden Saison; in diesen Tagen ruht der Vereinsbetrieb.</summary>
+    public List<InternationalWindowDates> InternationalWindows { get; set; } = new();
+    /// <summary>Länderspielbilanz je Spieler.</summary>
+    public Dictionary<int, InternationalCareer> Caps { get; set; } = new();
+
+    /// <summary>Liegt der Tag in einem Länderspielfenster der laufenden Saison?</summary>
+    public bool InInternationalWindow(DateOnly d) => InternationalWindows.Any(w => w.Contains(d));
     public List<Message> Messages { get; set; } = new();
     public List<SeasonRecord> History { get; set; } = new();
     public List<Cup> Cups { get; set; } = new();
