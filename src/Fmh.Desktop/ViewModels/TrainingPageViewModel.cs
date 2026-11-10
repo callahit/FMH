@@ -68,6 +68,8 @@ public sealed partial class TrainingPageViewModel : PageViewModel, IRefreshable
     [ObservableProperty] private string? _campInfo;
     [ObservableProperty] private bool _hasCamp;
     [ObservableProperty] private string? _message;
+    [ObservableProperty] private IReadOnlyList<string> _assistantFindings = Array.Empty<string>();
+    [ObservableProperty] private string? _assistantMessage;
 
     public void Refresh()
     {
@@ -104,6 +106,7 @@ public sealed partial class TrainingPageViewModel : PageViewModel, IRefreshable
                 p.Training.RetrainProgress * 100, p.Training.Retrain is not null))
             .ToList();
         CoachText = T.Format("training.coach", Club.CoachQuality, Club.YouthFacilities);
+        AssistantFindings = Session.TrainingReport().Findings.Select(f => T.Render(f)).ToList();
 
         HasCamp = Club.Camp is not null;
         CampInfo = Club.Camp is { } camp
@@ -165,5 +168,15 @@ public sealed partial class TrainingPageViewModel : PageViewModel, IRefreshable
         Session.CancelCamp();
         Message = null;
         Refresh();
+    }
+
+    /// <summary>Vorschlag des Co-Trainers als Wochenplan übernehmen (AP 11).</summary>
+    [RelayCommand]
+    private void ApplyAssistant()
+    {
+        var changes = Session.TrainingReport().Changes;
+        Session.ApplyTrainingSuggestion();
+        Refresh();
+        AssistantMessage = T[changes ? "assistant.applied" : "assistant.noChange"];
     }
 }

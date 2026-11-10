@@ -146,6 +146,12 @@
     },
     {
       "fileMatch": [
+        "data/*/rules/assistant.json"
+      ],
+      "url": "./data/schema/assistant.schema.json"
+    },
+    {
+      "fileMatch": [
         "data/*/competitions/europe.json"
       ],
       "url": "./data/schema/europe.schema.json"
