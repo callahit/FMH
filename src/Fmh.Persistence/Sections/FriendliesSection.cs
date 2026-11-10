@@ -9,17 +9,22 @@ public sealed class FriendliesSection : SaveSection
 {
     public override string ModuleId => "friendlies";
 
-    /// <summary>Version 6: neuer Abschnitt; ältere Spielstände legen die Tabelle per Migration an und haben keine Testspiele.</summary>
-    public override int Version => 6;
+    /// <summary>
+    /// Version 6: neuer Abschnitt; ältere Spielstände legen die Tabelle per Migration an und haben keine Testspiele.
+    /// Version 7: Sommerturniere (AP 9b) in eigener Tabelle; ältere Spielstände haben keine.
+    /// </summary>
+    public override int Version => 7;
 
     private const string Tables = "CREATE TABLE friendlies (id INTEGER PRIMARY KEY, data TEXT NOT NULL);";
+    private const string SummerTable = "CREATE TABLE summer_tournaments (id TEXT PRIMARY KEY, data TEXT NOT NULL);";
 
-    protected override string Schema => Tables;
+    protected override string Schema => Tables + SummerTable;
 
     public override void Migrate(SqliteConnection c, SqliteTransaction tx, int fromVersion)
     {
         if (fromVersion < BaseVersion || fromVersion > Version) base.Migrate(c, tx, fromVersion);
         if (fromVersion <= 5) Exec(c, tx, Tables);
+        if (fromVersion <= 6) Exec(c, tx, SummerTable);
     }
 
     public override void Save(SqliteConnection con, SqliteTransaction tx, World w)
@@ -27,11 +32,16 @@ public sealed class FriendliesSection : SaveSection
         using var cmd = Insert(con, tx, "friendlies", 2);
         foreach (var f in w.Friendlies.OrderBy(x => x.Fixture.Id))
             Run(cmd, f.Fixture.Id, J(f));
+        using var st = Insert(con, tx, "summer_tournaments", 2);
+        foreach (var t in w.SummerTournaments)
+            Run(st, t.Id, J(t));
     }
 
     public override void Load(SqliteConnection con, World w)
     {
         foreach (var r in Rows(con, "SELECT data FROM friendlies ORDER BY id"))
             w.Friendlies.Add(PJ<Friendly>(r.GetString(0))!);
+        foreach (var r in Rows(con, "SELECT data FROM summer_tournaments ORDER BY rowid"))
+            w.SummerTournaments.Add(PJ<SummerTournament>(r.GetString(0))!);
     }
 }

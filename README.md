@@ -399,6 +399,15 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
     Pflichtspiel +2,5). Es kommen 35 % der üblichen Zuschauer.
   - **Trainingslager:** Ein Testspiel während des eigenen Trainingslagers findet auf neutralem Platz statt, bringt
     keine Zuschauereinnahmen, wirkt aber um die Hälfte stärker.
+- **Sommerturniere (AP 9b):** In der Vorbereitung meldet der Manager seinen Verein auf der Seite Spielplan zu einem
+  Sommerturnier an (`summerTournaments` in `data/base/rules/friendlies.json`, z. B. Nordsee-Cup am 18. Juli, Alpen-Cup
+  am 25. Juli).
+  - **Teilnehmer:** Drei Vereine mit ähnlichem Ruf (höchstens 2 Punkte Abstand) kommen dazu, die Halbfinals werden
+    ausgelost.
+  - **Ablauf:** Zwei Tage nach den Halbfinals folgen Finale und Spiel um Platz 3, alle auf neutralem Platz, bei
+    Gleichstand mit Elfmeterschießen.
+  - **Prämien und Wertung:** Prämien je Platz; der Manager bekommt eine Nachricht mit Sieger und eigener Platzierung.
+    Die Spiele zählen wie Testspiele nicht in die Statistik und bringen keine Zuschauereinnahmen.
 - **Konferenz:** Anzeigemodus, in dem die anderen Spiele des Spieltags minutengenau mitlaufen, mit
   Torblitz im Ticker und Live-Tabelle.
 - **Einstellungen:** Schwierigkeit (Leicht, Normal, Schwer, Realistisch) beim Spielstart;
@@ -628,7 +637,7 @@ danach je Abschnitt angehoben:
 - Abschnitt `internationals` Version 7 bekommt die Tabelle `international_tournaments`. Ältere Spielstände legen
   das nächste Turnier neu an. Wer gerade beim Nationalteam ist, wird beim Laden aus den Kadern abgeleitet.
 - Abschnitt `friendlies` (Version 6, neu) bekommt die Tabelle `friendlies`. Ältere Spielstände haben keine
-  Testspiele.
+  Testspiele. Version 7 ergänzt die Tabelle `summer_tournaments` (Sommerturniere).
 - Abschnitt `internationals` Version 8 ergänzt in den Team-Daten Trainer, Ziel, Vertrag, Spielsystem, Vormerkliste und
   offenes Angebot. Ältere Spielstände haben keine Trainer; das Modul besetzt die Posten am nächsten Spieltag.
 

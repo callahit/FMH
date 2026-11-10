@@ -136,4 +136,21 @@ public sealed class Friendly
     public int HomeSharePercent { get; set; } = 100;
     /// <summary>Im Trainingslager: neutraler Platz, keine Zuschauereinnahmen, stärkere Wirkung.</summary>
     public bool Camp { get; set; }
+    /// <summary>Spiel eines Sommerturniers (AP 9b): neutraler Platz, keine Zuschauereinnahmen, Elfmeterschießen bei Gleichstand.</summary>
+    public string? TournamentId { get; set; }
+    /// <summary>Runde im Sommerturnier: SF (Halbfinale), F (Finale), P3 (Spiel um Platz 3).</summary>
+    public string Stage { get; set; } = "";
+}
+
+/// <summary>Sommerturnier (AP 9b) mit vier Vereinen; Platzierung 1 bis 4 nach Finale und Spiel um Platz 3.</summary>
+public sealed class SummerTournament
+{
+    /// <summary>Regel-Id und Jahr, z. B. CUP-2026.</summary>
+    public string Id { get; set; } = "";
+    public string RuleId { get; set; } = "";
+    public string Name { get; set; } = "";
+    public int Year { get; set; }
+    public List<int> ClubIds { get; set; } = new();
+    /// <summary>Endplatzierung (Club-Ids, Platz 1 zuerst), leer solange das Turnier läuft.</summary>
+    public List<int> Ranking { get; set; } = new();
 }

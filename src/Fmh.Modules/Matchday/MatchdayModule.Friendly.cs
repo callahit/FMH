@@ -17,7 +17,7 @@ public sealed partial class MatchdayModule
         var friendly = World.Friendlies.First(x => x.Fixture.Id == f.Id);
         var home = World.Clubs[f.HomeId];
         var away = World.Clubs[f.AwayId];
-        if (!friendly.Camp)
+        if (!friendly.Camp && friendly.TournamentId is null)
         {
             var (standing, seating, _) = Finance.Attendance(home, away, f, result.Weather);
             result.Attendance = (int)Math.Round((standing + seating) * rules.AttendanceFactor);
