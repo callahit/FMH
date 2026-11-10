@@ -1,0 +1,48 @@
+{
+  "unhappyThreshold": 30,
+  "talkCooldownDays": 14,
+  "graceMatchdays": 4,
+  "wantsTransferResetAt": 40,
+  "playingTimeSlope": 20,
+  "playingTimeMin": -25,
+  "playingTimeMax": 20,
+  "goalsPerPlace": 2.5,
+  "goalsMin": -15,
+  "goalsMax": 12,
+  "transferRequest": {
+    "base": 0.12,
+    "perPointBelow20": 0.01,
+    "perAmbition": 0.008,
+    "loyalFactor": 0.45,
+    "min": 0.05,
+    "max": 0.55
+  },
+  "promises": {
+    "heldBonus": 12,
+    "implicitHeldBonus": 4,
+    "brokenPenalty": 25,
+    "implicitBrokenPenalty": 14
+  },
+  "trust": {
+    "start": 60,
+    "brokenPromise": 8,
+    "heldPromise": 3,
+    "weeklyRecovery": 0.5,
+    "satisfactionPer4": 1
+  },
+  "hierarchy": {
+    "leaderMinLeadership": 10,
+    "establishedShare": 0.35,
+    "councilSize": 4,
+    "councilPull": 2,
+    "councilConcernBelow": 40,
+    "mentorBase": 0.12,
+    "mentorPerProfessionalism": 0.015,
+    "mentorPerLeadership": 0.008
+  },
+  "trainingMoralePerStep": 0.0167,
+  "unhappyShare": [
+    5,
+    20
+  ]
+}

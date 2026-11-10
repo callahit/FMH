@@ -1,11 +1,7 @@
 namespace Fmh.Core.Model;
 
-/// <summary>Schwellen und Fristen der Kabine (Must-now E3 / AP 7).</summary>
-public static class RelationsRules
-{
-    public const int TalkCooldownDays = 14;
-    public const int UnhappyThreshold = 30;
-}
+/// <summary>Stellung eines Spielers in der Hierarchie des Kaders (AP 7).</summary>
+public enum SquadTier { Follower, Established, Leader }
 
 /// <summary>Thema eines Einzelgesprächs (Must-now E3 / AP 7).</summary>
 public enum TalkTopic
@@ -46,6 +42,8 @@ public sealed class PlayerRelations
     public bool WantsTransfer { get; set; }
     /// <summary>Kaderstatus, den der Spieler aus der Verhandlung erwartet (implizites Versprechen).</summary>
     public SquadStatus? ExpectedStatus { get; set; }
+    /// <summary>Stellung in der Hierarchie (wöchentlich neu bestimmt).</summary>
+    public SquadTier Tier { get; set; }
 }
 
 /// <summary>Explizites Versprechen mit Frist.</summary>
@@ -76,6 +74,12 @@ public sealed class ClubRelations
     public List<MentoringGroup> Mentoring { get; set; } = new();
     /// <summary>Durchschnittliche Zufriedenheit des Kaders (Squad Mood).</summary>
     public double SquadMood { get; set; } = 55;
+    /// <summary>Vertrauen des Kaders in den Trainer (0–100); gebrochene Versprechen kosten Vertrauen.</summary>
+    public double Trust { get; set; } = 60;
+    /// <summary>Mannschaftsrat: Führungsspieler und Etablierte mit der meisten Führungsqualität.</summary>
+    public List<int> CouncilIds { get; set; } = new();
+    /// <summary>Letzte Meldung des Mannschaftsrats beim Trainer.</summary>
+    public DateOnly? LastCouncilConcern { get; set; }
 }
 
 public sealed class MentoringGroup

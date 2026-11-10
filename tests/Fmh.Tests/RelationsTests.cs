@@ -107,6 +107,11 @@ public class RelationsTests
         var unhappyWage = Negotiations.WageDemand(p, s.HumanClub, p.Contract.Status, s.World, s.Data);
         Assert.True(unhappyWage > happyWage);
 
+        // Wirklich unzufrieden (die wöchentliche Neuberechnung zählt): Titel verfehlt, Gehalt weit unter Gleichrangigen,
+        // kein Vertrauen in den Trainer
+        s.HumanClub.Board.Goal = SeasonGoal.Title;
+        p.Contract.WeeklyWage = 100;
+        s.ClubRelationsOf(s.HumanClub).Trust = 0;
         var requested = false;
         for (var i = 0; i < 12 && !requested; i++)
         {
