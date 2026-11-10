@@ -152,6 +152,11 @@ public sealed partial class PlayerPageViewModel : PageViewModel
             state.Add(new(T["player.wantsTransfer"], T["ui.yes"], new SolidColorBrush(P.Bad)));
         if (Fmh.Core.Logic.AgentGenerator.AgentOf(Session.World, p) is { } agent)
             state.Add(new(T["player.agent"], T.Format("player.agentValue", agent.Name, agent.Reputation, agent.Greed, agent.Influence)));
+        if (Session.World.Caps.TryGetValue(p.Id, out var caps) && caps.Caps > 0)
+            state.Add(new(T["player.caps"], T.Format("player.capsValue", caps.Caps, caps.Goals,
+                Fmh.Core.Logic.NationalSquads.TeamOf(Session.World, caps.Nation)?.Name ?? caps.Nation)));
+        if (Session.World.NationalTeams.FirstOrDefault(t => t.Squad.Contains(p.Id)) is { } nation)
+            state.Add(new(T["player.onDuty"], nation.Name, new SolidColorBrush(P.Accent)));
         if (p.State.Injury is { } inj)
             state.Add(new(T["player.injury"], T.Format("player.injuryValue", T["injury." + inj.Type], inj.DaysRemaining), new SolidColorBrush(P.Bad)));
         if (p.State.SuspendedMatches > 0)

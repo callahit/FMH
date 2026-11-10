@@ -346,6 +346,20 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
       entstehen aus einem eigenen Zufallsstrom.
   - Die Kalibrierung prüft den Anteil unzufriedener Spieler je Kader (Ziel 5–20 %) und dass unzufriedene
     Spieler häufiger einen Wechsel wollen als zufriedene.
+- **Nationalmannschaften (AP 8a):**
+  - **Länderspielfenster:** Fenster im September, Oktober, November und März (`data/base/rules/internationals.json`).
+    Ein Fenster beginnt am ersten Montag ab dem Starttag und dauert acht Tage, mit Spielen am Donnerstag und Sonntag.
+  - **Vereinsbetrieb ruht:** In den Fenstern finden keine Vereinsspiele statt.
+    - Ligaspieltage überspringen die Fenster, nötige Englische Wochen weichen ebenfalls aus.
+    - Pokaltermine rücken um ganze Wochen nach hinten.
+  - **Nationalteams:** Jedes Land mit Vereinen in der Welt hat ein Nationalteam. Fiktive Hintergrundländer mit fester
+    Spielstärke stellen weitere Gegner; ihre Kader werden je Spiel erzeugt und gehören nicht zur Welt.
+  - **Nominierung durch die KI:** 23 Spieler nach Stärke und Form, je Position nach der Kaderschablone. Verletzte und
+    gesperrte Spieler bleiben zu Hause. Wer einmal für ein Land gespielt hat, bleibt bei diesem Land.
+  - **Länderspiele:** Sie laufen mit der Engine im Schnellmodus. Kondition, Spielpraxis und Verletzungen wirken auf
+    die Spieler; nach der Rückkehr kostet die Reise zusätzlich Kondition.
+  - **Anzeige:** Der eigene Verein bekommt eine Meldung mit seinen Nominierten. Auf der Spielerseite stehen
+    Länderspiele und Tore sowie der Hinweis „Beim Nationalteam“.
 - **Konferenz:** Anzeigemodus, in dem die anderen Spiele des Spieltags minutengenau mitlaufen, mit
   Torblitz im Ticker und Live-Tabelle.
 - **Einstellungen:** Schwierigkeit (Leicht, Normal, Schwer, Realistisch) beim Spielstart;
@@ -504,7 +518,7 @@ aktive Spieler höchstens +10 % gegenüber dem ersten Saisonende, Vereinslose h�
 | 7 Transfers, Verträge, Scouting | **vollständig** inkl. Anfrage, Konkurrenz, Deadline Day, Sportdirektor-Delegation (E2), **Berater als Akteure** | – |
 | 8 Finanzen, Stadion, Personal | **vollständig**: Einnahmen und Ausgaben, Bank, Lizenz, Insolvenz, Stadionausbau, Personal, Sponsoren | – |
 | 9 Vereinsgelände | **83 Gebäude** mit Stufen, Lage und Synergien, Baufirmen, Genehmigungen | – |
-| 10 Umfeld, Karriere | **Vorstand, Fans, Presse, 166 Zufallsereignisse, Managerkarriere** mit Lizenzen und Erfolgen | Nationalmannschaft, Medienhaus |
+| 10 Umfeld, Karriere | **Vorstand, Fans, Presse, 166 Zufallsereignisse, Managerkarriere** mit Lizenzen und Erfolgen, **Nationalmannschaften mit Länderspielfenstern und KI-Nominierung** | Turniere und Nationaltrainer (AP 8b/8c), Medienhaus |
 | 11 Oberfläche | Desktop-Oberfläche (Avalonia) mit Maus, Drag & Drop, sortierbaren Tabellen, Diagrammen (Radar, Formkurve, xG, Heatmap), Wappen, Farbthemen | Tastenbelegung |
 | 12 Nicht-funktional | Determinismus, **SQLite-Spielstände** mit Schemamigration, **Mehrsprachigkeit (Deutsch, Englisch, erweiterbar)**, Datenpakete mit Überlagerung, Datenvalidierung, Kalibrierungs-CLI mit Toleranzprüfung, **CI auf Linux und Windows**, Warnungen als Fehler, **Modulaufbau mit Golden Master und Architekturtest**, **Datenbank-Editor mit JSON-Schemas (AP 6)** | Spielstand-Modus des Editors (optional), Mod-Verwaltung (AP 14) |
 
@@ -569,6 +583,9 @@ danach je Abschnitt angehoben:
   KI-Manager selbst ergänzt die Spielsitzung beim Laden.
 - Abschnitt `agents` (Version 6, neu) bekommt die Tabellen `agents` und `agent_clients`. Die Berater ergänzt die
   Spielsitzung beim Laden.
+- Abschnitt `internationals` (Version 6, neu) bekommt die Tabellen `national_teams`, `international_fixtures`,
+  `international_windows` und `international_caps`. Ältere Spielstände haben in der laufenden Saison keine
+  Länderspielfenster, damit die angesetzten Termine gültig bleiben; ab der nächsten Saison gelten sie.
 
 Ein Spielstand mit einem neueren oder unbekannten Abschnitt wird abgelehnt.
 

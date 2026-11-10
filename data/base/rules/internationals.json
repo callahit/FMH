@@ -1,0 +1,24 @@
+{
+  "windows": [
+    { "id": "sep", "start": "09-01", "days": 8, "matchOffsets": [3, 6] },
+    { "id": "oct", "start": "10-05", "days": 8, "matchOffsets": [3, 6] },
+    { "id": "nov", "start": "11-09", "days": 8, "matchOffsets": [3, 6] },
+    { "id": "mar", "start": "03-20", "days": 8, "matchOffsets": [3, 6] }
+  ],
+  "squadSize": 23,
+  "minAge": 17,
+  "formWeight": 0.4,
+  "travelFatigue": 8,
+  "formation": "442",
+  "substitutions": 5,
+  "backgroundNations": [
+    { "code": "NRD", "name": "Nordmark", "strength": 14 },
+    { "code": "OST", "name": "Ostrava-Union", "strength": 12 },
+    { "code": "LUS", "name": "Lusarien", "strength": 15 },
+    { "code": "KAR", "name": "Karpatien", "strength": 11 },
+    { "code": "BAL", "name": "Baltanien", "strength": 9 },
+    { "code": "HEL", "name": "Helvetanien", "strength": 13 },
+    { "code": "ADR", "name": "Adriana", "strength": 14 },
+    { "code": "SKA", "name": "Skandara", "strength": 12 }
+  ]
+}

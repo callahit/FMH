@@ -34,6 +34,9 @@ public sealed partial class CupsModule : GameModule, ICupsService
             var shift = World.Date.AddDays(3).DayNumber - round.Dates[0].DayNumber;
             round.Dates = round.Dates.Select(d => d.AddDays(shift)).ToList();
         }
+        // Länderspielfenster: Termine rücken um ganze Wochen nach hinten.
+        for (var guard = 0; guard < 10 && round.Dates.Any(World.InInternationalWindow); guard++)
+            round.Dates = round.Dates.Select(d => d.AddDays(7)).ToList();
         CupLogic.Draw(World, cup, round, teams, Rng);
         Finance.CupPrize(cup, round.Number, teams);
         var own = round.Ties.FirstOrDefault(t => t.HomeId == HumanClub.Id || t.AwayId == HumanClub.Id);
