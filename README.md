@@ -386,6 +386,19 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
   - **Seite Nationalteam (F11):** Vormerkliste mit Haken, KI-Vorschlag, Spielsystem und Rücktritt. Dazu das laufende
     Turnier mit Gruppen und K.-o.-Runde, die Länderspiele und die bisherigen Turniersieger. Fehlende Plätze der
     Vormerkliste füllt die KI bei der Berufung auf.
+- **Testspiele (AP 9):** Auf der Seite Spielplan vereinbart der Manager Testspiele mit Gegner, Datum, Heim- oder
+  Auswärtsspiel und dem Anteil des Gastgebers an den Zuschauereinnahmen (100, 70 oder 50 %). Die Regeln stehen in
+  `data/base/rules/friendlies.json`.
+  - **Vereinbarung:** Ein deutlich bekannterer Gegner (Ruf mehr als 3 Punkte höher) kommt nicht ins eigene Stadion;
+    auswärts sagt er bis zum doppelten Abstand zu. Zu jedem anderen Spiel beider Vereine bleiben 2 Tage Abstand,
+    in Länderspielfenstern gibt es keine Testspiele, höchstens 6 sind gleichzeitig offen. Absagen ist bis zum Vortag
+    möglich.
+  - **Keine Wettbewerbsstatistik:** Testspiele zählen nicht in Tabelle, Saisonstatistik, Form, Sperren oder
+    Gelbkartenkonto. Verletzungen gibt es wie im Pflichtspiel.
+  - **Wirkung:** Spielpraxis (25 je 90 Minuten), Fortschritt im Konditionstraining und Taktikvertrautheit (+5, im
+    Pflichtspiel +2,5). Es kommen 35 % der üblichen Zuschauer.
+  - **Trainingslager:** Ein Testspiel während des eigenen Trainingslagers findet auf neutralem Platz statt, bringt
+    keine Zuschauereinnahmen, wirkt aber um die Hälfte stärker.
 - **Konferenz:** Anzeigemodus, in dem die anderen Spiele des Spieltags minutengenau mitlaufen, mit
   Torblitz im Ticker und Live-Tabelle.
 - **Einstellungen:** Schwierigkeit (Leicht, Normal, Schwer, Realistisch) beim Spielstart;
@@ -614,6 +627,8 @@ danach je Abschnitt angehoben:
   Länderspielfenster, damit die angesetzten Termine gültig bleiben; ab der nächsten Saison gelten sie.
 - Abschnitt `internationals` Version 7 bekommt die Tabelle `international_tournaments`. Ältere Spielstände legen
   das nächste Turnier neu an. Wer gerade beim Nationalteam ist, wird beim Laden aus den Kadern abgeleitet.
+- Abschnitt `friendlies` (Version 6, neu) bekommt die Tabelle `friendlies`. Ältere Spielstände haben keine
+  Testspiele.
 - Abschnitt `internationals` Version 8 ergänzt in den Team-Daten Trainer, Ziel, Vertrag, Spielsystem, Vormerkliste und
   offenes Angebot. Ältere Spielstände haben keine Trainer; das Modul besetzt die Posten am nächsten Spieltag.
 

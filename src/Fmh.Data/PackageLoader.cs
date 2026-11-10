@@ -92,6 +92,7 @@ public static class PackageLoader
             Relations = Path1("rules/relations.json") is { } rel ? Json.Load<RelationsConfig>(rel) : new(),
             Agents = Path1("rules/agents.json") is { } ag ? Json.Load<AgentRules>(ag) : new(),
             Internationals = Path1("rules/internationals.json") is { } intl ? Json.Load<InternationalRules>(intl) : new(),
+            Friendlies = Path1("rules/friendlies.json") is { } fr ? Json.Load<FriendlyRules>(fr) : new(),
             Europe = Path1("competitions/europe.json") is { } eu ? Json.Load<EuropeFormat>(eu) : null,
             Languages = languages,
             DefaultLanguage = defaultLanguage,

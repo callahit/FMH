@@ -47,7 +47,7 @@ public sealed class League
 public enum Weather { Sunny, Cloudy, Rain, Snow, Wind }
 
 /// <summary>Art des Wettbewerbs eines Spiels.</summary>
-public enum CompetitionKind { League, Cup, Playoff, Europe }
+public enum CompetitionKind { League, Cup, Playoff, Europe, Friendly }
 
 public sealed class Fixture
 {
@@ -124,4 +124,16 @@ public sealed class Referee
     public string Name { get; set; } = "";
     /// <summary>Strenge 1–20.</summary>
     public int Strictness { get; set; } = 10;
+}
+
+/// <summary>Testspiel (AP 9): Spiel ohne Wettbewerb, mit vereinbarter Einnahmenteilung, ggf. im Trainingslager.</summary>
+public sealed class Friendly
+{
+    public const string CompetitionId = "FRIENDLY";
+
+    public Fixture Fixture { get; set; } = new() { CompetitionId = CompetitionId, Kind = CompetitionKind.Friendly };
+    /// <summary>Anteil des Gastgebers an den Zuschauereinnahmen (Prozent), der Rest geht an den Gast.</summary>
+    public int HomeSharePercent { get; set; } = 100;
+    /// <summary>Im Trainingslager: neutraler Platz, keine Zuschauereinnahmen, stärkere Wirkung.</summary>
+    public bool Camp { get; set; }
 }
