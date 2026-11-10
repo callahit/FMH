@@ -65,6 +65,23 @@ public sealed class NationalCoachTests
     }
 
     [Fact]
+    public void ExpiredOfferGoesToAnAiCoach()
+    {
+        var s = TestData.NewSession(836);
+        AdvanceTo(s, s.World.Date.AddDays(1));
+        var de = NationalSquads.TeamOf(s.World, "DE")!;
+        s.HumanManager.Reputation = s.Data.Internationals.Coach.OfferReputation;
+        de.CoachId = null;
+        AdvanceTo(s, s.World.Date.AddDays(1));
+        Assert.Same(de, s.PendingNationalOffer);
+        AdvanceTo(s, de.OfferExpires!.Value.AddDays(2));
+        Assert.Null(s.PendingNationalOffer);
+        Assert.NotNull(de.CoachId);
+        Assert.NotEqual(s.HumanManager.Id, de.CoachId);
+        Assert.Single(s.Inbox, m => m.Action == MessageAction.NationalJobOffer);
+    }
+
+    [Fact]
     public void ShortlistAndFormationOfTheHumanCoachAreUsed()
     {
         var (s, de) = HumanCoach(833);

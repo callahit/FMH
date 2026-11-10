@@ -26,7 +26,8 @@ public sealed partial class InternationalsModule
     private void EnsureCoaches()
     {
         NationalSquads.Ensure(World, Data);
-        foreach (var t in World.NationalTeams.Where(t => t.OfferExpires is { } d && d < World.Date)) t.OfferExpires = null;
+        // Verfallenes Angebot gilt als Absage: Der Posten geht an einen KI-Manager statt erneut an den Manager.
+        foreach (var t in World.NationalTeams.Where(t => t.OfferExpires is { } d && d < World.Date).ToList()) DeclineNationalJob(t);
         foreach (var team in World.NationalTeams.Where(t => !t.Background && t.CoachId is null && t.OfferExpires is null).ToList())
         {
             if (CanOfferToHuman())
