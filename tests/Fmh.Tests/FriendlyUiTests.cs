@@ -52,6 +52,9 @@ public class FriendlyUiTests
         Assert.Contains(page.Own, f => f.Fixture.Kind == Fmh.Core.Model.CompetitionKind.Friendly && f.Matchday == "Testspiel");
         var texts = w.GetVisualDescendants().OfType<TextBlock>().Where(t => t.IsEffectivelyVisible).Select(t => t.Text ?? "").ToList();
         Assert.DoesNotContain(texts, t => System.Text.RegularExpressions.Regex.IsMatch(t, @"^\[[a-z]+\.[A-Za-z.0-9]+\]$"));
+        // Vorbericht zeigt „Testspiel“ statt Pokalrunde und Hinspiel
+        var match = new MatchViewModel(vm, shell, page.Friendlies[0].Friendly.Fixture);
+        Assert.StartsWith("Testspiel ·", match.Subline);
         page.Friendlies[0].Cancel.Execute(null);
         Assert.True(page.NoFriendlies);
         Assert.Empty(s.OwnFriendlies);
