@@ -33,9 +33,13 @@ public sealed partial class InternationalsModule
                 Year = year,
                 FinalsStart = ScheduleGenerator.ParseDate(rule.Start, World.SeasonYear, World.Countries[0].Season.StartMonth),
             };
+            // Zu spät angelegt (z. B. älterer Spielstand im Juni): Die Endrunde rückt so weit nach hinten, dass die Kader
+            // morgen anreisen und kein Spieltag in der Vergangenheit liegt.
+            if (World.Date >= t.FinalsStart.AddDays(-CampDays)) t.FinalsStart = World.Date.AddDays(CampDays + 1);
             World.Tournaments.Add(t);
             var ratings = Participants().Select(n => (n.Code, InternationalTournaments.Rating(World, Data, n))).ToList();
-            var dates = World.InternationalWindows.SelectMany(w => w.MatchDates).Where(d => d > World.Date).OrderBy(d => d).ToList();
+            var dates = World.InternationalWindows.SelectMany(w => w.MatchDates)
+                .Where(d => d > World.Date && d < t.FinalsStart.AddDays(-CampDays)).OrderBy(d => d).ToList();
             var groups = (int)Math.Ceiling(ratings.Count / (double)rule.QualificationGroupSize);
             var rounds = 2 * (Math.Min(rule.QualificationGroupSize, ratings.Count) - 1);
             if (ratings.Count > rule.Teams && rounds <= dates.Count)
