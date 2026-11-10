@@ -1,0 +1,40 @@
+{
+  "$id": "https://fmh.local/schema/assistant.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Co-Trainer (Datei rules/assistant.json, AP 11): Schwellen für den Trainingsbericht, Urlaubsdauer.",
+  "properties": {
+    "lowCondition": {
+      "description": "Ø Kondition der Stammelf, unter der der Co-Trainer zu leichterem Training rät.",
+      "maximum": 100,
+      "minimum": 0,
+      "type": "number"
+    },
+    "lowFamiliarity": {
+      "description": "Vertrautheit mit dem Spielsystem, unter der mehr Taktiktraining empfohlen wird.",
+      "maximum": 100,
+      "minimum": 0,
+      "type": "number"
+    },
+    "lowMatchPractice": {
+      "description": "Ø Spielpraxis der Stammelf, unter der ein Trainingsspiel empfohlen wird.",
+      "maximum": 100,
+      "minimum": 0,
+      "type": "number"
+    },
+    "manyInjured": {
+      "description": "Ab so vielen Verletzten im Kader rät der Co-Trainer zu geringerer Belastung.",
+      "maximum": 30,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "maxHolidayDays": {
+      "description": "Höchstdauer eines Urlaubs in Tagen.",
+      "maximum": 400,
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "title": "FMH rules/assistant.json",
+  "type": "object"
+}

@@ -74,9 +74,12 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
     /// <summary>Spiel, das der Mensch selbst bestreitet (nicht während er ohne Verein ist).</summary>
     private bool HumanPlays(Fixture f) => !Board.AwaitingNewJob && f.Involves(HumanClub.Id);
 
+    /// <summary>Urlaub (AP 11): Der Co-Trainer stellt auch die Mannschaft des Managers auf.</summary>
+    public bool AiLineupForHuman { get; set; }
+
     private void PrepareClub(Club club, Club opponent, bool home)
     {
-        if (IsHuman(club))
+        if (IsHuman(club) && !AiLineupForHuman)
             LineupSelector.Repair(club, World, Data, BenchSize(club), AiTactics.MatchEligibility(club, World, Data));
         else
             AiTactics.Prepare(club, opponent, home, World, Data, BenchSize(club));

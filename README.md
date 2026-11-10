@@ -408,6 +408,17 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
     Gleichstand mit Elfmeterschießen.
   - **Prämien und Wertung:** Prämien je Platz; der Manager bekommt eine Nachricht mit Sieger und eigener Platzierung.
     Die Spiele zählen wie Testspiele nicht in die Statistik und bringen keine Zuschauereinnahmen.
+- **Urlaub und Co-Trainer (AP 11a):**
+  - **Urlaub:** Über die Sonne in der Kopfzeile nimmt der Manager eine, zwei, vier oder acht Wochen Urlaub oder bis
+    zum Saisonende (höchstens 120 Tage, `data/base/rules/assistant.json`). Die Spiele laufen sofort, offene
+    Entscheidungen übernimmt der Assistent. Wahlweise stellt der Co-Trainer die Mannschaft auf, plant jeden Montag das
+    Training, und der Sportdirektor verhandelt Transfers. Danach gelten die eigene Taktik und der eigene
+    Trainingsplan wieder. Ein Bericht zeigt Ergebnisse und die Zahl der getroffenen Entscheidungen. Wird der Manager
+    entlassen, endet der Urlaub sofort.
+  - **Bericht des Co-Trainers:** Auf der Trainingsseite. Er nennt niedrige Kondition der Stammelf, viele Verletzte,
+    Englische Wochen, geringe Vertrautheit mit dem Spielsystem und fehlende Spielpraxis. Sein angepasster Wochenplan
+    lässt sich übernehmen: leichtere Intensität, Regeneration statt Fitness, mehr Taktik, ein Trainingsspiel. Die
+    Schwellen stehen in `data/base/rules/assistant.json`.
 - **Konferenz:** Anzeigemodus, in dem die anderen Spiele des Spieltags minutengenau mitlaufen, mit
   Torblitz im Ticker und Live-Tabelle.
 - **Einstellungen:** Schwierigkeit (Leicht, Normal, Schwer, Realistisch) beim Spielstart;

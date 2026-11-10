@@ -1,0 +1,23 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Fmh.Desktop.ViewModels"
+             xmlns:s="using:Fmh.Desktop.Services"
+             x:Class="Fmh.Desktop.Views.HolidayDialogView"
+             x:DataType="vm:HolidayDialogViewModel">
+  <Border Classes="card" MinWidth="420" MaxWidth="560" Padding="24">
+    <StackPanel Spacing="12">
+      <TextBlock Classes="h2" Text="{s:L holiday.title}" />
+      <Grid ColumnDefinitions="Auto,*" ColumnSpacing="12">
+        <TextBlock Text="{s:L holiday.duration}" VerticalAlignment="Center" />
+        <ComboBox Grid.Column="1" ItemsSource="{Binding Durations}" SelectedIndex="{Binding DurationIndex}" HorizontalAlignment="Stretch" />
+      </Grid>
+      <CheckBox IsChecked="{Binding Lineup}" Content="{s:L holiday.lineup}" />
+      <CheckBox IsChecked="{Binding Training}" Content="{s:L holiday.training}" />
+      <CheckBox IsChecked="{Binding Transfers}" Content="{s:L holiday.transfers}" />
+      <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+        <Button Content="{s:L holiday.cancel}" Command="{Binding CancelCommand}" />
+        <Button Classes="primary" Content="{s:L holiday.start}" Command="{Binding StartCommand}" />
+      </StackPanel>
+    </StackPanel>
+  </Border>
+</UserControl>
