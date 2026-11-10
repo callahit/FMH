@@ -34,6 +34,7 @@ public sealed class GameData
     public TransferRules TransferRules { get; init; } = new();
     public ManagerRules ManagerRules { get; init; } = new();
     public RelationsConfig Relations { get; init; } = new();
+    public AgentRules Agents { get; init; } = new();
     /// <summary>Gemeinsames Format UCL/UEL/UECL (AP 5); null in älteren Paketen ohne competitions/europe.json.</summary>
     public EuropeFormat? Europe { get; set; }
 

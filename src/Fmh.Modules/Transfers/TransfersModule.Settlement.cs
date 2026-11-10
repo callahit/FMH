@@ -101,7 +101,7 @@ public sealed partial class TransfersModule
             Budgeted(buyer).Budget.TransferBudget -= upfront;
             Budgeted(seller).Budget.TransferBudget += upfront / 2;
             PaySellOns(p, seller, buyer, fee);
-            var agent = Negotiations.AgentFee(p, fee);
+            var agent = Negotiations.AgentFee(p, fee, World, Data);
             Finance.Book(buyer, TransactionType.AgentFee, -agent, TR("tx.agentFee", p.Name));
         }
         if (contract.SigningFee > 0) Finance.Book(buyer, TransactionType.SigningFee, -contract.SigningFee, TR("tx.signingFee", p.Name));

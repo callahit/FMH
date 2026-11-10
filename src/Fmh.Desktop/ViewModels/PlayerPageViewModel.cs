@@ -150,6 +150,8 @@ public sealed partial class PlayerPageViewModel : PageViewModel
         };
         if (sat.WantsTransfer)
             state.Add(new(T["player.wantsTransfer"], T["ui.yes"], new SolidColorBrush(P.Bad)));
+        if (Fmh.Core.Logic.AgentGenerator.AgentOf(Session.World, p) is { } agent)
+            state.Add(new(T["player.agent"], T.Format("player.agentValue", agent.Name, agent.Reputation, agent.Greed, agent.Influence)));
         if (p.State.Injury is { } inj)
             state.Add(new(T["player.injury"], T.Format("player.injuryValue", T["injury." + inj.Type], inj.DaysRemaining), new SolidColorBrush(P.Bad)));
         if (p.State.SuspendedMatches > 0)
