@@ -84,6 +84,24 @@
             </StackPanel>
           </Border>
 
+          <!-- Bericht des Co-Trainers (AP 11) -->
+          <Border Classes="card">
+            <StackPanel Spacing="8">
+              <TextBlock Classes="h3" Text="{s:L assistant.title}" />
+              <ItemsControl ItemsSource="{Binding AssistantFindings}">
+                <ItemsControl.ItemTemplate>
+                  <DataTemplate x:DataType="x:String">
+                    <TextBlock Text="{Binding}" TextWrapping="Wrap" Margin="0,2" />
+                  </DataTemplate>
+                </ItemsControl.ItemTemplate>
+              </ItemsControl>
+              <StackPanel Orientation="Horizontal" Spacing="12">
+                <Button Content="{s:L assistant.apply}" Command="{Binding ApplyAssistantCommand}" />
+                <TextBlock Text="{Binding AssistantMessage}" Foreground="{DynamicResource AccentBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
+              </StackPanel>
+            </StackPanel>
+          </Border>
+
           <!-- Trainingslager -->
           <Border Classes="card">
             <StackPanel Spacing="8">

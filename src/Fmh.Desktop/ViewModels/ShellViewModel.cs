@@ -267,6 +267,17 @@ public sealed partial class ShellViewModel : ViewModelBase
     private void Options() => _main.ShowDialog(new OptionsViewModel(this));
 
     [RelayCommand]
+    private void Holiday() => _main.ShowDialog(new HolidayDialogViewModel(this));
+
+    /// <summary>Nach dem Urlaub: Kopfzeile und Seite neu laden, Bericht zeigen.</summary>
+    public void AfterHoliday(ViewModelBase report)
+    {
+        RefreshHeader();
+        if (Page is IRefreshable r) r.Refresh();
+        _main.ShowDialog(report);
+    }
+
+    [RelayCommand]
     private void MainMenu() =>
         _main.ShowDialog(new ConfirmDialogViewModel(T["gameMenu.mainMenu"], T["gameMenu.confirmLeave"], () =>
         {
