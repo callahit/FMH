@@ -128,6 +128,11 @@ public sealed class World
     /// <summary>Sommerturniere der laufenden Saison (AP 9b).</summary>
     public List<SummerTournament> SummerTournaments { get; set; } = new();
 
+    /// <summary>Abschlussbilanzen aller Vereine je Ligasaison (AP 11b).</summary>
+    public List<ClubSeason> ClubSeasons { get; set; } = new();
+    /// <summary>Spielrekorde je Verein und Wettbewerb (AP 11b).</summary>
+    public List<MatchRecord> Records { get; set; } = new();
+
     public League League(string id) => Leagues.First(l => l.Id == id);
 
     public IEnumerable<Player> SquadOf(Club club) => club.PlayerIds.Select(id => Players[id]);
