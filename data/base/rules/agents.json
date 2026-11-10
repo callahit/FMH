@@ -1,0 +1,13 @@
+{
+  "playersPerAgent": 30,
+  "minPerCountry": 4,
+  "feePerGreed": 0.03,
+  "wagePerGreed": 0.012,
+  "requestPerInfluence": 0.04,
+  "unsettle": {
+    "minInfluence": 13,
+    "minReputationGap": 4,
+    "weeklyChance": 0.06,
+    "satisfactionHit": 6
+  }
+}

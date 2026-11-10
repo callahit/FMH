@@ -336,6 +336,14 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
     Wechselwunsch erlischt, wenn sie wieder zufrieden sind.
   - Die Stimmung des Kaders wirkt auf die Tagesform im Spiel.
   - Alle Werte stehen in `data/base/rules/relations.json`.
+  - **Berater:** Jeder Profi hat einen Spielerberater (Ruf, Gier, Einfluss; Berater je Land nach Zahl der Profis).
+    Gute Spieler landen eher bei großen Beratern.
+    - Gier erhöht das Beraterhonorar beim Transfer und die Gehaltsforderung.
+    - Einfluss verstärkt den Wechselwunsch unzufriedener Mandanten.
+    - Einflussreiche Berater bringen bei Mandanten, die deutlich besser sind als ihr Verein, einen Wechsel ins
+      Gespräch. Das kostet Zufriedenheit; beim eigenen Verein kommt eine Meldung.
+    - Der Berater steht auf der Spielerseite. Werte in `data/base/rules/agents.json`; Berater und Zuordnung
+      entstehen aus einem eigenen Zufallsstrom.
   - Die Kalibrierung prüft den Anteil unzufriedener Spieler je Kader (Ziel 5–20 %) und dass unzufriedene
     Spieler häufiger einen Wechsel wollen als zufriedene.
 - **Konferenz:** Anzeigemodus, in dem die anderen Spiele des Spieltags minutengenau mitlaufen, mit
@@ -493,7 +501,7 @@ aktive Spieler höchstens +10 % gegenüber dem ersten Saisonende, Vereinslose h�
 | 4 Spielerdatenmodell | 44 Attribute, versteckte Werte, Kondition, Form, Moral, Spielpraxis, Positionseignung, Entwicklung durch **Training** und Saisonwechsel, Karriereende, Dauerschäden, **Zufriedenheit, Hierarchie, Mentoring** | – |
 | 5 Kader, Training, Taktik | Kader, Profil, **Training**, **Trainingslager**, 25 Formationen, **Rollen und Aufgaben**, **Spieleranweisungen**, **freie Positionierung**, **Taktikvertrautheit**, **3 Taktikvarianten**, Standardvarianten, Co-Trainer | – |
 | 6 Spieltag und Matchengine | Vorbericht, Kabinenansprache, Kommentar/Ticker/Sofort/**Konferenz**, Wechsel, Taktik und Zurufe live, Nachbericht mit Noten und Statistik, **Verlängerung und Elfmeterschießen**, Hin- und Rückspiel, **Pressekonferenzen** | – |
-| 7 Transfers, Verträge, Scouting | **vollständig** inkl. Anfrage, Konkurrenz, Deadline Day, Sportdirektor-Delegation (E2) | Berater als Akteure (E2-S3) |
+| 7 Transfers, Verträge, Scouting | **vollständig** inkl. Anfrage, Konkurrenz, Deadline Day, Sportdirektor-Delegation (E2), **Berater als Akteure** | – |
 | 8 Finanzen, Stadion, Personal | **vollständig**: Einnahmen und Ausgaben, Bank, Lizenz, Insolvenz, Stadionausbau, Personal, Sponsoren | – |
 | 9 Vereinsgelände | **83 Gebäude** mit Stufen, Lage und Synergien, Baufirmen, Genehmigungen | – |
 | 10 Umfeld, Karriere | **Vorstand, Fans, Presse, 166 Zufallsereignisse, Managerkarriere** mit Lizenzen und Erfolgen | Nationalmannschaft, Medienhaus |
@@ -559,6 +567,8 @@ danach je Abschnitt angehoben:
 - Abschnitt `world` Version 7 bekommt die Vereinsspalten `reserve_of`, `region`, `latitude` und `longitude`.
 - Abschnitt `world` Version 8 bekommt die Spalte `managers.traits` (Eigenschaften der KI-Manager). Die
   KI-Manager selbst ergänzt die Spielsitzung beim Laden.
+- Abschnitt `agents` (Version 6, neu) bekommt die Tabellen `agents` und `agent_clients`. Die Berater ergänzt die
+  Spielsitzung beim Laden.
 
 Ein Spielstand mit einem neueren oder unbekannten Abschnitt wird abgelehnt.
 

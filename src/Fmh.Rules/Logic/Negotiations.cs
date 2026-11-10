@@ -114,6 +114,8 @@ public static class Negotiations
             _ => 1.0,
         };
         if (p.Hidden.Ambition >= 15) target *= 1.05;
+        // Gierige Berater treiben die Forderung (AP 7)
+        target *= AgentGenerator.WageFactor(AgentGenerator.AgentOf(world, p), data.Agents);
         // Unzufriedene Spieler fordern spürbar mehr Gehalt (Must-now E3-S4).
         if (world.PlayerRelations.TryGetValue(p.Id, out var rel) && rel.Satisfaction < 30)
             target *= 1.15 + (30 - rel.Satisfaction) * 0.005;
@@ -190,7 +192,9 @@ public static class Negotiations
     }
 
     /// <summary>Beraterprovision: 5–15 % der Ablöse, je nach Reputation des Spielers.</summary>
-    public static long AgentFee(Player p, long fee) => MarketValue.Round(fee * (0.05 + Math.Clamp(p.Reputation, 1, 20) / 20.0 * 0.10));
+    /// <summary>Beraterhonorar: 5–15 % der Ablöse nach Ruf des Spielers, dazu die Gier des Beraters (AP 7).</summary>
+    public static long AgentFee(Player p, long fee, World world, GameData data) =>
+        MarketValue.Round(fee * (0.05 + Math.Clamp(p.Reputation, 1, 20) / 20.0 * 0.10) * AgentGenerator.FeeFactor(AgentGenerator.AgentOf(world, p), data.Agents));
 
     /// <summary>Sinnvolles Startangebot für den Vertrag (Forderung des Spielers, erwarteter Status, bevorzugte Laufzeit).</summary>
     public static ContractOffer SuggestContract(Player p, Club buyer, World world, GameData data)

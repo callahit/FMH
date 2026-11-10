@@ -26,6 +26,7 @@ public static class SqliteStore
         new WorldSection(), new PlayersSection(), new CupsSection(), new MatchdaySection(), new TransfersSection(),
         new FinanceSection(), new ScoutingSection(), new StaffSection(), new EventsSection(), new LicenseSection(),
         new RelationsSection(),
+        new AgentsSection(),
     };
 
     // ------------------------------------------------------------------ Speichern

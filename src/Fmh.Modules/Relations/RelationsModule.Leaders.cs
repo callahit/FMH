@@ -146,6 +146,8 @@ public sealed partial class RelationsModule
             // Wechselwunsch: Ambition und Temperament erhöhen die Chance.
             var transferChance = request.Base + (20 - rel.Satisfaction) * request.PerPointBelow20 + p.Hidden.Ambition * request.PerAmbition;
             if (p.Hidden.Loyalty >= 15) transferChance *= request.LoyalFactor;
+            // Einflussreiche Berater bestärken den Wunsch (AP 7)
+            transferChance *= AgentGenerator.RequestFactor(AgentGenerator.AgentOf(World, p), Data.Agents);
             if (!rel.WantsTransfer && Rng.Chance(Math.Clamp(transferChance, request.Min, request.Max)))
             {
                 rel.WantsTransfer = true;
