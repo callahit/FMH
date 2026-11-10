@@ -212,6 +212,20 @@ public sealed partial class InboxPageViewModel : PageViewModel, IRefreshable
                     Done(T["inbox.jobDeclined"]);
                 })));
                 break;
+            case MessageAction.NationalJobOffer when !m.Resolved && s.NationalOfferOf(m) is { } nation:
+                title = T["inbox.nationalDecision"];
+                options.Add(new DecisionOption(T["inbox.acceptJob"], nation.Name,
+                    new RelayCommand(() =>
+                    {
+                        var error = s.AcceptNationalJob(nation);
+                        Done(error is null ? T.Format("inbox.nationalAccepted", nation.Name) : T[error]);
+                    }), true));
+                options.Add(new DecisionOption(T["inbox.declineJob"], "", new RelayCommand(() =>
+                {
+                    s.DeclineNationalJob(nation);
+                    Done(T["inbox.nationalDeclined"]);
+                })));
+                break;
             case MessageAction.PressConference when !m.Resolved && s.World.PendingPress is { } conf:
                 title = T["inbox.pressDecision"];
                 var answers = Enum.GetValues<PressAnswer>().Select(a => T["press.answer." + a]).ToList();

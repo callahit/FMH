@@ -69,7 +69,8 @@ public sealed partial class InternationalsModule
         var players = team.Background
             ? NationalSquads.BackgroundSquad(World, Data, team)
             : team.Squad.Select(id => World.Players[id]).Where(p => p.State.Injury is null).ToList();
-        var tactic = new Tactic { FormationId = Data.Internationals.Formation };
+        var formationId = team.Formation is { Length: > 0 } f && Data.Formations.Any(x => x.Id == f) ? f : Data.Internationals.Formation;
+        var tactic = new Tactic { FormationId = formationId };
         var formation = TacticResolver.Resolve(tactic, Data);
         tactic.Lineup = LineupSelector.Assign(formation, players, Data.PositionProfiles);
         tactic.Bench = LineupSelector.PickBench(tactic.Lineup, players, 9, Data.PositionProfiles);

@@ -21,6 +21,7 @@ public sealed partial class InternationalsModule : GameModule
     {
         foreach (var w in World.InternationalWindows.Where(w => World.Date == w.Start)) OpenWindow(w);
         EnsureTournaments();
+        EnsureCoaches();
         PlayToday();
         TournamentDay();
         foreach (var w in World.InternationalWindows.Where(w => World.Date == w.End)) CloseWindow(w);
@@ -39,7 +40,7 @@ public sealed partial class InternationalsModule : GameModule
         var taken = new HashSet<int>();
         foreach (var team in real)
         {
-            NationalSquads.Call(World, team, NationalSquads.Nominate(World, Data, team, taken));
+            NationalSquads.Call(World, team, SquadFor(team, taken));
             taken.UnionWith(team.Squad);
         }
         if (!World.InternationalFixtures.Any(f => f.TournamentId is not null && w.Contains(f.Date)))

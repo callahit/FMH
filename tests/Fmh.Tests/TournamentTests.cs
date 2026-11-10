@@ -146,5 +146,11 @@ public sealed class TournamentTests
         Assert.All(w.NationalTeams, t => Assert.Empty(t.Squad));
         Assert.DoesNotContain(w.Players.Values, p => p.State.OnNationalDuty);
         Assert.Equal(2028, w.SeasonYear);
+        // AP 8c: Nach dem Turnier ist jeder verbliebene Trainer bis zum nächsten Turnier verlängert, freie Posten sind neu besetzt.
+        Assert.All(w.NationalTeams.Where(t => !t.Background), t =>
+        {
+            Assert.NotNull(t.CoachId);
+            Assert.True(t.CoachUntil >= 2030, $"{t.Code} Vertrag bis {t.CoachUntil}");
+        });
     }
 }

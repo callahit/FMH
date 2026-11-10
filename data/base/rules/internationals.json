@@ -24,5 +24,6 @@
   "tournaments": [
     { "id": "EM", "name": "Europameisterschaft", "every": 4, "firstYear": 2028, "start": "06-14", "teams": 8, "groupSize": 4, "advance": 2, "daysBetween": 4, "qualificationGroupSize": 4 },
     { "id": "WM", "name": "Weltmeisterschaft", "every": 4, "firstYear": 2030, "start": "06-14", "teams": 8, "groupSize": 4, "advance": 2, "daysBetween": 4, "qualificationGroupSize": 4 }
-  ]
+  ],
+  "coach": { "offerReputation": 10, "offerDays": 21, "finalRank": 2, "semiFinalRank": 4 }
 }
