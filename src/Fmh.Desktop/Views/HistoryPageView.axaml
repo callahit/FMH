@@ -1,0 +1,88 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Fmh.Desktop.ViewModels"
+             xmlns:s="using:Fmh.Desktop.Services"
+             x:Class="Fmh.Desktop.Views.HistoryPageView"
+             x:DataType="vm:HistoryPageViewModel">
+  <UserControl.DataTemplates>
+    <DataTemplate x:DataType="vm:InfoLine">
+      <Grid ColumnDefinitions="190,*" Margin="0,2">
+        <TextBlock Text="{Binding Label}" Classes="muted" TextWrapping="Wrap" />
+        <TextBlock Grid.Column="1" Text="{Binding Value}" TextWrapping="Wrap" />
+      </Grid>
+    </DataTemplate>
+    <DataTemplate x:DataType="vm:ClubSeasonLine">
+      <Grid ColumnDefinitions="70,*,40,34,70,60,40" Margin="0,1">
+        <TextBlock Text="{Binding Season}" Classes="muted" />
+        <TextBlock Grid.Column="1" Text="{Binding League}" TextTrimming="CharacterEllipsis" />
+        <TextBlock Grid.Column="2" Text="{Binding Position}" HorizontalAlignment="Right" />
+        <TextBlock Grid.Column="3" Text="{Binding Played}" HorizontalAlignment="Right" />
+        <TextBlock Grid.Column="4" Text="{Binding Record}" HorizontalAlignment="Center" />
+        <TextBlock Grid.Column="5" Text="{Binding Goals}" HorizontalAlignment="Center" />
+        <TextBlock Grid.Column="6" Text="{Binding Points}" FontWeight="Bold" HorizontalAlignment="Right" />
+      </Grid>
+    </DataTemplate>
+    <DataTemplate x:DataType="vm:ChronicleLine">
+      <Grid ColumnDefinitions="80,*" Margin="0,1">
+        <TextBlock Text="{Binding Season}" Classes="muted" />
+        <TextBlock Grid.Column="1" Text="{Binding Champion}" />
+      </Grid>
+    </DataTemplate>
+  </UserControl.DataTemplates>
+  <DockPanel>
+    <TextBlock DockPanel.Dock="Top" Classes="h1" Text="{Binding Title}" Margin="0,0,0,12" />
+    <Grid ColumnDefinitions="*,16,*">
+      <!-- Verein: Rekorde, Titel, Rekordspieler, Saisonbilanzen -->
+      <Border Classes="card" Padding="14">
+        <DockPanel>
+          <ComboBox DockPanel.Dock="Top" ItemsSource="{Binding Clubs}" SelectedItem="{Binding Club}" MinWidth="220" Margin="0,0,0,8">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:HistoryClubChoice"><TextBlock Text="{Binding Name}" /></DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+          <ScrollViewer>
+            <StackPanel Spacing="6">
+              <TextBlock Classes="h2" Text="{s:L history.clubRecords}" />
+              <ItemsControl ItemsSource="{Binding ClubRecords}" />
+              <TextBlock Classes="h2" Text="{s:L history.honours}" Margin="0,8,0,0" />
+              <ItemsControl ItemsSource="{Binding Honours}" />
+              <Grid ColumnDefinitions="*,16,*" Margin="0,8,0,0">
+                <StackPanel Spacing="4">
+                  <TextBlock Classes="h3" Text="{s:L history.topScorers}" />
+                  <ItemsControl ItemsSource="{Binding Scorers}" />
+                </StackPanel>
+                <StackPanel Grid.Column="2" Spacing="4">
+                  <TextBlock Classes="h3" Text="{s:L history.mostApps}" />
+                  <ItemsControl ItemsSource="{Binding Appearances}" />
+                </StackPanel>
+              </Grid>
+              <TextBlock Classes="h2" Text="{s:L history.seasons}" Margin="0,8,0,0" />
+              <ItemsControl ItemsSource="{Binding Seasons}" />
+            </StackPanel>
+          </ScrollViewer>
+        </DockPanel>
+      </Border>
+
+      <!-- Wettbewerb: Rekorde, Titelliste, Meisterchronik -->
+      <Border Grid.Column="2" Classes="card" Padding="14">
+        <DockPanel>
+          <ComboBox DockPanel.Dock="Top" ItemsSource="{Binding Competitions}" SelectedItem="{Binding Competition}" MinWidth="220" Margin="0,0,0,8">
+            <ComboBox.ItemTemplate>
+              <DataTemplate x:DataType="vm:LeagueChoice"><TextBlock Text="{Binding Name}" /></DataTemplate>
+            </ComboBox.ItemTemplate>
+          </ComboBox>
+          <ScrollViewer>
+            <StackPanel Spacing="6">
+              <TextBlock Classes="h2" Text="{s:L history.competitionRecords}" />
+              <ItemsControl ItemsSource="{Binding CompetitionRecords}" />
+              <TextBlock Classes="h2" Text="{s:L history.titleTable}" Margin="0,8,0,0" />
+              <ItemsControl ItemsSource="{Binding TitleTable}" />
+              <TextBlock Classes="h2" Text="{s:L history.chronicle}" Margin="0,8,0,0" />
+              <ItemsControl ItemsSource="{Binding Chronicle}" />
+            </StackPanel>
+          </ScrollViewer>
+        </DockPanel>
+      </Border>
+    </Grid>
+  </DockPanel>
+</UserControl>

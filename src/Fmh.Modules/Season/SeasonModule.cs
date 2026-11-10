@@ -29,6 +29,7 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
                 ChampionName = champion.Name,
                 FinalOrder = table.Select(r => r.ClubId).ToList(),
             });
+            RecordBook.ArchiveSeason(World, league, table, World.SeasonYear);
         }
         foreach (var cup in World.Cups.Where(c => c.Kind == CompetitionKind.Cup && c.WinnerId is not null))
         {

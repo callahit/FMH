@@ -199,6 +199,17 @@
                 </DataTemplate>
               </ItemsControl.ItemTemplate>
             </ItemsControl>
+            <TextBlock Classes="h3" Text="{s:L player.career}" Margin="0,8,0,0" />
+            <ItemsControl ItemsSource="{Binding CareerLines}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:InfoLine">
+                  <Grid ColumnDefinitions="96,*" Margin="0,1">
+                    <TextBlock Text="{Binding Label}" Classes="muted" />
+                    <TextBlock Grid.Column="1" Text="{Binding Value}" TextWrapping="Wrap" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
           </StackPanel>
         </Border>
       </Grid>
