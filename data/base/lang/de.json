@@ -3112,5 +3112,16 @@
  "friendly.none": "Keine Testspiele vereinbart.",
  "friendly.info": "Testspiele zählen nicht in die Statistik, bringen aber Spielpraxis, Kondition und Taktikvertrautheit. Im Trainingslager wirken sie stärker.",
  "friendly.cancelled.subject": "Testspiel gegen {0} abgesagt",
- "friendly.cancelled.body": "Am {1} ist jetzt ein Pflichtspiel angesetzt. Das Testspiel gegen {0} fällt deshalb aus."
+ "friendly.cancelled.body": "Am {1} ist jetzt ein Pflichtspiel angesetzt. Das Testspiel gegen {0} fällt deshalb aus.",
+ "tx.summerPrize": "{0}: Platz {1}",
+ "summer.error.closed": "Für dieses Turnier ist keine Anmeldung mehr möglich.",
+ "summer.error.noTeams": "Es finden sich keine passenden Gegner für das Turnier.",
+ "summer.result.subject": "{0}: Platz {1}",
+ "summer.result.body": "Sieger des {0} ist {1}. Dein Verein belegt Platz {2} und erhält {3}.",
+ "summer.title": "Sommerturniere",
+ "summer.enter": "Anmelden",
+ "summer.entered": "Angemeldet: {0}",
+ "summer.place": "Platz {0}",
+ "summer.running": "läuft",
+ "summer.none": "Keine Turniere offen."
 }
