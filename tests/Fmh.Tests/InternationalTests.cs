@@ -136,6 +136,26 @@ public sealed class InternationalTests
     }
 
     [Fact]
+    public void DualNationalsJoinOnlyOneSquadAndSkipClubTraining()
+    {
+        var s = AllCountries(817);
+        var w = s.World;
+        var window = w.InternationalWindows[0];
+        // Der beste Spieler aus Deutschland bekommt zusätzlich die englische Staatsangehörigkeit.
+        var star = w.Players.Values.Where(p => NationalSquads.Eligible(p, "DE", w, s.Data)).OrderByDescending(p => NationalSquads.Score(p, s.Data)).First();
+        star.Nationalities.Add("ENG");
+        AdvanceTo(s, window.Start.AddDays(1));
+        Assert.Equal(1, w.NationalTeams.Count(t => t.Squad.Contains(star.Id)));
+
+        // Nominierte trainieren nicht im Verein: ihr Trainingsfortschritt bleibt im Fenster stehen.
+        var called = w.NationalTeams.SelectMany(t => t.Squad).Select(id => w.Players[id]).ToList();
+        static double Progress(Player p) => p.Training.Physical + p.Training.Technical + p.Training.Mental + p.Training.Goalkeeping;
+        var before = called.ToDictionary(p => p.Id, Progress);
+        AdvanceTo(s, window.Start.AddDays(2));
+        Assert.All(called, p => Assert.Equal(before[p.Id], Progress(p)));
+    }
+
+    [Fact]
     public void InternationalsSurviveSavingAndOldSavesLoad()
     {
         var s = TestData.NewSession(814);

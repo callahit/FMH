@@ -32,7 +32,13 @@ public sealed partial class InternationalsModule : GameModule
     {
         NationalSquads.Ensure(World, Data);
         var real = World.NationalTeams.Where(t => !t.Background).ToList();
-        foreach (var team in real) team.Squad = NationalSquads.Nominate(World, Data, team);
+        // Doppelte Staatsbürger: Wer schon nominiert ist (Teams in fester Reihenfolge), fehlt in den übrigen Kadern.
+        var taken = new HashSet<int>();
+        foreach (var team in real)
+        {
+            team.Squad = NationalSquads.Nominate(World, Data, team, taken);
+            taken.UnionWith(team.Squad);
+        }
         ScheduleFixtures(w, real.Where(t => t.Squad.Count >= 16).ToList());
         NotifyCallups();
     }

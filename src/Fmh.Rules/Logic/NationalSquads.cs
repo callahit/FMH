@@ -40,10 +40,11 @@ public static class NationalSquads
     /// Kader nominieren: je Position die Besten nach der Kaderschablone, übrige Plätze nach Stärke. Gleiche Stärke
     /// entscheidet die Spieler-Id, damit die Auswahl reproduzierbar bleibt.
     /// </summary>
-    public static List<int> Nominate(World world, GameData data, NationalTeam team)
+    public static List<int> Nominate(World world, GameData data, NationalTeam team, IReadOnlySet<int>? taken = null)
     {
         var size = data.Internationals.SquadSize;
-        var pool = world.Players.Values.Where(p => Eligible(p, team.Code, world, data))
+        // Doppelte Staatsbürger: Wer schon für ein anderes Land nominiert ist, steht nicht zur Verfügung.
+        var pool = world.Players.Values.Where(p => taken?.Contains(p.Id) != true && Eligible(p, team.Code, world, data))
             .Select(p => (p, score: Score(p, data))).OrderByDescending(x => x.score).ThenBy(x => x.p.Id).ToList();
         var chosen = new List<int>();
         foreach (var (pos, count) in PlayerGenerator.Template(size))
