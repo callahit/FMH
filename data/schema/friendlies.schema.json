@@ -1,0 +1,77 @@
+{
+  "$id": "https://fmh.local/schema/friendlies.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Testspiele (Datei rules/friendlies.json, AP 9): Vereinbarung, Einnahmen und Wirkung.",
+  "properties": {
+    "acceptReputationGap": {
+      "description": "Ein deutlich bekannterer Gegner (Ruf mehr als so viele Punkte höher) kommt nicht ins eigene Stadion; auswärts sagt er bis zum doppelten Abstand zu.",
+      "maximum": 20,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "attendanceFactor": {
+      "description": "Anteil der üblichen Zuschauerzahl bei einem Testspiel.",
+      "maximum": 1,
+      "minimum": 0,
+      "type": "number"
+    },
+    "campBonus": {
+      "description": "Verstärkung von Vertrautheit und Physis bei Testspielen im Trainingslager.",
+      "maximum": 3,
+      "minimum": 1,
+      "type": "number"
+    },
+    "familiarityGain": {
+      "description": "Taktikvertrautheit je Testspiel (Pflichtspiele: 2,5).",
+      "maximum": 20,
+      "minimum": 0,
+      "type": "number"
+    },
+    "homeShares": {
+      "description": "Auswahl für den Anteil des Gastgebers an den Zuschauereinnahmen (Prozent).",
+      "items": {
+        "type": "integer"
+      },
+      "type": "array"
+    },
+    "matchPracticeGain": {
+      "description": "Spielpraxis je 90 Minuten (Pflichtspiele: 22).",
+      "maximum": 50,
+      "minimum": 0,
+      "type": "number"
+    },
+    "maxDaysAhead": {
+      "description": "Wie weit im Voraus ein Testspiel vereinbart werden kann (Tage).",
+      "maximum": 365,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "maxOpen": {
+      "description": "Höchstzahl offener (noch nicht gespielter) Testspiele des eigenen Vereins.",
+      "maximum": 20,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "minRestDays": {
+      "description": "Mindestabstand in Tagen zu jedem anderen Spiel beider Vereine.",
+      "maximum": 7,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "physicalGain": {
+      "description": "Fortschritt im Konditionstraining je 90 Minuten (Trainingspunkte Physis).",
+      "maximum": 5,
+      "minimum": 0,
+      "type": "number"
+    },
+    "substitutions": {
+      "description": "Wechsel je Testspiel.",
+      "maximum": 11,
+      "minimum": 3,
+      "type": "integer"
+    }
+  },
+  "title": "FMH rules/friendlies.json",
+  "type": "object"
+}

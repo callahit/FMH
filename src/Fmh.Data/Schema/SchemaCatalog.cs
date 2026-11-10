@@ -62,6 +62,7 @@ public static class SchemaCatalog
         new("relations", typeof(RelationsConfig), "rules/relations.json"),
         new("agents", typeof(AgentRules), "rules/agents.json"),
         new("internationals", typeof(InternationalRules), "rules/internationals.json"),
+        new("friendlies", typeof(FriendlyRules), "rules/friendlies.json"),
         new("europe", typeof(EuropeFormat), "competitions/europe.json"),
         new("lang", typeof(Dictionary<string, string>), "lang/*.json"),
         new("commentary", typeof(Dictionary<string, List<string>>), "lang/*.commentary.json"),

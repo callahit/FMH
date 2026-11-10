@@ -156,6 +156,7 @@ internal static class WorldFingerprint
             ["environment"] = J(new { w.Staff, w.Events, w.EventHistory, w.PendingPress, w.EuropeanEntries, w.CountryCoefficients, w.ClubCoefficients }),
             ["relations"] = J(new { w.PlayerRelations, w.Promises, w.ClubRelations, w.Agents, w.PlayerAgents }),
             ["internationals"] = J(new { w.NationalTeams, w.InternationalFixtures, w.InternationalWindows, Caps = w.Caps.OrderBy(kv => kv.Key), w.Tournaments }),
+            ["friendlies"] = J(w.Friendlies),
             ["history"] = J(w.History),
             // Länder- und Weltregeln im Spielstand: auch Datenänderungen ohne Wirkung im Testlauf schlagen an.
             ["config"] = J(new { w.Seed, w.Packages, w.Countries, w.Rules, w.MarketLevels, w.MarketBases, w.Referees }),
