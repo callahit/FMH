@@ -12,8 +12,11 @@ public sealed class InternationalsSection : SaveSection
     /// <summary>
     /// Version 6: neuer Abschnitt. Ältere Spielstände legen die Tabellen per Migration an; ohne Fenster ruht der
     /// Vereinsbetrieb erst ab der nächsten Saison (die laufenden Termine bleiben unverändert).
+    /// Version 7: Turniere (AP 8b); ältere Spielstände bekommen eine leere Tabelle, das nächste Turnier wird neu angelegt.
     /// </summary>
-    public override int Version => 6;
+    public override int Version => 7;
+
+    private const string TournamentTable = "CREATE TABLE international_tournaments (id TEXT PRIMARY KEY, data TEXT NOT NULL);";
 
     private const string Tables = """
         CREATE TABLE national_teams (code TEXT PRIMARY KEY, data TEXT NOT NULL);
@@ -22,12 +25,13 @@ public sealed class InternationalsSection : SaveSection
         CREATE TABLE international_caps (player_id INTEGER PRIMARY KEY, caps INTEGER NOT NULL, goals INTEGER NOT NULL, nation TEXT NOT NULL);
         """;
 
-    protected override string Schema => Tables;
+    protected override string Schema => Tables + TournamentTable;
 
     public override void Migrate(SqliteConnection c, SqliteTransaction tx, int fromVersion)
     {
         if (fromVersion < BaseVersion || fromVersion > Version) base.Migrate(c, tx, fromVersion);
         if (fromVersion <= 5) Exec(c, tx, Tables);
+        if (fromVersion <= 6) Exec(c, tx, TournamentTable);
     }
 
     public override void Save(SqliteConnection con, SqliteTransaction tx, World w)
@@ -44,6 +48,9 @@ public sealed class InternationalsSection : SaveSection
         using (var cmd = Insert(con, tx, "international_caps", 4))
             foreach (var (player, c) in w.Caps.OrderBy(kv => kv.Key))
                 Run(cmd, player, c.Caps, c.Goals, c.Nation);
+        using (var cmd = Insert(con, tx, "international_tournaments", 2))
+            foreach (var t in w.Tournaments)
+                Run(cmd, t.Id, J(t));
     }
 
     public override void Load(SqliteConnection con, World w)
@@ -57,5 +64,10 @@ public sealed class InternationalsSection : SaveSection
         w.InternationalWindows.Sort((a, b) => a.Start.CompareTo(b.Start));
         foreach (var r in Rows(con, "SELECT player_id, caps, goals, nation FROM international_caps ORDER BY player_id"))
             w.Caps[r.GetInt32(0)] = new InternationalCareer { Caps = r.GetInt32(1), Goals = r.GetInt32(2), Nation = r.GetString(3) };
+        foreach (var r in Rows(con, "SELECT data FROM international_tournaments ORDER BY rowid"))
+            w.Tournaments.Add(PJ<InternationalTournament>(r.GetString(0))!);
+        // Abstellungen werden nicht beim Spieler gespeichert, sondern aus den Kadern abgeleitet.
+        foreach (var id in w.NationalTeams.SelectMany(t => t.Squad))
+            if (w.Players.TryGetValue(id, out var p)) p.State.OnNationalDuty = true;
     }
 }

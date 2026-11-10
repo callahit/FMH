@@ -20,5 +20,9 @@
     { "code": "HEL", "name": "Helvetanien", "strength": 13 },
     { "code": "ADR", "name": "Adriana", "strength": 14 },
     { "code": "SKA", "name": "Skandara", "strength": 12 }
+  ],
+  "tournaments": [
+    { "id": "EM", "name": "Europameisterschaft", "every": 4, "firstYear": 2028, "start": "06-14", "teams": 8, "groupSize": 4, "advance": 2, "daysBetween": 4, "qualificationGroupSize": 4 },
+    { "id": "WM", "name": "Weltmeisterschaft", "every": 4, "firstYear": 2030, "start": "06-14", "teams": 8, "groupSize": 4, "advance": 2, "daysBetween": 4, "qualificationGroupSize": 4 }
   ]
 }

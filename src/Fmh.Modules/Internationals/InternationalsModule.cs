@@ -19,29 +19,36 @@ public sealed partial class InternationalsModule : GameModule
 
     public override void OnDay(DayContext day)
     {
-        foreach (var w in World.InternationalWindows)
-        {
-            if (World.Date == w.Start) OpenWindow(w);
-            if (w.MatchDates.Contains(World.Date)) PlayDay(w);
-            if (World.Date == w.End) CloseWindow(w);
-        }
+        foreach (var w in World.InternationalWindows.Where(w => World.Date == w.Start)) OpenWindow(w);
+        EnsureTournaments();
+        PlayToday();
+        TournamentDay();
+        foreach (var w in World.InternationalWindows.Where(w => World.Date == w.End)) CloseWindow(w);
     }
 
-    /// <summary>Fenster beginnt: Teams anlegen, Spiele ansetzen, Kader nominieren, eigenen Verein informieren.</summary>
+    /// <summary>
+    /// Fenster beginnt: Teams anlegen, Kader nominieren, eigenen Verein informieren. Freundschaftsspiele nur in Saisons
+    /// ohne Qualifikation; sonst bestreiten die Teams ihre Qualifikationsspiele.
+    /// </summary>
     public void OpenWindow(InternationalWindowDates w)
     {
         NationalSquads.Ensure(World, Data);
+        EnsureTournaments();
         var real = World.NationalTeams.Where(t => !t.Background).ToList();
         // Doppelte Staatsbürger: Wer schon nominiert ist (Teams in fester Reihenfolge), fehlt in den übrigen Kadern.
         var taken = new HashSet<int>();
         foreach (var team in real)
         {
-            team.Squad = NationalSquads.Nominate(World, Data, team, taken);
+            NationalSquads.Call(World, team, NationalSquads.Nominate(World, Data, team, taken));
             taken.UnionWith(team.Squad);
         }
-        ScheduleFixtures(w, real.Where(t => t.Squad.Count >= 16).ToList());
-        NotifyCallups();
+        if (!World.InternationalFixtures.Any(f => f.TournamentId is not null && w.Contains(f.Date)))
+            ScheduleFixtures(w, real.Where(t => t.Squad.Count >= MinSquad).ToList());
+        NotifyCallups(TR("intl.callup.body", CallupLines(), TextArg.OfDate(w.End.AddDays(1))));
     }
+
+    /// <summary>Mindestzahl gesunder Nationalspieler, damit ein Land antritt.</summary>
+    private const int MinSquad = 16;
 
     /// <summary>
     /// Spiele je Spieltag des Fensters: Länder mit Spielern treten gegeneinander an, bei ungerader Zahl gegen ein
@@ -73,28 +80,25 @@ public sealed partial class InternationalsModule : GameModule
         }
     }
 
-    private void NotifyCallups()
-    {
-        if (Board.AwaitingNewJob) return;
-        var own = World.NationalTeams.Where(t => !t.Background)
+    private string CallupLines() => string.Join(", ", OwnCallups().Select(x => $"{x.player.Name} ({x.team.Name})"));
+
+    private List<(NationalTeam team, Player player)> OwnCallups() => Board.AwaitingNewJob
+        ? new()
+        : World.NationalTeams.Where(t => !t.Background)
             .SelectMany(t => t.Squad.Select(id => (team: t, player: World.Players[id])))
             .Where(x => x.player.ClubId == HumanClub.Id).ToList();
+
+    private void NotifyCallups(TextRef body)
+    {
+        var own = OwnCallups();
         if (own.Count == 0) return;
-        var lines = string.Join(", ", own.Select(x => $"{x.player.Name} ({x.team.Name})"));
-        Notify(MessageType.Info, "msg.sender.association", TR("intl.callup.subject", own.Count),
-            TR("intl.callup.body", lines, TextArg.OfDate(World.InternationalWindows.First(w => w.Start == World.Date).End.AddDays(1))));
+        Notify(MessageType.Info, "msg.sender.association", TR("intl.callup.subject", own.Count), body);
     }
 
     /// <summary>Fenster endet: Spieler kehren zurück, die Reise kostet Kondition.</summary>
     public void CloseWindow(InternationalWindowDates w)
     {
-        foreach (var team in World.NationalTeams.Where(t => !t.Background))
-        {
-            foreach (var id in team.Squad)
-                if (World.Players.TryGetValue(id, out var p))
-                    p.State.Condition = Math.Max(0, Math.Round(p.State.Condition - Data.Internationals.TravelFatigue, 1));
-            team.Squad.Clear();
-        }
+        foreach (var team in World.NationalTeams.Where(t => !t.Background)) NationalSquads.Release(World, Data, team);
     }
 
     /// <summary>Ist der Spieler gerade beim Nationalteam?</summary>

@@ -29,6 +29,12 @@ public sealed class InternationalFixture
     public string HomeCode { get; set; } = "";
     public string AwayCode { get; set; } = "";
     public MatchResult? Result { get; set; }
+    /// <summary>Turnier-Id (z. B. EM-2028); leer bei Freundschaftsspielen.</summary>
+    public string? TournamentId { get; set; }
+    /// <summary>Runde: Q-A (Qualifikation Gruppe A), G-A (Endrunde Gruppe A), KO4 (Halbfinale), KO2 (Finale) usw.</summary>
+    public string Stage { get; set; } = "";
+    /// <summary>Sieger eines K.-o.-Spiels (nach Verlängerung oder Elfmeterschießen).</summary>
+    public string? WinnerCode { get; set; }
 
     public bool Involves(string code) => HomeCode == code || AwayCode == code;
 }
@@ -53,4 +59,28 @@ public sealed class InternationalCareer
     public int Goals { get; set; }
     /// <summary>Land, für das der Spieler spielt (ab dem ersten Einsatz festgelegt).</summary>
     public string Nation { get; set; } = "";
+}
+
+public enum TournamentPhase { Qualification, Finals, Done }
+
+/// <summary>Turnier (AP 8b): Qualifikation, Endrunde und Sieger.</summary>
+public sealed class InternationalTournament
+{
+    /// <summary>Regel-Id und Jahr, z. B. EM-2028.</summary>
+    public string Id { get; set; } = "";
+    public string RuleId { get; set; } = "";
+    public string Name { get; set; } = "";
+    public int Year { get; set; }
+    public TournamentPhase Phase { get; set; }
+    public DateOnly FinalsStart { get; set; }
+    public List<TournamentGroup> QualificationGroups { get; set; } = new();
+    public List<string> Qualified { get; set; } = new();
+    public List<TournamentGroup> Groups { get; set; } = new();
+    public string Champion { get; set; } = "";
+}
+
+public sealed class TournamentGroup
+{
+    public string Name { get; set; } = "";
+    public List<string> Codes { get; set; } = new();
 }
