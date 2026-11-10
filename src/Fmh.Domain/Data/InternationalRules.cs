@@ -26,6 +26,41 @@ public sealed class InternationalRules
     public int Substitutions { get; set; } = 5;
     /// <summary>Fiktive Länder ohne spielbare Ligen; sie stellen Gegner mit erzeugten Kadern.</summary>
     public List<BackgroundNation> BackgroundNations { get; set; } = new();
+    /// <summary>Turniere (EM, WM) mit Qualifikation in den Fenstern der Saison davor (AP 8b).</summary>
+    public List<TournamentRule> Tournaments { get; set; } = new();
+}
+
+/// <summary>
+/// Turnier einer Nationalmannschafts-Endrunde: Qualifikation in den Länderspielfenstern der Saison vor dem Turnierjahr
+/// (Gruppen mit Hin- und Rückspiel), Endrunde im Sommer mit Gruppen und K.-o.-Runden auf neutralem Platz.
+/// </summary>
+public sealed class TournamentRule
+{
+    public string Id { get; set; } = "";
+    public string Name { get; set; } = "";
+    /// <summary>Abstand in Jahren zwischen zwei Turnieren.</summary>
+    [Range(1, 8)]
+    public int Every { get; set; } = 4;
+    /// <summary>Jahr der ersten Endrunde; weitere folgen im Abstand <see cref="Every"/>.</summary>
+    [Range(2000, 2200)]
+    public int FirstYear { get; set; } = 2028;
+    /// <summary>Erster Spieltag der Endrunde (MM-TT, im Turnierjahr).</summary>
+    public string Start { get; set; } = "06-14";
+    /// <summary>Teilnehmer der Endrunde; bei weniger Ländern spielen alle.</summary>
+    [Range(2, 64)]
+    public int Teams { get; set; } = 8;
+    /// <summary>Teams je Endrundengruppe (einfache Runde).</summary>
+    [Range(2, 8)]
+    public int GroupSize { get; set; } = 4;
+    /// <summary>Weiterkommende je Gruppe; Gruppen mal Weiterkommende muss eine Zweierpotenz sein.</summary>
+    [Range(1, 4)]
+    public int Advance { get; set; } = 2;
+    /// <summary>Tage zwischen zwei Spieltagen der Endrunde.</summary>
+    [Range(1, 10)]
+    public int DaysBetween { get; set; } = 4;
+    /// <summary>Teams je Qualifikationsgruppe (Hin- und Rückspiel in den Fenstern).</summary>
+    [Range(2, 8)]
+    public int QualificationGroupSize { get; set; } = 4;
 }
 
 /// <summary>Ein Länderspielfenster: beginnt am ersten Montag ab <see cref="Start"/> und dauert <see cref="Days"/> Tage.</summary>
