@@ -15,12 +15,12 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
 
     /// <summary>Heutiges, noch nicht gespieltes Spiel des menschlichen Vereins.</summary>
     public Fixture? PendingHumanFixture =>
-        Board.AwaitingNewJob ? null : AllFixtures.FirstOrDefault(f => f.Date == World.Date && f.Result is null && f.Involves(HumanClub.Id));
+        Board.AwaitingNewJob ? null : World.AllMatches.FirstOrDefault(f => f.Date == World.Date && f.Result is null && f.Involves(HumanClub.Id));
 
     /// <summary>Simuliert alle anderen Spiele des heutigen Tages (z. B. für die Ergebnisse im Nachbericht).</summary>
     public void PlayOtherFixturesToday()
     {
-        foreach (var f in AllFixtures.Where(f => f.Date == World.Date && f.Result is null && !HumanPlays(f)).ToList())
+        foreach (var f in World.AllMatches.Where(f => f.Date == World.Date && f.Result is null && !HumanPlays(f)).ToList())
             PlayInstant(f);
     }
 
@@ -44,6 +44,7 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
         var cup = f.Kind == CompetitionKind.League ? null : World.FindCup(f.CompetitionId);
         var isFinal = cup is not null && f.Matchday == cup.Rounds.Count
                       && cup.Kind is CompetitionKind.Cup or CompetitionKind.Europe;
+        var friendly = f.Kind == CompetitionKind.Friendly ? World.Friendlies.FirstOrDefault(x => x.Fixture.Id == f.Id) : null;
         var setup = new MatchSetup
         {
             Home = TeamSetupFor(home, humanControlled && home.Id == HumanClub.Id),
@@ -56,9 +57,9 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
             RefereeStrictness = referee?.Strictness ?? 10,
             Weather = WeatherFor(f),
             InjuryFrequency = World.Rules.InjuryFrequency,
-            Substitutions = country.Squad.Substitutions,
+            Substitutions = friendly is null ? country.Squad.Substitutions : Data.Friendlies.Substitutions,
             Knockout = cup is null ? null : CupLogic.KnockoutFor(cup, f),
-            NeutralGround = isFinal && cup!.Config.NeutralFinal,
+            NeutralGround = isFinal && cup!.Config.NeutralFinal || friendly is { Camp: true },
             UseSceneText = sceneText,
             RefereeName = referee?.Name,
             Floodlit = f.Date.Month is 11 or 12 or 1 or 2,
@@ -145,8 +146,24 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
     public void FinishMatch(Fixture f, IMatchSimulation sim)
     {
         if (!sim.IsFinished) throw new InvalidOperationException("Spiel ist noch nicht beendet.");
+        var result = BuildResult(sim);
+        if (f.Kind == CompetitionKind.Friendly)
+        {
+            FinishFriendly(f, sim, result);
+            return;
+        }
         var home = World.Clubs[f.HomeId];
         var away = World.Clubs[f.AwayId];
+        var (standing, seating, boxes) = Finance.Attendance(home, away, f, result.Weather);
+        result.Attendance = standing + seating;
+        f.Result = result;
+        Finance.MatchdayFinances(f, result, standing, seating, boxes);
+        FinishCompetitive(f, sim, result, home, away);
+    }
+
+    /// <summary>Ergebnis, Halbzeitstand, Tore und Karten aus der Simulation.</summary>
+    private static MatchResult BuildResult(IMatchSimulation sim)
+    {
         var result = new MatchResult
         {
             HomeGoals = sim.Home.Goals,
@@ -176,11 +193,12 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
                 result.Cards.Add(new CardRecord { Minute = e.Minute + e.Stoppage, Home = e.Side == Side.Home, PlayerId = carded, Red = e.Type != MatchEventType.YellowCard });
         }
 
-        var (standing, seating, boxes) = Finance.Attendance(home, away, f, result.Weather);
-        result.Attendance = standing + seating;
-        f.Result = result;
-        Finance.MatchdayFinances(f, result, standing, seating, boxes);
+        return result;
+    }
 
+    /// <summary>Pflichtspiel: Stimmung, Sperren, Statistiken, Spielerzustände und Vertrautheit.</summary>
+    private void FinishCompetitive(Fixture f, IMatchSimulation sim, MatchResult result, Club home, Club away)
+    {
         // Stimmungszeile aus dem vor dem Spiel geltenden Squad Mood; danach Zufriedenheit fortschreiben.
         foreach (var club in new[] { home, away })
         {

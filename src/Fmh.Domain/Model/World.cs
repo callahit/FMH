@@ -120,6 +120,12 @@ public sealed class World
 
     public IEnumerable<Fixture> AllFixtures => Leagues.SelectMany(l => l.Fixtures).Concat(Cups.SelectMany(c => c.Fixtures));
 
+    /// <summary>Pflichtspiele und Testspiele (AP 9): alles, was an einem Tag gespielt wird.</summary>
+    public IEnumerable<Fixture> AllMatches => AllFixtures.Concat(Friendlies.Select(f => f.Fixture));
+
+    /// <summary>Vereinbarte Testspiele; zählen nicht in Wettbewerbsstatistiken.</summary>
+    public List<Friendly> Friendlies { get; set; } = new();
+
     public League League(string id) => Leagues.First(l => l.Id == id);
 
     public IEnumerable<Player> SquadOf(Club club) => club.PlayerIds.Select(id => Players[id]);

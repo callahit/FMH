@@ -31,13 +31,54 @@
     <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,12">
       <TextBlock Classes="h1" Text="{Binding Title}" />
       <TextBlock Grid.Column="1" Classes="muted" Text="{Binding Season}" VerticalAlignment="Bottom" Margin="16,0" />
-      <ToggleButton Grid.Column="2" IsChecked="{Binding LeagueView}" Content="{s:L fixtures.leagueView}" />
+      <StackPanel Grid.Column="2" Orientation="Horizontal" Spacing="6">
+        <ToggleButton IsChecked="{Binding FriendlyView}" Content="{s:L friendly.title}" />
+        <ToggleButton IsChecked="{Binding LeagueView}" Content="{s:L fixtures.leagueView}" />
+      </StackPanel>
     </Grid>
     <Border Classes="card" Padding="12">
       <Panel>
         <ScrollViewer IsVisible="{Binding !LeagueView}">
-          <ItemsControl ItemsSource="{Binding Own}" />
+          <ItemsControl ItemsSource="{Binding Own}" IsVisible="{Binding !FriendlyView}" />
         </ScrollViewer>
+        <!-- Testspiele (AP 9) -->
+        <DockPanel IsVisible="{Binding FriendlyView}">
+          <StackPanel DockPanel.Dock="Top" Spacing="8" Margin="0,0,0,12">
+            <TextBlock Classes="h2" Text="{s:L friendly.title}" />
+            <TextBlock Classes="muted small" Text="{s:L friendly.info}" TextWrapping="Wrap" />
+            <Grid ColumnDefinitions="Auto,*,Auto,220" RowDefinitions="Auto,Auto" RowSpacing="8" ColumnSpacing="8">
+              <TextBlock Text="{s:L friendly.opponent}" VerticalAlignment="Center" />
+              <ComboBox Grid.Column="1" ItemsSource="{Binding Opponents}" SelectedItem="{Binding Opponent}" HorizontalAlignment="Stretch" />
+              <TextBlock Grid.Column="2" Text="{s:L friendly.date}" VerticalAlignment="Center" />
+              <ComboBox Grid.Column="3" ItemsSource="{Binding FriendlyDates}" SelectedItem="{Binding FriendlyDate}" HorizontalAlignment="Stretch" />
+              <CheckBox Grid.Row="1" Grid.Column="1" IsChecked="{Binding FriendlyHome}" Content="{s:L friendly.home}" />
+              <TextBlock Grid.Row="1" Grid.Column="2" Text="{s:L friendly.share}" VerticalAlignment="Center" />
+              <StackPanel Grid.Row="1" Grid.Column="3" Orientation="Horizontal" Spacing="8">
+                <ComboBox ItemsSource="{Binding Shares}" SelectedItem="{Binding Share}" MinWidth="80" />
+                <Button Content="{s:L friendly.arrange}" Command="{Binding ArrangeFriendlyCommand}" />
+              </StackPanel>
+            </Grid>
+            <TextBlock Text="{Binding FriendlyMessage}" TextWrapping="Wrap" />
+            <TextBlock Classes="h2" Text="{s:L friendly.list}" Margin="0,8,0,0" />
+            <TextBlock Classes="muted" Text="{s:L friendly.none}" IsVisible="{Binding NoFriendlies}" />
+          </StackPanel>
+          <ScrollViewer>
+            <ItemsControl ItemsSource="{Binding Friendlies}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:FriendlyRowVm">
+                  <Border Classes="inset" Margin="0,3" Padding="12,6">
+                    <Grid ColumnDefinitions="110,*,220,Auto">
+                      <TextBlock Text="{Binding Date}" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="1" Text="{Binding Match}" VerticalAlignment="Center" />
+                      <TextBlock Grid.Column="2" Text="{Binding Detail}" Classes="muted small" VerticalAlignment="Center" />
+                      <Button Grid.Column="3" Content="{s:L friendly.cancel}" Command="{Binding Cancel}" />
+                    </Grid>
+                  </Border>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </DockPanel>
         <DockPanel IsVisible="{Binding LeagueView}">
           <Grid DockPanel.Dock="Top" ColumnDefinitions="Auto,*,Auto" Margin="0,0,0,10">
             <Button Content="◄" Command="{Binding PreviousDayCommand}" />
