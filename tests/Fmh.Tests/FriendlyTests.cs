@@ -107,6 +107,22 @@ public sealed class FriendlyTests
     }
 
     [Fact]
+    public void LaterCompetitiveFixtureCancelsTheFriendly()
+    {
+        var s = TestData.NewSession(905);
+        var w = s.World;
+        var opp = Opponent(s);
+        var date = s.FriendlyDates(opp).First(d => d > w.Date.AddDays(3));
+        Assert.Null(s.ArrangeFriendly(opp, date, true, 100));
+        // Pflichtspiel des Gegners wird nachträglich auf denselben Tag gelegt (wie bei einer Pokalauslosung)
+        var cupLike = w.AllFixtures.First(f => f.Involves(opp.Id) && f.Date > date);
+        cupLike.Date = date;
+        AdvanceTo(s, w.Date.AddDays(1));
+        Assert.Empty(s.OwnFriendlies);
+        Assert.Contains(s.Inbox, m => m.SubjectRef?.Key == "friendly.cancelled.subject");
+    }
+
+    [Fact]
     public void FriendliesSurviveSavingAndOldSavesLoad()
     {
         var s = TestData.NewSession(904);

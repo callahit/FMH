@@ -3110,5 +3110,7 @@
  "friendly.cancel": "Cancel",
  "friendly.list": "Arranged friendlies",
  "friendly.none": "No friendlies arranged.",
- "friendly.info": "Friendlies do not count in the statistics but bring match practice, fitness and tactical familiarity. At a training camp they have a stronger effect."
+ "friendly.info": "Friendlies do not count in the statistics but bring match practice, fitness and tactical familiarity. At a training camp they have a stronger effect.",
+ "friendly.cancelled.subject": "Friendly against {0} cancelled",
+ "friendly.cancelled.body": "A competitive match is now scheduled around {1}, so the friendly against {0} is called off."
 }
