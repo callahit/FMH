@@ -352,6 +352,9 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
   - **Vereinsbetrieb ruht:** In den Fenstern finden keine Vereinsspiele statt.
     - Ligaspieltage überspringen die Fenster, nötige Englische Wochen weichen ebenfalls aus.
     - Pokaltermine rücken um ganze Wochen nach hinten.
+    - Deutschland hat deshalb einen spätesten Spieltag (16. Mai, Englische Wochen am Dienstag); so endet auch die
+      3. Liga mit 38 Spieltagen im Mai. Endet ein Wettbewerb doch erst nach dem 1. Juli, beginnt die neue Saison
+      am Folgetag.
   - **Nationalteams:** Jedes Land mit Vereinen in der Welt hat ein Nationalteam. Fiktive Hintergrundländer mit fester
     Spielstärke stellen weitere Gegner; ihre Kader werden je Spiel erzeugt und gehören nicht zur Welt.
   - **Nominierung durch die KI:** 23 Spieler nach Stärke und Form, je Position nach der Kaderschablone. Verletzte und
