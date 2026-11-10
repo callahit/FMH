@@ -38,19 +38,14 @@ public static class RecordBook
     {
         var score = Score(kind, f.HomeId, r.HomeGoals, r.AwayGoals, r.Attendance, clubId);
         if (score is null) return;
-        var index = world.Records.FindIndex(x => x.Scope == scope && x.Kind == kind);
-        if (index >= 0)
-        {
-            var old = world.Records[index];
-            if (Compare(score.Value, Score(kind, old.HomeId, old.HomeGoals, old.AwayGoals, old.Attendance, clubId)) <= 0) return;
-        }
-        var record = new MatchRecord
+        var key = MatchRecord.Key(scope, kind);
+        if (world.Records.TryGetValue(key, out var old)
+            && Compare(score.Value, Score(kind, old.HomeId, old.HomeGoals, old.AwayGoals, old.Attendance, clubId)) <= 0) return;
+        world.Records[key] = new MatchRecord
         {
             Scope = scope, Kind = kind, SeasonYear = seasonYear, Date = f.Date, CompetitionId = f.CompetitionId,
             HomeId = f.HomeId, AwayId = f.AwayId, HomeGoals = r.HomeGoals, AwayGoals = r.AwayGoals, Attendance = r.Attendance,
         };
-        if (index >= 0) world.Records[index] = record;
-        else world.Records.Add(record);
     }
 
     /// <summary>Wertung eines Spiels für eine Rekordart; null, wenn das Spiel nicht in Frage kommt.</summary>
@@ -72,7 +67,7 @@ public static class RecordBook
         b is not { } o ? 1 : a.Main != o.Main ? a.Main.CompareTo(o.Main) : a.Tie.CompareTo(o.Tie);
 
     public static MatchRecord? Find(World world, string scope, string kind) =>
-        world.Records.FirstOrDefault(r => r.Scope == scope && r.Kind == kind);
+        world.Records.GetValueOrDefault(MatchRecord.Key(scope, kind));
 
     /// <summary>Abschlussbilanzen aller Vereine einer Liga zum Saisonende ablegen.</summary>
     public static void ArchiveSeason(World world, League league, IReadOnlyList<TableRow> table, int seasonYear)

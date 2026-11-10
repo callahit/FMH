@@ -130,8 +130,8 @@ public sealed class World
 
     /// <summary>Abschlussbilanzen aller Vereine je Ligasaison (AP 11b).</summary>
     public List<ClubSeason> ClubSeasons { get; set; } = new();
-    /// <summary>Spielrekorde je Verein und Wettbewerb (AP 11b).</summary>
-    public List<MatchRecord> Records { get; set; } = new();
+    /// <summary>Spielrekorde je Verein und Wettbewerb (AP 11b), Schlüssel <see cref="MatchRecord.Key"/>.</summary>
+    public Dictionary<string, MatchRecord> Records { get; set; } = new();
 
     public League League(string id) => Leagues.First(l => l.Id == id);
 
