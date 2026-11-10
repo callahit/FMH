@@ -3041,5 +3041,9 @@
  "tier.Follower": "Mitläufer",
  "relations.council": "Mannschaftsrat",
  "relations.trust": "Vertrauen im Kader",
- "relations.tier": "Hierarchie"
+ "relations.tier": "Hierarchie",
+ "player.agent": "Berater",
+ "player.agentValue": "{0} (Ruf {1}, Gier {2}, Einfluss {3})",
+ "agent.unsettle.subject": "Berater bringt Wechsel ins Gespräch: {0}",
+ "agent.unsettle.body": "{0}, Berater von {1}, lässt durchblicken, dass {1} bei {2} unter Wert spielt. Seither wirkt der Spieler unruhiger."
 }

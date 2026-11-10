@@ -1,0 +1,69 @@
+{
+  "$id": "https://fmh.local/schema/agents.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Regeln der Spielerberater (Datei rules/agents.json, AP 7).",
+  "properties": {
+    "feePerGreed": {
+      "description": "Honorar: Aufschlag je Punkt Gier über 10 (negativ darunter).",
+      "maximum": 0.2,
+      "minimum": 0,
+      "type": "number"
+    },
+    "minPerCountry": {
+      "maximum": 100,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "playersPerAgent": {
+      "description": "Profis je Berater (bestimmt die Zahl der Berater je Land, mindestens MinPerCountry).",
+      "maximum": 500,
+      "minimum": 1,
+      "type": "integer"
+    },
+    "requestPerInfluence": {
+      "description": "Wechselwunsch unzufriedener Mandanten: Aufschlag auf die Chance je Punkt Einfluss über 10.",
+      "maximum": 0.2,
+      "minimum": 0,
+      "type": "number"
+    },
+    "unsettle": {
+      "additionalProperties": false,
+      "properties": {
+        "minInfluence": {
+          "description": "Mindest-Einfluss des Beraters.",
+          "maximum": 20,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "minReputationGap": {
+          "description": "Mandant hat mindestens so viel mehr Ruf als sein Verein.",
+          "maximum": 20,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "satisfactionHit": {
+          "description": "Zufriedenheitsverlust.",
+          "maximum": 50,
+          "minimum": 0,
+          "type": "integer"
+        },
+        "weeklyChance": {
+          "description": "Wöchentliche Chance.",
+          "maximum": 1,
+          "minimum": 0,
+          "type": "number"
+        }
+      },
+      "type": "object"
+    },
+    "wagePerGreed": {
+      "description": "Gehaltsforderung: Aufschlag je Punkt Gier über 10.",
+      "maximum": 0.1,
+      "minimum": 0,
+      "type": "number"
+    }
+  },
+  "title": "FMH rules/agents.json",
+  "type": "object"
+}

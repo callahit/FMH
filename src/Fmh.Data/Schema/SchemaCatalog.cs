@@ -60,6 +60,7 @@ public static class SchemaCatalog
         new("transfers", typeof(TransferRules), "rules/transfers.json"),
         new("manager-rules", typeof(ManagerRules), "rules/managers.json"),
         new("relations", typeof(RelationsConfig), "rules/relations.json"),
+        new("agents", typeof(AgentRules), "rules/agents.json"),
         new("europe", typeof(EuropeFormat), "competitions/europe.json"),
         new("lang", typeof(Dictionary<string, string>), "lang/*.json"),
         new("commentary", typeof(Dictionary<string, List<string>>), "lang/*.commentary.json"),
