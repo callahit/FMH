@@ -3031,5 +3031,15 @@
  "managers.exit.sacked": "entlassen",
  "managers.exit.moved": "gewechselt",
  "managers.free": "Vereinslose Trainer",
- "managers.sackings": "Entlassungen"
+ "managers.sackings": "Entlassungen",
+ "council.concern.subject": "Der Mannschaftsrat möchte sprechen",
+ "council.concern.body": "Der Mannschaftsrat ({0}) meldet sich: Die Stimmung im Rat liegt bei {1} von 100. Vor allem geht es um: {2}.",
+ "sat.reason.trust.low": "Vertrauen in den Trainer fehlt (gebrochene Versprechen)",
+ "sat.reason.trust.high": "Großes Vertrauen in den Trainer",
+ "tier.Leader": "Führungsspieler",
+ "tier.Established": "Etabliert",
+ "tier.Follower": "Mitläufer",
+ "relations.council": "Mannschaftsrat",
+ "relations.trust": "Vertrauen im Kader",
+ "relations.tier": "Hierarchie"
 }

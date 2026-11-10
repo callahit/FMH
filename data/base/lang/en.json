@@ -3031,5 +3031,15 @@
  "managers.exit.sacked": "sacked",
  "managers.exit.moved": "moved on",
  "managers.free": "Managers without a club",
- "managers.sackings": "Sackings"
+ "managers.sackings": "Sackings",
+ "council.concern.subject": "The players' committee wants a word",
+ "council.concern.body": "The players' committee ({0}) has spoken up: the committee's mood is {1} out of 100. The main issue: {2}.",
+ "sat.reason.trust.low": "Lacks trust in the manager (broken promises)",
+ "sat.reason.trust.high": "Strong trust in the manager",
+ "tier.Leader": "Leader",
+ "tier.Established": "Established",
+ "tier.Follower": "Follower",
+ "relations.council": "Players' committee",
+ "relations.trust": "Squad trust",
+ "relations.tier": "Hierarchy"
 }

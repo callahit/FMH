@@ -315,6 +315,29 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
   - Liga-Seite, Ansicht „Trainer“ (Taste M): Trainer je Verein mit Amtsbeginn, Bilanz, Punkten je Spiel,
     Ruf, Spielidee und Alter; dazu die Trainerwechsel der Saison und die vereinslosen Trainer.
     Wechsel in der eigenen Liga meldet die Zeitung im Posteingang.
+- **Kabine (AP 7):**
+  - Zufriedenheit je Spieler (0–100) aus mehreren Teilen:
+    - Einsatzzeit gegenüber dem Kaderstatus, mit Schonfrist bis zum 4. Spieltag;
+    - Gehalt im Vergleich mit Spielern desselben Status;
+    - Tabellenplatz gegenüber dem Saisonziel;
+    - gehaltene oder gebrochene Versprechen;
+    - Vertrauen in den Trainer.
+  - Loyalität dämpft, Temperament verstärkt. Die Gründe stehen als Hinweis auf der Spielerseite.
+  - Einzelgespräche (Einsatzzeit, Leistung, Vertrag, Lob, Kritik, Versprechen) mit Antworten nach Persönlichkeit.
+    Versprechen haben eine Frist und werden geprüft.
+  - **Vertrauen im Kader:** Gebrochene Versprechen kosten alle Spieler Zufriedenheit, nicht nur den Betroffenen.
+    Das Vertrauen erholt sich Woche für Woche.
+  - **Hierarchie:** Führungsspieler, Etablierte (nach Ruf, Alter und Zeit im Verein) und Mitläufer.
+  - **Mannschaftsrat:** Führungsspieler und die Etablierten mit der meisten Führungsqualität. Ist der Rat
+    zufrieden oder unzufrieden, färbt das auf die Mitläufer ab. Bei schlechter Stimmung meldet er sich beim
+    Trainer (höchstens monatlich) und nennt den häufigsten Grund.
+  - **Mentoring:** Führungsspieler betreuen junge Profis und heben langsam deren Professionalität.
+  - Unzufriedene Spieler fordern einen Wechsel, reden mit der Presse und verlangen mehr Gehalt. Der
+    Wechselwunsch erlischt, wenn sie wieder zufrieden sind.
+  - Die Stimmung des Kaders wirkt auf die Tagesform im Spiel.
+  - Alle Werte stehen in `data/base/rules/relations.json`.
+  - Die Kalibrierung prüft den Anteil unzufriedener Spieler je Kader (Ziel 5–20 %) und dass unzufriedene
+    Spieler häufiger einen Wechsel wollen als zufriedene.
 - **Konferenz:** Anzeigemodus, in dem die anderen Spiele des Spieltags minutengenau mitlaufen, mit
   Torblitz im Ticker und Live-Tabelle.
 - **Einstellungen:** Schwierigkeit (Leicht, Normal, Schwer, Realistisch) beim Spielstart;
@@ -467,7 +490,7 @@ aktive Spieler höchstens +10 % gegenüber dem ersten Saisonende, Vereinslose h�
 |---|---|---|
 | 2 Spielmodi und Spielstart | Karriere mit neuem Spiel (Name, Werdegang, Verein, Seed, Weltregeln), Managerprofil, Speichern, Autosave vor jedem Spieltag in 3 rotierenden Slots, optional Ironman | Schnellsaison, Hot-Seat, Herausforderungen (Phase 4) |
 | 3 Spielwelt, Wettbewerbe | Tagesgenauer Kalender, Ligen als Daten, DE/EN/ES/IT/FR bis zur 4. Liga, **nationale Pokale und Relegation**, **echte Europapokale (UCL/UEL/UECL) mit Qualifikation, Ligaphase und K.-o.**, Transferfenster, Pflicht-Entscheidungen, **Ligapyramiden** | Hintergrundländer / EuropeOnly (Welle 3), weitere Länder |
-| 4 Spielerdatenmodell | 44 Attribute, versteckte Werte, Kondition, Form, Moral, Spielpraxis, Positionseignung, Entwicklung durch **Training** und Saisonwechsel, Karriereende, Dauerschäden | Zufriedenheit, Tutor-System |
+| 4 Spielerdatenmodell | 44 Attribute, versteckte Werte, Kondition, Form, Moral, Spielpraxis, Positionseignung, Entwicklung durch **Training** und Saisonwechsel, Karriereende, Dauerschäden, **Zufriedenheit, Hierarchie, Mentoring** | – |
 | 5 Kader, Training, Taktik | Kader, Profil, **Training**, **Trainingslager**, 25 Formationen, **Rollen und Aufgaben**, **Spieleranweisungen**, **freie Positionierung**, **Taktikvertrautheit**, **3 Taktikvarianten**, Standardvarianten, Co-Trainer | – |
 | 6 Spieltag und Matchengine | Vorbericht, Kabinenansprache, Kommentar/Ticker/Sofort/**Konferenz**, Wechsel, Taktik und Zurufe live, Nachbericht mit Noten und Statistik, **Verlängerung und Elfmeterschießen**, Hin- und Rückspiel, **Pressekonferenzen** | – |
 | 7 Transfers, Verträge, Scouting | **vollständig** inkl. Anfrage, Konkurrenz, Deadline Day, Sportdirektor-Delegation (E2) | Berater als Akteure (E2-S3) |
@@ -564,7 +587,8 @@ Weitere Prüfungen:
 - `--season --seasons 5 --strict` prüft den Karrierelauf: Der langsamste Spieltag muss unter 5 s
   liegen, alle Saisons müssen durchlaufen, Gehälter und Ligazahlen müssen passen und Insolvenzen sowie
   Lizenz-Punktabzüge unter den Grenzen bleiben (siehe Finanzen). Dazu kommen die Entlassungen je Saison in den
-  1. Ligen, mit dem Zielbereich aus `rules/managers.json`.
+  1. Ligen, mit dem Zielbereich aus `rules/managers.json`, und der Anteil unzufriedener Spieler je Kader mit dem
+  Zielbereich aus `rules/relations.json`.
 - `--max-drift 0.05` prüft zusätzlich die Ligastärke-Drift (Durchschnitt der besten elf je Verein der 1. Liga);
   die CI ruft den Karrierelauf damit auf. Gemessen: +0,024 je Saison. Dafür holen junge Spieler im Mittel nur ihren
   Altersabschlag auf, Akademietalente erreichen etwa die Stärke ihres Vereins, und der Abbau ab 30 nimmt mit dem
