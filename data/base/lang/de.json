@@ -3110,5 +3110,7 @@
  "friendly.cancel": "Absagen",
  "friendly.list": "Vereinbarte Testspiele",
  "friendly.none": "Keine Testspiele vereinbart.",
- "friendly.info": "Testspiele zählen nicht in die Statistik, bringen aber Spielpraxis, Kondition und Taktikvertrautheit. Im Trainingslager wirken sie stärker."
+ "friendly.info": "Testspiele zählen nicht in die Statistik, bringen aber Spielpraxis, Kondition und Taktikvertrautheit. Im Trainingslager wirken sie stärker.",
+ "friendly.cancelled.subject": "Testspiel gegen {0} abgesagt",
+ "friendly.cancelled.body": "Am {1} ist jetzt ein Pflichtspiel angesetzt. Das Testspiel gegen {0} fällt deshalb aus."
 }

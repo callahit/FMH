@@ -72,10 +72,27 @@ public sealed class FriendliesModule : GameModule
         if (friendly.Fixture.Result is null && friendly.Fixture.Date > World.Date) World.Friendlies.Remove(friendly);
     }
 
-    /// <summary>Zum Saisonstart: Testspiele der Vorsaison werden aus dem Spielplan entfernt.</summary>
+    /// <summary>
+    /// Täglich: Testspiele der Vorsaison verschwinden; ein offenes Testspiel, das mit einem später angesetzten Pflichtspiel
+    /// kollidiert (z. B. Pokalrunde), wird abgesagt – Pflichtspiele haben Vorrang.
+    /// </summary>
     public override void OnDay(DayContext day)
     {
         var start = new DateOnly(World.SeasonYear, World.Countries[0].Season.StartMonth, 1);
         World.Friendlies.RemoveAll(f => f.Fixture.Result is not null && f.Fixture.Date < start);
+        var rest = Rules.MinRestDays;
+        foreach (var friendly in World.Friendlies.Where(f => f.Fixture.Result is null && f.Fixture.Date >= World.Date).ToList())
+        {
+            var f = friendly.Fixture;
+            if (!World.AllFixtures.Any(c => (c.Involves(f.HomeId) || c.Involves(f.AwayId)) && Math.Abs(c.Date.DayNumber - f.Date.DayNumber) < Math.Max(1, rest)))
+                continue;
+            World.Friendlies.Remove(friendly);
+            if (!Board.AwaitingNewJob && f.Involves(HumanClub.Id))
+            {
+                var opponent = World.Clubs[f.HomeId == HumanClub.Id ? f.AwayId : f.HomeId];
+                Notify(MessageType.Info, "msg.sender.assistant", TR("friendly.cancelled.subject", opponent.Name),
+                    TR("friendly.cancelled.body", opponent.Name, TextArg.OfDate(f.Date)));
+            }
+        }
     }
 }
