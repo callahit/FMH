@@ -3045,5 +3045,10 @@
  "player.agent": "Agent",
  "player.agentValue": "{0} (reputation {1}, greed {2}, influence {3})",
  "agent.unsettle.subject": "Agent floats a move: {0}",
- "agent.unsettle.body": "{0}, agent of {1}, hints that the client is wasted at {2}. The player has seemed restless since."
+ "agent.unsettle.body": "{0}, agent of {1}, hints that the client is wasted at {2}. The player has seemed restless since.",
+ "intl.callup.subject": "International call-ups: {0} players",
+ "intl.callup.body": "Called up for the international break: {0}. They return on {1}, tired from travelling.",
+ "player.caps": "Caps",
+ "player.capsValue": "{0} ({1} goals) for {2}",
+ "player.onDuty": "With the national team"
 }

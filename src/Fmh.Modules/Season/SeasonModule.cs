@@ -79,7 +79,8 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
     {
         if (!World.SeasonFinished) return false;
         var startMonth = World.Countries[0].Season.StartMonth;
-        if (World.Date != new DateOnly(World.SeasonYear + 1, startMonth, 1)) return false;
+        // Ab dem Monatsersten; endet ein Wettbewerb erst danach, beginnt die neue Saison am Folgetag (sonst ginge ein Jahr verloren).
+        if (World.Date < new DateOnly(World.SeasonYear + 1, startMonth, 1)) return false;
 
         // Ausbildungsjahre für die abgelaufene Saison: Alter und Verein vor Vertragsende, Leihrückkehr und Saisonwechsel.
         foreach (var p in World.Players.Values.Where(p => !p.Retired)) Registration.CountSeason(p, World);
@@ -94,6 +95,7 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
         Transfers.RetireFreeAgents();
         MarketValue.UpdateMarketLevel(World, Data.PositionProfiles);
 
+        InternationalCalendar.Plan(World, Data);
         foreach (var league in World.Leagues)
             ScheduleGenerator.CreateFixtures(World, league, World.Country(league.CountryCode), Rng);
         World.Cups.Clear();

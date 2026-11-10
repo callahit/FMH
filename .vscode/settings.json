@@ -134,6 +134,12 @@
     },
     {
       "fileMatch": [
+        "data/*/rules/internationals.json"
+      ],
+      "url": "./data/schema/internationals.schema.json"
+    },
+    {
+      "fileMatch": [
         "data/*/competitions/europe.json"
       ],
       "url": "./data/schema/europe.schema.json"

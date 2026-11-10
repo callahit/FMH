@@ -9,7 +9,9 @@
     "firstMatchday": "08-15",
     "winterBreakStart": "12-21",
     "winterBreakEnd": "01-14",
-    "matchDay": "Saturday"
+    "matchDay": "Saturday",
+    "lastMatchday": "05-16",
+    "midweekDay": "Tuesday"
   },
   "squad": {
     "maxSquad": 32,

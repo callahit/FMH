@@ -39,7 +39,11 @@ public class SpainTests
         var dates = w.League("ES2").Fixtures.GroupBy(f => f.Matchday).Select(g => g.Select(f => f.Date).Distinct().Single()).ToList();
         Assert.Equal(42, dates.Distinct().Count());
         Assert.Contains(dates, d => d.DayOfWeek == DayOfWeek.Tuesday);
-        Assert.All(w.League("ES1").Fixtures, f => Assert.Equal(DayOfWeek.Saturday, f.Date.DayOfWeek));
+        // Die Primera braucht seit den Länderspielfenstern (AP 8) höchstens so viele Englische Wochen, wie Fenster Wochenenden blockieren.
+        var top = w.League("ES1").Fixtures.Select(f => f.Date).Distinct().ToList();
+        Assert.All(top, d => Assert.Contains(d.DayOfWeek, new[] { DayOfWeek.Saturday, DayOfWeek.Tuesday }));
+        Assert.InRange(top.Count(d => d.DayOfWeek == DayOfWeek.Tuesday), 0, w.InternationalWindows.Count);
+        Assert.DoesNotContain(top, w.InInternationalWindow);
         // Tabellen: direkter Vergleich vor der Tordifferenz.
         Assert.Equal(TieBreaker.HeadToHead, w.Country("ESP").Divisions.First().TieBreakers[0]);
     }

@@ -27,7 +27,7 @@ public static partial class Pyramid
             {
                 var ids = group.PositionList().Where(p => p <= table.Count).Select(p => table[p - 1].ClubId).ToList();
                 var days = ScheduleGenerator.RoundRobin(ids, phase.Rounds, rng);
-                var dates = ScheduleGenerator.WeeklyDates(country.Season, world.SeasonYear, start, days.Count);
+                var dates = ScheduleGenerator.WeeklyDates(country.Season, world.SeasonYear, start, days.Count, world.InInternationalWindow);
                 for (var d = 0; d < days.Count; d++)
                     foreach (var (home, away) in days[d])
                         league.Fixtures.Add(new Fixture
