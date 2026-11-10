@@ -18,6 +18,18 @@ public sealed class NationalTeam
     public int Lost { get; set; }
     public int GoalsFor { get; set; }
     public int GoalsAgainst { get; set; }
+    /// <summary>Nationaltrainer (Manager-Id; auch der menschliche Manager, neben seinem Verein), leer = unbesetzt.</summary>
+    public int? CoachId { get; set; }
+    /// <summary>Ziel des Verbands für das nächste Turnier: Q (Endrunde erreichen), KO4 (Halbfinale), KO2 (Finale).</summary>
+    public string CoachTarget { get; set; } = "";
+    /// <summary>Vertrag bis zum Turnier dieses Jahres; danach wird abgerechnet.</summary>
+    public int CoachUntil { get; set; }
+    /// <summary>Spielsystem; leer = Vorgabe aus den Daten.</summary>
+    public string Formation { get; set; } = "";
+    /// <summary>Vom menschlichen Nationaltrainer vorgemerkte Spieler; fehlende Plätze füllt die KI auf.</summary>
+    public List<int> PlannedSquad { get; set; } = new();
+    /// <summary>Offenes Angebot an den menschlichen Manager (gültig bis), sonst leer.</summary>
+    public DateOnly? OfferExpires { get; set; }
 }
 
 /// <summary>Länderspiel; Hintergrundländer haben keine Spieler der Welt, ihre Torschützen fehlen im Ergebnis.</summary>

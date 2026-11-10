@@ -28,6 +28,24 @@ public sealed class InternationalRules
     public List<BackgroundNation> BackgroundNations { get; set; } = new();
     /// <summary>Turniere (EM, WM) mit Qualifikation in den Fenstern der Saison davor (AP 8b).</summary>
     public List<TournamentRule> Tournaments { get; set; } = new();
+    /// <summary>Nationaltrainer (AP 8c): Angebote an den Manager.</summary>
+    public NationalCoachRules Coach { get; set; } = new();
+}
+
+/// <summary>Nationaltrainer: Wann ein Verband dem Manager den Posten anbietet.</summary>
+public sealed class NationalCoachRules
+{
+    /// <summary>Mindestruf des Managers (1–20) für ein Angebot.</summary>
+    [Range(1, 20)]
+    public int OfferReputation { get; set; } = 10;
+    /// <summary>Bedenkzeit in Tagen.</summary>
+    [Range(1, 90)]
+    public int OfferDays { get; set; } = 21;
+    /// <summary>Platz in der Stärkerangliste, bis zu dem der Verband das Finale bzw. das Halbfinale erwartet.</summary>
+    [Range(1, 64)]
+    public int FinalRank { get; set; } = 2;
+    [Range(1, 64)]
+    public int SemiFinalRank { get; set; } = 4;
 }
 
 /// <summary>

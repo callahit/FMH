@@ -13,8 +13,10 @@ public sealed class InternationalsSection : SaveSection
     /// Version 6: neuer Abschnitt. Ältere Spielstände legen die Tabellen per Migration an; ohne Fenster ruht der
     /// Vereinsbetrieb erst ab der nächsten Saison (die laufenden Termine bleiben unverändert).
     /// Version 7: Turniere (AP 8b); ältere Spielstände bekommen eine leere Tabelle, das nächste Turnier wird neu angelegt.
+    /// Version 8: Nationaltrainer, Ziel, Vertrag, Formation und Vormerkliste je Team (AP 8c, in den Team-Daten); ältere
+    /// Spielstände haben keine Trainer, das Modul besetzt die Posten am nächsten Spieltag.
     /// </summary>
-    public override int Version => 7;
+    public override int Version => 8;
 
     private const string TournamentTable = "CREATE TABLE international_tournaments (id TEXT PRIMARY KEY, data TEXT NOT NULL);";
 
@@ -32,6 +34,7 @@ public sealed class InternationalsSection : SaveSection
         if (fromVersion < BaseVersion || fromVersion > Version) base.Migrate(c, tx, fromVersion);
         if (fromVersion <= 5) Exec(c, tx, Tables);
         if (fromVersion <= 6) Exec(c, tx, TournamentTable);
+        // Version 8 ergänzt nur Felder in den Team-Daten (JSON); fehlende Felder lesen sich als „unbesetzt“, keine Tabellenänderung.
     }
 
     public override void Save(SqliteConnection con, SqliteTransaction tx, World w)

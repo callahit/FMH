@@ -1,0 +1,96 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Fmh.Desktop.ViewModels"
+             xmlns:s="using:Fmh.Desktop.Services"
+             x:Class="Fmh.Desktop.Views.NationalPageView"
+             x:DataType="vm:NationalPageViewModel">
+  <UserControl.DataTemplates>
+    <DataTemplate x:DataType="vm:IntlFixtureVm">
+      <Grid ColumnDefinitions="64,52,*,64,*" Margin="0,2">
+        <TextBlock Text="{Binding Date}" Classes="muted small" VerticalAlignment="Center" />
+        <TextBlock Grid.Column="1" Text="{Binding Stage}" Classes="muted small" VerticalAlignment="Center" />
+        <TextBlock Grid.Column="2" Text="{Binding Home}" FontWeight="{Binding Weight}" HorizontalAlignment="Right" />
+        <TextBlock Grid.Column="3" Text="{Binding Result}" HorizontalAlignment="Center" FontWeight="Bold" />
+        <TextBlock Grid.Column="4" Text="{Binding Away}" FontWeight="{Binding Weight}" />
+      </Grid>
+    </DataTemplate>
+  </UserControl.DataTemplates>
+  <DockPanel>
+    <TextBlock DockPanel.Dock="Top" Classes="h1" Text="{Binding Title}" Margin="0,0,0,12" />
+    <Grid ColumnDefinitions="*,16,*">
+      <!-- Amt des Nationaltrainers -->
+      <Border Classes="card" Padding="14">
+        <DockPanel>
+          <StackPanel DockPanel.Dock="Top" Spacing="4">
+            <TextBlock Text="{Binding JobText}" Classes="muted" TextWrapping="Wrap" IsVisible="{Binding !IsCoach}" />
+            <TextBlock Text="{Binding CoachTitle}" Classes="h2" IsVisible="{Binding IsCoach}" />
+            <TextBlock Text="{Binding TargetText}" IsVisible="{Binding IsCoach}" />
+            <TextBlock Text="{Binding RecordText}" Classes="muted small" IsVisible="{Binding IsCoach}" />
+            <Grid ColumnDefinitions="Auto,*,Auto,Auto" Margin="0,8" IsVisible="{Binding IsCoach}">
+              <TextBlock Text="{s:L national.formation}" VerticalAlignment="Center" Margin="0,0,8,0" />
+              <ComboBox Grid.Column="1" ItemsSource="{Binding Formations}" SelectedItem="{Binding Formation}" MinWidth="120" />
+              <Button Grid.Column="2" Content="{s:L national.suggest}" Command="{Binding SuggestCommand}" Margin="8,0" />
+              <Button Grid.Column="3" Content="{s:L national.resign}" Command="{Binding ResignCommand}" />
+            </Grid>
+            <TextBlock Text="{Binding SquadTitle}" Classes="h2" IsVisible="{Binding IsCoach}" />
+          </StackPanel>
+          <ScrollViewer IsVisible="{Binding IsCoach}">
+            <ItemsControl ItemsSource="{Binding Candidates}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:NationalCandidateVm">
+                  <Grid ColumnDefinitions="32,*,90,*,50" Margin="0,1">
+                    <CheckBox IsChecked="{Binding Selected}" />
+                    <TextBlock Grid.Column="1" Text="{Binding Name}" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="2" Text="{Binding Position}" Classes="muted small" VerticalAlignment="Center" />
+                    <TextBlock Grid.Column="3" Text="{Binding Club}" Classes="muted small" VerticalAlignment="Center" TextTrimming="CharacterEllipsis" />
+                    <TextBlock Grid.Column="4" Text="{Binding Strength}" HorizontalAlignment="Right" VerticalAlignment="Center" />
+                  </Grid>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+          </ScrollViewer>
+        </DockPanel>
+      </Border>
+
+      <!-- Turnier, Länderspiele, Sieger -->
+      <Border Grid.Column="2" Classes="card" Padding="14">
+        <ScrollViewer>
+          <StackPanel Spacing="8">
+            <TextBlock Text="{Binding TournamentTitle}" Classes="h2" TextWrapping="Wrap" />
+            <ItemsControl ItemsSource="{Binding Groups}">
+              <ItemsControl.ItemTemplate>
+                <DataTemplate x:DataType="vm:TournamentGroupVm">
+                  <StackPanel Margin="0,0,0,8">
+                    <TextBlock Text="{Binding Title}" FontWeight="SemiBold" />
+                    <ItemsControl ItemsSource="{Binding Rows}">
+                      <ItemsControl.ItemTemplate>
+                        <DataTemplate x:DataType="vm:TournamentRowVm">
+                          <Grid ColumnDefinitions="24,*,30,30,30,30,56,34">
+                            <TextBlock Text="{Binding Position}" Classes="muted" />
+                            <TextBlock Grid.Column="1" Text="{Binding Name}" FontWeight="{Binding Weight}" />
+                            <TextBlock Grid.Column="2" Text="{Binding Played}" HorizontalAlignment="Center" />
+                            <TextBlock Grid.Column="3" Text="{Binding Won}" HorizontalAlignment="Center" />
+                            <TextBlock Grid.Column="4" Text="{Binding Drawn}" HorizontalAlignment="Center" />
+                            <TextBlock Grid.Column="5" Text="{Binding Lost}" HorizontalAlignment="Center" />
+                            <TextBlock Grid.Column="6" Text="{Binding Goals}" HorizontalAlignment="Center" />
+                            <TextBlock Grid.Column="7" Text="{Binding Points}" FontWeight="Bold" HorizontalAlignment="Right" />
+                          </Grid>
+                        </DataTemplate>
+                      </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                  </StackPanel>
+                </DataTemplate>
+              </ItemsControl.ItemTemplate>
+            </ItemsControl>
+            <TextBlock Text="{s:L national.knockout}" FontWeight="SemiBold" />
+            <ItemsControl ItemsSource="{Binding Knockout}" />
+            <TextBlock Text="{s:L national.fixtures}" Classes="h2" Margin="0,8,0,0" />
+            <ItemsControl ItemsSource="{Binding Fixtures}" />
+            <TextBlock Text="{s:L national.champions}" Classes="h2" Margin="0,8,0,0" />
+            <TextBlock Text="{Binding Champions}" TextWrapping="Wrap" Classes="muted" />
+          </StackPanel>
+        </ScrollViewer>
+      </Border>
+    </Grid>
+  </DockPanel>
+</UserControl>

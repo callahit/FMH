@@ -26,6 +26,36 @@
       },
       "type": "array"
     },
+    "coach": {
+      "additionalProperties": false,
+      "description": "Nationaltrainer (AP 8c): Angebote an den Manager.",
+      "properties": {
+        "finalRank": {
+          "description": "Platz in der Stärkerangliste, bis zu dem der Verband das Finale bzw. das Halbfinale erwartet.",
+          "maximum": 64,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "offerDays": {
+          "description": "Bedenkzeit in Tagen.",
+          "maximum": 90,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "offerReputation": {
+          "description": "Mindestruf des Managers (1–20) für ein Angebot.",
+          "maximum": 20,
+          "minimum": 1,
+          "type": "integer"
+        },
+        "semiFinalRank": {
+          "maximum": 64,
+          "minimum": 1,
+          "type": "integer"
+        }
+      },
+      "type": "object"
+    },
     "formWeight": {
       "description": "Gewicht der Form: Aufschlag auf die Spielstärke je Formpunkt über 5 (Form 1–10 aus den letzten Noten).",
       "maximum": 3,
