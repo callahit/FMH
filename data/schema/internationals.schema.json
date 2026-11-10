@@ -54,6 +54,69 @@
       "minimum": 0,
       "type": "integer"
     },
+    "tournaments": {
+      "description": "Turniere (EM, WM) mit Qualifikation in den Fenstern der Saison davor (AP 8b).",
+      "items": {
+        "additionalProperties": false,
+        "description": "Turnier einer Nationalmannschafts-Endrunde: Qualifikation in den Länderspielfenstern der Saison vor dem Turnierjahr (Gruppen mit Hin- und Rückspiel), Endrunde im Sommer mit Gruppen und K.-o.-Runden auf neutralem Platz.",
+        "properties": {
+          "advance": {
+            "description": "Weiterkommende je Gruppe; Gruppen mal Weiterkommende muss eine Zweierpotenz sein.",
+            "maximum": 4,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "daysBetween": {
+            "description": "Tage zwischen zwei Spieltagen der Endrunde.",
+            "maximum": 10,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "every": {
+            "description": "Abstand in Jahren zwischen zwei Turnieren.",
+            "maximum": 8,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "firstYear": {
+            "description": "Jahr der ersten Endrunde; weitere folgen im Abstand Every.",
+            "maximum": 2200,
+            "minimum": 2000,
+            "type": "integer"
+          },
+          "groupSize": {
+            "description": "Teams je Endrundengruppe (einfache Runde).",
+            "maximum": 8,
+            "minimum": 2,
+            "type": "integer"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "qualificationGroupSize": {
+            "description": "Teams je Qualifikationsgruppe (Hin- und Rückspiel in den Fenstern).",
+            "maximum": 8,
+            "minimum": 2,
+            "type": "integer"
+          },
+          "start": {
+            "description": "Erster Spieltag der Endrunde (MM-TT, im Turnierjahr).",
+            "type": "string"
+          },
+          "teams": {
+            "description": "Teilnehmer der Endrunde; bei weniger Ländern spielen alle.",
+            "maximum": 64,
+            "minimum": 2,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
     "travelFatigue": {
       "description": "Konditionsverlust durch die Reise, wenn ein Spieler zum Verein zurückkehrt (zusätzlich zur Belastung der Spiele).",
       "maximum": 50,

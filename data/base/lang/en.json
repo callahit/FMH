@@ -3050,5 +3050,8 @@
  "intl.callup.body": "Called up for the international break: {0}. They return on {1}, tired from travelling.",
  "player.caps": "Caps",
  "player.capsValue": "{0} ({1} goals) for {2}",
- "player.onDuty": "With the national team"
+ "player.onDuty": "With the national team",
+ "intl.tournamentCallup.body": "Called up for the {1} finals: {0}. They are away until their country is knocked out.",
+ "intl.champion.subject": "{0} win the {1}",
+ "intl.champion.body": "{0} final: {1} {2}:{3} {4}. {5} are the champions."
 }

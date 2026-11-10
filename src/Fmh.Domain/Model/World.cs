@@ -41,6 +41,8 @@ public sealed class World
     public List<InternationalWindowDates> InternationalWindows { get; set; } = new();
     /// <summary>Länderspielbilanz je Spieler.</summary>
     public Dictionary<int, InternationalCareer> Caps { get; set; } = new();
+    /// <summary>Turniere (EM, WM) mit Qualifikation und Endrunde (AP 8b).</summary>
+    public List<InternationalTournament> Tournaments { get; set; } = new();
 
     /// <summary>Liegt der Tag in einem Länderspielfenster der laufenden Saison?</summary>
     public bool InInternationalWindow(DateOnly d) => InternationalWindows.Any(w => w.Contains(d));

@@ -59,7 +59,7 @@ public sealed class Player
     public PreferredFoot Foot =>
         Math.Abs(LeftFoot - RightFoot) <= 3 ? PreferredFoot.Both : LeftFoot > RightFoot ? PreferredFoot.Left : PreferredFoot.Right;
 
-    public bool IsAvailable => State.Injury is null && State.SuspendedMatches == 0;
+    public bool IsAvailable => State.Injury is null && State.SuspendedMatches == 0 && !State.OnNationalDuty;
 }
 
 public sealed class PlayerRegistration
@@ -117,6 +117,12 @@ public sealed class PlayerState
     public Injury? Injury { get; set; }
     public int SuspendedMatches { get; set; }
     public int YellowCardsAccumulated { get; set; }
+    /// <summary>
+    /// Beim Nationalteam (AP 8): fehlt dem Verein. Wird nicht gespeichert, sondern beim Laden aus den Kadern der
+    /// Nationalteams gesetzt.
+    /// </summary>
+    [System.Text.Json.Serialization.JsonIgnore]
+    public bool OnNationalDuty { get; set; }
 
     /// <summary>Form 1–10 aus den letzten 5 Noten; ohne Noten neutral 5.</summary>
     public int Form

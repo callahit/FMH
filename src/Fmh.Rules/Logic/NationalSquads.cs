@@ -57,6 +57,26 @@ public static class NationalSquads
         return chosen.Take(size).ToList();
     }
 
+    /// <summary>Kader berufen: Die Spieler fehlen ab jetzt ihrem Verein.</summary>
+    public static void Call(World world, NationalTeam team, List<int> squad)
+    {
+        team.Squad = squad;
+        foreach (var id in squad)
+            if (world.Players.TryGetValue(id, out var p)) p.State.OnNationalDuty = true;
+    }
+
+    /// <summary>Kader entlassen: Die Spieler kehren mit Reisebelastung zum Verein zurück.</summary>
+    public static void Release(World world, GameData data, NationalTeam team)
+    {
+        foreach (var id in team.Squad)
+            if (world.Players.TryGetValue(id, out var p))
+            {
+                p.State.OnNationalDuty = false;
+                p.State.Condition = Math.Max(0, Math.Round(p.State.Condition - data.Internationals.TravelFatigue, 1));
+            }
+        team.Squad.Clear();
+    }
+
     /// <summary>
     /// Kader eines Hintergrundlandes für ein Spiel: erzeugte Spieler mit negativen Ids, die nicht in die Welt gelangen.
     /// Je Saison und Land gleich (eigener Zufallsstrom).

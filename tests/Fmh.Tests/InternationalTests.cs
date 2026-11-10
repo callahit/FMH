@@ -176,12 +176,12 @@ public sealed class InternationalTests
             {
                 con.Open();
                 using var cmd = con.CreateCommand();
-                cmd.CommandText = "DROP TABLE national_teams; DROP TABLE international_fixtures; DROP TABLE international_windows; DROP TABLE international_caps; DELETE FROM meta WHERE key = 'schema.internationals';";
+                cmd.CommandText = "DROP TABLE national_teams; DROP TABLE international_fixtures; DROP TABLE international_windows; DROP TABLE international_caps; DROP TABLE international_tournaments; DELETE FROM meta WHERE key = 'schema.internationals';";
                 cmd.ExecuteNonQuery();
             }
             var old = SqliteStore.Load(path);
             Assert.Empty(old.InternationalWindows);
-            Assert.Equal("6", SqliteStore.ReadMetaTable(path)["schema.internationals"]);
+            Assert.Equal("7", SqliteStore.ReadMetaTable(path)["schema.internationals"]);
             var session = new GameSession(old, TestData.Data, new TextMatchEngine());
             session.Advance(3);
             Assert.Empty(old.InternationalFixtures);
