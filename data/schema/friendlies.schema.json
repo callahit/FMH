@@ -70,6 +70,46 @@
       "maximum": 11,
       "minimum": 3,
       "type": "integer"
+    },
+    "summerTournaments": {
+      "description": "Sommerturniere: vier Vereine, Halbfinale und zwei Tage später Finale und Spiel um Platz 3 (AP 9b).",
+      "items": {
+        "additionalProperties": false,
+        "description": "Sommerturnier mit vier Vereinen auf neutralem Platz; Prämien je Platz (1 bis 4).",
+        "properties": {
+          "date": {
+            "description": "Tag der Halbfinals (MM-TT, in der Vorbereitung).",
+            "type": "string"
+          },
+          "daysToFinal": {
+            "description": "Tage zwischen Halbfinale und Finale.",
+            "maximum": 7,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "id": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "prizes": {
+            "description": "Prämie für Platz 1 bis 4 (Euro).",
+            "items": {
+              "type": "integer"
+            },
+            "type": "array"
+          },
+          "reputationRange": {
+            "description": "Höchster Rufabstand der eingeladenen Gegner.",
+            "maximum": 20,
+            "minimum": 0,
+            "type": "integer"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
     }
   },
   "title": "FMH rules/friendlies.json",

@@ -9,5 +9,9 @@
   "physicalGain": 0.6,
   "campBonus": 1.5,
   "acceptReputationGap": 3,
-  "substitutions": 9
+  "substitutions": 9,
+  "summerTournaments": [
+    { "id": "NORDCUP", "name": "Nordsee-Cup", "date": "07-18", "daysToFinal": 2, "reputationRange": 2, "prizes": [250000, 150000, 100000, 75000] },
+    { "id": "ALPENCUP", "name": "Alpen-Cup", "date": "07-25", "daysToFinal": 2, "reputationRange": 2, "prizes": [300000, 180000, 120000, 90000] }
+  ]
 }

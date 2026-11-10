@@ -122,6 +122,55 @@ public sealed class FriendlyTests
         Assert.Contains(s.Inbox, m => m.SubjectRef?.Key == "friendly.cancelled.subject");
     }
 
+    /// <summary>AP 9b: Sommerturnier mit vier Vereinen läuft vollständig, Platzierung und Prämien, keine Statistik.</summary>
+    [Fact]
+    public void SummerTournamentRunsWithPrizes()
+    {
+        var s = TestData.NewSession(906);
+        var w = s.World;
+        var open = s.OpenSummerTournaments();
+        Assert.Equal(2, open.Count);
+        var rule = open[0];
+        Assert.Null(s.EnterSummerTournament(rule.Id));
+        Assert.Equal("summer.error.closed", s.EnterSummerTournament(rule.Id));
+        var t = s.OwnSummerTournaments.Single();
+        Assert.Equal(4, t.ClubIds.Distinct().Count());
+        Assert.All(t.ClubIds.Where(id => id != s.HumanClub.Id), id => Assert.InRange(Math.Abs(w.Clubs[id].Reputation - s.HumanClub.Reputation), 0, rule.ReputationRange));
+        var appearances = w.SquadOf(s.HumanClub).Sum(p => p.SeasonStats.Appearances);
+        var semi = w.Friendlies.Where(f => f.TournamentId == t.Id).Min(f => f.Fixture.Date);
+        AdvanceTo(s, semi.AddDays(rule.DaysToFinal + 1));
+
+        var games = w.Friendlies.Where(f => f.TournamentId == t.Id).ToList();
+        Assert.Equal(new[] { "F", "P3", "SF", "SF" }, games.Select(f => f.Stage).OrderBy(x => x, StringComparer.Ordinal));
+        Assert.All(games, f => Assert.NotNull(f.Fixture.Result));
+        // Ein K.-o.-Spiel hat immer einen Sieger (bei Gleichstand nach Elfmeterschießen)
+        Assert.All(games.Where(f => f.Fixture.Result!.HomeGoals == f.Fixture.Result.AwayGoals), f => Assert.NotNull(f.Fixture.Result!.PenaltiesHome));
+        Assert.Equal(4, t.Ranking.Distinct().Count());
+        Assert.Contains(s.HumanClub.Id, t.Ranking);
+        var place = t.Ranking.IndexOf(s.HumanClub.Id);
+        Assert.Contains(w.Transactions, x => x.Type == TransactionType.PrizeMoney && x.Amount == rule.Prizes[place] && x.TextRef?.Key == "tx.summerPrize");
+        Assert.Contains(s.Inbox, m => m.SubjectRef?.Key == "summer.result.subject");
+        Assert.Equal(appearances, w.SquadOf(s.HumanClub).Sum(p => p.SeasonStats.Appearances));
+        Assert.Single(s.OpenSummerTournaments());
+    }
+
+    [Fact]
+    public void ClubsWithAnOpenCupRoundInTheSpanAreNotInvited()
+    {
+        var s = TestData.NewSession(907);
+        var w = s.World;
+        var rule = s.OpenSummerTournaments()[0];
+        var semi = ScheduleGenerator.ParseDate(rule.Date, w.SeasonYear, w.Countries[0].Season.StartMonth);
+        // Eine noch nicht ausgeloste Pokalrunde liegt im Turnierzeitraum: ihre Teilnehmer sind belegt.
+        var near = s.FriendlyCandidates().Where(c => Math.Abs(c.Reputation - s.HumanClub.Reputation) <= rule.ReputationRange).Take(4).Select(c => c.Id).ToList();
+        var cup = new Cup { Id = "TEST-CUP", Kind = CompetitionKind.Cup, ParticipantIds = near };
+        cup.Rounds.Add(new CupRound { Number = 1, Dates = { semi } });
+        w.Cups.Add(cup);
+        Assert.Null(s.EnterSummerTournament(rule.Id));
+        var t = s.OwnSummerTournaments.Single();
+        Assert.DoesNotContain(t.ClubIds, id => cup.ParticipantIds.Contains(id));
+    }
+
     [Fact]
     public void FriendliesSurviveSavingAndOldSavesLoad()
     {
@@ -136,12 +185,12 @@ public sealed class FriendlyTests
             var a = s.World.Friendlies.Single();
             var b = loaded.Friendlies.Single();
             Assert.Equal((a.Fixture.Id, a.Fixture.Date, a.Fixture.HomeId, a.HomeSharePercent, a.Fixture.Kind), (b.Fixture.Id, b.Fixture.Date, b.Fixture.HomeId, b.HomeSharePercent, b.Fixture.Kind));
-            Assert.Equal("6", SqliteStore.ReadMetaTable(path)["schema.friendlies"]);
+            Assert.Equal("7", SqliteStore.ReadMetaTable(path)["schema.friendlies"]);
             using (var con = new Microsoft.Data.Sqlite.SqliteConnection($"Data Source={path};Pooling=False"))
             {
                 con.Open();
                 using var cmd = con.CreateCommand();
-                cmd.CommandText = "DROP TABLE friendlies; DELETE FROM meta WHERE key = 'schema.friendlies';";
+                cmd.CommandText = "DROP TABLE friendlies; DROP TABLE summer_tournaments; DELETE FROM meta WHERE key = 'schema.friendlies';";
                 cmd.ExecuteNonQuery();
             }
             var old = SqliteStore.Load(path);

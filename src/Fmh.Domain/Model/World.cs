@@ -125,6 +125,8 @@ public sealed class World
 
     /// <summary>Vereinbarte Testspiele; zählen nicht in Wettbewerbsstatistiken.</summary>
     public List<Friendly> Friendlies { get; set; } = new();
+    /// <summary>Sommerturniere der laufenden Saison (AP 9b).</summary>
+    public List<SummerTournament> SummerTournaments { get; set; } = new();
 
     public League League(string id) => Leagues.First(l => l.Id == id);
 

@@ -37,4 +37,23 @@ public sealed class FriendlyRules
     /// <summary>Wechsel je Testspiel.</summary>
     [Range(3, 11)]
     public int Substitutions { get; set; } = 9;
+    /// <summary>Sommerturniere: vier Vereine, Halbfinale und zwei Tage später Finale und Spiel um Platz 3 (AP 9b).</summary>
+    public List<SummerTournamentRule> SummerTournaments { get; set; } = new();
+}
+
+/// <summary>Sommerturnier mit vier Vereinen auf neutralem Platz; Prämien je Platz (1 bis 4).</summary>
+public sealed class SummerTournamentRule
+{
+    public string Id { get; set; } = "";
+    public string Name { get; set; } = "";
+    /// <summary>Tag der Halbfinals (MM-TT, in der Vorbereitung).</summary>
+    public string Date { get; set; } = "07-20";
+    /// <summary>Tage zwischen Halbfinale und Finale.</summary>
+    [Range(1, 7)]
+    public int DaysToFinal { get; set; } = 2;
+    /// <summary>Höchster Rufabstand der eingeladenen Gegner.</summary>
+    [Range(0, 20)]
+    public int ReputationRange { get; set; } = 2;
+    /// <summary>Prämie für Platz 1 bis 4 (Euro).</summary>
+    public List<long> Prizes { get; set; } = new() { 250_000, 150_000, 100_000, 75_000 };
 }

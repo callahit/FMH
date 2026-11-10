@@ -18,6 +18,8 @@ public sealed record FriendlyDateVm(DateOnly Date, string Label)
 
 public sealed record FriendlyRowVm(Friendly Friendly, string Date, string Match, string Detail, IRelayCommand Cancel);
 
+public sealed record SummerTournamentVm(string Name, string Detail, IRelayCommand Enter, bool CanEnter);
+
 /// <summary>Testspiele (AP 9): Gegner, Datum, Ort und Einnahmenteilung wählen, vereinbarte Spiele absagen.</summary>
 public sealed partial class FixturesPageViewModel
 {
@@ -32,6 +34,7 @@ public sealed partial class FixturesPageViewModel
     [ObservableProperty] private string _friendlyMessage = "";
     [ObservableProperty] private IReadOnlyList<FriendlyRowVm> _friendlies = Array.Empty<FriendlyRowVm>();
     [ObservableProperty] private bool _noFriendlies;
+    [ObservableProperty] private IReadOnlyList<SummerTournamentVm> _summerTournaments = Array.Empty<SummerTournamentVm>();
 
     private void InitFriendlies()
     {
@@ -68,6 +71,30 @@ public sealed partial class FixturesPageViewModel
                 new RelayCommand(() => { Session.CancelFriendly(friendly); Refresh(); }, () => friendly.Fixture.Result is null && friendly.Fixture.Date > Session.World.Date));
         }).ToList();
         NoFriendlies = Friendlies.Count == 0;
+        RefreshSummer();
+    }
+
+    /// <summary>Offene Sommerturniere zum Anmelden und eigene mit Stand bzw. Platzierung (AP 9b).</summary>
+    private void RefreshSummer()
+    {
+        var s = Session;
+        var start = s.World.Countries[0].Season.StartMonth;
+        var open = s.OpenSummerTournaments().Select(r =>
+        {
+            var id = r.Id;
+            var date = Fmh.Core.Logic.ScheduleGenerator.ParseDate(r.Date, s.World.SeasonYear, start);
+            return new SummerTournamentVm(r.Name, $"{Fmt.Date(date)} · {Fmt.Money(r.Prizes.FirstOrDefault(), UiText.Currency(s.HumanClub))}",
+                new RelayCommand(() =>
+                {
+                    var error = s.EnterSummerTournament(id);
+                    FriendlyMessage = error is null ? T.Format("summer.entered", r.Name) : T[error];
+                    Refresh();
+                }), true);
+        });
+        var own = s.OwnSummerTournaments.Select(t => new SummerTournamentVm(t.Name,
+            t.Ranking.Count == 0 ? T["summer.running"] : T.Format("summer.place", t.Ranking.IndexOf(s.HumanClub.Id) + 1),
+            new RelayCommand(() => { }), false));
+        SummerTournaments = own.Concat(open).ToList();
     }
 
     [RelayCommand]
