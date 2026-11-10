@@ -63,6 +63,7 @@ public static class WorldGenerator
         InitCareer(world, data, rng);
         MarketValue.UpdateMarketLevel(world, data.PositionProfiles);
 
+        InternationalCalendar.Plan(world, data);
         foreach (var league in world.Leagues)
             ScheduleGenerator.CreateFixtures(world, league, world.Country(league.CountryCode), rng);
 

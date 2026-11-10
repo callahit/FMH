@@ -94,6 +94,7 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
         Transfers.RetireFreeAgents();
         MarketValue.UpdateMarketLevel(World, Data.PositionProfiles);
 
+        InternationalCalendar.Plan(World, Data);
         foreach (var league in World.Leagues)
             ScheduleGenerator.CreateFixtures(World, league, World.Country(league.CountryCode), Rng);
         World.Cups.Clear();
