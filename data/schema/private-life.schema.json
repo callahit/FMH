@@ -1,0 +1,93 @@
+{
+  "$id": "https://fmh.local/schema/private-life.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Privatleben des Managers (Datei rules/privateLife.json, AP 13b): Besitz mit Kaufpreis, laufenden Kosten, Prestige und Erholung, dazu Stressregeln. Prestige wirkt auf den Medienruf, Stress auf das Vorstandsvertrauen.",
+  "properties": {
+    "cars": {
+      "items": {
+        "$ref": "#/properties/homes/items",
+        "description": "Wohnung, Auto oder Hobby; Text unter private.<id>."
+      },
+      "type": "array"
+    },
+    "hobbies": {
+      "items": {
+        "$ref": "#/properties/homes/items",
+        "description": "Wohnung, Auto oder Hobby; Text unter private.<id>."
+      },
+      "type": "array"
+    },
+    "homes": {
+      "items": {
+        "additionalProperties": false,
+        "description": "Wohnung, Auto oder Hobby; Text unter private.<id>.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "monthly": {
+            "description": "Laufende Kosten je Monat in Euro.",
+            "type": "integer"
+          },
+          "prestige": {
+            "description": "Prestige: Medienruf je Monat.",
+            "type": "number"
+          },
+          "price": {
+            "type": "integer"
+          },
+          "relief": {
+            "description": "Erholung: zusätzlicher Stressabbau je Tag.",
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "maxHobbies": {
+      "type": "integer"
+    },
+    "resaleShare": {
+      "description": "Anteil des Kaufpreises, den ein Verkauf zurückbringt.",
+      "type": "number"
+    },
+    "startSavingsWeeks": {
+      "description": "Startvermögen in Wochengehältern des Managers.",
+      "type": "number"
+    },
+    "stress": {
+      "additionalProperties": false,
+      "properties": {
+        "boardPenaltyPerWeek": {
+          "type": "number"
+        },
+        "dailyDecay": {
+          "description": "Grundabbau je Tag.",
+          "type": "number"
+        },
+        "debt": {
+          "description": "Stress, wenn das Privatkonto ins Minus rutscht (je Monat).",
+          "type": "number"
+        },
+        "draw": {
+          "type": "number"
+        },
+        "high": {
+          "description": "Ab hier leidet das Vorstandsvertrauen (je Woche).",
+          "type": "number"
+        },
+        "loss": {
+          "type": "number"
+        },
+        "win": {
+          "type": "number"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "title": "FMH rules/privateLife.json",
+  "type": "object"
+}

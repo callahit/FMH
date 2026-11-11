@@ -286,7 +286,8 @@ public sealed class EventOption
     public string Id { get; set; } = "";
     /// <summary>
     /// Wirkungen: money (EUR bei Reputation 10, skaliert mit Vereinsgröße), fans, board, morale, media, reputation,
-    /// playerMorale, playerCondition, playerInjury (Tage), playerSuspend (Spiele), playerFine (Wochengehälter), pitch, attendance (%).
+    /// playerMorale, playerCondition, playerInjury (Tage), playerSuspend (Spiele), playerFine (Wochengehälter), pitch, attendance (%),
+    /// stress und savings (Privatleben, AP 13b).
     /// </summary>
     public Dictionary<string, double> Effects { get; set; } = new();
     /// <summary>Erfolgswahrscheinlichkeit; bei Misserfolg gelten FailEffects.</summary>

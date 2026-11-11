@@ -1,0 +1,111 @@
+{
+  "startSavingsWeeks": 20,
+  "homes": [
+    {
+      "id": "flat",
+      "price": 0,
+      "monthly": 1200,
+      "prestige": 0,
+      "relief": 0
+    },
+    {
+      "id": "townhouse",
+      "price": 450000,
+      "monthly": 2200,
+      "prestige": 0.3,
+      "relief": 0.1
+    },
+    {
+      "id": "villa",
+      "price": 1600000,
+      "monthly": 6000,
+      "prestige": 0.8,
+      "relief": 0.2
+    },
+    {
+      "id": "estate",
+      "price": 4500000,
+      "monthly": 15000,
+      "prestige": 1.5,
+      "relief": 0.3
+    }
+  ],
+  "cars": [
+    {
+      "id": "compact",
+      "price": 0,
+      "monthly": 300,
+      "prestige": 0,
+      "relief": 0
+    },
+    {
+      "id": "estateCar",
+      "price": 45000,
+      "monthly": 600,
+      "prestige": 0.1,
+      "relief": 0
+    },
+    {
+      "id": "sportsCar",
+      "price": 160000,
+      "monthly": 1800,
+      "prestige": 0.5,
+      "relief": 0.05
+    },
+    {
+      "id": "limousine",
+      "price": 280000,
+      "monthly": 2600,
+      "prestige": 0.7,
+      "relief": 0
+    }
+  ],
+  "hobbies": [
+    {
+      "id": "fishing",
+      "price": 800,
+      "monthly": 80,
+      "prestige": 0,
+      "relief": 0.4
+    },
+    {
+      "id": "golf",
+      "price": 6000,
+      "monthly": 900,
+      "prestige": 0.3,
+      "relief": 0.3
+    },
+    {
+      "id": "cards",
+      "price": 0,
+      "monthly": 150,
+      "prestige": -0.1,
+      "relief": 0.25
+    },
+    {
+      "id": "charity",
+      "price": 0,
+      "monthly": 3000,
+      "prestige": 0.6,
+      "relief": 0.1
+    },
+    {
+      "id": "vineyard",
+      "price": 250000,
+      "monthly": 2500,
+      "prestige": 0.4,
+      "relief": 0.35
+    }
+  ],
+  "maxHobbies": 2,
+  "resaleShare": 0.6,
+  "stress": {
+    "win": -3,
+    "draw": 1,
+    "loss": 4,
+    "dailyDecay": 0.3,
+    "high": 75,
+    "boardPenaltyPerWeek": 1,
+    "debt": 8
+  }
+}

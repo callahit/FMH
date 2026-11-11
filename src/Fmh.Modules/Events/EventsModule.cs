@@ -160,6 +160,11 @@ public sealed partial class EventsModule : GameModule, IEventsService
                     lines.Add(TR("effect.stadiumSite", club.Grounds.Site!.MaxCapacity, TextArg.OfDate(club.Grounds.Site.Expires)));
                     continue;
                 case "pitch": club.Stadium.Pitch = Math.Clamp(club.Stadium.Pitch + value, 0, 100); break;
+                // Privatleben (AP 13b): nur, wenn es angelegt ist.
+                case "stress" when World.PrivateLives.TryGetValue(HumanManager.Id, out var life):
+                    life.Stress = Math.Clamp(life.Stress + value, 0, 100); break;
+                case "savings" when World.PrivateLives.TryGetValue(HumanManager.Id, out var own):
+                    own.Savings += (long)Math.Round(value); break;
                 case "playerMorale" when player is not null:
                     player.State.Morale = (Morale)Math.Clamp((int)player.State.Morale + (int)Math.Round(value), 0, 6); break;
                 case "playerCondition" when player is not null:
