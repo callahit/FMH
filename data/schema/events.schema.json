@@ -33,7 +33,7 @@
               "additionalProperties": {
                 "type": "number"
               },
-              "description": "Wirkungen: money (EUR bei Reputation 10, skaliert mit Vereinsgröße), fans, board, morale, media, reputation, playerMorale, playerCondition, playerInjury (Tage), playerSuspend (Spiele), playerFine (Wochengehälter), pitch, attendance (%).",
+              "description": "Wirkungen: money (EUR bei Reputation 10, skaliert mit Vereinsgröße), fans, board, morale, media, reputation, playerMorale, playerCondition, playerInjury (Tage), playerSuspend (Spiele), playerFine (Wochengehälter), pitch, attendance (%), stress und savings (Privatleben, AP 13b).",
               "type": "object"
             },
             "failEffects": {

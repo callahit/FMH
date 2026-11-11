@@ -123,7 +123,28 @@ So funktionieren die Schalter:
   verschwinden ohne Wirkung samt Nachricht.
 
 Ein Abnahmetest prüft: Mit Hauptschalter aus läuft die Welt Bereich für Bereich genau wie ohne das Paket.
-Privatleben (AP 13b) und Grauzonen (AP 13c) folgen als weitere Elemente.
+Grauzonen (AP 13c) folgen als weiteres Element.
+
+### Privatleben (AP 13b)
+
+Das Element `privateLife` gibt dem Manager ein Leben neben dem Platz. Alle Regeln stehen in
+`data/anstoss/rules/privateLife.json`.
+
+- **Privatkonto:** Es ist getrennt von der Vereinskasse. Zum Start liegen 20 Wochengehälter darauf. Am Monatsersten
+  kommt das Gehalt dazu, die laufenden Kosten von Wohnung, Auto und Hobbys gehen ab. Ohne Job fließt kein Gehalt.
+- **Besitz:** Vier Wohnungen von der Mietwohnung bis zum Landsitz und vier Autos vom Kleinwagen bis zur Limousine mit
+  Fahrer. Beim Wechsel bringt der alte Besitz 60 % seines Preises zurück. Dazu kommen höchstens zwei Hobbys: Angeln,
+  Golf, Skatrunde, Stiftung oder Weinberg.
+- **Wirkung:** Prestige erhöht monatlich den Medienruf; die Skatrunde senkt ihn leicht. Erholung baut Stress zusätzlich
+  zum täglichen Grundabbau ab.
+- **Stress (0–100):** Er steigt nach Niederlagen und Unentschieden und sinkt nach Siegen. Ab 75 kostet er jeden Montag
+  Vorstandsvertrauen, und eine Warnung kommt in den Posteingang. Rutscht das Privatkonto ins Minus, gibt es
+  zusätzlichen Stress.
+- **Familie:** Sechs Ereignisse wie Hochzeitstag, Elternabend, Kurzurlaub oder Homestory, mit den neuen Wirkungen
+  `stress` und `savings`.
+- **Bedienung:** Der Dialog „Privatleben …“ auf der Vereinsseite unter „Karriere“ zeigt Konto, Stress, Kosten,
+  Prestige und Erholung. Dort wechselt man Wohnung und Auto und nimmt Hobbys auf oder gibt sie auf.
+- **Schalter:** Ist das Element aus, ruht alles. Konto und Besitz bleiben erhalten, bis es wieder an ist.
 
 ## Karriere (Phase 2)
 
@@ -367,7 +388,8 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
     vereinsloser Trainer.
   - Die Spielidee verschiebt die Grundhaltung der KI-Mannschaft und wirkt auf Konter und Pressing.
   - Entlassungen folgen festen Regeln ohne Spielzufall. Während der Saison wird ein Trainer entlassen, wenn
-    der Verein auf einem direkten Abstiegsplatz deutlich unter der Erwartung nach Ruf steht und aus den
+    der Verein auf einem direkten Abstiegsplatz oder einem der letzten drei Plätze (`bottomPlaces` in
+    `rules/managers.json`, schließt den Relegationsplatz der 18er-Ligen ein) deutlich unter der Erwartung nach Ruf steht und aus den
     letzten fünf Spielen höchstens drei Punkte holte. Das gilt frühestens nach einem Drittel der Saison,
     nach mindestens 120 Tagen im Amt und höchstens einmal je Verein und Saison. Zum Saisonende trifft es
     Absteiger mit klarer Enttäuschung oder Vereine weit unter der Erwartung.
@@ -740,6 +762,8 @@ danach je Abschnitt angehoben:
   Testspiele. Version 7 ergänzt die Tabelle `summer_tournaments` (Sommerturniere).
 - Abschnitt `internationals` Version 8 ergänzt in den Team-Daten Trainer, Ziel, Vertrag, Spielsystem, Vormerkliste und
   offenes Angebot. Ältere Spielstände haben keine Trainer; das Modul besetzt die Posten am nächsten Spieltag.
+- Abschnitt `privateLife` (Version 6, neu) bekommt die Tabelle `private_lives` (Privatkonto, Stress und Besitz je
+  Manager). In älteren Spielständen beginnt das Privatleben beim Laden neu.
 - Abschnitt `anstoss` (Version 6, neu) bekommt die Tabelle `anstoss_settings` (Anstoß-Schalter je Manager, nur
   Abweichungen von „alles an“). In älteren Spielständen ist alles an.
 - Abschnitt `challenge` (Version 6, neu) bekommt die Tabelle `game_mode` (Schnellsaison oder Herausforderung mit

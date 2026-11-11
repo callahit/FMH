@@ -35,7 +35,7 @@ public sealed class AnstossTests
     {
         var data = PackageLoader.Load(new[] { PackageLoader.FindDataRoot() }, enabledPackages: new[] { "base", "anstoss" });
         var elements = data.Anstoss.Elements.Select(e => e.Id).ToList();
-        Assert.Equal(new[] { "satire", "teamNights", "fanActions", "curiosities" }, elements);
+        Assert.Equal(new[] { "satire", "teamNights", "fanActions", "curiosities", "privateLife" }, elements);
         var tagged = data.Events.Where(e => e.Feature is not null).ToList();
         Assert.All(tagged, e => Assert.Contains(Anstoss.Element(e.Feature!), elements));
         Assert.All(elements, el => Assert.True(tagged.Count(e => Anstoss.Element(e.Feature!) == el) >= 5, el));

@@ -70,4 +70,30 @@ public class AnstossUiTests
         Assert.False(session.AnstossOn);
         vm.CloseDialog();
     }
+
+    [AvaloniaFact]
+    public void PrivateLifeDialogChangesHobbies()
+    {
+        var (w, vm, ng) = NewGame();
+        ng.StartCommand.Execute(null);
+        var shell = Assert.IsType<ShellViewModel>(vm.Screen);
+        shell.Open(shell.Nav.Single(n => n.Id == "club"));
+        var club = Assert.IsType<ClubPageViewModel>(shell.Page);
+        Assert.True(club.HasPrivateLife);
+        club.OpenPrivateLifeCommand.Execute(null);
+        var dialog = Assert.IsType<PrivateLifeViewModel>(vm.Dialog);
+        Pump();
+        Assert.Contains(w.GetVisualDescendants().OfType<TextBlock>(), t => t.IsEffectivelyVisible && t.Text == AppState.Current.T["private.title"]);
+        Assert.Equal(AppState.Current.Data.PrivateLife!.Homes.Count, dialog.Homes.Count);
+        Assert.Single(dialog.Homes, h => h.Owned);
+        var before = dialog.Savings;
+        dialog.Hobbies.Single(h => h.Name == AppState.Current.T["private.golf"]).Command.Execute(null);
+        Assert.Contains("golf", AppState.Current.Session!.PrivateLife!.Hobbies);
+        Assert.NotEqual(before, dialog.Savings);
+        Assert.True(dialog.Hobbies.Single(h => h.Name == AppState.Current.T["private.golf"]).Owned);
+        dialog.Homes.Single(h => h.Name == AppState.Current.T["private.estate"]).Command.Execute(null);
+        Assert.Equal(AppState.Current.T["private.error.money"], dialog.Message);
+        Pump();
+        vm.CloseDialog();
+    }
 }
