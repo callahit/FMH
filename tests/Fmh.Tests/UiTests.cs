@@ -105,7 +105,7 @@ public class UiTests
     {
         var (w, vm) = Open();
         var shell = StartGame(vm);
-        var names = new[] { "inbox", "squad", "tactics", "training", "fixtures", "transfers", "finances", "stadium", "club", "league", "national" };
+        var names = new[] { "inbox", "squad", "tactics", "training", "fixtures", "transfers", "finances", "stadium", "club", "league", "national", "history" };
         for (var i = 0; i < shell.Nav.Count; i++)
         {
             shell.Open(shell.Nav[i]);
