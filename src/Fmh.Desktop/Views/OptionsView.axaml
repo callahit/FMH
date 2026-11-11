@@ -5,6 +5,7 @@
              x:Class="Fmh.Desktop.Views.OptionsView"
              x:DataType="vm:OptionsViewModel">
   <Border Classes="card" Width="560" Padding="24">
+    <ScrollViewer MaxHeight="780">
     <StackPanel Spacing="10">
       <TextBlock Classes="h2" Text="{Binding Title}" />
       <TextBlock Classes="h3" Text="{s:L options.personal}" Margin="0,6,0,0" />
@@ -13,7 +14,8 @@
           <DataTemplate x:DataType="vm:ChoiceSetting">
             <Grid ColumnDefinitions="200,*" Margin="0,3">
               <TextBlock Text="{Binding Label}" VerticalAlignment="Center" Classes="muted" />
-              <ComboBox Grid.Column="1" ItemsSource="{Binding Options}" SelectedIndex="{Binding SelectedIndex}" HorizontalAlignment="Stretch" />
+              <ComboBox Grid.Column="1" ItemsSource="{Binding Options}" SelectedIndex="{Binding SelectedIndex}" HorizontalAlignment="Stretch"
+                        AutomationProperties.Name="{Binding Label}" />
             </Grid>
           </DataTemplate>
         </ItemsControl.ItemTemplate>
@@ -24,6 +26,22 @@
         <Button Grid.Column="2" Margin="6,0,0,0" Content="{s:L options.rateReset}" Command="{Binding ResetRateCommand}" />
       </Grid>
       <TextBlock Classes="muted small" Text="{Binding RateLabel}" TextWrapping="Wrap" />
+      <TextBlock Classes="h3" Text="{s:L options.access}" Margin="0,10,0,0" />
+      <ItemsControl ItemsSource="{Binding Access}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:ChoiceSetting">
+            <Grid ColumnDefinitions="200,*" Margin="0,3">
+              <TextBlock Text="{Binding Label}" VerticalAlignment="Center" Classes="muted" />
+              <ComboBox Grid.Column="1" ItemsSource="{Binding Options}" SelectedIndex="{Binding SelectedIndex}" HorizontalAlignment="Stretch"
+                        AutomationProperties.Name="{Binding Label}" />
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <StackPanel Orientation="Horizontal" Spacing="8">
+        <Button Content="{s:L options.keyBindings}" Command="{Binding KeyBindingsCommand}" />
+        <Button Content="{s:L options.tutorialReset}" Command="{Binding ResetTutorialCommand}" />
+      </StackPanel>
       <TextBlock Classes="h3" Text="{s:L options.world}" Margin="0,10,0,0" />
       <ItemsControl ItemsSource="{Binding World}">
         <ItemsControl.ItemTemplate>
@@ -38,5 +56,6 @@
       <TextBlock Classes="muted small" Text="{s:L options.worldHint}" TextWrapping="Wrap" />
       <Button Classes="primary" HorizontalAlignment="Right" Content="{s:L ui.ok}" Command="{Binding CloseCommand}" Margin="0,8,0,0" />
     </StackPanel>
+    </ScrollViewer>
   </Border>
 </UserControl>

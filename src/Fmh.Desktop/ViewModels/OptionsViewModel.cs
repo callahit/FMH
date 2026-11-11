@@ -52,6 +52,19 @@ public sealed partial class OptionsViewModel : ViewModelBase
                 Palette.Apply(p.Theme);
             }),
         };
+        // Bedienung (AP 12b): geräteweit, nicht im Spielstand.
+        var scales = Data.Ui.FontScales;
+        Access = new List<ChoiceSetting>
+        {
+            new(T["options.fontScale"], scales.Select(f => $"{f * 100:0} %").ToList(), Math.Max(0, scales.IndexOf(State.FontScale)), i =>
+                MainWindowViewModel.Instance?.SetScale(scales[i])),
+            new(T["options.tutorial"], yesNo, State.Settings.Tutorial ? 1 : 0, i =>
+            {
+                State.Settings.Tutorial = i == 1;
+                State.SaveSettings();
+                _shell.RefreshTutorial();
+            }),
+        };
         var rules = Session.World.Rules;
         World = new List<InfoLine>
         {
@@ -91,6 +104,21 @@ public sealed partial class OptionsViewModel : ViewModelBase
         OnPropertyChanged(nameof(Rate));
     }
     public IReadOnlyList<ChoiceSetting> Settings { get; }
+    public IReadOnlyList<ChoiceSetting> Access { get; }
+
+    [RelayCommand]
+    private void KeyBindings() => MainWindowViewModel.Instance?.ShowDialog(new KeyBindingsViewModel(_shell));
+
+    /// <summary>Alle Tutorial-Hinweise erneut zeigen.</summary>
+    [RelayCommand]
+    private void ResetTutorial()
+    {
+        State.Settings.TutorialSeen.Clear();
+        State.Settings.Tutorial = true;
+        State.SaveSettings();
+        _shell.RefreshTutorial();
+        Access[1].SelectedIndex = 1;
+    }
     public IReadOnlyList<InfoLine> World { get; }
 
     [RelayCommand]

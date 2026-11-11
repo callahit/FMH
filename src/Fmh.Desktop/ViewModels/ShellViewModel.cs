@@ -24,12 +24,14 @@ public abstract class PageViewModel : ViewModelBase
 public sealed partial class NavItem : ObservableObject
 {
     public required string Label { get; init; }
+    /// <summary>Kennung des Menüpunkts (inbox, squad, …) für Tastenbelegung und Tutorial.</summary>
+    public required string Id { get; init; }
     public required Geometry Icon { get; init; }
     public required Func<PageViewModel> Create { get; init; }
     public required int Index { get; init; }
     public required Type PageType { get; init; }
     public bool Later { get; init; }
-    public string Shortcut => $"F{Index + 1}";
+    public string Shortcut { get; init; } = "";
 
     [ObservableProperty] private bool _isActive;
 }
@@ -63,7 +65,12 @@ public sealed partial class ShellViewModel : ViewModelBase
             ("menu.national", "IconNational", typeof(NationalPageViewModel), () => new NationalPageViewModel(this), false),
             ("menu.history", "IconHistory", typeof(HistoryPageViewModel), () => new HistoryPageViewModel(this), false),
         };
-        Nav = defs.Select((d, i) => new NavItem { Label = T[d.key], Icon = Icon(d.icon), PageType = d.type, Create = d.create, Index = i, Later = d.later }).ToList();
+        var keys = KeyMap.Current;
+        Nav = defs.Select((d, i) => new NavItem
+        {
+            Label = T[d.key], Id = d.key["menu.".Length..], Icon = Icon(d.icon), PageType = d.type, Create = d.create, Index = i, Later = d.later,
+            Shortcut = keys.Display("page." + d.key["menu.".Length..], T),
+        }).ToList();
         Open(Nav[0]);
     }
 
@@ -170,6 +177,7 @@ public sealed partial class ShellViewModel : ViewModelBase
         foreach (var n in Nav) n.IsActive = n == item;
         _previousPage = null;
         Page = item.Create();
+        ShowTutorial(item);
         RefreshHeader();
     }
 
@@ -288,17 +296,24 @@ public sealed partial class ShellViewModel : ViewModelBase
 
     public void ShowDialog(ViewModelBase dialog) => _main.ShowDialog(dialog);
 
+    /// <summary>Tasten nach der Belegung (rules/ui.json und eigene Einstellungen).</summary>
     public override bool HandleKey(Key key, KeyModifiers modifiers)
     {
-        if (key >= Key.F1 && key <= Key.F12 && key - Key.F1 < Nav.Count)
+        var action = KeyMap.Current.ActionFor(key, modifiers);
+        if (action?.StartsWith("page.", StringComparison.Ordinal) == true && Nav.FirstOrDefault(n => "page." + n.Id == action) is { } item)
         {
-            Open(Nav[key - Key.F1]);
+            Open(item);
             return true;
         }
-        if (key == Key.S && modifiers.HasFlag(KeyModifiers.Control)) { Save(); return true; }
+        switch (action)
+        {
+            case "save": Save(); return true;
+            case "options": Options(); return true;
+            case "holiday": Holiday(); return true;
+        }
         if (Page?.HandleKey(key, modifiers) == true) return true;
-        if (key == Key.Space) { Continue(); return true; }
-        if (key == Key.Escape && CanGoBack) { Back(); return true; }
+        if (action == "continue") { Continue(); return true; }
+        if (action == "back" && CanGoBack) { Back(); return true; }
         return false;
     }
 }

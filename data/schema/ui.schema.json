@@ -1,0 +1,54 @@
+{
+  "$id": "https://fmh.local/schema/ui.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Bedienung (Datei rules/ui.json, AP 12b): Tastenbelegung, Schriftgrößen und Tutorial.",
+  "properties": {
+    "fontScales": {
+      "description": "Wählbare Skalierungen der Oberfläche (1 = normal).",
+      "items": {
+        "type": "number"
+      },
+      "type": "array"
+    },
+    "keyBindings": {
+      "description": "Standardbelegung; eigene Belegungen liegen geräteweit in den Einstellungen.",
+      "items": {
+        "additionalProperties": false,
+        "description": "Aktion mit Standardtaste, z. B. continue = Space oder save = Ctrl+S.",
+        "properties": {
+          "action": {
+            "description": "Kennung der Aktion; Text unter keys.<action>. Seiten heißen page.<menü>.",
+            "type": "string"
+          },
+          "gesture": {
+            "description": "Tastenkombination im Avalonia-Format (F1, Ctrl+S, Space).",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "tutorial": {
+      "description": "Tutorial-Hinweise, je Seite einer beim ersten Öffnen.",
+      "items": {
+        "additionalProperties": false,
+        "description": "Tutorial-Hinweis; Texte unter tutorial.<id>.title und tutorial.<id>.text.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "page": {
+            "description": "Menüpunkt der Seite (inbox, squad, …), auf der der Hinweis erscheint.",
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "title": "FMH rules/ui.json",
+  "type": "object"
+}
