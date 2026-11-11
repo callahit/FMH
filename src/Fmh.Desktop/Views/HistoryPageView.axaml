@@ -28,61 +28,232 @@
         <TextBlock Grid.Column="1" Text="{Binding Champion}" />
       </Grid>
     </DataTemplate>
+    <DataTemplate x:DataType="vm:PlayerStatLine">
+      <Grid ColumnDefinitions="30,*,*,40,40,40,40,44" Margin="0,1">
+        <TextBlock Text="{Binding Rank}" Classes="muted" />
+        <TextBlock Grid.Column="1" Text="{Binding Name}" TextTrimming="CharacterEllipsis" />
+        <TextBlock Grid.Column="2" Text="{Binding Club}" Classes="muted" TextTrimming="CharacterEllipsis" />
+        <TextBlock Grid.Column="3" Text="{Binding Apps}" HorizontalAlignment="Right" />
+        <TextBlock Grid.Column="4" Text="{Binding Goals}" HorizontalAlignment="Right" />
+        <TextBlock Grid.Column="5" Text="{Binding Assists}" HorizontalAlignment="Right" />
+        <TextBlock Grid.Column="6" Text="{Binding Cards}" HorizontalAlignment="Right" />
+        <TextBlock Grid.Column="7" Text="{Binding Grade}" HorizontalAlignment="Right" />
+      </Grid>
+    </DataTemplate>
+    <DataTemplate x:DataType="vm:TeamStatLine">
+      <Grid ColumnDefinitions="30,*,34,70,60,90,40" Margin="0,1">
+        <TextBlock Text="{Binding Position}" Classes="muted" />
+        <TextBlock Grid.Column="1" Text="{Binding Club}" TextTrimming="CharacterEllipsis" />
+        <TextBlock Grid.Column="2" Text="{Binding Played}" HorizontalAlignment="Right" />
+        <TextBlock Grid.Column="3" Text="{Binding Record}" HorizontalAlignment="Center" />
+        <TextBlock Grid.Column="4" Text="{Binding Goals}" HorizontalAlignment="Center" />
+        <TextBlock Grid.Column="5" Text="{Binding PerGame}" HorizontalAlignment="Center" />
+        <TextBlock Grid.Column="6" Text="{Binding Points}" FontWeight="Bold" HorizontalAlignment="Right" />
+      </Grid>
+    </DataTemplate>
+    <DataTemplate x:DataType="vm:CompareLine">
+      <Grid ColumnDefinitions="*,120,120" Margin="0,1">
+        <TextBlock Text="{Binding Label}" Classes.muted="{Binding !Header}" FontWeight="{Binding WeightA}" />
+        <TextBlock Grid.Column="1" Text="{Binding A}" FontWeight="{Binding WeightA}" HorizontalAlignment="Right" />
+        <TextBlock Grid.Column="2" Text="{Binding B}" FontWeight="{Binding WeightB}" HorizontalAlignment="Right" />
+      </Grid>
+    </DataTemplate>
+    <DataTemplate x:DataType="vm:OpponentMatchLine">
+      <Grid ColumnDefinitions="56,*,24,*,50" Margin="0,1">
+        <TextBlock Text="{Binding Date}" Classes="muted small" VerticalAlignment="Center" />
+        <TextBlock Grid.Column="1" Text="{Binding Competition}" Classes="muted small" TextTrimming="CharacterEllipsis" VerticalAlignment="Center" />
+        <TextBlock Grid.Column="2" Text="{Binding Venue}" Classes="muted" HorizontalAlignment="Center" />
+        <TextBlock Grid.Column="3" Text="{Binding Opponent}" TextTrimming="CharacterEllipsis" />
+        <TextBlock Grid.Column="4" Text="{Binding Result}" Foreground="{Binding Brush}" FontWeight="Bold" HorizontalAlignment="Right" />
+      </Grid>
+    </DataTemplate>
   </UserControl.DataTemplates>
   <DockPanel>
     <TextBlock DockPanel.Dock="Top" Classes="h1" Text="{Binding Title}" Margin="0,0,0,12" />
-    <Grid ColumnDefinitions="*,16,*">
-      <!-- Verein: Rekorde, Titel, Rekordspieler, Saisonbilanzen -->
-      <Border Classes="card" Padding="14">
-        <DockPanel>
-          <ComboBox DockPanel.Dock="Top" ItemsSource="{Binding Clubs}" SelectedItem="{Binding Club}" MinWidth="220" Margin="0,0,0,8">
-            <ComboBox.ItemTemplate>
-              <DataTemplate x:DataType="vm:HistoryClubChoice"><TextBlock Text="{Binding Name}" /></DataTemplate>
-            </ComboBox.ItemTemplate>
-          </ComboBox>
-          <ScrollViewer>
-            <StackPanel Spacing="6">
-              <TextBlock Classes="h2" Text="{s:L history.clubRecords}" />
-              <ItemsControl ItemsSource="{Binding ClubRecords}" />
-              <TextBlock Classes="h2" Text="{s:L history.honours}" Margin="0,8,0,0" />
-              <ItemsControl ItemsSource="{Binding Honours}" />
-              <Grid ColumnDefinitions="*,16,*" Margin="0,8,0,0">
-                <StackPanel Spacing="4">
-                  <TextBlock Classes="h3" Text="{s:L history.topScorers}" />
-                  <ItemsControl ItemsSource="{Binding Scorers}" />
-                </StackPanel>
-                <StackPanel Grid.Column="2" Spacing="4">
-                  <TextBlock Classes="h3" Text="{s:L history.mostApps}" />
-                  <ItemsControl ItemsSource="{Binding Appearances}" />
-                </StackPanel>
-              </Grid>
-              <TextBlock Classes="h2" Text="{s:L history.seasons}" Margin="0,8,0,0" />
-              <ItemsControl ItemsSource="{Binding Seasons}" />
-            </StackPanel>
-          </ScrollViewer>
-        </DockPanel>
-      </Border>
+    <TabControl>
+      <TabItem Header="{s:L data.tab.history}">
+          <Grid ColumnDefinitions="*,16,*">
+            <!-- Verein: Rekorde, Titel, Rekordspieler, Saisonbilanzen -->
+            <Border Classes="card" Padding="14">
+              <DockPanel>
+                <ComboBox DockPanel.Dock="Top" ItemsSource="{Binding Clubs}" SelectedItem="{Binding Club}" MinWidth="220" Margin="0,0,0,8">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:HistoryClubChoice"><TextBlock Text="{Binding Name}" /></DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
+                <ScrollViewer>
+                  <StackPanel Spacing="6">
+                    <TextBlock Classes="h2" Text="{s:L history.clubRecords}" />
+                    <ItemsControl ItemsSource="{Binding ClubRecords}" />
+                    <TextBlock Classes="h2" Text="{s:L history.honours}" Margin="0,8,0,0" />
+                    <ItemsControl ItemsSource="{Binding Honours}" />
+                    <Grid ColumnDefinitions="*,16,*" Margin="0,8,0,0">
+                      <StackPanel Spacing="4">
+                        <TextBlock Classes="h3" Text="{s:L history.topScorers}" />
+                        <ItemsControl ItemsSource="{Binding Scorers}" />
+                      </StackPanel>
+                      <StackPanel Grid.Column="2" Spacing="4">
+                        <TextBlock Classes="h3" Text="{s:L history.mostApps}" />
+                        <ItemsControl ItemsSource="{Binding Appearances}" />
+                      </StackPanel>
+                    </Grid>
+                    <TextBlock Classes="h2" Text="{s:L history.seasons}" Margin="0,8,0,0" />
+                    <ItemsControl ItemsSource="{Binding Seasons}" />
+                  </StackPanel>
+                </ScrollViewer>
+              </DockPanel>
+            </Border>
 
-      <!-- Wettbewerb: Rekorde, Titelliste, Meisterchronik -->
-      <Border Grid.Column="2" Classes="card" Padding="14">
+            <!-- Wettbewerb: Rekorde, Titelliste, Meisterchronik -->
+            <Border Grid.Column="2" Classes="card" Padding="14">
+              <DockPanel>
+                <ComboBox DockPanel.Dock="Top" ItemsSource="{Binding Competitions}" SelectedItem="{Binding Competition}" MinWidth="220" Margin="0,0,0,8">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:LeagueChoice"><TextBlock Text="{Binding Name}" /></DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
+                <ScrollViewer>
+                  <StackPanel Spacing="6">
+                    <TextBlock Classes="h2" Text="{s:L history.competitionRecords}" />
+                    <ItemsControl ItemsSource="{Binding CompetitionRecords}" />
+                    <TextBlock Classes="h2" Text="{s:L history.titleTable}" Margin="0,8,0,0" />
+                    <ItemsControl ItemsSource="{Binding TitleTable}" />
+                    <TextBlock Classes="h2" Text="{s:L history.chronicle}" Margin="0,8,0,0" />
+                    <ItemsControl ItemsSource="{Binding Chronicle}" />
+                  </StackPanel>
+                </ScrollViewer>
+              </DockPanel>
+            </Border>
+          </Grid>
+      </TabItem>
+
+      <!-- Statistiken je Liga und Saison -->
+      <TabItem Header="{s:L data.tab.stats}">
         <DockPanel>
-          <ComboBox DockPanel.Dock="Top" ItemsSource="{Binding Competitions}" SelectedItem="{Binding Competition}" MinWidth="220" Margin="0,0,0,8">
-            <ComboBox.ItemTemplate>
-              <DataTemplate x:DataType="vm:LeagueChoice"><TextBlock Text="{Binding Name}" /></DataTemplate>
-            </ComboBox.ItemTemplate>
-          </ComboBox>
-          <ScrollViewer>
-            <StackPanel Spacing="6">
-              <TextBlock Classes="h2" Text="{s:L history.competitionRecords}" />
-              <ItemsControl ItemsSource="{Binding CompetitionRecords}" />
-              <TextBlock Classes="h2" Text="{s:L history.titleTable}" Margin="0,8,0,0" />
-              <ItemsControl ItemsSource="{Binding TitleTable}" />
-              <TextBlock Classes="h2" Text="{s:L history.chronicle}" Margin="0,8,0,0" />
-              <ItemsControl ItemsSource="{Binding Chronicle}" />
-            </StackPanel>
-          </ScrollViewer>
+          <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,8">
+            <ComboBox ItemsSource="{Binding StatLeagues}" SelectedItem="{Binding StatLeague}" MinWidth="200">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:LeagueChoice"><TextBlock Text="{Binding Name}" /></DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <ComboBox ItemsSource="{Binding StatSeasons}" SelectedItem="{Binding StatSeason}" MinWidth="110">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:SeasonChoice"><TextBlock Text="{Binding Label}" /></DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+            <TextBlock Text="{s:L data.sortBy}" VerticalAlignment="Center" />
+            <ComboBox ItemsSource="{Binding StatSorts}" SelectedItem="{Binding StatSort}" MinWidth="130">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:ValueOption"><TextBlock Text="{Binding Label}" /></DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+          <Grid ColumnDefinitions="*,16,*">
+            <Border Classes="card" Padding="14">
+              <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Spacing="4">
+                  <TextBlock Classes="h2" Text="{s:L data.players}" />
+                  <Grid ColumnDefinitions="30,*,*,40,40,40,40,44">
+                    <TextBlock Grid.Column="1" Text="{s:L col.name}" Classes="muted small" />
+                    <TextBlock Grid.Column="2" Text="{s:L col.club}" Classes="muted small" />
+                    <TextBlock Grid.Column="3" Text="{s:L col.apps}" Classes="muted small" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Column="4" Text="{s:L col.goals}" Classes="muted small" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Column="5" Text="{s:L col.assists}" Classes="muted small" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Column="6" Text="{s:L data.cards}" Classes="muted small" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Column="7" Text="{s:L col.grade}" Classes="muted small" HorizontalAlignment="Right" />
+                  </Grid>
+                </StackPanel>
+                <ScrollViewer><ItemsControl ItemsSource="{Binding PlayerStats}" /></ScrollViewer>
+              </DockPanel>
+            </Border>
+            <Border Grid.Column="2" Classes="card" Padding="14">
+              <DockPanel>
+                <StackPanel DockPanel.Dock="Top" Spacing="4">
+                  <TextBlock Classes="h2" Text="{s:L data.teams}" />
+                  <Grid ColumnDefinitions="30,*,34,70,60,90,40">
+                    <TextBlock Grid.Column="1" Text="{s:L col.club}" Classes="muted small" />
+                    <TextBlock Grid.Column="2" Text="{s:L col.played}" Classes="muted small" HorizontalAlignment="Right" />
+                    <TextBlock Grid.Column="3" Text="{s:L data.record}" Classes="muted small" HorizontalAlignment="Center" />
+                    <TextBlock Grid.Column="4" Text="{s:L col.goals}" Classes="muted small" HorizontalAlignment="Center" />
+                    <TextBlock Grid.Column="5" Text="{s:L data.perGame}" Classes="muted small" HorizontalAlignment="Center" />
+                    <TextBlock Grid.Column="6" Text="{s:L col.points}" Classes="muted small" HorizontalAlignment="Right" />
+                  </Grid>
+                </StackPanel>
+                <ScrollViewer><ItemsControl ItemsSource="{Binding TeamStats}" /></ScrollViewer>
+              </DockPanel>
+            </Border>
+          </Grid>
         </DockPanel>
-      </Border>
-    </Grid>
+      </TabItem>
+
+      <!-- Spielervergleich -->
+      <TabItem Header="{s:L data.tab.compare}">
+        <Border Classes="card" Padding="14" Margin="0,8,0,0">
+          <DockPanel>
+            <Grid DockPanel.Dock="Top" ColumnDefinitions="*,16,*" Margin="0,0,0,8">
+              <StackPanel Spacing="4">
+                <ComboBox ItemsSource="{Binding Clubs}" SelectedItem="{Binding CompareClubA}" MinWidth="220">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:HistoryClubChoice"><TextBlock Text="{Binding Name}" /></DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+                <ComboBox ItemsSource="{Binding ComparePlayersA}" SelectedItem="{Binding CompareA}" MinWidth="220">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:PlayerChoice"><TextBlock Text="{Binding Name}" /></DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
+              </StackPanel>
+              <StackPanel Grid.Column="2" Spacing="4">
+                <ComboBox ItemsSource="{Binding Clubs}" SelectedItem="{Binding CompareClubB}" MinWidth="220">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:HistoryClubChoice"><TextBlock Text="{Binding Name}" /></DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+                <ComboBox ItemsSource="{Binding ComparePlayersB}" SelectedItem="{Binding CompareB}" MinWidth="220">
+                  <ComboBox.ItemTemplate>
+                    <DataTemplate x:DataType="vm:PlayerChoice"><TextBlock Text="{Binding Name}" /></DataTemplate>
+                  </ComboBox.ItemTemplate>
+                </ComboBox>
+              </StackPanel>
+            </Grid>
+            <ScrollViewer><ItemsControl ItemsSource="{Binding CompareLines}" MaxWidth="640" HorizontalAlignment="Left" /></ScrollViewer>
+          </DockPanel>
+        </Border>
+      </TabItem>
+
+      <!-- Gegneranalyse -->
+      <TabItem Header="{s:L data.tab.opponent}">
+        <DockPanel>
+          <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Spacing="8" Margin="0,8">
+            <ComboBox ItemsSource="{Binding Clubs}" SelectedItem="{Binding Opponent}" MinWidth="220">
+              <ComboBox.ItemTemplate>
+                <DataTemplate x:DataType="vm:HistoryClubChoice"><TextBlock Text="{Binding Name}" /></DataTemplate>
+              </ComboBox.ItemTemplate>
+            </ComboBox>
+          </StackPanel>
+          <Grid ColumnDefinitions="*,16,*">
+            <Border Classes="card" Padding="14">
+              <StackPanel Spacing="6">
+                <TextBlock Classes="h2" Text="{Binding OpponentTitle}" />
+                <TextBlock Text="{Binding OpponentSummary}" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding OpponentFormation}" Classes="muted" />
+                <TextBlock Classes="h3" Text="{s:L data.lastMatches}" Margin="0,8,0,0" />
+                <ItemsControl ItemsSource="{Binding OpponentMatches}" />
+              </StackPanel>
+            </Border>
+            <Border Grid.Column="2" Classes="card" Padding="14">
+              <ScrollViewer>
+                <StackPanel Spacing="6">
+                  <TextBlock Classes="h3" Text="{s:L data.regulars}" />
+                  <ItemsControl ItemsSource="{Binding OpponentRegulars}" />
+                  <TextBlock Classes="h3" Text="{s:L data.scorers}" Margin="0,8,0,0" />
+                  <ItemsControl ItemsSource="{Binding OpponentScorers}" />
+                </StackPanel>
+              </ScrollViewer>
+            </Border>
+          </Grid>
+        </DockPanel>
+      </TabItem>
+    </TabControl>
   </DockPanel>
 </UserControl>
