@@ -388,7 +388,8 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
     vereinsloser Trainer.
   - Die Spielidee verschiebt die Grundhaltung der KI-Mannschaft und wirkt auf Konter und Pressing.
   - Entlassungen folgen festen Regeln ohne Spielzufall. Während der Saison wird ein Trainer entlassen, wenn
-    der Verein auf einem direkten Abstiegsplatz deutlich unter der Erwartung nach Ruf steht und aus den
+    der Verein auf einem direkten Abstiegsplatz oder einem der letzten drei Plätze (`bottomPlaces` in
+    `rules/managers.json`, schließt den Relegationsplatz der 18er-Ligen ein) deutlich unter der Erwartung nach Ruf steht und aus den
     letzten fünf Spielen höchstens drei Punkte holte. Das gilt frühestens nach einem Drittel der Saison,
     nach mindestens 120 Tagen im Amt und höchstens einmal je Verein und Saison. Zum Saisonende trifft es
     Absteiger mit klarer Enttäuschung oder Vereine weit unter der Erwartung.
