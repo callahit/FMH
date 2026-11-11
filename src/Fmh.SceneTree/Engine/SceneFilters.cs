@@ -18,14 +18,21 @@ public sealed class SceneGate
 
 public static class SceneFilters
 {
-    public static bool Allows(SceneNode node, SceneGate gate)
+    /// <summary>Nass, Eis und Flutlicht. Ohne Rollen- und Easter-Egg-Filter, damit seltene Texte dieselben Wetterbits achten.</summary>
+    public static bool WeatherAllows(SceneNode node, Weather weather, bool floodlit)
     {
         var c = node.Conditions;
-        if ((c & SceneCondition.Wet) != 0 && gate.Weather is not (Weather.Rain or Weather.Snow)) return false;
-        if ((c & SceneCondition.Icy) != 0 && gate.Weather != Weather.Snow) return false;
-        if ((c & SceneCondition.Floodlit) != 0 && !gate.Floodlit) return false;
-        if ((c & SceneCondition.LivePlay) != 0 && gate.Shootout) return false;
-        if ((c & SceneCondition.ClearLead) != 0 && gate.AttackLead < 2) return false;
+        if ((c & SceneCondition.Wet) != 0 && weather is not (Weather.Rain or Weather.Snow)) return false;
+        if ((c & SceneCondition.Icy) != 0 && weather != Weather.Snow) return false;
+        if ((c & SceneCondition.Floodlit) != 0 && !floodlit) return false;
+        return true;
+    }
+
+    public static bool Allows(SceneNode node, SceneGate gate)
+    {
+        if (!WeatherAllows(node, gate.Weather, gate.Floodlit)) return false;
+        if ((node.Conditions & SceneCondition.LivePlay) != 0 && gate.Shootout) return false;
+        if ((node.Conditions & SceneCondition.ClearLead) != 0 && gate.AttackLead < 2) return false;
         // Bit 32 ist unklar und filtert nicht. Nur die Geburtstags-Sondertexte (b29 = 2 oder 4) sind Easter Eggs.
         if (node.SpecialId is 2 or 4 && !gate.EasterEgg) return false;
         if (node.OffsideTrap && !gate.DefenceOffsideTrap) return false;
@@ -44,12 +51,9 @@ public static class SceneFilters
     /// <summary>Wetter und Rolle, ohne Abseitsfalle und Sondertext. Fallback, wenn sonst niemand übrig bleibt.</summary>
     public static bool AllowsCore(SceneNode node, SceneGate gate)
     {
-        var c = node.Conditions;
-        if ((c & SceneCondition.Wet) != 0 && gate.Weather is not (Weather.Rain or Weather.Snow)) return false;
-        if ((c & SceneCondition.Icy) != 0 && gate.Weather != Weather.Snow) return false;
-        if ((c & SceneCondition.Floodlit) != 0 && !gate.Floodlit) return false;
-        if ((c & SceneCondition.LivePlay) != 0 && gate.Shootout) return false;
-        if ((c & SceneCondition.ClearLead) != 0 && gate.AttackLead < 2) return false;
+        if (!WeatherAllows(node, gate.Weather, gate.Floodlit)) return false;
+        if ((node.Conditions & SceneCondition.LivePlay) != 0 && gate.Shootout) return false;
+        if ((node.Conditions & SceneCondition.ClearLead) != 0 && gate.AttackLead < 2) return false;
         return RolesFit(node, gate.Occupied);
     }
 }

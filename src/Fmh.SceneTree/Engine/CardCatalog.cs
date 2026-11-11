@@ -6,20 +6,20 @@ namespace Fmh.SceneTree;
 /// </summary>
 public static class CardCatalog
 {
+    /// <summary>Passt in „Karte für OFFENDER REASON“, also mit „wegen …“.</summary>
     public static string Reason(byte code) => code switch
     {
-        2 => "grobes Foul",
-        3 => "Foul",
-        4 or 5 => "Foul",
-        6 or 10 => "Handspiel",
-        7 => "Halten",
-        9 => "taktisches Foul",
-        25 => "Nachtreten",
-        26 => "Stoßen",
-        29 => "Foul am Torwart",
-        30 or 33 => "Meckern",
-        37 => "Schwalbe",
-        _ => "Foulspiel",
+        2 => "wegen eines groben Fouls",
+        3 or 4 or 5 => "wegen eines Fouls",
+        6 or 10 => "wegen Handspiels",
+        7 => "wegen Haltens",
+        9 => "wegen eines taktischen Fouls",
+        25 => "wegen Nachtretens",
+        26 => "wegen Stoßens",
+        29 => "wegen eines Fouls am Torwart",
+        30 or 33 => "wegen Meckerns",
+        37 => "wegen einer Schwalbe",
+        _ => "wegen Foulspiels",
     };
 
     public static bool Serious(byte code) => code is 2 or 25 or 26 or 29;

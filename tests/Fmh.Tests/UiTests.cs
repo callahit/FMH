@@ -11,6 +11,7 @@ using Fmh.Desktop;
 using Fmh.Desktop.Services;
 using Fmh.Desktop.ViewModels;
 using Fmh.Desktop.Views;
+using Fmh.SceneTree;
 
 [assembly: AvaloniaTestApplication(typeof(Fmh.Tests.TestAppBuilder))]
 
@@ -324,5 +325,40 @@ public partial class UiTests
             AppState.Current.Session!.HumanManager.Profile.DisplayCurrency = "EUR";
             AppState.Current.ApplyCurrency();
         }
+    }
+
+    [AvaloniaFact]
+    public void WatchedCareerMatchUsesTheTextEngine()
+    {
+        var (w, vm) = Open();
+        var shell = StartGame(vm);
+        var session = AppState.Current.Session!;
+        session.HumanManager.Profile.MatchDisplay = MatchDisplayMode.Scene;
+        ContinueToMatchday(shell, session);
+        var fixture = session.PendingHumanFixture;
+        Assert.NotNull(fixture);
+        shell.Continue();
+        var match = Assert.IsType<MatchViewModel>(vm.Screen);
+        Pump();
+        match.Kickoff();
+        match.Talk(match.Tones[5]);
+        Assert.Equal(MatchStage.Live, match.Stage);
+        for (var i = 0; i < 8; i++) match.Tick(TimeSpan.FromSeconds(2));
+        if (match.Paused) match.TogglePause();
+        match.FinishNow();
+        Assert.Equal(MatchStage.PostMatch, match.Stage);
+        Assert.NotNull(fixture!.Result);
+
+        var sim = (SceneSimulation)typeof(MatchViewModel)
+            .GetField("_sim", System.Reflection.BindingFlags.Instance | System.Reflection.BindingFlags.NonPublic)!
+            .GetValue(match)!;
+        Assert.Equal(fixture.Result!.HomeGoals, sim.Home.Goals);
+        Assert.Equal(fixture.Result.AwayGoals, sim.Away.Goals);
+        var ticker = match.Ticker.Select(t => t.Text).Where(t => !string.IsNullOrWhiteSpace(t)).ToList();
+        TextmodusAbnahmeTests.AssertSurface(ticker, allowEaster: false);
+        Assert.Contains(ticker, t => t.Contains("...", StringComparison.Ordinal));
+        Assert.True(sim.Events.Count(e => !string.IsNullOrEmpty(e.Narrative)) >= 40);
+        Pump();
+        AssertNoMissingTexts(w);
     }
 }

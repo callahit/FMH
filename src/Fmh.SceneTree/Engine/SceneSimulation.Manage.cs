@@ -21,6 +21,25 @@ public sealed partial class SceneSimulation
         if (AutoReplace(team, tired)) _lastAiSub[(int)side] = Minute;
     }
 
+    /// <summary>Platzverweis und Auswechslung erst nach dem Text, damit die Zeile den betroffenen Spieler noch kennt.</summary>
+    private void SettleIncident()
+    {
+        if (_ejectAfterIncident is { } sent)
+        {
+            _ejectAfterIncident = null;
+            var team = _teamOf[sent];
+            Remove(sent);
+            if (team.OnPitch.All(p => p.Position != Position.GK)) EnsureGoalkeeper(team);
+        }
+        if (_injureAfterIncident is { } hurt)
+        {
+            _injureAfterIncident = null;
+            hurt.Injured = true;
+            var team = _teamOf[hurt];
+            if (!team.HumanControlled) AutoReplace(team, hurt);
+        }
+    }
+
     private bool AutoReplace(MatchTeamState team, MatchPlayer outgoing)
     {
         if (team.SubstitutionsUsed >= MaxSubstitutions || !team.OnPitch.Contains(outgoing)) return false;

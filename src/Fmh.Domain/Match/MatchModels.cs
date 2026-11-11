@@ -58,7 +58,7 @@ public sealed class MatchSetup
     public IReadOnlyList<InjuryType> InjuryTypes { get; init; } = Array.Empty<InjuryType>();
     public ulong Seed { get; init; }
     public int RefereeStrictness { get; init; } = 10;
-    public Weather Weather { get; init; } = Weather.Sunny;
+    public Weather Weather { get; set; } = Weather.Sunny;
     public double InjuryFrequency { get; init; } = 1.0;
     public int Substitutions { get; init; } = 5;
     public bool NeutralGround { get; init; }
@@ -68,7 +68,7 @@ public sealed class MatchSetup
     /// <summary>Platzhalter REF. Die schnelle Engine liest das Feld nicht.</summary>
     public string? RefereeName { get; init; }
     /// <summary>Annahme: November bis Februar unter Flutlicht. Die schnelle Engine liest das Feld nicht.</summary>
-    public bool Floodlit { get; init; }
+    public bool Floodlit { get; set; }
 
     public TeamSetup Team(Side s) => s == Side.Home ? Home : Away;
 }

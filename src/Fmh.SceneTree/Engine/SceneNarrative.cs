@@ -34,7 +34,9 @@ public static partial class SceneNarrative
             if (code == 0) return match.Value;
             var index = match.Groups[3].Length == 0 ? 0 : match.Groups[3].Value[0] - '0';
             var player = narrator.Find(match.Groups[1].Value == "1", code, index);
-            return player?.Player.LastName ?? RoleBook.FallbackName(code);
+            if (player is not null) return player.Player.LastName;
+            // Suffix 1–3 meint einen weiteren Spieler. Fehlt er, nicht denselben Namen wiederholen.
+            return index > 0 ? "ein weiterer Spieler" : RoleBook.FallbackName(code);
         });
         return Words.Replace(text, match => match.Value switch
         {
@@ -46,6 +48,19 @@ public static partial class SceneNarrative
             _ => match.Value,
         });
     }
+
+    /// <summary>
+    /// Eigenständiger Torjubel („Tor!“, „… Tor!“), nicht „über das Tor“, „Kein Tor“ oder „am Tor vorbei“.
+    /// Solche Zeilen stehen im Baum manchmal auf dem Elternknoten, bevor der Schiri oder die Linie den Treffer zurücknimmt.
+    /// </summary>
+    public static bool IsGoalCheer(string text)
+    {
+        if (string.IsNullOrEmpty(text) || !text.Contains("Tor!", StringComparison.Ordinal)) return false;
+        return GoalCheerPattern().IsMatch(text);
+    }
+
+    [GeneratedRegex(@"(^|[.!?]\s*)Tor!")]
+    private static partial Regex GoalCheerPattern();
 
     public static int Code(string name) => name switch
     {

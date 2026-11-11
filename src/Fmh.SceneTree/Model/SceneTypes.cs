@@ -95,10 +95,10 @@ public sealed class SceneWeightOptions
     public double MinutesPerScene { get; init; } = 7.15;
 
     /// <summary>Fouls je Spiel, beide Teams, bevor Taktik und Zweikampfhärte skalieren.</summary>
-    public double FoulsPerMatch { get; init; } = 30.4;
+    public double FoulsPerMatch { get; init; } = 28.8;
 
     public double OffsidesPerMatch { get; init; } = 14.3;
-    public double CornersPerMatch { get; init; } = 15.5;
+    public double CornersPerMatch { get; init; } = 14.6;
     public double ThrowInsPerMatch { get; init; } = 16;
 
     /// <summary>Kurze Abschlüsse zusätzlich zu den Schüssen aus offenen Szenen und vollen Standards.</summary>
@@ -122,7 +122,7 @@ public sealed class SceneWeightOptions
 
     /// <summary>Gelbe und rote Karte je Foul, skaliert mit Schiri und Zweikampfhärte.</summary>
     public double YellowPerFoul { get; init; } = 0.140;
-    public double RedPerFoul { get; init; } = 0.0054;
+    public double RedPerFoul { get; init; } = 0.0063;
 
     /// <summary>Verletzung je Foul, mal der Welthäufigkeit und der Verletzungsanfälligkeit.</summary>
     public double InjuryPerFoul { get; init; } = 0.029;
