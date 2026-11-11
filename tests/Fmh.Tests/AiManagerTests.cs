@@ -2,6 +2,7 @@ using Fmh.Core.Data;
 using Fmh.Core.Game;
 using Fmh.Core.Logic;
 using Fmh.Core.Model;
+using Fmh.Core.Modules;
 using Fmh.Core.Persistence;
 using Fmh.MatchEngine;
 
@@ -179,5 +180,20 @@ public sealed class AiManagerTests
         data.ManagerRules.SackingsPerTopLeague = new double[] { 3 };
         Assert.Contains(DataValidator.Validate(data), e => e.Contains("sackingsPerTopLeague"));
         Assert.Contains(DataValidator.Validate(data), e => e.Contains("Ligazahlen 'ITA1': abweichende Toleranzen ohne Begründung"));
+    }
+
+    /// <summary>Der Relegationsplatz der 18er-Ligen zählt für Entlassungen in der Saison zum gefährdeten Tabellenende.</summary>
+    [Fact]
+    public void RelegationPlayoffPlaceCountsAsDanger()
+    {
+        var s = TestData.NewSession(seed: 3);
+        var w = s.World;
+        Assert.Equal(3, TestData.Data.ManagerRules.InSeason.BottomPlaces);
+        var de1 = w.Leagues.First(l => l.Id == "DE1");
+        Assert.Equal(18, de1.ClubIds.Count);
+        Assert.True(ManagersModule.InDanger(de1, 16, w.SeasonYear, 3));
+        Assert.False(ManagersModule.InDanger(de1, 16, w.SeasonYear, 2));
+        Assert.True(ManagersModule.InDanger(de1, 18, w.SeasonYear, 2));
+        Assert.False(ManagersModule.InDanger(de1, 15, w.SeasonYear, 3));
     }
 }

@@ -57,7 +57,7 @@ public sealed class ManagersModule : GameModule
             .Select((c, i) => (c.Id, i + 1)).ToDictionary(t => t.Id, t => t.Item2);
 
     /// <summary>
-    /// Nach einem Spieltag: Entlassung, wenn der Verein auf einem direkten Abstiegsplatz (bzw. ganz unten) deutlich unter
+    /// Nach einem Spieltag: Entlassung, wenn der Verein auf einem direkten Abstiegsplatz bzw. den letzten BottomPlaces Plätzen deutlich unter
     /// den Erwartungen steht und die letzten fünf Spiele höchstens drei Punkte brachten. Frühestens nach einem Drittel
     /// der Saison und höchstens einmal je Verein und Saison.
     /// </summary>
@@ -75,11 +75,15 @@ public sealed class ManagersModule : GameModule
             if (ManagerGenerator.AiManagerOf(World, club) is not { CurrentStation: { } st } m) continue;
             if (date.DayNumber - st.From.DayNumber < rules.MinTenureDays || st.From > seasonStart.AddDays(rules.NewcomerDays)) continue;
             var formPoints = row.Form.TakeLast(5).Sum(c => c == 'S' ? 3 : c == 'U' ? 1 : 0);
-            var bottom = Pyramid.DirectZone(league, row.Position, World.SeasonYear) == MovementDirection.Down || row.Position > n - 2;
+            var bottom = InDanger(league, row.Position, World.SeasonYear, rules.BottomPlaces);
             var below = row.Position - expected.GetValueOrDefault(club.Id, row.Position);
             if (bottom && below >= Math.Max(rules.MinBelow, (int)(n * rules.BelowShare)) && formPoints <= rules.MaxFormPoints) Sack(m, club, date, row.Position);
         }
     }
+
+    /// <summary>Gefährdeter Tabellenplatz: direkte Abstiegszone oder einer der letzten <paramref name="bottomPlaces"/> Plätze.</summary>
+    public static bool InDanger(League league, int position, int seasonYear, int bottomPlaces) =>
+        Pyramid.DirectZone(league, position, seasonYear) == MovementDirection.Down || position > league.ClubIds.Count - bottomPlaces;
 
     /// <summary>Saisonende: Absteiger und deutlich enttäuschende Vereine trennen sich, erfolgreiche Trainer gewinnen an Ruf.</summary>
     public void ReviewSeason(DateOnly date)
