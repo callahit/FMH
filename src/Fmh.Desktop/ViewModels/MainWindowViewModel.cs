@@ -1,4 +1,5 @@
 using Avalonia.Input;
+using Avalonia.Media;
 using CommunityToolkit.Mvvm.ComponentModel;
 
 namespace Fmh.Desktop.ViewModels;
@@ -22,6 +23,20 @@ public sealed partial class MainWindowViewModel : ViewModelBase
     }
 
     public bool HasDialog => Dialog is not null;
+
+    /// <summary>Skalierung der ganzen Oberfläche (AP 12b, Einstellung "Schriftgröße").</summary>
+    public double Scale => State.FontScale;
+
+    public ITransform UiTransform => new ScaleTransform(Scale, Scale);
+
+    /// <summary>Neue Skalierung übernehmen und speichern.</summary>
+    public void SetScale(double scale)
+    {
+        State.Settings.FontScale = scale;
+        State.SaveSettings();
+        OnPropertyChanged(nameof(Scale));
+        OnPropertyChanged(nameof(UiTransform));
+    }
 
     public void Navigate(ViewModelBase screen)
     {

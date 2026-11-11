@@ -7,10 +7,13 @@
         Title="{s:L app.windowTitle}"
         Width="1440" Height="900" MinWidth="1180" MinHeight="720"
         WindowStartupLocation="CenterScreen">
-  <Grid>
-    <ContentControl Content="{Binding Screen}" />
-    <Border IsVisible="{Binding HasDialog}" Background="#99000000">
-      <ContentControl Content="{Binding Dialog}" HorizontalAlignment="Center" VerticalAlignment="Center" />
-    </Border>
-  </Grid>
+  <!-- Skalierung der ganzen Oberfläche (Einstellung Schriftgröße) -->
+  <LayoutTransformControl LayoutTransform="{Binding UiTransform}">
+    <Grid>
+      <ContentControl Content="{Binding Screen}" />
+      <Border IsVisible="{Binding HasDialog}" Background="#99000000">
+        <ContentControl Content="{Binding Dialog}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+      </Border>
+    </Grid>
+  </LayoutTransformControl>
 </Window>

@@ -3,10 +3,25 @@ using Fmh.Core.Data;
 
 namespace Fmh.Desktop.Services;
 
-/// <summary>Geräteweite Einstellungen außerhalb der Spielstände (Sprache). Liegen als settings.json neben dem Spielstandordner.</summary>
+/// <summary>
+/// Geräteweite Einstellungen außerhalb der Spielstände (Sprache, Bedienung). Liegen als settings.json neben dem
+/// Spielstandordner.
+/// </summary>
 public sealed class AppSettings
 {
     public string? Language { get; set; }
+
+    /// <summary>Eigene Tastenbelegung (Aktion → Taste); fehlende Aktionen nutzen den Standard aus rules/ui.json.</summary>
+    public Dictionary<string, string> KeyBindings { get; set; } = new();
+
+    /// <summary>Skalierung der Oberfläche (1 = normal).</summary>
+    public double FontScale { get; set; } = 1.0;
+
+    /// <summary>Tutorial-Hinweise zeigen.</summary>
+    public bool Tutorial { get; set; } = true;
+
+    /// <summary>Bereits bestätigte Tutorial-Hinweise.</summary>
+    public List<string> TutorialSeen { get; set; } = new();
 
     public static AppSettings Load(string path)
     {
@@ -31,7 +46,7 @@ public sealed class AppSettings
         }
         catch (Exception ex) when (ex is IOException or UnauthorizedAccessException)
         {
-            // Nicht speicherbar (z. B. schreibgeschützt): Sprache gilt dann nur für diese Sitzung.
+            // Nicht speicherbar (z. B. schreibgeschützt): Einstellungen gelten dann nur für diese Sitzung.
         }
     }
 
