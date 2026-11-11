@@ -454,5 +454,115 @@
     }
    }
   ]
+ },
+ {
+  "id": "anpAnniversary",
+  "category": "club",
+  "feature": "anstoss.privateLife",
+  "options": [
+   {
+    "id": "flowers",
+    "effects": {
+     "savings": -500,
+     "stress": -2
+    }
+   },
+   {
+    "id": "forget",
+    "effects": {
+     "stress": 8,
+     "media": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "anpParentsEvening",
+  "category": "club",
+  "feature": "anstoss.privateLife",
+  "options": [
+   {
+    "id": "go",
+    "effects": {
+     "stress": -3,
+     "board": -1
+    }
+   },
+   {
+    "id": "skip",
+    "effects": {
+     "stress": 4
+    }
+   }
+  ]
+ },
+ {
+  "id": "anpHoliday",
+  "category": "club",
+  "feature": "anstoss.privateLife",
+  "options": [
+   {
+    "id": "book",
+    "effects": {
+     "savings": -6000,
+     "stress": -12
+    }
+   },
+   {
+    "id": "no",
+    "effects": {
+     "stress": 3
+    }
+   }
+  ]
+ },
+ {
+  "id": "anpNeighbour",
+  "category": "club",
+  "feature": "anstoss.privateLife",
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "stress": 2,
+     "fans": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "anpLottery",
+  "category": "club",
+  "feature": "anstoss.privateLife",
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "savings": 2500,
+     "stress": -2
+    }
+   }
+  ]
+ },
+ {
+  "id": "anpTabloidHouse",
+  "category": "club",
+  "feature": "anstoss.privateLife",
+  "options": [
+   {
+    "id": "deny",
+    "effects": {
+     "media": -1,
+     "stress": 2
+    }
+   },
+   {
+    "id": "invite",
+    "effects": {
+     "media": 2,
+     "stress": 3
+    }
+   }
+  ]
  }
 ]
