@@ -1,0 +1,458 @@
+[
+ {
+  "id": "ansHoroscope",
+  "category": "media",
+  "feature": "anstoss.satire",
+  "options": [
+   {
+    "id": "obey",
+    "effects": {
+     "board": 3,
+     "morale": -0.1
+    }
+   },
+   {
+    "id": "ignore",
+    "effects": {
+     "board": -2
+    }
+   }
+  ]
+ },
+ {
+  "id": "ansMicrophone",
+  "category": "media",
+  "feature": "anstoss.satire",
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "media": -1,
+     "fans": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "ansSausageKit",
+  "category": "media",
+  "feature": "anstoss.satire",
+  "options": [
+   {
+    "id": "accept",
+    "effects": {
+     "money": 40000,
+     "media": -2,
+     "morale": -0.2
+    }
+   },
+   {
+    "id": "decline",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "ansMayorSpeech",
+  "category": "media",
+  "feature": "anstoss.satire",
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "fans": -1,
+     "board": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "ansTvExpert",
+  "category": "media",
+  "feature": "anstoss.satire",
+  "options": [
+   {
+    "id": "respond",
+    "effects": {
+     "media": 2,
+     "board": -1
+    },
+    "chance": 0.6,
+    "failEffects": {
+     "media": -3
+    }
+   },
+   {
+    "id": "ignore",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "ansGnomes",
+  "category": "media",
+  "feature": "anstoss.satire",
+  "options": [
+   {
+    "id": "accept",
+    "effects": {
+     "fans": 2,
+     "money": -1000
+    }
+   },
+   {
+    "id": "decline",
+    "effects": {
+     "fans": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "antKaraoke",
+  "category": "club",
+  "feature": "anstoss.teamNights",
+  "options": [
+   {
+    "id": "pay",
+    "effects": {
+     "money": -3000,
+     "morale": 0.3
+    }
+   },
+   {
+    "id": "skip",
+    "effects": {
+     "morale": -0.1
+    }
+   }
+  ]
+ },
+ {
+  "id": "antBowling",
+  "category": "club",
+  "feature": "anstoss.teamNights",
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "morale": 0.2
+    }
+   }
+  ]
+ },
+ {
+  "id": "antPubNight",
+  "category": "club",
+  "feature": "anstoss.teamNights",
+  "when": {
+   "player": "any"
+  },
+  "options": [
+   {
+    "id": "fine",
+    "effects": {
+     "playerFine": 1,
+     "playerMorale": -0.3,
+     "media": 1
+    }
+   },
+   {
+    "id": "laugh",
+    "effects": {
+     "morale": 0.2,
+     "media": -2,
+     "board": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "antCooking",
+  "category": "club",
+  "feature": "anstoss.teamNights",
+  "when": {
+   "player": "any"
+  },
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "morale": 0.2
+    }
+   }
+  ]
+ },
+ {
+  "id": "antThemePark",
+  "category": "club",
+  "feature": "anstoss.teamNights",
+  "when": {
+   "afterLoss": true
+  },
+  "options": [
+   {
+    "id": "go",
+    "effects": {
+     "money": -8000,
+     "morale": 0.4
+    }
+   },
+   {
+    "id": "stay",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "antChristmas",
+  "category": "club",
+  "feature": "anstoss.teamNights",
+  "when": {
+   "months": [
+    12
+   ]
+  },
+  "options": [
+   {
+    "id": "big",
+    "effects": {
+     "money": -15000,
+     "morale": 0.4,
+     "media": -1
+    }
+   },
+   {
+    "id": "small",
+    "effects": {
+     "money": -3000,
+     "morale": 0.1
+    }
+   }
+  ]
+ },
+ {
+  "id": "anfChoreo",
+  "category": "fans",
+  "feature": "anstoss.fanActions",
+  "options": [
+   {
+    "id": "pay",
+    "effects": {
+     "money": -5000,
+     "fans": 4
+    }
+   },
+   {
+    "id": "decline",
+    "effects": {
+     "fans": -2
+    }
+   }
+  ]
+ },
+ {
+  "id": "anfBusWelcome",
+  "category": "fans",
+  "feature": "anstoss.fanActions",
+  "when": {
+   "afterWin": true
+  },
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "morale": 0.2,
+     "fans": 2
+    }
+   }
+  ]
+ },
+ {
+  "id": "anfProtest",
+  "category": "fans",
+  "feature": "anstoss.fanActions",
+  "when": {
+   "afterLoss": true
+  },
+  "options": [
+   {
+    "id": "talk",
+    "effects": {
+     "fans": 2
+    },
+    "chance": 0.5,
+    "failEffects": {
+     "fans": -2,
+     "board": -1
+    }
+   },
+   {
+    "id": "ignore",
+    "effects": {
+     "board": -2,
+     "fans": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "anfOpenTraining",
+  "category": "fans",
+  "feature": "anstoss.fanActions",
+  "options": [
+   {
+    "id": "open",
+    "effects": {
+     "fans": 3,
+     "morale": -0.05
+    }
+   },
+   {
+    "id": "closed",
+    "effects": {
+     "fans": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "anfAnthem",
+  "category": "fans",
+  "feature": "anstoss.fanActions",
+  "options": [
+   {
+    "id": "accept",
+    "effects": {
+     "fans": 2,
+     "media": -1
+    }
+   },
+   {
+    "id": "veto",
+    "effects": {
+     "fans": -2
+    }
+   }
+  ]
+ },
+ {
+  "id": "anfSpecialTrain",
+  "category": "fans",
+  "feature": "anstoss.fanActions",
+  "options": [
+   {
+    "id": "sponsor",
+    "effects": {
+     "money": -6000,
+     "fans": 4
+    }
+   },
+   {
+    "id": "no",
+    "effects": {}
+   }
+  ]
+ },
+ {
+  "id": "ancMole",
+  "category": "curious",
+  "feature": "anstoss.curiosities",
+  "options": [
+   {
+    "id": "catch",
+    "effects": {
+     "money": -2000,
+     "pitch": 3
+    }
+   },
+   {
+    "id": "leave",
+    "effects": {
+     "pitch": -5,
+     "fans": 1,
+     "media": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "ancBallBoy",
+  "category": "curious",
+  "feature": "anstoss.curiosities",
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "media": 2,
+     "fans": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "ancFloodlight",
+  "category": "curious",
+  "feature": "anstoss.curiosities",
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "morale": 0.1,
+     "money": -1500
+    }
+   }
+  ]
+ },
+ {
+  "id": "ancSeagulls",
+  "category": "curious",
+  "feature": "anstoss.curiosities",
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "fans": 1,
+     "media": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "ancLuckyShorts",
+  "category": "curious",
+  "feature": "anstoss.curiosities",
+  "when": {
+   "player": "striker"
+  },
+  "options": [
+   {
+    "id": "wash",
+    "effects": {
+     "playerMorale": -0.3
+    }
+   },
+   {
+    "id": "allow",
+    "effects": {
+     "playerMorale": 0.2,
+     "media": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "ancWrongStadium",
+  "category": "curious",
+  "feature": "anstoss.curiosities",
+  "options": [
+   {
+    "id": "ok",
+    "effects": {
+     "morale": -0.1,
+     "media": 1
+    }
+   }
+  ]
+ }
+]

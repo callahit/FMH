@@ -164,6 +164,12 @@
     },
     {
       "fileMatch": [
+        "data/*/rules/anstoss.json"
+      ],
+      "url": "./data/schema/anstoss.schema.json"
+    },
+    {
+      "fileMatch": [
         "data/*/competitions/europe.json"
       ],
       "url": "./data/schema/europe.schema.json"

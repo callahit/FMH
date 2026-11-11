@@ -65,6 +65,14 @@ public sealed partial class OptionsViewModel : ViewModelBase
                 _shell.RefreshTutorial();
             }),
         };
+        // Anstoß-Elemente (AP 13): je Manager im Spielstand, auch im laufenden Spiel schaltbar.
+        Anstoss = Data.Anstoss.Elements.Count == 0 ? new List<ChoiceSetting>() : new List<ChoiceSetting>
+        {
+            new(T["options.anstoss"], yesNo, Session.AnstossOn ? 1 : 0, i => Session.SetAnstoss(i == 1)),
+        };
+        foreach (var e in Data.Anstoss.Elements)
+            Anstoss.Add(new ChoiceSetting("  " + T["anstoss." + e.Id + ".name"], yesNo, Session.AnstossElementOn(e.Id) ? 1 : 0,
+                i => Session.SetAnstossElement(e.Id, i == 1)));
         var rules = Session.World.Rules;
         World = new List<InfoLine>
         {
@@ -105,6 +113,8 @@ public sealed partial class OptionsViewModel : ViewModelBase
     }
     public IReadOnlyList<ChoiceSetting> Settings { get; }
     public IReadOnlyList<ChoiceSetting> Access { get; }
+    public List<ChoiceSetting> Anstoss { get; }
+    public bool HasAnstoss => Anstoss.Count > 0;
 
     [RelayCommand]
     private void KeyBindings() => MainWindowViewModel.Instance?.ShowDialog(new KeyBindingsViewModel(_shell));

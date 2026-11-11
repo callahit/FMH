@@ -3304,5 +3304,10 @@
  "keys.page.history": "Datenzentrale",
  "tutorial.history.title": "Datenzentrale",
  "tutorial.history.text": "Rekorde, Meisterchronik, Statistiken über mehrere Saisons, Spielervergleich und Gegneranalyse.",
- "keys.reserved": "{0} ist für Eingabefelder und Listen reserviert. Bitte eine andere Taste oder eine Kombination mit Strg, Umschalt oder Alt wählen."
+ "keys.reserved": "{0} ist für Eingabefelder und Listen reserviert. Bitte eine andere Taste oder eine Kombination mit Strg, Umschalt oder Alt wählen.",
+ "options.anstoss": "Anstoß-Modus",
+ "options.anstossTitle": "Anstoß-Elemente",
+ "options.anstossHint": "Gilt für diesen Spielstand. Ausgeschaltete Elemente werden weder ausgelöst noch angezeigt; offene Ereignisse verschwinden ohne Wirkung.",
+ "newGame.anstoss": "Anstoß-Modus",
+ "newGame.anstossInfo": "Satire, Mannschaftsabende, Fanaktionen und Kuriositäten aus dem Paket „Anstoß-Elemente“. Jedes Element lässt sich später in den Einstellungen einzeln schalten."
 }

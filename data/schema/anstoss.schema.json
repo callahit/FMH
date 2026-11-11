@@ -1,0 +1,23 @@
+{
+  "$id": "https://fmh.local/schema/anstoss.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Anstoß-Elemente (Datei rules/anstoss.json, AP 13), geliefert vom Paket anstoss. Inhalte tragen das Kennzeichen \"feature\": \"anstoss.<element>\"; ausgeschaltete Elemente werden weder ausgelöst noch angezeigt.",
+  "properties": {
+    "elements": {
+      "items": {
+        "additionalProperties": false,
+        "description": "Einzeln abschaltbares Element; Texte unter anstoss.<id>.name und anstoss.<id>.info.",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "title": "FMH rules/anstoss.json",
+  "type": "object"
+}

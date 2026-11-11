@@ -26,6 +26,19 @@
         <Button Grid.Column="2" Margin="6,0,0,0" Content="{s:L options.rateReset}" Command="{Binding ResetRateCommand}" />
       </Grid>
       <TextBlock Classes="muted small" Text="{Binding RateLabel}" TextWrapping="Wrap" />
+      <TextBlock Classes="h3" Text="{s:L options.anstossTitle}" Margin="0,10,0,0" IsVisible="{Binding HasAnstoss}" />
+      <TextBlock Classes="muted small" Text="{s:L options.anstossHint}" TextWrapping="Wrap" IsVisible="{Binding HasAnstoss}" />
+      <ItemsControl ItemsSource="{Binding Anstoss}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:ChoiceSetting">
+            <Grid ColumnDefinitions="200,*" Margin="0,3">
+              <TextBlock Text="{Binding Label}" VerticalAlignment="Center" Classes="muted" />
+              <ComboBox Grid.Column="1" ItemsSource="{Binding Options}" SelectedIndex="{Binding SelectedIndex}" HorizontalAlignment="Stretch"
+                        AutomationProperties.Name="{Binding Label}" />
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
       <TextBlock Classes="h3" Text="{s:L options.access}" Margin="0,10,0,0" />
       <ItemsControl ItemsSource="{Binding Access}">
         <ItemsControl.ItemTemplate>

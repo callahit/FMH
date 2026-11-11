@@ -102,6 +102,29 @@ Im Startdialog wird der Spielmodus gewählt:
   - **Mitgeliefert:** Klassenerhalt mit dem Letzten, Aus dem Keller nach oben, Ohne Geld ins Mittelfeld,
     Pokalschreck, Meister in drei Jahren.
 
+## Anstoß-Elemente (AP 13a)
+
+Das Paket `data/anstoss/` bringt Inhalte mit Anstoß-Humor als einzeln abschaltbare Elemente:
+
+- **Satire:** Präsidenten mit Astrologen, Wurst-Sondertrikots, TV-Experten, Gartenzwerge.
+- **Mannschaftsabende:** Karaoke, Bowling, Kneipe, Kochkurs, Freizeitpark, Weihnachtsfeier; sie wirken auf die Moral.
+- **Fanaktionen:** Choreos, Empfang am Bus, Protestbanner, offenes Training, neue Hymne, Sonderzug; sie wirken auf
+  die Fans.
+- **Kuriositäten:** Maulwürfe, Balljungen, Flutlichtausfall, Möwen, Glückshosen, falsch abgebogene Busse.
+
+So funktionieren die Schalter:
+
+- Die Elemente stehen in `rules/anstoss.json`. Jedes Ereignis trägt das Kennzeichen
+  `"feature": "anstoss.<element>"`.
+- Der Hauptschalter „Anstoß-Modus“ steht im Startdialog und ist bei einem neuen Spiel an. Die Einzelschalter stehen
+  in den Einstellungen.
+- Alle Schalter gelten je Manager und gehören zum Spielstand. Sie lassen sich auch im laufenden Spiel umlegen.
+- Ausgeschaltete Elemente werden weder ausgelöst noch angezeigt. Offene Ereignisse eines ausgeschalteten Elements
+  verschwinden ohne Wirkung samt Nachricht.
+
+Ein Abnahmetest prüft: Mit Hauptschalter aus läuft die Welt Bereich für Bereich genau wie ohne das Paket.
+Privatleben (AP 13b) und Grauzonen (AP 13c) folgen als weitere Elemente.
+
 ## Karriere (Phase 2)
 
 - **Training:** Wochenplan mit Vor- und Nachmittag (9 Bausteine), drei Intensitäten mit
@@ -643,7 +666,7 @@ aktive Spieler höchstens +10 % gegenüber dem ersten Saisonende, Vereinslose h�
 | 7 Transfers, Verträge, Scouting | **vollständig** inkl. Anfrage, Konkurrenz, Deadline Day, Sportdirektor-Delegation (E2), **Berater als Akteure** | – |
 | 8 Finanzen, Stadion, Personal | **vollständig**: Einnahmen und Ausgaben, Bank, Lizenz, Insolvenz, Stadionausbau, Personal, Sponsoren | – |
 | 9 Vereinsgelände | **83 Gebäude** mit Stufen, Lage und Synergien, Baufirmen, Genehmigungen | – |
-| 10 Umfeld, Karriere | **Vorstand, Fans, Presse, 166 Zufallsereignisse, Managerkarriere** mit Lizenzen und Erfolgen, **Nationalmannschaften mit Länderspielfenstern, KI-Nominierung, EM und WM mit Qualifikation, Manager als Nationaltrainer** | Medienhaus |
+| 10 Umfeld, Karriere | **Vorstand, Fans, Presse, 166 Zufallsereignisse, Anstoß-Elemente als abschaltbares Paket (AP 13a), Managerkarriere** mit Lizenzen und Erfolgen, **Nationalmannschaften mit Länderspielfenstern, KI-Nominierung, EM und WM mit Qualifikation, Manager als Nationaltrainer** | Medienhaus |
 | 11 Oberfläche | Desktop-Oberfläche (Avalonia) mit Maus, Drag & Drop, sortierbaren Tabellen, Diagrammen (Radar, Formkurve, xG, Heatmap), Wappen, Farbthemen, **Tastenbelegung, Schriftgröße, Kontrastthema, Screenreader-Namen und Tutorial (AP 12b)** | – |
 | 12 Nicht-funktional | Determinismus, **SQLite-Spielstände** mit Schemamigration, **Mehrsprachigkeit (Deutsch, Englisch, erweiterbar)**, Datenpakete mit Überlagerung, Datenvalidierung, Kalibrierungs-CLI mit Toleranzprüfung, **CI auf Linux und Windows**, Warnungen als Fehler, **Modulaufbau mit Golden Master und Architekturtest**, **Datenbank-Editor mit JSON-Schemas (AP 6)** | Spielstand-Modus des Editors (optional), Mod-Verwaltung (AP 14) |
 
@@ -717,6 +740,8 @@ danach je Abschnitt angehoben:
   Testspiele. Version 7 ergänzt die Tabelle `summer_tournaments` (Sommerturniere).
 - Abschnitt `internationals` Version 8 ergänzt in den Team-Daten Trainer, Ziel, Vertrag, Spielsystem, Vormerkliste und
   offenes Angebot. Ältere Spielstände haben keine Trainer; das Modul besetzt die Posten am nächsten Spieltag.
+- Abschnitt `anstoss` (Version 6, neu) bekommt die Tabelle `anstoss_settings` (Anstoß-Schalter je Manager, nur
+  Abweichungen von „alles an“). In älteren Spielständen ist alles an.
 - Abschnitt `challenge` (Version 6, neu) bekommt die Tabelle `game_mode` (Schnellsaison oder Herausforderung mit
   Ziel und Ergebnis). Ältere Spielstände sind Karrieren.
 - Abschnitt `history` (Version 6, neu) bekommt die Tabellen `club_seasons` (Saisonbilanzen der Vereine) und
@@ -802,6 +827,7 @@ data/england/        Länderpaket England (dependsOn base): Ligen, Vereine, Name
 data/spain/          Länderpaket Spanien (dependsOn base): Ligen mit Gruppen, Filiales, Vereine, Namen, Sponsoren
 data/italy/          Länderpaket Italien (dependsOn base): Serie A–C, Serie D als Pool, Under-23-Teams, Namen, Sponsoren
 data/france/         Länderpaket Frankreich (dependsOn base): Ligue 1–3, National 1 in Gruppen, National 2 als Pool
+data/anstoss/        Anstoß-Elemente (dependsOn base): Ereignisse mit Kennzeichen anstoss.<element>, Schalterliste
 ```
 
 Regeln, die ein Architekturtest prüft: erlaubte Projektverweise (Konzept 4.1; `Fmh.Rules` nur auf `Fmh.Domain`),
