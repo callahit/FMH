@@ -175,8 +175,23 @@ public sealed partial class PlayerPageViewModel : PageViewModel
                 s.ClubId is { } id && world.Clubs.TryGetValue(id, out var c) ? c.ShortName : "–",
                 s.Appearances, s.Minutes, s.Goals, s.Assists, s.YellowCards, s.RedCards, UiText.Grade(s.AverageGrade)))
             .ToList();
+        CareerLines = Career(p, world);
         LoadTransfer(p, club);
         OnPropertyChanged(nameof(Title));
+    }
+
+    [ObservableProperty] private IReadOnlyList<InfoLine> _careerLines = Array.Empty<InfoLine>();
+
+    /// <summary>Karriere (AP 11b): Summen über alle Saisons und alle Vereinswechsel.</summary>
+    private IReadOnlyList<InfoLine> Career(Player p, World world)
+    {
+        var all = RecordBook.Seasons(p).ToList();
+        var lines = new List<InfoLine> { new(T["player.careerTotal"], T.Format("player.careerTotalValue", all.Sum(x => x.Appearances), all.Sum(x => x.Goals), all.Sum(x => x.Assists))) };
+        string Name(int? id) => id is { } c && world.Clubs.TryGetValue(c, out var club) ? club.ShortName : T["transfer.freeAgent"];
+        var cur = UiText.Currency(Session.HumanClub);
+        lines.AddRange(world.Transfers.Where(t => t.PlayerId == p.Id).Select(t => new InfoLine(Fmt.Date(t.Date),
+            $"{Name(t.FromClubId)} → {Name(t.ToClubId)} · " + (t.Loan ? T["transfer.loanFee"] : t.Fee > 0 ? Fmt.Money(t.Fee, cur) : T["transfer.free"]))));
+        return lines;
     }
 
     // ================================================================== Transfer, Vertrag, Training

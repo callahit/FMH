@@ -15,6 +15,8 @@ public sealed partial class SeasonModule
             if (StartNewSeasonIfDue()) e.Day.Stop = StopReason.NewSeason;
             else CalendarEvents();
         });
+        // Historie (AP 11b): Spielrekorde je Verein und Wettbewerb nach jedem Pflichtspiel.
+        ctx.Bus.Subscribe<MatchPlayed>(e => RecordBook.Update(World, e.Fixture, World.SeasonYear));
     }
 
     public override void OnDay(DayContext day)
