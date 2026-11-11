@@ -158,6 +158,7 @@ internal static class WorldFingerprint
             ["internationals"] = J(new { w.NationalTeams, w.InternationalFixtures, w.InternationalWindows, Caps = w.Caps.OrderBy(kv => kv.Key), w.Tournaments }),
             ["friendlies"] = J(new { w.Friendlies, w.SummerTournaments }),
             ["history"] = J(w.History),
+            ["records"] = J(new { w.ClubSeasons, w.Records }),
             // Länder- und Weltregeln im Spielstand: auch Datenänderungen ohne Wirkung im Testlauf schlagen an.
             ["config"] = J(new { w.Seed, w.Packages, w.Countries, w.Rules, w.MarketLevels, w.MarketBases, w.Referees }),
         };

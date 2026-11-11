@@ -49,7 +49,7 @@ Zusätzlich gibt es Tastenkürzel:
 | Taste | Wirkung |
 |---|---|
 | Leertaste | **Weiter** bis zum nächsten Ereignis (Spieltag, Nachricht, Entscheidung, Saisonende) |
-| F1–F11 | Posteingang, Kader, Taktik, Training, Spielplan, Transfers, Finanzen, Stadion, Verein, Liga, Nationalteam |
+| F1–F12 | Posteingang, Kader, Taktik, Training, Spielplan, Transfers, Finanzen, Stadion, Verein, Liga, Nationalteam, Historie |
 | Strg+S | Speichern |
 | Kader / Transfers | Enter oder Doppelklick: Spielerprofil, ←→ im Profil: voriger/nächster Spieler |
 | Taktik | A automatisch aufstellen, Esc Auswahl aufheben, Umschalt+Pfeile gewählten Platz verschieben |
@@ -419,6 +419,18 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
     Englische Wochen, geringe Vertrautheit mit dem Spielsystem und fehlende Spielpraxis. Sein angepasster Wochenplan
     lässt sich übernehmen: leichtere Intensität, Regeneration statt Fitness, mehr Taktik, ein Trainingsspiel. Die
     Schwellen stehen in `data/base/rules/assistant.json`.
+- **Historie (AP 11b):** Eigene Seite (F12) mit zwei Spalten.
+  - **Verein (frei wählbar):** Höchster Sieg, höchste Niederlage, torreichstes Spiel und Zuschauerrekord, jeweils
+    aus Pflichtspielen. Dazu Rekordzugang und Rekordabgang, die beste Ligasaison und alle Titel mit Jahren.
+    Rekordtorschützen und Rekordspieler (Einsätze für den Verein) stehen in eigenen Listen, darunter die
+    Saisonbilanzen (Platz, Spiele, S-U-N, Tore, Punkte).
+  - **Wettbewerb (Liga, Pokal oder Europapokal):** Höchster Sieg, torreichstes Spiel und Zuschauerrekord. Für Ligen
+    kommen der Punkterekord und die beste Torjägersaison dazu. Außerdem die ewige Titelliste und die Meisterchronik.
+  - **Fortschreibung:** Spielrekorde ändern sich nach jedem Pflichtspiel und nur durch ein echt besseres Spiel; bei
+    Gleichstand bleibt der ältere Rekord. Testspiele zählen nicht. Die Saisonbilanzen aller Vereine werden zum
+    Saisonende abgelegt.
+  - **Karriere:** Die Spielerseite zeigt unter den Saisonstatistiken die Gesamtbilanz und alle Vereinswechsel mit
+    Ablöse.
 - **Konferenz:** Anzeigemodus, in dem die anderen Spiele des Spieltags minutengenau mitlaufen, mit
   Torblitz im Ticker und Live-Tabelle.
 - **Einstellungen:** Schwierigkeit (Leicht, Normal, Schwer, Realistisch) beim Spielstart;
@@ -651,6 +663,9 @@ danach je Abschnitt angehoben:
   Testspiele. Version 7 ergänzt die Tabelle `summer_tournaments` (Sommerturniere).
 - Abschnitt `internationals` Version 8 ergänzt in den Team-Daten Trainer, Ziel, Vertrag, Spielsystem, Vormerkliste und
   offenes Angebot. Ältere Spielstände haben keine Trainer; das Modul besetzt die Posten am nächsten Spieltag.
+- Abschnitt `history` (Version 6, neu) bekommt die Tabellen `club_seasons` (Saisonbilanzen der Vereine) und
+  `match_records` (Spielrekorde je Verein und Wettbewerb). Ältere Spielstände beginnen ohne Rekorde; die
+  Meisterchronik bleibt erhalten.
 
 Ein Spielstand mit einem neueren oder unbekannten Abschnitt wird abgelehnt.
 
