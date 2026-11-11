@@ -1,0 +1,8 @@
+{
+  "id": "anstoss",
+  "name": "Anstoß-Elemente",
+  "version": "0.1.0",
+  "dependsOn": [
+    "base"
+  ]
+}

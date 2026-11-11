@@ -110,6 +110,10 @@ public sealed partial class NewGameViewModel : ViewModelBase
     [ObservableProperty] private string _seed;
     [ObservableProperty] private bool _ironman;
 
+    /// <summary>Anstoß-Modus (AP 13): Voreinstellung an; nur sichtbar, wenn ein Paket Anstoß-Elemente liefert.</summary>
+    [ObservableProperty] private bool _anstoss = true;
+    public bool HasAnstoss => Data.Anstoss.Elements.Count > 0;
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(BackgroundInfo))]
     private OptionItem _selectedBackground;
@@ -179,6 +183,7 @@ public sealed partial class NewGameViewModel : ViewModelBase
         profile.Style = (MediaStyle)StyleIndex;
         profile.Events = (EventFrequency)EventIndex;
         var session = new GameSession(world, Data, State.Engine);
+        if (!Anstoss) session.SetAnstoss(false);
         if (SelectedMode.Value == 1) session.StartQuickSeason();
         else if (IsChallenge && SelectedChallenge is { } challenge && session.StartChallenge(challenge.Rule.Id) is { } error)
             throw new InvalidOperationException(T[error]);

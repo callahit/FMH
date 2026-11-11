@@ -3304,5 +3304,10 @@
  "keys.page.history": "Data centre",
  "tutorial.history.title": "Data centre",
  "tutorial.history.text": "Records, roll of honour, statistics across seasons, player comparison and opponent analysis.",
- "keys.reserved": "{0} is reserved for input fields and lists. Choose another key or a combination with Ctrl, Shift or Alt."
+ "keys.reserved": "{0} is reserved for input fields and lists. Choose another key or a combination with Ctrl, Shift or Alt.",
+ "options.anstoss": "Anstoß mode",
+ "options.anstossTitle": "Anstoß elements",
+ "options.anstossHint": "Applies to this save. Switched-off elements are neither triggered nor shown; open events disappear without effect.",
+ "newGame.anstoss": "Anstoß mode",
+ "newGame.anstossInfo": "Satire, team nights, fan actions and curiosities from the \"Anstoß elements\" package. Each element can be switched individually later in the options."
 }

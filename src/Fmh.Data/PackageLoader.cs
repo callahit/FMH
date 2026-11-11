@@ -96,6 +96,7 @@ public static class PackageLoader
             Assistant = Path1("rules/assistant.json") is { } asr ? Json.Load<AssistantRules>(asr) : new(),
             Challenges = Path1("rules/challenges.json") is { } chr ? Json.Load<ChallengeRules>(chr) : new(),
             Ui = Path1("rules/ui.json") is { } uir ? Json.Load<UiRules>(uir) : new(),
+            Anstoss = Path1("rules/anstoss.json") is { } ans ? Json.Load<AnstossRules>(ans) : new(),
             Europe = Path1("competitions/europe.json") is { } eu ? Json.Load<EuropeFormat>(eu) : null,
             Languages = languages,
             DefaultLanguage = defaultLanguage,

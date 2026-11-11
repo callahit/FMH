@@ -305,6 +305,9 @@ public sealed class EventDef
     public EventCondition When { get; set; } = new();
     public List<EventOption> Options { get; set; } = new();
     public int CooldownDays { get; set; } = 365;
+    /// <summary>Anstoß-Element (<c>anstoss.&lt;element&gt;</c>, AP 13); leer = immer möglich.</summary>
+    [System.Text.Json.Serialization.JsonIgnore(Condition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull)]
+    public string? Feature { get; set; }
 }
 
 /// <summary>Frage für Pressekonferenzen; Text unter press.q.&lt;key&gt;.</summary>
