@@ -244,6 +244,11 @@ public sealed partial class ClubPageViewModel : PageViewModel, IRefreshable
             new(T["career.media"], Fmt.Num(c.Media, "0") + "/100"),
             new(T["career.feuds"], c.Feuds.Count == 0 ? T["ui.none"] : string.Join(", ", c.Feuds.Select(id => s.World.Clubs[id].ShortName))),
         };
+        // Herausforderung (AP 12a): Ziel, Frist und Stand
+        if (s.Mode is { Mode: GameMode.Challenge } mode && s.ActiveChallenge is { } rule)
+            CareerFacts = CareerFacts.Append(new InfoLine(T["challenge.label"], T.Format("challenge.status", T["challenge." + rule.Id + ".name"],
+                T.Format("challenge.goal." + rule.Goal.Type, rule.Goal.Value), GameSession.SeasonLabel(mode.StartSeason + rule.Seasons - 1),
+                T["challenge.outcome." + mode.Outcome]))).ToList();
         CourseText = c.CourseUntil is { } until ? T.Format("career.courseRunning", Fmt.Date(until))
             : c.License == CoachingLicense.Pro ? T["career.error.maxLicense"]
             : T.Format("career.courseInfo", T["license." + (c.License + 1)], GameSession.CourseReputation(c.License + 1));

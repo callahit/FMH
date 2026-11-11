@@ -59,6 +59,26 @@ Zusätzlich gibt es Tastenkürzel:
 Die Farbcodierung der Attribute steht zusätzlich als Symbol daneben (▼ 1–5, · 6–10, ▲ 11–15, ★ 16–20).
 Farbthemen: Klassik, Hell, Terminal.
 
+## Spielmodi (AP 12a)
+
+Im Startdialog wird der Spielmodus gewählt:
+
+- **Karriere:** offen und ohne festes Ende.
+- **Schnellsaison:** eine Saison ohne Halt. Pflicht-Entscheidungen übernimmt der Assistent, eigene Spiele werden
+  sofort berechnet, und der Co-Trainer stellt auf. Am letzten Spieltag kommt ein Bericht mit Platz, Punkten und
+  Toren, danach geht es als normale Karriere weiter.
+- **Herausforderung:** fester Verein, Startbedingungen, Ziel und Frist. Alles steht in `data/base/rules/challenges.json`.
+  - **Verein:** Land, Ligaebene und Auswahlregel (`weakest`, `median`, `strongest` nach Ruf) bestimmen ihn.
+  - **Startbedingungen:** Faktoren auf Kontostand und Transferbudget.
+  - **Ziele:** `avoidRelegation` (bis zur Frist nie abgestiegen), `promotion`, `finishAtLeast` (Platz in der Startliga
+    oder höher), `winCup` (ein Pokal oder Europapokal) und `balanceAtLeast`.
+  - **Auswertung:** Saisonziele gelten am letzten Spieltag, Ligaziele nach Auf- und Abstieg beim Saisonwechsel. Ein
+    erreichtes Ziel gewinnt sofort. Mit Ablauf der Frist, einer Entlassung oder einem Vereinswechsel ist die
+    Herausforderung verloren. Das Ergebnis kommt als Nachricht vom Vorstand, Ziel und Stand zeigt die Vereinsseite
+    unter „Karriere“. Danach geht es als Karriere weiter.
+  - **Mitgeliefert:** Klassenerhalt mit dem Letzten, Aus dem Keller nach oben, Ohne Geld ins Mittelfeld,
+    Pokalschreck, Meister in drei Jahren.
+
 ## Karriere (Phase 2)
 
 - **Training:** Wochenplan mit Vor- und Nachmittag (9 Bausteine), drei Intensitäten mit
@@ -592,7 +612,7 @@ aktive Spieler höchstens +10 % gegenüber dem ersten Saisonende, Vereinslose h�
 
 | Kapitel | Umgesetzt | Folgt laut Roadmap |
 |---|---|---|
-| 2 Spielmodi und Spielstart | Karriere mit neuem Spiel (Name, Werdegang, Verein, Seed, Weltregeln), Managerprofil, Speichern, Autosave vor jedem Spieltag in 3 rotierenden Slots, optional Ironman | Schnellsaison, Hot-Seat, Herausforderungen (Phase 4) |
+| 2 Spielmodi und Spielstart | Karriere mit neuem Spiel (Name, Werdegang, Verein, Seed, Weltregeln), Managerprofil, Speichern, Autosave vor jedem Spieltag in 3 rotierenden Slots, optional Ironman, **Schnellsaison und Herausforderungen (AP 12a)** | Hot-Seat (AP 10) |
 | 3 Spielwelt, Wettbewerbe | Tagesgenauer Kalender, Ligen als Daten, DE/EN/ES/IT/FR bis zur 4. Liga, **nationale Pokale und Relegation**, **echte Europapokale (UCL/UEL/UECL) mit Qualifikation, Ligaphase und K.-o.**, Transferfenster, Pflicht-Entscheidungen, **Ligapyramiden** | Hintergrundländer / EuropeOnly (Welle 3), weitere Länder |
 | 4 Spielerdatenmodell | 44 Attribute, versteckte Werte, Kondition, Form, Moral, Spielpraxis, Positionseignung, Entwicklung durch **Training** und Saisonwechsel, Karriereende, Dauerschäden, **Zufriedenheit, Hierarchie, Mentoring** | – |
 | 5 Kader, Training, Taktik | Kader, Profil, **Training**, **Trainingslager**, 25 Formationen, **Rollen und Aufgaben**, **Spieleranweisungen**, **freie Positionierung**, **Taktikvertrautheit**, **3 Taktikvarianten**, Standardvarianten, Co-Trainer | – |
@@ -674,6 +694,8 @@ danach je Abschnitt angehoben:
   Testspiele. Version 7 ergänzt die Tabelle `summer_tournaments` (Sommerturniere).
 - Abschnitt `internationals` Version 8 ergänzt in den Team-Daten Trainer, Ziel, Vertrag, Spielsystem, Vormerkliste und
   offenes Angebot. Ältere Spielstände haben keine Trainer; das Modul besetzt die Posten am nächsten Spieltag.
+- Abschnitt `challenge` (Version 6, neu) bekommt die Tabelle `game_mode` (Schnellsaison oder Herausforderung mit
+  Ziel und Ergebnis). Ältere Spielstände sind Karrieren.
 - Abschnitt `history` (Version 6, neu) bekommt die Tabellen `club_seasons` (Saisonbilanzen der Vereine) und
   `match_records` (Spielrekorde je Verein und Wettbewerb). Ältere Spielstände beginnen ohne Rekorde; die
   Meisterchronik bleibt erhalten.

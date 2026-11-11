@@ -159,6 +159,7 @@ internal static class WorldFingerprint
             ["friendlies"] = J(new { w.Friendlies, w.SummerTournaments }),
             ["history"] = J(w.History),
             ["records"] = J(new { w.ClubSeasons, w.Records }),
+            ["mode"] = J(w.Mode),
             // Länder- und Weltregeln im Spielstand: auch Datenänderungen ohne Wirkung im Testlauf schlagen an.
             ["config"] = J(new { w.Seed, w.Packages, w.Countries, w.Rules, w.MarketLevels, w.MarketBases, w.Referees }),
         };
