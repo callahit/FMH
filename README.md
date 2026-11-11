@@ -49,7 +49,7 @@ Zusätzlich gibt es Tastenkürzel:
 | Taste | Wirkung |
 |---|---|
 | Leertaste | **Weiter** bis zum nächsten Ereignis (Spieltag, Nachricht, Entscheidung, Saisonende) |
-| F1–F12 | Posteingang, Kader, Taktik, Training, Spielplan, Transfers, Finanzen, Stadion, Verein, Liga, Nationalteam, Historie |
+| F1–F12 | Posteingang, Kader, Taktik, Training, Spielplan, Transfers, Finanzen, Stadion, Verein, Liga, Nationalteam, Datenzentrale |
 | Strg+S | Speichern |
 | Kader / Transfers | Enter oder Doppelklick: Spielerprofil, ←→ im Profil: voriger/nächster Spieler |
 | Taktik | A automatisch aufstellen, Esc Auswahl aufheben, Umschalt+Pfeile gewählten Platz verschieben |
@@ -419,7 +419,8 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
     Englische Wochen, geringe Vertrautheit mit dem Spielsystem und fehlende Spielpraxis. Sein angepasster Wochenplan
     lässt sich übernehmen: leichtere Intensität, Regeneration statt Fitness, mehr Taktik, ein Trainingsspiel. Die
     Schwellen stehen in `data/base/rules/assistant.json`.
-- **Historie (AP 11b):** Eigene Seite (F12) mit zwei Spalten.
+- **Datenzentrale (F12)** mit vier Reitern: Historie, Statistiken, Spielervergleich und Gegneranalyse.
+- **Historie (AP 11b):** Erster Reiter der Datenzentrale, zwei Spalten.
   - **Verein (frei wählbar):** Höchster Sieg, höchste Niederlage, torreichstes Spiel und Zuschauerrekord, jeweils
     aus Pflichtspielen. Dazu Rekordzugang und Rekordabgang, die beste Ligasaison und alle Titel mit Jahren.
     Rekordtorschützen und Rekordspieler (Einsätze für den Verein) stehen in eigenen Listen, darunter die
@@ -431,6 +432,16 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
     Saisonende abgelegt.
   - **Karriere:** Die Spielerseite zeigt unter den Saisonstatistiken die Gesamtbilanz und alle Vereinswechsel mit
     Ablöse.
+- **Datenzentrale (AP 11c):**
+  - **Statistiken:** Liga und Saison sind wählbar, auch abgeschlossene Saisons. Links stehen die besten 30 Spieler,
+    sortiert nach Toren, Vorlagen, Note, Einsätzen oder Karten (Pflichtspiele). Die Notenliste zählt nur Spieler mit
+    mindestens einem Drittel der benoteten Spiele des Spitzenreiters. Rechts stehen die Teambilanzen mit Toren je
+    Spiel. Ein Spieler zählt zur Liga, in der sein Verein in dieser Saison spielte.
+  - **Spielervergleich:** Zwei Spieler beliebiger Vereine nebeneinander: Position, Alter, Stärke, Saison- und
+    Karrierewerte sowie alle Attribute. Der bessere Wert ist fett. Fremde Spieler erscheinen nur so genau, wie das
+    Scouting reicht (Spannen); eine Spanne wird nie als besser markiert.
+  - **Gegneranalyse:** Vorausgewählt ist der nächste Gegner. Sie zeigt die letzten fünf Pflichtspiele mit Ort und
+    Ergebnis, die Bilanz daraus, das Spielsystem, die elf Stammkräfte und die drei besten Torschützen der Saison.
 - **Konferenz:** Anzeigemodus, in dem die anderen Spiele des Spieltags minutengenau mitlaufen, mit
   Torblitz im Ticker und Live-Tabelle.
 - **Einstellungen:** Schwierigkeit (Leicht, Normal, Schwer, Realistisch) beim Spielstart;
