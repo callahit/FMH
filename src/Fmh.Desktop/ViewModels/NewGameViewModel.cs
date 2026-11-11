@@ -26,6 +26,9 @@ public sealed partial class ClubChoice : ObservableObject
 
 public sealed record OptionItem(string Label, int Value);
 
+/// <summary>Herausforderung im Startdialog mit dem aus den Daten gewählten Verein.</summary>
+public sealed record ChallengeChoice(ChallengeRule Rule, string Name, string Info, ClubChoice? Club);
+
 /// <summary>Neues Spiel (Kapitel 2): Manager, Werdegang, Verein, Weltregeln.</summary>
 public sealed partial class NewGameViewModel : ViewModelBase
 {
@@ -47,6 +50,13 @@ public sealed partial class NewGameViewModel : ViewModelBase
             .ToList();
         Backgrounds = BackgroundDefs.Select((b, i) => new OptionItem(T[b.key], i)).ToList();
         InjuryOptions = Enumerable.Range(0, 3).Select(i => new OptionItem(T[$"newGame.injuries.{i}"], i)).ToList();
+        Modes = new[] { "career", "quickSeason", "challenge" }.Select((k, i) => new OptionItem(T["newGame.mode." + k], i)).ToList();
+        _selectedMode = Modes[0];
+        ChallengeChoices = Data.Challenges.Challenges.Select(r => new ChallengeChoice(r, T["challenge." + r.Id + ".name"],
+            T["challenge." + r.Id + ".info"] + " " + T.Format("newGame.challengeDeadline", r.Seasons),
+            Challenges.PickClub(Data, r) is { } def ? Clubs.FirstOrDefault(c => c.Def.Key == def.Key) : null))
+            .Where(c => c.Club is not null).ToList();
+        _selectedChallenge = ChallengeChoices.FirstOrDefault();
         _selectedBackground = Backgrounds[1];
         _selectedInjury = InjuryOptions[1];
         _managerName = Environment.UserName is { Length: > 0 } u ? u : "Manager";
@@ -57,6 +67,34 @@ public sealed partial class NewGameViewModel : ViewModelBase
     public IReadOnlyList<ClubChoice> Clubs { get; }
     public IReadOnlyList<OptionItem> Backgrounds { get; }
     public IReadOnlyList<OptionItem> InjuryOptions { get; }
+    public IReadOnlyList<OptionItem> Modes { get; }
+    public IReadOnlyList<ChallengeChoice> ChallengeChoices { get; }
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(IsChallenge), nameof(ModeInfo))]
+    private OptionItem _selectedMode;
+
+    [ObservableProperty]
+    [NotifyPropertyChangedFor(nameof(ModeInfo))]
+    private ChallengeChoice? _selectedChallenge;
+
+    /// <summary>Herausforderung gewählt: Der Verein steht fest.</summary>
+    public bool IsChallenge => SelectedMode.Value == 2;
+
+    public string ModeInfo => SelectedMode.Value switch
+    {
+        1 => T["newGame.mode.quickSeason.info"],
+        2 => SelectedChallenge?.Info ?? "",
+        _ => T["newGame.mode.career.info"],
+    };
+
+    partial void OnSelectedModeChanged(OptionItem value) => LockChallengeClub();
+    partial void OnSelectedChallengeChanged(ChallengeChoice? value) => LockChallengeClub();
+
+    private void LockChallengeClub()
+    {
+        if (IsChallenge && SelectedChallenge?.Club is { } club) SelectClubCore(club);
+    }
 
     public IReadOnlyList<string> Difficulties { get; } = Enum.GetValues<Difficulty>().Select(d => T["difficulty." + d]).ToList();
     public IReadOnlyList<string> Styles { get; } = Enum.GetValues<MediaStyle>().Select(d => T["style." + d]).ToList();
@@ -107,7 +145,13 @@ public sealed partial class NewGameViewModel : ViewModelBase
     [RelayCommand]
     private void SelectClub(ClubChoice? club)
     {
-        if (club is null) return;
+        // Bei einer Herausforderung ist der Verein vorgegeben.
+        if (club is null || IsChallenge) return;
+        SelectClubCore(club);
+    }
+
+    private void SelectClubCore(ClubChoice club)
+    {
         foreach (var c in Clubs) c.IsSelected = c == club;
         Selected = club;
     }
@@ -134,7 +178,11 @@ public sealed partial class NewGameViewModel : ViewModelBase
         profile.Difficulty = (Difficulty)DifficultyIndex;
         profile.Style = (MediaStyle)StyleIndex;
         profile.Events = (EventFrequency)EventIndex;
-        State.Session = new GameSession(world, Data, State.Engine);
+        var session = new GameSession(world, Data, State.Engine);
+        if (SelectedMode.Value == 1) session.StartQuickSeason();
+        else if (IsChallenge && SelectedChallenge is { } challenge && session.StartChallenge(challenge.Rule.Id) is { } error)
+            throw new InvalidOperationException(T[error]);
+        State.Session = session;
         _main.Navigate(new ShellViewModel(_main));
     }
 }

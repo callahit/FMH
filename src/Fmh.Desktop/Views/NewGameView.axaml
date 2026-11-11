@@ -62,6 +62,22 @@
           </Border>
           <Border Classes="card">
             <StackPanel Spacing="8">
+              <TextBlock Classes="h3" Text="{s:L newGame.mode}" />
+              <ComboBox ItemsSource="{Binding Modes}" SelectedItem="{Binding SelectedMode}" HorizontalAlignment="Stretch">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate x:DataType="vm:OptionItem"><TextBlock Text="{Binding Label}" /></DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+              <ComboBox ItemsSource="{Binding ChallengeChoices}" SelectedItem="{Binding SelectedChallenge}" HorizontalAlignment="Stretch" IsVisible="{Binding IsChallenge}">
+                <ComboBox.ItemTemplate>
+                  <DataTemplate x:DataType="vm:ChallengeChoice"><TextBlock Text="{Binding Name}" /></DataTemplate>
+                </ComboBox.ItemTemplate>
+              </ComboBox>
+              <TextBlock Classes="muted small" Text="{Binding ModeInfo}" TextWrapping="Wrap" />
+            </StackPanel>
+          </Border>
+          <Border Classes="card">
+            <StackPanel Spacing="8">
               <TextBlock Classes="h3" Text="{s:L newGame.name}" />
               <TextBox Text="{Binding ManagerName}" MaxLength="24" />
               <TextBlock Classes="h3" Text="{s:L newGame.background}" Margin="0,6,0,0" />
