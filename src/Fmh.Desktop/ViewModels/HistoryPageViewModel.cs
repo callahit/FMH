@@ -15,7 +15,7 @@ public sealed record ClubSeasonLine(string Season, string League, string Positio
 public sealed record ChronicleLine(string Season, string Champion);
 
 /// <summary>
-/// Historie (AP 11b): Vereinsrekorde und Saisonbilanzen eines wählbaren Vereins, Ligarekorde und Meisterchronik eines
+/// Datenzentrale (AP 11b/11c), Reiter Historie: Vereinsrekorde und Saisonbilanzen eines wählbaren Vereins, Ligarekorde und Meisterchronik eines
 /// wählbaren Wettbewerbs. Spielrekorde zählen nur Pflichtspiele.
 /// </summary>
 public sealed partial class HistoryPageViewModel : PageViewModel, IRefreshable
@@ -34,6 +34,9 @@ public sealed partial class HistoryPageViewModel : PageViewModel, IRefreshable
             .Select(id => new LeagueChoice(id, CompetitionName(id), w.FindLeague(id) is null)).ToList();
         _club = Clubs.FirstOrDefault(c => c.Id == own.Id) ?? Clubs.FirstOrDefault();
         _competition = Competitions.FirstOrDefault(c => c.Id == own.LeagueId) ?? Competitions.FirstOrDefault();
+        InitStats();
+        InitOpponent();
+        InitCompare();
         Refresh();
     }
 
@@ -60,6 +63,9 @@ public sealed partial class HistoryPageViewModel : PageViewModel, IRefreshable
     {
         RefreshClub();
         RefreshCompetition();
+        RefreshStats();
+        RefreshCompare();
+        RefreshOpponent();
     }
 
     private string CompetitionName(string id) =>

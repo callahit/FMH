@@ -69,6 +69,32 @@ public class HistoryUiTests
         Assert.Equal("–", page.ClubRecords[0].Value);
         Assert.Contains(page.Honours, l => l.Label.EndsWith("(1×)", StringComparison.Ordinal));
 
+        // Statistiken: laufende Saison der eigenen Liga, Teamtabelle mit allen Vereinen
+        Assert.Equal(own.LeagueId, page.StatLeague!.Id);
+        Assert.Equal(world.LeagueOf(own).ClubIds.Count, page.TeamStats.Count);
+        page.StatSort = page.StatSorts.Single(o => (string)o.Value! == "grade");
+        Assert.Empty(page.PlayerStats);
+
+        // Spielervergleich: eigener Spieler gegen den nächsten Gegner, Abschnitte und Attribute
+        Assert.Equal(own.Id, page.CompareClubA!.Id);
+        Assert.NotNull(page.CompareA);
+        Assert.NotNull(page.CompareB);
+        Assert.Contains(page.CompareLines, l => l.Header && l.Label == "Karriere");
+        Assert.Contains(page.CompareLines, l => l.Label == "Abschluss");
+
+        // Gegneranalyse: nächster Gegner vorausgewählt, vor dem ersten Spieltag ohne Spiele
+        var next = Fmh.Core.Logic.DataCenter.NextOpponent(world, own.Id)!.Value;
+        Assert.Equal(next, page.Opponent!.Id);
+        Assert.StartsWith("Nächster Gegner:", page.OpponentTitle);
+        Assert.Equal("Noch keine Pflichtspiele in dieser Saison.", page.OpponentSummary);
+        var tabs = w.GetVisualDescendants().OfType<TabControl>().Single();
+        tabs.SelectedIndex = 3;
+        Pump();
+        Assert.Contains("Stammkräfte", VisibleTexts(w));
+        tabs.SelectedIndex = 1;
+        Pump();
+        Assert.Contains("Spieler (Pflichtspiele)", VisibleTexts(w));
+
         // Spielerseite: Karriere mit Gesamtbilanz
         var player = world.SquadOf(own).First();
         shell.ShowSubPage(new PlayerPageViewModel(shell, new[] { player }, 0));
