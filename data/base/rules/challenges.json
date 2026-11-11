@@ -1,0 +1,19 @@
+{
+  "quickSeason": {
+    "delegateDecisions": true,
+    "instantMatches": true
+  },
+  "challenges": [
+    { "id": "survival", "country": "DE", "level": 1, "pick": "weakest", "seasons": 1,
+      "goal": { "type": "avoidRelegation" } },
+    { "id": "promotion", "country": "DE", "level": 2, "pick": "weakest", "seasons": 2,
+      "goal": { "type": "promotion" } },
+    { "id": "austerity", "country": "DE", "level": 1, "pick": "median", "seasons": 1,
+      "balanceFactor": 0.25, "transferBudgetFactor": 0,
+      "goal": { "type": "finishAtLeast", "value": 9 } },
+    { "id": "giantKiller", "country": "DE", "level": 3, "pick": "weakest", "seasons": 3,
+      "goal": { "type": "winCup" } },
+    { "id": "title", "country": "DE", "level": 1, "pick": "median", "seasons": 3,
+      "goal": { "type": "finishAtLeast", "value": 1 } }
+  ]
+}

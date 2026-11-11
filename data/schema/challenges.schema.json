@@ -1,0 +1,82 @@
+{
+  "$id": "https://fmh.local/schema/challenges.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Spielmodi (Datei rules/challenges.json, AP 12): Schnellsaison und Herausforderungen.",
+  "properties": {
+    "challenges": {
+      "items": {
+        "additionalProperties": false,
+        "description": "Herausforderung: fester Verein (nach Land, Ebene und Auswahlregel), Startbedingungen, Ziel und Frist.",
+        "properties": {
+          "balanceFactor": {
+            "description": "Faktor auf den Kontostand zu Beginn.",
+            "maximum": 5,
+            "minimum": 0,
+            "type": "number"
+          },
+          "country": {
+            "description": "Ländercode des Vereins.",
+            "type": "string"
+          },
+          "goal": {
+            "additionalProperties": false,
+            "properties": {
+              "type": {
+                "type": "string"
+              },
+              "value": {
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "id": {
+            "description": "Kennung; Texte unter challenge.<id>.name und challenge.<id>.info.",
+            "type": "string"
+          },
+          "level": {
+            "description": "Ligaebene (1 = höchste Liga).",
+            "maximum": 10,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "pick": {
+            "description": "Auswahl in dieser Ebene: weakest, median oder strongest (nach Ruf).",
+            "type": "string"
+          },
+          "seasons": {
+            "description": "Frist in Saisons.",
+            "maximum": 10,
+            "minimum": 1,
+            "type": "integer"
+          },
+          "transferBudgetFactor": {
+            "description": "Faktor auf das Transferbudget zu Beginn.",
+            "maximum": 5,
+            "minimum": 0,
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "quickSeason": {
+      "additionalProperties": false,
+      "properties": {
+        "delegateDecisions": {
+          "description": "Pflicht-Entscheidungen übernimmt der Assistent sofort.",
+          "type": "boolean"
+        },
+        "instantMatches": {
+          "description": "Eigene Spiele werden sofort berechnet; der Co-Trainer füllt Lücken in der Aufstellung.",
+          "type": "boolean"
+        }
+      },
+      "type": "object"
+    }
+  },
+  "title": "FMH rules/challenges.json",
+  "type": "object"
+}
