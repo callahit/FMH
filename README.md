@@ -46,18 +46,41 @@ Alles ist mit der Maus bedienbar: Navigation links, Spalten zum Sortieren anklic
 Spielerprofile, Spieler werden auf dem Taktikfeld per Drag & Drop oder Klick-Klick aufgestellt.
 Zusätzlich gibt es Tastenkürzel:
 
+Die globalen Tasten sind die Standardbelegung aus `data/base/rules/ui.json` und lassen sich in den Einstellungen
+ändern (siehe „Zugänglichkeit“).
+
 | Taste | Wirkung |
 |---|---|
 | Leertaste | **Weiter** bis zum nächsten Ereignis (Spieltag, Nachricht, Entscheidung, Saisonende) |
 | F1–F12 | Posteingang, Kader, Taktik, Training, Spielplan, Transfers, Finanzen, Stadion, Verein, Liga, Nationalteam, Datenzentrale |
 | Strg+S | Speichern |
+| Strg+O / Strg+H | Einstellungen / Urlaub |
 | Kader / Transfers | Enter oder Doppelklick: Spielerprofil, ←→ im Profil: voriger/nächster Spieler |
 | Taktik | A automatisch aufstellen, Esc Auswahl aufheben, Umschalt+Pfeile gewählten Platz verschieben |
 | Liga | T Tabelle ↔ Torjäger |
 | Spiel | Leertaste/P Pause, W Wechsel, T Taktik, Z Zuruf, M Kommentar/Ticker |
 
 Die Farbcodierung der Attribute steht zusätzlich als Symbol daneben (▼ 1–5, · 6–10, ▲ 11–15, ★ 16–20).
-Farbthemen: Klassik, Hell, Terminal.
+Farbthemen: Klassik, Hell, Terminal, Hoher Kontrast.
+
+### Zugänglichkeit und Tutorial (AP 12b)
+
+Die Einstellungen (Zahnrad oder Strg+O) haben einen Abschnitt „Bedienung“. Er gilt für das Gerät, nicht für den
+Spielstand, und liegt in `settings.json` neben dem Spielstandordner.
+
+- **Tastenbelegung:** Im Dialog „Tastenbelegung …“ eine Aktion anklicken und die neue Taste drücken; Strg, Umschalt
+  und Alt sind möglich, Esc bricht ab. Ist die Taste schon vergeben, tauschen beide Aktionen ihre Tasten. Enter, Tab
+  und die Pfeiltasten ohne Zusatztaste bleiben Eingabefeldern, Listen und Seiten vorbehalten. Gespeichert werden nur
+  Abweichungen vom Standard; die Statuszeile und das Menü zeigen die aktuelle Belegung.
+- **Schriftgröße:** Die ganze Oberfläche lässt sich auf 110, 125 oder 140 % skalieren (Stufen in `rules/ui.json`).
+- **Hoher Kontrast:** Farbthema mit Weiß und Gelb auf Schwarz. Text und Signalfarben erreichen auf allen Flächen
+  mindestens 7:1 nach WCAG AAA; ein Test prüft das.
+- **Screenreader:** Knöpfe, die nur ein Symbol oder mehrere Texte zeigen, bekommen ihren Namen aus dem Tooltip oder
+  ihren Texten; Auswahlfelder der Einstellungen tragen ihre Beschriftung. Ein Oberflächentest prüft auf allen Seiten
+  und Reitern, dass kein sichtbarer Knopf ohne Namen bleibt.
+- **Tutorial:** Beim ersten Öffnen einer Seite erscheint oben ein kurzer Hinweis. „Verstanden“ blendet ihn dauerhaft
+  aus, „Tutorial aus“ schaltet alle ab; „Hinweise erneut zeigen“ in den Einstellungen setzt sie zurück. Die Hinweise
+  stehen als Daten in `rules/ui.json` (Seite) und in den Sprachdateien (`tutorial.<id>.title`, `tutorial.<id>.text`).
 
 ## Spielmodi (AP 12a)
 
@@ -621,7 +644,7 @@ aktive Spieler höchstens +10 % gegenüber dem ersten Saisonende, Vereinslose h�
 | 8 Finanzen, Stadion, Personal | **vollständig**: Einnahmen und Ausgaben, Bank, Lizenz, Insolvenz, Stadionausbau, Personal, Sponsoren | – |
 | 9 Vereinsgelände | **83 Gebäude** mit Stufen, Lage und Synergien, Baufirmen, Genehmigungen | – |
 | 10 Umfeld, Karriere | **Vorstand, Fans, Presse, 166 Zufallsereignisse, Managerkarriere** mit Lizenzen und Erfolgen, **Nationalmannschaften mit Länderspielfenstern, KI-Nominierung, EM und WM mit Qualifikation, Manager als Nationaltrainer** | Medienhaus |
-| 11 Oberfläche | Desktop-Oberfläche (Avalonia) mit Maus, Drag & Drop, sortierbaren Tabellen, Diagrammen (Radar, Formkurve, xG, Heatmap), Wappen, Farbthemen | Tastenbelegung |
+| 11 Oberfläche | Desktop-Oberfläche (Avalonia) mit Maus, Drag & Drop, sortierbaren Tabellen, Diagrammen (Radar, Formkurve, xG, Heatmap), Wappen, Farbthemen, **Tastenbelegung, Schriftgröße, Kontrastthema, Screenreader-Namen und Tutorial (AP 12b)** | – |
 | 12 Nicht-funktional | Determinismus, **SQLite-Spielstände** mit Schemamigration, **Mehrsprachigkeit (Deutsch, Englisch, erweiterbar)**, Datenpakete mit Überlagerung, Datenvalidierung, Kalibrierungs-CLI mit Toleranzprüfung, **CI auf Linux und Windows**, Warnungen als Fehler, **Modulaufbau mit Golden Master und Architekturtest**, **Datenbank-Editor mit JSON-Schemas (AP 6)** | Spielstand-Modus des Editors (optional), Mod-Verwaltung (AP 14) |
 
 ## Sprachen

@@ -5,7 +5,8 @@ using Avalonia.Styling;
 namespace Fmh.Desktop.Services;
 
 /// <summary>
-/// Farbthemen (Kapitel 11): "Klassik" (dunkles Blau wie Anstoß), "Hell" und "Terminal" (grün auf schwarz).
+/// Farbthemen (Kapitel 11): "Klassik" (dunkles Blau wie Anstoß), "Hell", "Terminal" (grün auf schwarz) und
+/// "Kontrast" (AP 12b: weiß und gelb auf schwarz, Text mindestens 7:1 nach WCAG AAA).
 /// Die Farben liegen als Ressourcen in der Anwendung und werden beim Themenwechsel ausgetauscht.
 /// </summary>
 public sealed record Palette(
@@ -31,7 +32,13 @@ public sealed record Palette(
         Good: Color.Parse("#7CFC7C"), Warn: Color.Parse("#E3D34A"), Bad: Color.Parse("#FF5F57"),
         Pitch: Color.Parse("#0F2A12"), PitchLine: Color.Parse("#3FBF3F"));
 
-    public static readonly IReadOnlyList<Palette> All = new[] { Classic, Light, Terminal };
+    public static readonly Palette HighContrast = new("Kontrast", ThemeVariant.Dark,
+        Bg: Color.Parse("#000000"), Surface: Color.Parse("#000000"), Surface2: Color.Parse("#1A1A1A"), Line: Color.Parse("#FFFFFF"),
+        Text: Color.Parse("#FFFFFF"), Muted: Color.Parse("#E6E6E6"), Accent: Color.Parse("#FFD400"), Gold: Color.Parse("#FFD400"),
+        Good: Color.Parse("#4DFF7A"), Warn: Color.Parse("#FFB000"), Bad: Color.Parse("#FF8A8A"),
+        Pitch: Color.Parse("#00451A"), PitchLine: Color.Parse("#FFFFFF"));
+
+    public static readonly IReadOnlyList<Palette> All = new[] { Classic, Light, Terminal, HighContrast };
 
     public static Palette Current { get; private set; } = Classic;
 
@@ -105,6 +112,22 @@ public sealed record Palette(
         "White" => Color.Parse("#F5F5F2"),
         _ => Color.Parse("#808080"),
     };
+
+    /// <summary>Kontrastverhältnis nach WCAG 2 (1 bis 21).</summary>
+    public static double ContrastRatio(Color a, Color b)
+    {
+        static double Lum(Color c)
+        {
+            static double Ch(byte v)
+            {
+                var x = v / 255.0;
+                return x <= 0.03928 ? x / 12.92 : Math.Pow((x + 0.055) / 1.055, 2.4);
+            }
+            return 0.2126 * Ch(c.R) + 0.7152 * Ch(c.G) + 0.0722 * Ch(c.B);
+        }
+        var (la, lb) = (Lum(a), Lum(b));
+        return (Math.Max(la, lb) + 0.05) / (Math.Min(la, lb) + 0.05);
+    }
 
     public static Color Contrast(Color bg) =>
         0.299 * bg.R + 0.587 * bg.G + 0.114 * bg.B > 150 ? Color.Parse("#141414") : Colors.White;

@@ -41,7 +41,7 @@
         <TextBlock Grid.Column="1" Text="{Binding MoraleText}" Classes="small" />
         <TextBlock Grid.Column="2" Text="{Binding NextText}" Classes="small" Margin="24,0" />
         <TextBlock Grid.Column="3" Text="{Binding StatusMessage}" Classes="small" Foreground="{DynamicResource GoldBrush}" />
-        <TextBlock Grid.Column="4" Text="{s:L help.shell}" Classes="muted small" />
+        <TextBlock Grid.Column="4" Text="{Binding HelpText}" Classes="muted small" />
       </Grid>
     </Border>
 
@@ -69,6 +69,21 @@
           </ItemsControl.ItemTemplate>
         </ItemsControl>
       </DockPanel>
+    </Border>
+
+    <!-- Tutorial-Hinweis der Seite -->
+    <Border DockPanel.Dock="Top" Classes="card" Margin="22,14,22,0" Padding="14,10" IsVisible="{Binding HasTutorial}"
+            BorderBrush="{DynamicResource AccentBrush}" BorderThickness="1" Name="TutorialHint">
+      <Grid ColumnDefinitions="*,Auto">
+        <StackPanel Spacing="2">
+          <TextBlock Text="{Binding TutorialTitle}" FontWeight="SemiBold" Foreground="{DynamicResource AccentBrush}" />
+          <TextBlock Text="{Binding TutorialText}" TextWrapping="Wrap" />
+        </StackPanel>
+        <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="6" VerticalAlignment="Center" Margin="12,0,0,0">
+          <Button Content="{s:L tutorial.done}" Command="{Binding TutorialDoneCommand}" />
+          <Button Classes="ghost" Content="{s:L tutorial.off}" Command="{Binding TutorialOffCommand}" />
+        </StackPanel>
+      </Grid>
     </Border>
 
     <!-- Hauptbereich -->

@@ -54,6 +54,12 @@ public sealed class AppState
         Settings.Save(SettingsFile);
     }
 
+    /// <summary>Geräteweite Einstellungen sichern (Tasten, Skalierung, Tutorial).</summary>
+    public void SaveSettings() => Settings.Save(SettingsFile);
+
+    /// <summary>Gewählte Skalierung, auf die Stufen aus rules/ui.json begrenzt.</summary>
+    public double FontScale => Data.Ui.FontScales.Contains(Settings.FontScale) ? Settings.FontScale : 1.0;
+
     private void ApplyLanguage(string code)
     {
         Data.UseLanguage(code);
