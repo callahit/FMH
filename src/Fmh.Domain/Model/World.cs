@@ -128,6 +128,9 @@ public sealed class World
     /// <summary>Sommerturniere der laufenden Saison (AP 9b).</summary>
     public List<SummerTournament> SummerTournaments { get; set; } = new();
 
+    /// <summary>Schnellsaison oder Herausforderung (AP 12); null bei einer normalen Karriere.</summary>
+    public GameModeState? Mode { get; set; }
+
     /// <summary>Abschlussbilanzen aller Vereine je Ligasaison (AP 11b).</summary>
     public List<ClubSeason> ClubSeasons { get; set; } = new();
     /// <summary>Spielrekorde je Verein und Wettbewerb (AP 11b), Schlüssel <see cref="MatchRecord.Key"/>.</summary>

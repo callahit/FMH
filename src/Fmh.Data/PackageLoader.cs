@@ -94,6 +94,7 @@ public static class PackageLoader
             Internationals = Path1("rules/internationals.json") is { } intl ? Json.Load<InternationalRules>(intl) : new(),
             Friendlies = Path1("rules/friendlies.json") is { } fr ? Json.Load<FriendlyRules>(fr) : new(),
             Assistant = Path1("rules/assistant.json") is { } asr ? Json.Load<AssistantRules>(asr) : new(),
+            Challenges = Path1("rules/challenges.json") is { } chr ? Json.Load<ChallengeRules>(chr) : new(),
             Europe = Path1("competitions/europe.json") is { } eu ? Json.Load<EuropeFormat>(eu) : null,
             Languages = languages,
             DefaultLanguage = defaultLanguage,
