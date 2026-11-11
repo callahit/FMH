@@ -11,6 +11,13 @@
       "cooldownDays": {
         "type": "integer"
       },
+      "feature": {
+        "description": "Anstoß-Element (anstoss.<element>, AP 13); leer = immer möglich.",
+        "type": [
+          "string",
+          "null"
+        ]
+      },
       "id": {
         "type": "string"
       },

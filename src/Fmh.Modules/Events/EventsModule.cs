@@ -71,6 +71,7 @@ public sealed partial class EventsModule : GameModule, IEventsService
 
     private bool Eligible(EventDef d, Club club)
     {
+        if (!Anstoss.IsOn(World, HumanManager.Id, d.Feature)) return false;
         if (!Press.StyleFits(d.Styles)) return false;
         if (World.EventHistory.TryGetValue(d.Id, out var last) && last.AddDays(d.CooldownDays) > World.Date) return false;
         var w = d.When;

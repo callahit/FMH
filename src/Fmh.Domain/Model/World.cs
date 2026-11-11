@@ -131,6 +131,9 @@ public sealed class World
     /// <summary>Schnellsaison oder Herausforderung (AP 12); null bei einer normalen Karriere.</summary>
     public GameModeState? Mode { get; set; }
 
+    /// <summary>Anstoß-Schalter je Manager (AP 13); fehlender Eintrag = alles an.</summary>
+    public Dictionary<int, AnstossSettings> Anstoss { get; set; } = new();
+
     /// <summary>Abschlussbilanzen aller Vereine je Ligasaison (AP 11b).</summary>
     public List<ClubSeason> ClubSeasons { get; set; } = new();
     /// <summary>Spielrekorde je Verein und Wettbewerb (AP 11b), Schlüssel <see cref="MatchRecord.Key"/>.</summary>
