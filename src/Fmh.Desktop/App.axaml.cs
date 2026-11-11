@@ -13,6 +13,7 @@ public sealed class App : Application
     {
         AvaloniaXamlLoader.Load(this);
         Palette.Apply(Palette.Classic.Name);
+        AccessibleNames.Install();
     }
 
     public override void OnFrameworkInitializationCompleted()

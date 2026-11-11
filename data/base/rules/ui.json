@@ -1,0 +1,128 @@
+{
+  "keyBindings": [
+    {
+      "action": "page.inbox",
+      "gesture": "F1"
+    },
+    {
+      "action": "page.squad",
+      "gesture": "F2"
+    },
+    {
+      "action": "page.tactics",
+      "gesture": "F3"
+    },
+    {
+      "action": "page.training",
+      "gesture": "F4"
+    },
+    {
+      "action": "page.fixtures",
+      "gesture": "F5"
+    },
+    {
+      "action": "page.transfers",
+      "gesture": "F6"
+    },
+    {
+      "action": "page.finances",
+      "gesture": "F7"
+    },
+    {
+      "action": "page.stadium",
+      "gesture": "F8"
+    },
+    {
+      "action": "page.club",
+      "gesture": "F9"
+    },
+    {
+      "action": "page.league",
+      "gesture": "F10"
+    },
+    {
+      "action": "page.national",
+      "gesture": "F11"
+    },
+    {
+      "action": "page.history",
+      "gesture": "F12"
+    },
+    {
+      "action": "continue",
+      "gesture": "Space"
+    },
+    {
+      "action": "save",
+      "gesture": "Ctrl+S"
+    },
+    {
+      "action": "back",
+      "gesture": "Escape"
+    },
+    {
+      "action": "options",
+      "gesture": "Ctrl+O"
+    },
+    {
+      "action": "holiday",
+      "gesture": "Ctrl+H"
+    }
+  ],
+  "fontScales": [
+    1.0,
+    1.1,
+    1.25,
+    1.4
+  ],
+  "tutorial": [
+    {
+      "id": "inbox",
+      "page": "inbox"
+    },
+    {
+      "id": "squad",
+      "page": "squad"
+    },
+    {
+      "id": "tactics",
+      "page": "tactics"
+    },
+    {
+      "id": "training",
+      "page": "training"
+    },
+    {
+      "id": "fixtures",
+      "page": "fixtures"
+    },
+    {
+      "id": "transfers",
+      "page": "transfers"
+    },
+    {
+      "id": "finances",
+      "page": "finances"
+    },
+    {
+      "id": "stadium",
+      "page": "stadium"
+    },
+    {
+      "id": "club",
+      "page": "club"
+    },
+    {
+      "id": "league",
+      "page": "league"
+    },
+    {
+      "id": "national",
+      "page": "national"
+    },
+    {
+      "id": "history",
+      "page": "history"
+    }
+  ]
+}
