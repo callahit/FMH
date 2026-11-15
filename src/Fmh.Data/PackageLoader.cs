@@ -98,6 +98,7 @@ public static class PackageLoader
             Ui = Path1("rules/ui.json") is { } uir ? Json.Load<UiRules>(uir) : new(),
             Anstoss = Path1("rules/anstoss.json") is { } ans ? Json.Load<AnstossRules>(ans) : new(),
             PrivateLife = Path1("rules/privateLife.json") is { } pl ? Json.Load<PrivateLifeRules>(pl) : null,
+            GrayZones = Path1("rules/grayZones.json") is { } gz ? Json.Load<GrayZoneRules>(gz) : null,
             Europe = Path1("competitions/europe.json") is { } eu ? Json.Load<EuropeFormat>(eu) : null,
             Languages = languages,
             DefaultLanguage = defaultLanguage,

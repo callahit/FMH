@@ -162,6 +162,7 @@ internal static class WorldFingerprint
             ["mode"] = J(w.Mode),
             ["anstoss"] = J(w.Anstoss),
             ["privateLife"] = J(w.PrivateLives),
+            ["grayZones"] = J(w.GrayZones),
             // Länder- und Weltregeln im Spielstand: auch Datenänderungen ohne Wirkung im Testlauf schlagen an.
             ["config"] = J(new { w.Seed, w.Packages, w.Countries, w.Rules, w.MarketLevels, w.MarketBases, w.Referees }),
         };

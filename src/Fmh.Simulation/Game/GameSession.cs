@@ -47,6 +47,7 @@ public sealed partial class GameSession
     private readonly FriendliesModule _friendlies = new();
     private readonly ChallengeModule _challenge = new();
     private readonly PrivateLifeModule _privateLife = new();
+    private readonly GrayZonesModule _grayZones = new();
 
     public GameSession(World world, GameData data, IMatchEngine engine)
     {
@@ -54,7 +55,7 @@ public sealed partial class GameSession
         CountryDataMigration.Refresh(world, data);
         var rng = world.RngState.Length == 4 ? Rng.FromState(world.RngState) : new Rng(world.Seed);
         _kernel = new GameKernel(world, data, engine, rng);
-        IGameModule[] modules = { _training, _matchday, _transfers, _scouting, _youth, _facilities, _finance, _license, _economy, _cups, _europe, _board, _press, _events, _sponsors, _staff, _stadiumPlans, _season, _relations, _managers, _agents, _internationals, _friendlies, _challenge, _privateLife };
+        IGameModule[] modules = { _training, _matchday, _transfers, _scouting, _youth, _facilities, _finance, _license, _economy, _cups, _europe, _board, _press, _events, _sponsors, _staff, _stadiumPlans, _season, _relations, _managers, _agents, _internationals, _friendlies, _challenge, _privateLife, _grayZones };
         var ctx = new ModuleContext(_kernel);
         foreach (var m in modules) m.Register(ctx);
         Modules = ModuleRegistry.Order(modules);
