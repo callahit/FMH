@@ -15,6 +15,7 @@
         <TextBlock Text="{Binding Error}" Foreground="{DynamicResource BadBrush}" VerticalAlignment="Center" TextWrapping="Wrap" />
         <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
           <Button Content="{s:L neg.withdraw}" Command="{Binding WithdrawCommand}" IsVisible="{Binding !Finished}" />
+          <Button Content="{Binding TrickText}" Command="{Binding TrickCommand}" IsVisible="{Binding CanTrick}" ToolTip.Tip="{Binding TrickInfo}" />
           <Button Content="{s:L ui.close}" Command="{Binding CloseCommand}" />
           <Button Classes="primary" Content="{s:L neg.submit}" Command="{Binding SubmitCommand}" IsVisible="{Binding CanSubmit}" />
         </StackPanel>

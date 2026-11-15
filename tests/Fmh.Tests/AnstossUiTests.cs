@@ -96,4 +96,28 @@ public class AnstossUiTests
         Pump();
         vm.CloseDialog();
     }
+
+    [AvaloniaFact]
+    public void GrayZonesDialogPlansABribe()
+    {
+        var (w, vm, ng) = NewGame();
+        ng.StartCommand.Execute(null);
+        var shell = Assert.IsType<ShellViewModel>(vm.Screen);
+        shell.Open(shell.Nav.Single(n => n.Id == "club"));
+        var club = Assert.IsType<ClubPageViewModel>(shell.Page);
+        Assert.True(club.HasGrayZones);
+        club.OpenGrayZonesCommand.Execute(null);
+        var dialog = Assert.IsType<GrayZonesViewModel>(vm.Dialog);
+        Pump();
+        var t = AppState.Current.T;
+        Assert.Contains(w.GetVisualDescendants().OfType<TextBlock>(), x => x.IsEffectivelyVisible && x.Text == t["gray.title"]);
+        Assert.Equal(2, dialog.Actions.Count);
+        dialog.Actions.Single(a => a.Name == t["gray.referee.name"]).Command.Execute(null);
+        Assert.Equal(t["gray.done"], dialog.Message);
+        Assert.Single(AppState.Current.Session!.GrayZoneFile!.Deeds);
+        dialog.Actions.Single(a => a.Name == t["gray.doping.name"]).Command.Execute(null);
+        Assert.Equal(t["gray.error.cooldown"], dialog.Message);
+        Pump();
+        vm.CloseDialog();
+    }
 }

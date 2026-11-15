@@ -146,6 +146,27 @@ Das Element `privateLife` gibt dem Manager ein Leben neben dem Platz. Alle Regel
   Prestige und Erholung. Dort wechselt man Wohnung und Auto und nimmt Hobbys auf oder gibt sie auf.
 - **Schalter:** Ist das Element aus, ruht alles. Konto und Besitz bleiben erhalten, bis es wieder an ist.
 
+### Grauzonen (AP 13c)
+
+Das Element `grayZones` erlaubt, was der Verband verbietet. Die Regeln stehen in `data/anstoss/rules/grayZones.json`.
+Kosten und Geldstrafen gelten für einen Erstligisten und schrumpfen mit kleineren Vereinen.
+
+- **Schiedsrichter „überzeugen“:** Kostet 60.000 € und gibt der eigenen Mannschaft im nächsten Pflichtspiel +1,0
+  Tagesform. Das Risiko liegt bei 15 %. Fliegt es auf, drohen 400.000 € Geldstrafe, 3 Punkte Abzug in der Liga sowie
+  Verluste bei Vorstand und Medienruf.
+- **Verbotene Mittel:** Kosten 25.000 € und geben +1,6 Tagesform. Das Risiko liegt bei 25 %. Fliegt es auf, werden alle
+  eingesetzten Spieler und die Bank für 3 Spiele gesperrt, dazu 200.000 € Geldstrafe.
+- **Vertragstrick:** Ein erfundenes Konkurrenzangebot senkt die Gehaltsforderung in einer laufenden Verhandlung um
+  15 %. Das Risiko liegt bei 20 %. Fliegt es auf, steigt die Forderung zurück, der Spieler ist verstimmt, dazu kommt
+  eine Geldstrafe.
+- **Ablauf:** Zwischen zwei Taten liegen mindestens 14 Tage. Spiel-Taten wirken auf das nächste Pflichtspiel, die
+  Aufdeckung entscheidet sich nach dem Abpfiff. Der Zufall läuft über einen eigenen Strom, sodass ein Spiel ohne Taten
+  unverändert bleibt.
+- **Entlassung:** Nach drei aufgeflogenen Taten entlässt der Vorstand den Manager.
+- **Bedienung:** Der Dialog „Grauzonen …“ auf der Vereinsseite unter „Karriere“ führt die Spiel-Taten. Der Vertragstrick
+  ist ein eigener Knopf in der Spielerphase einer Verhandlung.
+- **Ereignisse:** Fünf weitere Ereignisse rund um Bestechung und Beraterangebote.
+
 ## Karriere (Phase 2)
 
 - **Training:** Wochenplan mit Vor- und Nachmittag (9 Bausteine), drei Intensitäten mit
@@ -762,6 +783,8 @@ danach je Abschnitt angehoben:
   Testspiele. Version 7 ergänzt die Tabelle `summer_tournaments` (Sommerturniere).
 - Abschnitt `internationals` Version 8 ergänzt in den Team-Daten Trainer, Ziel, Vertrag, Spielsystem, Vormerkliste und
   offenes Angebot. Ältere Spielstände haben keine Trainer; das Modul besetzt die Posten am nächsten Spieltag.
+- Abschnitt `grayZones` (Version 6, neu) bekommt die Tabelle `gray_zones` (Taten und aufgeflogene Fälle je Manager).
+  In älteren Spielständen beginnt die Akte leer.
 - Abschnitt `privateLife` (Version 6, neu) bekommt die Tabelle `private_lives` (Privatkonto, Stress und Besitz je
   Manager). In älteren Spielständen beginnt das Privatleben beim Laden neu.
 - Abschnitt `anstoss` (Version 6, neu) bekommt die Tabelle `anstoss_settings` (Anstoß-Schalter je Manager, nur

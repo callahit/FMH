@@ -68,6 +68,7 @@ public static class SchemaCatalog
         new("ui", typeof(UiRules), "rules/ui.json"),
         new("anstoss", typeof(AnstossRules), "rules/anstoss.json"),
         new("private-life", typeof(PrivateLifeRules), "rules/privateLife.json"),
+        new("gray-zones", typeof(GrayZoneRules), "rules/grayZones.json"),
         new("europe", typeof(EuropeFormat), "competitions/europe.json"),
         new("lang", typeof(Dictionary<string, string>), "lang/*.json"),
         new("commentary", typeof(Dictionary<string, List<string>>), "lang/*.commentary.json"),
