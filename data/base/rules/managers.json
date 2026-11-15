@@ -21,6 +21,7 @@
     "belowShare": 0.25,
     "minBelow": 4,
     "maxFormPoints": 3,
+    "bottomPlaces": 3,
     "newcomerDays": 30
   },
   "seasonEnd": {

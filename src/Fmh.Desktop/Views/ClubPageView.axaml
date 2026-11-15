@@ -294,6 +294,7 @@
                   <StackPanel Orientation="Horizontal" Spacing="8">
                     <Button Classes="primary" Content="{s:L career.startCourse}" Command="{Binding StartCourseCommand}" />
                     <Button Content="{s:L career.resign}" Command="{Binding ResignCommand}" />
+                    <Button Content="{s:L private.open}" Command="{Binding OpenPrivateLifeCommand}" IsVisible="{Binding HasPrivateLife}" />
                   </StackPanel>
                 </StackPanel>
               </Border>

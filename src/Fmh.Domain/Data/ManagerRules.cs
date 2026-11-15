@@ -49,6 +49,9 @@ public sealed class SackingRules
     /// <summary>Höchstens so viele Punkte aus den letzten fünf Spielen.</summary>
     [Range(0, 15)]
     public int MaxFormPoints { get; set; } = 3;
+    /// <summary>So viele Plätze am Tabellenende gelten (neben der direkten Abstiegszone) als gefährdet; 3 schließt den Relegationsplatz der 18er-Ligen ein.</summary>
+    [Range(1, 10)]
+    public int BottomPlaces { get; set; } = 2;
     /// <summary>Wer später als so viele Tage nach Saisonbeginn kam, wird in dieser Saison nicht mehr entlassen.</summary>
     [Range(0, 365)]
     public int NewcomerDays { get; set; } = 30;

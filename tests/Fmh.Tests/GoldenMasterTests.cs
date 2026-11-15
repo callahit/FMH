@@ -161,6 +161,7 @@ internal static class WorldFingerprint
             ["records"] = J(new { w.ClubSeasons, w.Records }),
             ["mode"] = J(w.Mode),
             ["anstoss"] = J(w.Anstoss),
+            ["privateLife"] = J(w.PrivateLives),
             // Länder- und Weltregeln im Spielstand: auch Datenänderungen ohne Wirkung im Testlauf schlagen an.
             ["config"] = J(new { w.Seed, w.Packages, w.Countries, w.Rules, w.MarketLevels, w.MarketBases, w.Referees }),
         };

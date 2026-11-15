@@ -14,12 +14,14 @@ public sealed partial class GameSession
     {
         Anstoss.SetMaster(World, HumanManager.Id, on);
         DropSwitchedOff();
+        _privateLife.Ensure();
     }
 
     public void SetAnstossElement(string element, bool on)
     {
         Anstoss.SetElement(World, HumanManager.Id, element, on);
         DropSwitchedOff();
+        _privateLife.Ensure();
     }
 
     /// <summary>Offene Ereignisse ausgeschalteter Elemente verschwinden samt Nachricht, ohne Wirkung.</summary>
