@@ -84,31 +84,57 @@ public sealed class SceneTreeAsset
         return new SceneTreeAsset(magic, headerVersion, headerFlags, lines, list, categories.ToArray());
     }
 
-    private static SceneTreeAsset? _cached;
+    /// <summary>Umgebungsvariable mit dem Ordner der Textmodus-Dateien (Textm.sav und Textm.txt oder scene-tree.json).</summary>
+    public const string DirectoryVariable = "FMH_TEXTMODE_DIR";
 
-    /// <summary>Lädt data/textmode/scene-tree.json, sonst die Originaldateien daneben.</summary>
-    public static SceneTreeAsset LoadDefault()
+    private static readonly object Gate = new();
+    private static SceneTreeAsset? _cached;
+    private static bool _searched;
+
+    /// <summary>
+    /// Lädt den Szenenbaum aus dem Ordner, den der Nutzer bereitstellt; null, wenn keiner gefunden wird.
+    /// Die Dateien gehören nicht zum Repository.
+    /// </summary>
+    public static SceneTreeAsset? TryLoadDefault()
     {
-        if (_cached is not null) return _cached;
-        var dir = Locate();
-        var json = Path.Combine(dir, "scene-tree.json");
-        _cached = File.Exists(json) ? SceneAssetStore.Read(json) : TextmImporter.Load(dir);
-        return _cached;
+        lock (Gate)
+        {
+            if (_searched) return _cached;
+            if (Locate() is { } dir)
+            {
+                var json = Path.Combine(dir, "scene-tree.json");
+                _cached = File.Exists(json) ? SceneAssetStore.Read(json) : TextmImporter.Load(dir);
+            }
+            _searched = true;
+            return _cached;
+        }
     }
 
     /// <summary>Nur für Tests, die den Cache nach dem Schreiben der Datei neu laden.</summary>
-    public static void ClearCache() => _cached = null;
-
-    public static string Locate()
+    public static void ClearCache()
     {
-        var dir = new DirectoryInfo(AppContext.BaseDirectory);
-        while (dir is not null)
+        lock (Gate)
         {
-            var candidate = Path.Combine(dir.FullName, "data", "textmode");
-            if (File.Exists(Path.Combine(candidate, "Textm.sav")) || File.Exists(Path.Combine(candidate, "scene-tree.json")))
-                return candidate;
-            dir = dir.Parent;
+            _cached = null;
+            _searched = false;
         }
-        throw new DirectoryNotFoundException("data/textmode nicht gefunden.");
     }
+
+    /// <summary>
+    /// Sucht den Ordner: zuerst <see cref="DirectoryVariable"/>, dann den Benutzerordner (…/FMH/textmode),
+    /// dann <c>data/textmode</c> oberhalb des Programms (lokale Kopie, per .gitignore ausgeschlossen).
+    /// </summary>
+    public static string? Locate()
+    {
+        var candidates = new List<string>();
+        if (Environment.GetEnvironmentVariable(DirectoryVariable) is { Length: > 0 } env) candidates.Add(env);
+        candidates.Add(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ApplicationData), "FMH", "textmode"));
+        for (var dir = new DirectoryInfo(AppContext.BaseDirectory); dir is not null; dir = dir.Parent)
+            candidates.Add(Path.Combine(dir.FullName, "data", "textmode"));
+        return candidates.FirstOrDefault(Holds);
+    }
+
+    private static bool Holds(string dir) =>
+        File.Exists(Path.Combine(dir, "scene-tree.json")) ||
+        (File.Exists(Path.Combine(dir, "Textm.sav")) && File.Exists(Path.Combine(dir, "Textm.txt")));
 }

@@ -8,12 +8,12 @@ using Fmh.SceneTree;
 
 namespace Fmh.Tests;
 
-/// <summary>Import des FM2002-Szenenbaums, Kindauswahl und Rückschreiben eines einzelnen Spiels.</summary>
+/// <summary>Import des Szenenbaums, Kindauswahl und Rückschreiben eines einzelnen Spiels (nur mit bereitgestellten Textmodus-Dateien).</summary>
 public class SceneTreeTests
 {
-    private static SceneTreeAsset Tree() => TextmImporter.Load(Path.Combine(TestData.RepoRoot(), "data", "textmode"));
+    private static SceneTreeAsset Tree() => SceneTreeAsset.TryLoadDefault()!;
 
-    [Fact]
+    [SceneFact]
     public void ImportHasTheKnownShape()
     {
         var tree = Tree();
@@ -57,10 +57,11 @@ public class SceneTreeTests
         Assert.Contains(tree.Nodes, n => (n.Conditions & SceneCondition.Floodlit) != 0);
     }
 
-    [Fact]
+    [SceneFact]
     public void CommittedAssetMatchesTheImporter()
     {
-        var dir = Path.Combine(TestData.RepoRoot(), "data", "textmode");
+        var dir = SceneTreeAsset.Locate()!;
+        if (!File.Exists(Path.Combine(dir, "Textm.sav"))) return;
         var imported = TextmImporter.Load(dir);
         var json = Path.Combine(dir, "scene-tree.json");
         if (Environment.GetEnvironmentVariable("FMH_SCENE_WRITE") == "1")
@@ -81,7 +82,7 @@ public class SceneTreeTests
         Assert.Equal("Tor!", loaded.Line(loaded.Nodes[4].LineRefs[0]));
     }
 
-    [Fact]
+    [SceneFact]
     public void WeightIsGroundPlusBasePlusAttributes()
     {
         var bytes = new byte[SceneNode.ParameterLength];
@@ -105,7 +106,7 @@ public class SceneTreeTests
         Assert.Equal(1 + 0.5 * (21 - 16), inverse, 3);
     }
 
-    [Fact]
+    [SceneFact]
     public void HardFiltersDropWeatherAndEmptyRoles()
     {
         var bytes = new byte[SceneNode.ParameterLength];
@@ -125,7 +126,7 @@ public class SceneTreeTests
         Assert.True(SceneFilters.Allows(night, new SceneGate { Weather = Weather.Sunny, Floodlit = true, Occupied = _ => true }));
     }
 
-    [Fact]
+    [SceneFact]
     public void PlaceholdersUsePlayersAndTheReferee()
     {
         var text = SceneNarrative.Apply("1-ST gegen 2-GK, gepfiffen von REF.", new SceneNarrator
@@ -138,7 +139,7 @@ public class SceneTreeTests
         Assert.Equal(1, SceneNarrative.Code("GK"));
     }
 
-    [Fact]
+    [SceneFact]
     public void SameSeedReplaysTheSameTextMatch()
     {
         var session = TestData.NewSession(3);
@@ -158,7 +159,7 @@ public class SceneTreeTests
         Assert.Contains(first.Events, e => !string.IsNullOrEmpty(e.Narrative));
     }
 
-    [Fact]
+    [SceneFact]
     public void SceneMatchWritesBackGoalsShotsAndCards()
     {
         var session = TestData.NewSession(9);
@@ -184,7 +185,7 @@ public class SceneTreeTests
         Assert.All(scene.Home.Participants.Concat(scene.Away.Participants).Where(p => p.Started), p => Assert.True(p.MinutesPlayed(scene.Minute) > 0));
     }
 
-    [Fact]
+    [SceneFact]
     public void KnockoutMatchFinishesWithPenaltiesIfStillLevel()
     {
         var session = TestData.NewSession(4);
@@ -202,7 +203,7 @@ public class SceneTreeTests
         }
     }
 
-    [Fact]
+    [SceneFact]
     public void RoutingKeepsTheFastEngineUnlessTheWatchedMatchAsks()
     {
         var session = new GameSession(WorldGenerator.Create(TestData.Data, new NewGameOptions { Seed = 5, ClubKey = "nordheide", ManagerName = "Test" }),
@@ -215,6 +216,21 @@ public class SceneTreeTests
         Assert.DoesNotContain(fast.Events, e => e.Narrative is not null);
         Assert.Contains(scene.Events, e => e.Narrative is not null);
         Assert.True(fast.Home.Goals + fast.Away.Goals >= 0);
+    }
+
+    /// <summary>Ohne bereitgestellte Textmodus-Dateien läuft auch ein Spiel im Textmodus über die schnelle Engine.</summary>
+    [Fact]
+    public void WithoutSceneFilesTheTextModeFallsBackToTheFastEngine()
+    {
+        var routing = new SceneRoutingEngine(new TextMatchEngine(), null);
+        Assert.False(routing.HasScene);
+        var session = new GameSession(WorldGenerator.Create(TestData.Data, new NewGameOptions { Seed = 5, ClubKey = "nordheide", ManagerName = "Test" }),
+            TestData.Data, routing);
+        var fixture = session.World.AllFixtures.First(f => f.Result is null);
+        var sim = session.StartMatch(fixture, humanControlled: false, sceneText: true);
+        Assert.IsNotType<SceneSimulation>(sim);
+        sim.RunToEnd();
+        Assert.True(sim.IsFinished);
     }
 
     private static SceneNode WithBytes(byte[] bytes) => new(2, 3, [], bytes, 0);

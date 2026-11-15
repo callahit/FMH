@@ -286,3 +286,6 @@ __pycache__/
 *.btm.cs
 *.odx.cs
 *.xsd.cs
+
+# Textmodus-Dateien stellt der Nutzer selbst bereit (docs/textmodus.md)
+data/textmode/

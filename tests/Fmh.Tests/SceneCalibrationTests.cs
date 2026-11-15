@@ -15,7 +15,7 @@ public class SceneCalibrationTests
     private readonly ITestOutputHelper _out;
     public SceneCalibrationTests(ITestOutputHelper output) => _out = output;
 
-    [Fact]
+    [SceneFact]
     public void OneThousandMatchesStayNearTheFastEngine()
     {
         const int matches = 1000;

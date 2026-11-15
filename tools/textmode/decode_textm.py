@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Decoder fuer FM2002 Textm.sav / Textm.txt (Textmodus-Update III, 2.11.2001).
+"""Decoder fuer Szenenbaeume im Format Textm.sav / Textm.txt.
 Format (belegt):
   Kopf 16 Byte: 8 Byte Kennung, u32 (=2), u32 (=0)
   dann N Knoten in Preorder, je:

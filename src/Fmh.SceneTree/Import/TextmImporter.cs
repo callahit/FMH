@@ -3,7 +3,7 @@ using System.Buffers.Binary;
 namespace Fmh.SceneTree;
 
 /// <summary>
-/// Liest Textm.sav und Textm.txt (Textmodus-Update III, 2.11.2001).
+/// Liest einen Szenenbaum im Format Textm.sav und Textm.txt (Dateien stellt der Nutzer bereit, siehe docs/textmodus.md).
 /// Layout: 16 Byte Kopf, dann Knoten in Preorder: u32 Id, u32 n, n mal u32 Zeilennummer, 44 Byte Parameter, u32 Kinderzahl.
 /// </summary>
 public static class TextmImporter

@@ -1,6 +1,6 @@
 namespace Fmh.SceneTree;
 
-/// <summary>Rollencode aus dem FM2002-Szenenbaum (untere 7 Bit). Bit 0x80 am Byte markiert Team 1 (angreifend).</summary>
+/// <summary>Rollencode aus dem Szenenbaum (untere 7 Bit). Bit 0x80 am Byte markiert Team 1 (angreifend).</summary>
 public enum FmRole
 {
     Gk = 1, Rb = 2, Lb = 3, Cd = 4, Sw = 5, Rwb = 6, Lwb = 7, Anc = 8,

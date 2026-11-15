@@ -4,7 +4,7 @@ using Fmh.Core.Model;
 namespace Fmh.SceneTree;
 
 /// <summary>
-/// FM2002-Attributindex auf FMH-Attribute. Namen mit Textbeleg stehen im Katalog;
+/// Attributindex des Szenenbaums auf FMH-Attribute. Namen mit Textbeleg stehen im Katalog;
 /// Indizes ohne Beleg sind gekennzeichnet und liefern sonst den neutralen Wert 10.
 /// </summary>
 public static class AttributeMap
