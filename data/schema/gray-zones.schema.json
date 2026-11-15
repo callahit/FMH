@@ -1,0 +1,104 @@
+{
+  "$id": "https://fmh.local/schema/gray-zones.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Grauzonen (AP 13c, Paket data/anstoss, rules/grayZones.json).",
+  "properties": {
+    "actions": {
+      "items": {
+        "additionalProperties": false,
+        "properties": {
+          "cost": {
+            "description": "Kosten in Euro für einen Erstligisten (skaliert mit der Vereinsgröße).",
+            "maximum": 100000000,
+            "minimum": 0,
+            "type": "integer"
+          },
+          "dayForm": {
+            "description": "Tagesform-Bonus (Attributpunkte) der eigenen Spieler im betroffenen Spiel.",
+            "maximum": 5,
+            "minimum": 0,
+            "type": "number"
+          },
+          "detection": {
+            "description": "Aufdeckungsrisiko je Tat.",
+            "maximum": 1,
+            "minimum": 0,
+            "type": "number"
+          },
+          "id": {
+            "type": "string"
+          },
+          "kind": {
+            "enum": [
+              "Match",
+              "Negotiation"
+            ]
+          },
+          "penalty": {
+            "additionalProperties": false,
+            "properties": {
+              "board": {
+                "maximum": 0,
+                "minimum": -100,
+                "type": "number"
+              },
+              "fine": {
+                "description": "Geldstrafe in Euro für einen Erstligisten (skaliert).",
+                "maximum": 100000000,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "media": {
+                "maximum": 0,
+                "minimum": -100,
+                "type": "number"
+              },
+              "playerBan": {
+                "description": "Sperre je gedoptem Spieler in Spielen.",
+                "maximum": 20,
+                "minimum": 0,
+                "type": "integer"
+              },
+              "playerMorale": {
+                "description": "Moral des betroffenen Spielers (Vertragstrick).",
+                "maximum": 0,
+                "minimum": -6,
+                "type": "integer"
+              },
+              "points": {
+                "description": "Punktabzug in der Liga (nur Ligaspiele).",
+                "maximum": 20,
+                "minimum": 0,
+                "type": "integer"
+              }
+            },
+            "type": "object"
+          },
+          "wageCut": {
+            "description": "Senkt die Gehaltsforderung in einer laufenden Verhandlung um diesen Anteil.",
+            "maximum": 0.9,
+            "minimum": 0,
+            "type": "number"
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "cooldownDays": {
+      "description": "Mindestabstand zwischen zwei Taten in Tagen.",
+      "maximum": 365,
+      "minimum": 0,
+      "type": "integer"
+    },
+    "sackAfter": {
+      "description": "So viele aufgeflogene Taten führen zur Entlassung.",
+      "maximum": 20,
+      "minimum": 1,
+      "type": "integer"
+    }
+  },
+  "title": "FMH rules/grayZones.json",
+  "type": "object"
+}

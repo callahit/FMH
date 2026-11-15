@@ -295,6 +295,7 @@
                     <Button Classes="primary" Content="{s:L career.startCourse}" Command="{Binding StartCourseCommand}" />
                     <Button Content="{s:L career.resign}" Command="{Binding ResignCommand}" />
                     <Button Content="{s:L private.open}" Command="{Binding OpenPrivateLifeCommand}" IsVisible="{Binding HasPrivateLife}" />
+                    <Button Content="{s:L gray.open}" Command="{Binding OpenGrayZonesCommand}" IsVisible="{Binding HasGrayZones}" />
                   </StackPanel>
                 </StackPanel>
               </Border>
