@@ -98,6 +98,7 @@ public static class PackageLoader
             Ui = Path1("rules/ui.json") is { } uir ? Json.Load<UiRules>(uir) : new(),
             Anstoss = Path1("rules/anstoss.json") is { } ans ? Json.Load<AnstossRules>(ans) : new(),
             PrivateLife = Path1("rules/privateLife.json") is { } pl ? Json.Load<PrivateLifeRules>(pl) : null,
+            Scenes = Path1("rules/scenes.json") is { } sc ? Json.Load<SceneRules>(sc) : new(),
             GrayZones = Path1("rules/grayZones.json") is { } gz ? Json.Load<GrayZoneRules>(gz) : null,
             Europe = Path1("competitions/europe.json") is { } eu ? Json.Load<EuropeFormat>(eu) : null,
             Languages = languages,
@@ -118,7 +119,7 @@ public static class PackageLoader
             .Where(Directory.Exists)
             .SelectMany(d => Directory.GetFiles(d, "*.json"))
             .Select(Path.GetFileName)
-            .Where(f => f is not null && !f.EndsWith(".commentary.json", StringComparison.Ordinal))
+            .Where(f => f is not null && !f.EndsWith(".commentary.json", StringComparison.Ordinal) && !f.EndsWith(".scenes.json", StringComparison.Ordinal))
             .Select(f => f![..^".json".Length])
             .Distinct()
             .OrderBy(c => c, StringComparer.Ordinal)
@@ -134,9 +135,13 @@ public static class PackageLoader
                 var langFile = Path.Combine(m.Directory, "lang", code + ".json");
                 if (File.Exists(langFile))
                     foreach (var kv in Json.Load<Dictionary<string, string>>(langFile)) texts[kv.Key] = kv.Value;
-                var commentaryFile = Path.Combine(m.Directory, "lang", code + ".commentary.json");
-                if (File.Exists(commentaryFile))
-                    foreach (var kv in Json.Load<Dictionary<string, List<string>>>(commentaryFile)) commentary[kv.Key] = kv.Value;
+                // Kommentarbausteine und Szenentexte des Textmodus (gleiches Format, Schlüssel „scene.…“)
+                foreach (var suffix in new[] { ".commentary.json", ".scenes.json" })
+                {
+                    var file = Path.Combine(m.Directory, "lang", code + suffix);
+                    if (File.Exists(file))
+                        foreach (var kv in Json.Load<Dictionary<string, List<string>>>(file)) commentary[kv.Key] = kv.Value;
+                }
             }
             return (texts, commentary);
         }

@@ -44,7 +44,8 @@ public sealed class CommentaryGenerator
         return new CommentaryLine(e, e.MinuteLabel, text, highlight);
     }
 
-    private static string? TemplateKey(MatchEvent e) => e.Type switch
+    /// <summary>Ereignisschlüssel, z. B. <c>goal.header</c> oder <c>shot.normal.saved</c>; auch der Textmodus nutzt ihn.</summary>
+    public static string? TemplateKey(MatchEvent e) => e.Type switch
     {
         MatchEventType.KickOff => "kickoff",
         MatchEventType.SecondHalfKickOff => "secondHalf",
@@ -105,6 +106,14 @@ public sealed class CommentaryGenerator
             _ => "wide",
         };
         return $"shot.{kind}.{outcome}";
+    }
+
+    /// <summary>Kommentarzeile ohne Auslassung von Angriffen (Rückfall des Textmodus).</summary>
+    public CommentaryLine? Plain(MatchEvent e)
+    {
+        if (TemplateKey(e) is not { } key || !_data.Commentary.TryGetValue(key, out var templates) || templates.Count == 0) return null;
+        var rng = new Rng(Rng.Mix(_sim.Setup.Seed, (ulong)e.Index + 1));
+        return new CommentaryLine(e, e.MinuteLabel, Fill(rng.Pick(templates), e), false);
     }
 
     private string Fill(string template, MatchEvent e)

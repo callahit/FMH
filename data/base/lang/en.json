@@ -529,6 +529,8 @@
  "comm.side.right": "down the right",
  "comm.side.centre": "through the middle",
  "comm.keeper": "the goalkeeper",
+ "scene.someone": "someone",
+ "scene.referee": "the referee",
  "msg.sender.board": "Board",
  "msg.sender.assistant": "Assistant manager",
  "msg.sender.association": "Football association",

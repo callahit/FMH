@@ -529,6 +529,8 @@
  "comm.side.right": "über rechts",
  "comm.side.centre": "durch die Mitte",
  "comm.keeper": "der Torwart",
+ "scene.someone": "jemand",
+ "scene.referee": "der Schiedsrichter",
  "msg.sender.board": "Vorstand",
  "msg.sender.assistant": "Co-Trainer",
  "msg.sender.association": "Verband",
