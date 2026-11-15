@@ -1,11 +1,21 @@
-# Textmodus (FM2002-Szenenbaum)
+# Textmodus (Szenenbaum)
 
-Angeschaute Spiele können im Darstellungsmodus **Textmodus** über den Szenenbaum aus dem FM2002-Textmodus-Update III (2. November 2001) laufen. Alle anderen Spiele, einschließlich Sofortergebnis und der Hintergrundpartien, bleiben auf der schnellen Engine. Deren Golden Master (10.000 Spiele) ändert sich dadurch nicht.
+Angeschaute Spiele können im Darstellungsmodus **Textmodus** über einen Szenenbaum laufen. Alle anderen Spiele, einschließlich Sofortergebnis und der Hintergrundpartien, bleiben auf der schnellen Engine. Deren Golden Master (10.000 Spiele) ändert sich dadurch nicht.
 
-Die Originaldateien liegen unter `data/textmode/` (`Textm.sav`, `Textm.txt`, `liesmich.txt`). Sie sind nicht geschützt und dürfen im Repository stehen. `scene-tree.json` ist das daraus erzeugte, versionierte Asset (Format 1). Der Parameterkatalog steht in `data/textmode/parameter-katalog.json`. Die Decoder liegen unter `tools/textmode/`.
+Die Textmodus-Dateien gehören nicht zum Repository und werden nicht mitgeliefert. Der Textmodus ist nur verfügbar, wenn
+der Nutzer einen Szenenbaum selbst bereitstellt: entweder `Textm.sav` und `Textm.txt` oder das daraus erzeugte
+`scene-tree.json` (Format 1). FMH sucht in dieser Reihenfolge:
+
+1. im Ordner aus der Umgebungsvariablen `FMH_TEXTMODE_DIR`,
+2. im Benutzerordner `FMH/textmode` (Windows `%APPDATA%\FMH\textmode`, Linux `~/.config/FMH/textmode`),
+3. in einer lokalen Kopie unter `data/textmode/` (per `.gitignore` ausgeschlossen, nie committen).
+
+Ohne Dateien läuft auch ein Spiel im Darstellungsmodus „Textmodus“ über die schnelle Engine. Die Tests, die den Baum
+brauchen (`[SceneFact]`), werden dann übersprungen; mit `FMH_TEXTMODE_DIR` laufen sie mit. Ein eigener, frei
+lizenzierter Szenenkatalog ist geplant. Die Decoder liegen unter `tools/textmode/`:
 
 ```bash
-python3 tools/textmode/decode_textm.py data/textmode
+python3 tools/textmode/decode_textm.py "$FMH_TEXTMODE_DIR"
 ```
 
 ## Format
@@ -116,11 +126,11 @@ Alle Werte liegen innerhalb von etwa ±10 %. Der Test lässt ±13 % zu, bei Rot 
 
 ## Offen
 
-- Die exakte FM2002-Gewichtsformel ist nicht belegt. `SceneWeightOptions` ist der Stellhebel.
+- Die exakte Gewichtsformel des Baums ist nicht belegt. `SceneWeightOptions` ist der Stellhebel.
 - Die Ereignisschicht setzt die Häufigkeit von Fouls, Standards, Karten und kurzen Abschlüssen. Der Baum entscheidet den Text und, bei vollen Standards, das Tor.
 - Bytes b8/b9 (Stimmung), b20, b22, b28, b31 und b34 sind nur teilweise oder gar nicht angeschlossen. b34 hat keinen Effekt. b29 steuert nur noch die Geburtstagszeilen.
 - Attributindizes ohne Katalogname sind Annahmen.
 - `REASON`- und `INJURY`-Texte fehlen im Original.
-- Rollen wie Libero, Wingback und „ANC“ werden aus der FMH-Formation abgeleitet, nicht aus einem FM2002-Slot.
+- Rollen wie Libero, Wingback und „ANC“ werden aus der FMH-Formation abgeleitet, nicht aus einem Slot des Baums.
 - Elfmeterschießen benutzt Kategorie 1 und zählt nur Tor oder nicht. Verlängerung folgt der K.-o.-Regel der schnellen Engine.
 - Die 2D-Darstellung ist nicht Teil dieses MVP. Der Ereignisstrom (`MatchEvent` inklusive `Narrative`, Minute, Team, Spieler, Ergebnis) ist dafür vorgesehen. `Narrative` ist vom Golden Master ausgenommen.

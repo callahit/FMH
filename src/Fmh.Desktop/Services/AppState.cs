@@ -36,7 +36,7 @@ public sealed class AppState
 
     public GameData Data { get; }
     public Texts T => Data.Texts;
-    public IMatchEngine Engine { get; } = new SceneRoutingEngine(new TextMatchEngine(), new SceneMatchEngine());
+    public IMatchEngine Engine { get; } = new SceneRoutingEngine(new TextMatchEngine(), SceneMatchEngine.TryCreate());
     public string SaveDirectory { get; }
     public string SettingsFile { get; }
     public AppSettings Settings { get; }

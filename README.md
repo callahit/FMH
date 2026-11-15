@@ -82,6 +82,14 @@ Spielstand, und liegt in `settings.json` neben dem Spielstandordner.
   aus, „Tutorial aus“ schaltet alle ab; „Hinweise erneut zeigen“ in den Einstellungen setzt sie zurück. Die Hinweise
   stehen als Daten in `rules/ui.json` (Seite) und in den Sprachdateien (`tutorial.<id>.title`, `tutorial.<id>.text`).
 
+## Textmodus (Szenenbaum)
+
+Der Darstellungsmodus „Textmodus“ lässt ein angeschautes Spiel über einen Szenenbaum laufen. Die Dateien dafür gehören
+nicht zum Repository und werden nicht mitgeliefert; wer einen Szenenbaum hat, legt ihn in `FMH_TEXTMODE_DIR` oder im
+Benutzerordner `FMH/textmode` ab (Details in [docs/textmodus.md](docs/textmodus.md)). Ohne Dateien läuft der Textmodus
+über die normale Kommentar-Engine, und die Tests mit `[SceneFact]` werden übersprungen. Ein eigener, frei lizenzierter
+Szenenkatalog ist geplant.
+
 ## Spielmodi (AP 12a)
 
 Im Startdialog wird der Spielmodus gewählt:
