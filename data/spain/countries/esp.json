@@ -635,6 +635,8 @@
         "relegationWagePercent": 50,
         "squadSize": 27,
         "reference": {
+          "maxDeductionsPerSeason": 1.5,
+          "toleranceNote": "Punktabzüge: hoch verschuldete Primera-Klubs (negatives Eigenkapital wie real) schwanken im Fünf-Saisons-Lauf je Seed zwischen 0,0 und 1,4 Lizenz-Punktabzügen je Saison (Kalibrierung AP 13c, Seeds 1–4: 1,4/0,6/0,8/0,0).",
           "source": "LALIGA Financial Report 2024/25 (LALIGA EA Sports, 20 Klubs), Saison 2024/25, Durchschnitt je Klub",
           "official": true,
           "income": {

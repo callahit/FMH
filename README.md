@@ -656,8 +656,9 @@ im Monat, Spitze bis 6.500 €).
   `reference.tolerances` und brauchen eine Begründung in `reference.toleranceNote`. Die Werte jeder Saison werden mit
   ausgegeben; ein einzelner reicher Absteiger verzerrt sonst die zweite Liga einer Saison.
 - **Insolvenzen und Lizenz-Punktabzüge:** Der Saisonlauf zählt beides je Land und Ebene. Im Mittel über alle Saisons
-  sind höchstens 2 % Insolvenzen je Saison (bezogen auf die Vereinszahl der Ebene) und höchstens ein Lizenz-Punktabzug
-  je Ebene und Saison erlaubt.
+  sind höchstens 2 % Insolvenzen je Saison (bezogen auf die Vereinszahl der Ebene) und höchstens 1,25 Lizenz-Punktabzüge
+  je Ebene und Saison erlaubt. Eine Liga kann mit Begründung eine eigene Grenze in `reference.maxDeductionsPerSeason`
+  setzen (Serie A und Primera División: 1,5, weil hoch verschuldete Spitzenklubs je Seed stark schwanken).
 
 Die Finanzsimulation über fünf Saisons ergibt folgende Werte je Verein:
 
