@@ -136,6 +136,8 @@ public sealed class World
 
     /// <summary>Privatleben je Manager (AP 13b); nur bei eingeschaltetem Element.</summary>
     public Dictionary<int, PrivateLife> PrivateLives { get; set; } = new();
+    /// <summary>Grauzonen-Akten je Manager (AP 13c).</summary>
+    public Dictionary<int, GrayZoneFile> GrayZones { get; set; } = new();
 
     /// <summary>Abschlussbilanzen aller Vereine je Ligasaison (AP 11b).</summary>
     public List<ClubSeason> ClubSeasons { get; set; } = new();

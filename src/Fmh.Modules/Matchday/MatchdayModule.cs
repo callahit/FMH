@@ -68,6 +68,7 @@ public sealed partial class MatchdayModule : GameModule, IMatchdayService
         // Mannschaftsstimmung wirkt messbar auf Tagesform und Moral (Must-now E3-S6).
         Relations.ApplyMatchMood(sim.Home);
         Relations.ApplyMatchMood(sim.Away);
+        Bus.Publish(new MatchStarting(f, sim));
         return sim;
     }
 

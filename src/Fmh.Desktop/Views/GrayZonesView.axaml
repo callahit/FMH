@@ -1,0 +1,32 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Fmh.Desktop.ViewModels"
+             xmlns:s="using:Fmh.Desktop.Services"
+             x:Class="Fmh.Desktop.Views.GrayZonesView"
+             x:DataType="vm:GrayZonesViewModel">
+  <Border Classes="card" Width="600" Padding="24">
+    <StackPanel Spacing="10">
+      <TextBlock Classes="h2" Text="{s:L gray.title}" />
+      <TextBlock Classes="muted" Text="{s:L gray.hint}" TextWrapping="Wrap" />
+      <TextBlock Text="{Binding Next}" FontWeight="SemiBold" />
+      <ItemsControl ItemsSource="{Binding Actions}">
+        <ItemsControl.ItemTemplate>
+          <DataTemplate x:DataType="vm:GrayRow">
+            <Grid ColumnDefinitions="*,Auto" Margin="0,4">
+              <StackPanel>
+                <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+                <TextBlock Text="{Binding Info}" Classes="muted small" TextWrapping="Wrap" />
+                <TextBlock Text="{Binding Detail}" Classes="small" />
+              </StackPanel>
+              <Button Grid.Column="1" Content="{s:L gray.do}" Command="{Binding Command}" MinWidth="110"
+                      HorizontalContentAlignment="Center" VerticalAlignment="Center" />
+            </Grid>
+          </DataTemplate>
+        </ItemsControl.ItemTemplate>
+      </ItemsControl>
+      <TextBlock Classes="muted small" Text="{Binding Record}" />
+      <TextBlock Text="{Binding Message}" Foreground="{DynamicResource WarnBrush}" TextWrapping="Wrap" />
+      <Button Classes="primary" HorizontalAlignment="Right" Content="{s:L ui.ok}" Command="{Binding CloseCommand}" />
+    </StackPanel>
+  </Border>
+</UserControl>

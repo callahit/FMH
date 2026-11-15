@@ -1,0 +1,44 @@
+{
+  "actions": [
+    {
+      "id": "referee",
+      "kind": "Match",
+      "cost": 60000,
+      "dayForm": 1.0,
+      "detection": 0.15,
+      "penalty": {
+        "fine": 400000,
+        "board": -15,
+        "media": -15,
+        "points": 3
+      }
+    },
+    {
+      "id": "doping",
+      "kind": "Match",
+      "cost": 25000,
+      "dayForm": 1.6,
+      "detection": 0.25,
+      "penalty": {
+        "fine": 200000,
+        "board": -12,
+        "media": -12,
+        "playerBan": 3
+      }
+    },
+    {
+      "id": "contractTrick",
+      "kind": "Negotiation",
+      "wageCut": 0.15,
+      "detection": 0.2,
+      "penalty": {
+        "fine": 80000,
+        "board": -6,
+        "media": -8,
+        "playerMorale": -2
+      }
+    }
+  ],
+  "cooldownDays": 14,
+  "sackAfter": 3
+}

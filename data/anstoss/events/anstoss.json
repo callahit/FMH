@@ -564,5 +564,106 @@
     }
    }
   ]
+ },
+ {
+  "id": "angWhistle",
+  "category": "club",
+  "feature": "anstoss.grayZones",
+  "options": [
+   {
+    "id": "report",
+    "effects": {
+     "media": 3,
+     "board": 2
+    }
+   },
+   {
+    "id": "ignore",
+    "effects": {
+     "fans": -1
+    }
+   }
+  ]
+ },
+ {
+  "id": "angPills",
+  "category": "club",
+  "feature": "anstoss.grayZones",
+  "options": [
+   {
+    "id": "throw",
+    "effects": {
+     "media": 2
+    }
+   },
+   {
+    "id": "keep",
+    "effects": {
+     "morale": 0.1,
+     "board": -2
+    }
+   }
+  ]
+ },
+ {
+  "id": "angLinesman",
+  "category": "club",
+  "feature": "anstoss.grayZones",
+  "options": [
+   {
+    "id": "thank",
+    "effects": {
+     "board": 1,
+     "media": -1
+    }
+   },
+   {
+    "id": "complain",
+    "effects": {
+     "media": 2,
+     "fans": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "angJournalist",
+  "category": "club",
+  "feature": "anstoss.grayZones",
+  "options": [
+   {
+    "id": "deny",
+    "effects": {
+     "media": -2
+    }
+   },
+   {
+    "id": "pay",
+    "effects": {
+     "money": -20000,
+     "media": 1
+    }
+   }
+  ]
+ },
+ {
+  "id": "angAgentDinner",
+  "category": "club",
+  "feature": "anstoss.grayZones",
+  "options": [
+   {
+    "id": "accept",
+    "effects": {
+     "board": -1,
+     "morale": 0.05
+    }
+   },
+   {
+    "id": "decline",
+    "effects": {
+     "media": 1
+    }
+   }
+  ]
  }
 ]
