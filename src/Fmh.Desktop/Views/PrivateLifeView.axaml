@@ -1,0 +1,48 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Fmh.Desktop.ViewModels"
+             xmlns:c="using:Fmh.Desktop.Controls"
+             xmlns:s="using:Fmh.Desktop.Services"
+             x:Class="Fmh.Desktop.Views.PrivateLifeView"
+             x:DataType="vm:PrivateLifeViewModel">
+  <UserControl.Resources>
+    <DataTemplate x:Key="Row" x:DataType="vm:PrivateRow">
+      <Grid ColumnDefinitions="*,Auto" Margin="0,3">
+        <StackPanel>
+          <TextBlock Text="{Binding Name}" FontWeight="SemiBold" />
+          <TextBlock Text="{Binding Detail}" Classes="muted small" />
+        </StackPanel>
+        <Button Grid.Column="1" Content="{Binding Action}" Command="{Binding Command}" Classes.primary="{Binding Owned}" MinWidth="110"
+                HorizontalContentAlignment="Center" VerticalAlignment="Center" />
+      </Grid>
+    </DataTemplate>
+  </UserControl.Resources>
+  <Border Classes="card" Width="640" Padding="24">
+    <ScrollViewer MaxHeight="760">
+      <StackPanel Spacing="10">
+        <TextBlock Classes="h2" Text="{s:L private.title}" />
+        <Grid ColumnDefinitions="*,*" RowDefinitions="Auto,Auto,Auto" ColumnSpacing="16" RowSpacing="6">
+          <StackPanel><TextBlock Classes="muted small" Text="{s:L private.savings}" /><TextBlock Text="{Binding Savings}" FontSize="16" FontWeight="SemiBold" /></StackPanel>
+          <StackPanel Grid.Column="1"><TextBlock Classes="muted small" Text="{s:L private.monthly}" /><TextBlock Text="{Binding Monthly}" FontSize="16" FontWeight="SemiBold" /></StackPanel>
+          <StackPanel Grid.Row="1"><TextBlock Classes="muted small" Text="{s:L private.prestige}" /><TextBlock Text="{Binding Prestige}" /></StackPanel>
+          <StackPanel Grid.Row="1" Grid.Column="1"><TextBlock Classes="muted small" Text="{s:L private.relief}" /><TextBlock Text="{Binding Relief}" /></StackPanel>
+          <StackPanel Grid.Row="2" Grid.ColumnSpan="2" Spacing="2">
+            <TextBlock Classes="muted small" Text="{s:L private.stress}" />
+            <Grid ColumnDefinitions="*,Auto">
+              <c:Meter Value="{Binding Stress}" Maximum="100" Height="8" Fill="{DynamicResource WarnBrush}" Track="{DynamicResource LineBrush}" VerticalAlignment="Center" />
+              <TextBlock Grid.Column="1" Text="{Binding StressText}" Margin="8,0,0,0" />
+            </Grid>
+          </StackPanel>
+        </Grid>
+        <TextBlock Classes="h3" Text="{s:L private.homes}" Margin="0,6,0,0" />
+        <ItemsControl ItemsSource="{Binding Homes}" ItemTemplate="{StaticResource Row}" />
+        <TextBlock Classes="h3" Text="{s:L private.cars}" Margin="0,6,0,0" />
+        <ItemsControl ItemsSource="{Binding Cars}" ItemTemplate="{StaticResource Row}" />
+        <TextBlock Classes="h3" Text="{Binding HobbiesTitle}" Margin="0,6,0,0" />
+        <ItemsControl ItemsSource="{Binding Hobbies}" ItemTemplate="{StaticResource Row}" />
+        <TextBlock Text="{Binding Message}" Foreground="{DynamicResource BadBrush}" TextWrapping="Wrap" />
+        <Button Classes="primary" HorizontalAlignment="Right" Content="{s:L ui.ok}" Command="{Binding CloseCommand}" />
+      </StackPanel>
+    </ScrollViewer>
+  </Border>
+</UserControl>

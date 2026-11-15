@@ -27,7 +27,7 @@ public static class SqliteStore
         new FinanceSection(), new ScoutingSection(), new StaffSection(), new EventsSection(), new LicenseSection(),
         new RelationsSection(),
         new AgentsSection(),
-        new InternationalsSection(), new FriendliesSection(), new HistorySection(), new ModeSection(), new AnstossSection(),
+        new InternationalsSection(), new FriendliesSection(), new HistorySection(), new ModeSection(), new AnstossSection(), new PrivateLifeSection(),
     };
 
     // ------------------------------------------------------------------ Speichern

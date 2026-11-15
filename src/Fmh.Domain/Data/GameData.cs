@@ -41,6 +41,8 @@ public sealed class GameData
     public ChallengeRules Challenges { get; init; } = new();
     public UiRules Ui { get; init; } = new();
     public AnstossRules Anstoss { get; init; } = new();
+    /// <summary>Privatleben (AP 13b); null ohne Anstoß-Paket.</summary>
+    public PrivateLifeRules? PrivateLife { get; init; }
     /// <summary>Gemeinsames Format UCL/UEL/UECL (AP 5); null in älteren Paketen ohne competitions/europe.json.</summary>
     public EuropeFormat? Europe { get; set; }
 

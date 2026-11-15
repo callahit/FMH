@@ -170,6 +170,12 @@
     },
     {
       "fileMatch": [
+        "data/*/rules/privateLife.json"
+      ],
+      "url": "./data/schema/private-life.schema.json"
+    },
+    {
+      "fileMatch": [
         "data/*/competitions/europe.json"
       ],
       "url": "./data/schema/europe.schema.json"
