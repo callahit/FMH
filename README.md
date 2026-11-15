@@ -932,6 +932,11 @@ noch offen.
     kommen aus dem Schema; Positionen werden auf die Schreibweise des Schemas gebracht, ungültige Werte abgewiesen.
     Attribute, Positionseignungen und Charakterwerte bearbeitet man im Baum.
   - Personal: Personal, KI-Manager und Schiedsrichter (`staff/`, `managers/`, `referees/`) als Tabellen.
+  - Szenen (Textmodus): Liste aller Szenen und seltenen Szenen mit Suche über Kennung, Schlüssel und Texte.
+    Rechts stehen Ereignisse, Gewicht und Bedingungen als Formular (Minute, Spielstand, Wetter, Flutlicht, xG,
+    Attribute wie `Finishing>=15`). Darunter die Zeilen mit Textschlüssel, Chance und den Varianten je Sprache, eine
+    Variante je Zeile. Fehlende Übersetzungen und abweichende Platzhalter sind markiert. Szenen lassen sich kopieren
+    und löschen, Zeilen hinzufügen und entfernen.
   - Regeln und Inhalte: jede Datendatei als Baum. Werte behalten ihren Typ, ungültige Zahlen werden abgewiesen.
     Listen bekommen neue Einträge als Kopie des letzten, Objekte neue Felder (Zahl, Wahrheitswert, `[]`, `{}` oder
     Text), und jeder Eintrag lässt sich entfernen. Mit Schema zeigt der Feldname die Beschreibung, „+ Feld“ schlägt

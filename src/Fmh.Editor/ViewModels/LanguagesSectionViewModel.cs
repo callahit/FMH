@@ -12,7 +12,7 @@ public sealed partial class LanguagesSectionViewModel : SectionViewModel
 
     public LanguagesSectionViewModel(PackageWorkspace ws) : base(ws, "editor.section.languages")
     {
-        Languages = ws.Files.Where(f => f.StartsWith("lang/", StringComparison.Ordinal) && !f.EndsWith(".commentary.json", StringComparison.Ordinal))
+        Languages = ws.Files.Where(f => f.StartsWith("lang/", StringComparison.Ordinal) && !f.EndsWith(".commentary.json", StringComparison.Ordinal) && !f.EndsWith(".scenes.json", StringComparison.Ordinal))
             .Select(f => f["lang/".Length..^".json".Length]).ToList();
         Rebuild();
     }

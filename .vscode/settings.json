@@ -182,6 +182,12 @@
     },
     {
       "fileMatch": [
+        "data/*/rules/scenes.json"
+      ],
+      "url": "./data/schema/scenes.schema.json"
+    },
+    {
+      "fileMatch": [
         "data/*/competitions/europe.json"
       ],
       "url": "./data/schema/europe.schema.json"
@@ -189,7 +195,8 @@
     {
       "fileMatch": [
         "data/*/lang/*.json",
-        "!data/*/lang/*.commentary.json"
+        "!data/*/lang/*.commentary.json",
+        "!data/*/lang/*.scenes.json"
       ],
       "url": "./data/schema/lang.schema.json"
     },
@@ -198,6 +205,12 @@
         "data/*/lang/*.commentary.json"
       ],
       "url": "./data/schema/commentary.schema.json"
+    },
+    {
+      "fileMatch": [
+        "data/*/lang/*.scenes.json"
+      ],
+      "url": "./data/schema/scene-texts.schema.json"
     }
   ]
 }

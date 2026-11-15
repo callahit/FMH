@@ -1,0 +1,419 @@
+{
+  "$id": "https://fmh.local/schema/scenes.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Textmodus (Szenenkatalog): Zu jedem Ereignis der Matchengine erzählt eine Szene den Spielzug in mehreren Zeilen. Der Ablauf steht hier (sprachunabhängig), die Texte stehen je Sprache in lang/<code>.scenes.json. Das Ergebnis entscheidet immer die Engine; der Katalog ändert keine Statistik.",
+  "properties": {
+    "attackShare": {
+      "description": "Anteil der einfachen Angriffe, die eine eigene Szene bekommen (sonst wird der Text zu dicht).",
+      "type": "number"
+    },
+    "rare": {
+      "description": "Seltene Zwischenszenen ohne Wirkung auf das Spiel (Wetter, Flutlicht, Publikum).",
+      "items": {
+        "additionalProperties": false,
+        "description": "Seltene Zwischenszene: erscheint mit kleiner Wahrscheinlichkeit je Spielminute, wenn die Bedingung passt.",
+        "properties": {
+          "chance": {
+            "description": "Wahrscheinlichkeit je Spiel (verteilt auf die Spielzeit).",
+            "type": "number"
+          },
+          "id": {
+            "type": "string"
+          },
+          "steps": {
+            "items": {
+              "$ref": "#/properties/scenes/items/properties/steps/items",
+              "description": "Eine Zeile der Szene: Textschlüssel (Varianten je Sprache) und optional eine Bedingung oder Wahrscheinlichkeit."
+            },
+            "type": "array"
+          },
+          "when": {
+            "additionalProperties": false,
+            "properties": {
+              "after": {
+                "$ref": "#/properties/scenes/items/properties/when/properties/after",
+                "description": "Vorheriges Ereignis derselben Mannschaft in derselben Minute, z. B. cross oder counter."
+              },
+              "attrs": {
+                "$ref": "#/properties/scenes/items/properties/when/properties/attrs",
+                "description": "Attributgrenzen des handelnden Spielers."
+              },
+              "floodlit": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "keeperAttrs": {
+                "$ref": "#/properties/scenes/items/properties/when/properties/keeperAttrs",
+                "description": "Attributgrenzen des gegnerischen Torwarts."
+              },
+              "knockout": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "maxMinute": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "maxRow": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "maxXg": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "minMinute": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "minRow": {
+                "description": "Spielfeldreihe aus Angriffssicht (0 = eigenes Tor, 6 = gegnerischer Strafraum).",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "minXg": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "score": {
+                "description": "Spielstand aus Sicht der handelnden Mannschaft vor dem Ereignis.",
+                "enum": [
+                  "Level",
+                  "Leading",
+                  "Trailing",
+                  null
+                ]
+              },
+              "weather": {
+                "$ref": "#/properties/scenes/items/properties/when/properties/weather"
+              }
+            },
+            "type": [
+              "object",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "scenes": {
+      "items": {
+        "additionalProperties": false,
+        "description": "Eine Szene: passende Ereignisse, Bedingungen und die Zeilenfolge.",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "on": {
+            "description": "Ereignisschlüssel wie im Kommentar, z. B. goal.header oder shot.normal.saved.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "steps": {
+            "items": {
+              "additionalProperties": false,
+              "description": "Eine Zeile der Szene: Textschlüssel (Varianten je Sprache) und optional eine Bedingung oder Wahrscheinlichkeit.",
+              "properties": {
+                "chance": {
+                  "description": "Wahrscheinlichkeit, dass die Zeile erscheint (1 = immer).",
+                  "type": "number"
+                },
+                "text": {
+                  "type": "string"
+                },
+                "when": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "after": {
+                      "$ref": "#/properties/scenes/items/properties/when/properties/after",
+                      "description": "Vorheriges Ereignis derselben Mannschaft in derselben Minute, z. B. cross oder counter."
+                    },
+                    "attrs": {
+                      "$ref": "#/properties/scenes/items/properties/when/properties/attrs",
+                      "description": "Attributgrenzen des handelnden Spielers."
+                    },
+                    "floodlit": {
+                      "type": [
+                        "boolean",
+                        "null"
+                      ]
+                    },
+                    "keeperAttrs": {
+                      "$ref": "#/properties/scenes/items/properties/when/properties/keeperAttrs",
+                      "description": "Attributgrenzen des gegnerischen Torwarts."
+                    },
+                    "knockout": {
+                      "type": [
+                        "boolean",
+                        "null"
+                      ]
+                    },
+                    "maxMinute": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "maxRow": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "maxXg": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "minMinute": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "minRow": {
+                      "description": "Spielfeldreihe aus Angriffssicht (0 = eigenes Tor, 6 = gegnerischer Strafraum).",
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "minXg": {
+                      "type": [
+                        "number",
+                        "null"
+                      ]
+                    },
+                    "score": {
+                      "description": "Spielstand aus Sicht der handelnden Mannschaft vor dem Ereignis.",
+                      "enum": [
+                        "Level",
+                        "Leading",
+                        "Trailing",
+                        null
+                      ]
+                    },
+                    "weather": {
+                      "$ref": "#/properties/scenes/items/properties/when/properties/weather"
+                    }
+                  },
+                  "type": [
+                    "object",
+                    "null"
+                  ]
+                }
+              },
+              "type": "object"
+            },
+            "type": "array"
+          },
+          "weight": {
+            "description": "Relatives Gewicht unter allen passenden Szenen.",
+            "type": "number"
+          },
+          "when": {
+            "additionalProperties": false,
+            "properties": {
+              "after": {
+                "description": "Vorheriges Ereignis derselben Mannschaft in derselben Minute, z. B. cross oder counter.",
+                "items": {
+                  "type": "string"
+                },
+                "type": [
+                  "array",
+                  "null"
+                ]
+              },
+              "attrs": {
+                "description": "Attributgrenzen des handelnden Spielers.",
+                "items": {
+                  "additionalProperties": false,
+                  "properties": {
+                    "attr": {
+                      "enum": [
+                        "FirstTouch",
+                        "Dribbling",
+                        "Crossing",
+                        "Heading",
+                        "Passing",
+                        "Technique",
+                        "Finishing",
+                        "LongShots",
+                        "FreeKicks",
+                        "Penalties",
+                        "Corners",
+                        "LongThrows",
+                        "Tackling",
+                        "Marking",
+                        "Anticipation",
+                        "Decisions",
+                        "Concentration",
+                        "Determination",
+                        "Bravery",
+                        "Leadership",
+                        "Flair",
+                        "WorkRate",
+                        "OffTheBall",
+                        "Positioning",
+                        "Teamwork",
+                        "Aggression",
+                        "Composure",
+                        "Acceleration",
+                        "Pace",
+                        "Stamina",
+                        "Strength",
+                        "Agility",
+                        "Balance",
+                        "JumpingReach",
+                        "NaturalFitness",
+                        "Reflexes",
+                        "CommandOfArea",
+                        "Handling",
+                        "OneOnOnes",
+                        "Kicking",
+                        "Throwing",
+                        "RushingOut",
+                        "Communication",
+                        "Eccentricity"
+                      ]
+                    },
+                    "max": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
+                    "min": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    }
+                  },
+                  "type": "object"
+                },
+                "type": [
+                  "array",
+                  "null"
+                ]
+              },
+              "floodlit": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "keeperAttrs": {
+                "description": "Attributgrenzen des gegnerischen Torwarts.",
+                "items": {
+                  "$ref": "#/properties/scenes/items/properties/when/properties/attrs/items"
+                },
+                "type": [
+                  "array",
+                  "null"
+                ]
+              },
+              "knockout": {
+                "type": [
+                  "boolean",
+                  "null"
+                ]
+              },
+              "maxMinute": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "maxRow": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "maxXg": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "minMinute": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "minRow": {
+                "description": "Spielfeldreihe aus Angriffssicht (0 = eigenes Tor, 6 = gegnerischer Strafraum).",
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
+              "minXg": {
+                "type": [
+                  "number",
+                  "null"
+                ]
+              },
+              "score": {
+                "description": "Spielstand aus Sicht der handelnden Mannschaft vor dem Ereignis.",
+                "enum": [
+                  "Level",
+                  "Leading",
+                  "Trailing",
+                  null
+                ]
+              },
+              "weather": {
+                "items": {
+                  "enum": [
+                    "Sunny",
+                    "Cloudy",
+                    "Rain",
+                    "Snow",
+                    "Wind"
+                  ]
+                },
+                "type": [
+                  "array",
+                  "null"
+                ]
+              }
+            },
+            "type": [
+              "object",
+              "null"
+            ]
+          }
+        },
+        "type": "object"
+      },
+      "type": "array"
+    }
+  },
+  "title": "FMH rules/scenes.json",
+  "type": "object"
+}

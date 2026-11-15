@@ -51,7 +51,7 @@ public sealed partial class MatchViewModel : ViewModelBase
     private IMatchSimulation? _sim;
     private CommentaryGenerator? _commentary;
     /// <summary>Textmodus: erzählt die Ereignisse als Szenen (null in den übrigen Darstellungen).</summary>
-    private SceneNarrator? _narrator;
+    private SceneCommentary? _narrator;
     private int _processedEvents;
     private bool _halfTimeTalkDone;
     private readonly List<Point> _xgHome = new() { new Point(0, 0) };
@@ -228,7 +228,7 @@ public sealed partial class MatchViewModel : ViewModelBase
         var scene = Profile.MatchDisplay == MatchDisplayMode.Scene;
         _sim = Session.StartMatch(_fixture, humanControlled: !instant, sceneText: scene && !instant);
         _commentary = new CommentaryGenerator(Data, _sim);
-        _narrator = scene && !instant ? new SceneNarrator(Data, _sim) : null;
+        _narrator = scene && !instant ? new SceneCommentary(Data, _sim) : null;
         TickerMode = scene || Profile.MatchDisplay is MatchDisplayMode.Ticker or MatchDisplayMode.Conference;
         _conference = Profile.MatchDisplay == MatchDisplayMode.Conference;
         // Konferenz: die übrigen Spiele werden vorab berechnet und minutengenau aufgedeckt.
