@@ -636,7 +636,6 @@
         "squadSize": 27,
         "reference": {
           "maxDeductionsPerSeason": 1.5,
-          "toleranceNote": "Punktabzüge: hoch verschuldete Primera-Klubs (negatives Eigenkapital wie real) schwanken im Fünf-Saisons-Lauf je Seed zwischen 0,0 und 1,4 Lizenz-Punktabzügen je Saison (Kalibrierung AP 13c, Seeds 1–4: 1,4/0,6/0,8/0,0).",
           "source": "LALIGA Financial Report 2024/25 (LALIGA EA Sports, 20 Klubs), Saison 2024/25, Durchschnitt je Klub",
           "official": true,
           "income": {
@@ -649,7 +648,7 @@
           "expenses": {
             "squad": 106200000
           },
-          "toleranceNote": "Fanartikel je Zuschauer gelten für das ganze Land; real konzentrieren sich die Shop-Umsätze der Primera auf die Großvereine (Segunda: 1,0 Mio. je Klub). Merch ±40 %, Gesamteinnahmen ±15 % wegen Transfer-/Europapokal-Schwankungen nach Must-now E1 und Orte.",
+          "toleranceNote": "Fanartikel je Zuschauer gelten für das ganze Land; real konzentrieren sich die Shop-Umsätze der Primera auf die Großvereine (Segunda: 1,0 Mio. je Klub). Merch ±40 %, Gesamteinnahmen ±15 % wegen Transfer-/Europapokal-Schwankungen nach Must-now E1 und Orte. Punktabzüge: hoch verschuldete Primera-Klubs (negatives Eigenkapital wie real) schwanken im Fünf-Saisons-Lauf je Seed zwischen 0,0 und 1,4 Lizenz-Punktabzügen je Saison (Kalibrierung AP 13c, Seeds 1–4: 1,4/0,6/0,8/0,0).",
           "tolerances": {
             "income.merchandising": 0.4,
             "income.total": 0.15
