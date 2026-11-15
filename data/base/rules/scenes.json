@@ -1,0 +1,1831 @@
+{
+  "attackShare": 0.55,
+  "scenes": [
+    {
+      "id": "shot.normal.saved.catch",
+      "on": [
+        "shot.normal.saved"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.counter",
+          "when": {
+            "after": [
+              "counter"
+            ]
+          }
+        },
+        {
+          "text": "scene.build.box",
+          "chance": 0.7
+        },
+        {
+          "text": "scene.shot.strike"
+        },
+        {
+          "text": "scene.save.catch"
+        }
+      ],
+      "weight": 2,
+      "when": {
+        "maxXg": 0.25
+      }
+    },
+    {
+      "id": "shot.normal.saved.dive",
+      "on": [
+        "shot.normal.saved"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.counter",
+          "when": {
+            "after": [
+              "counter"
+            ]
+          }
+        },
+        {
+          "text": "scene.build.box",
+          "chance": 0.7
+        },
+        {
+          "text": "scene.shot.strike"
+        },
+        {
+          "text": "scene.save.dive"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.4
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "shot.normal.saved.reflex",
+      "on": [
+        "shot.normal.saved"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.counter",
+          "when": {
+            "after": [
+              "counter"
+            ]
+          }
+        },
+        {
+          "text": "scene.build.box",
+          "chance": 0.7
+        },
+        {
+          "text": "scene.shot.strike"
+        },
+        {
+          "text": "scene.save.reflex"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.6
+        }
+      ],
+      "when": {
+        "keeperAttrs": [
+          {
+            "attr": "Reflexes",
+            "min": 14
+          }
+        ]
+      }
+    },
+    {
+      "id": "shot.normal.wide.near",
+      "on": [
+        "shot.normal.wide"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.counter",
+          "when": {
+            "after": [
+              "counter"
+            ]
+          }
+        },
+        {
+          "text": "scene.build.box",
+          "chance": 0.7
+        },
+        {
+          "text": "scene.shot.strike"
+        },
+        {
+          "text": "scene.wide.near"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.5
+        }
+      ],
+      "weight": 2,
+      "when": {
+        "minXg": 0.12
+      }
+    },
+    {
+      "id": "shot.normal.wide.far",
+      "on": [
+        "shot.normal.wide"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.counter",
+          "when": {
+            "after": [
+              "counter"
+            ]
+          }
+        },
+        {
+          "text": "scene.build.box",
+          "chance": 0.7
+        },
+        {
+          "text": "scene.shot.strike"
+        },
+        {
+          "text": "scene.wide.far"
+        }
+      ],
+      "when": {
+        "maxXg": 0.2
+      }
+    },
+    {
+      "id": "shot.normal.blocked",
+      "on": [
+        "shot.normal.blocked"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.counter",
+          "when": {
+            "after": [
+              "counter"
+            ]
+          }
+        },
+        {
+          "text": "scene.build.box",
+          "chance": 0.7
+        },
+        {
+          "text": "scene.shot.strike"
+        },
+        {
+          "text": "scene.blocked.body"
+        }
+      ]
+    },
+    {
+      "id": "shot.normal.post",
+      "on": [
+        "shot.normal.post"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.counter",
+          "when": {
+            "after": [
+              "counter"
+            ]
+          }
+        },
+        {
+          "text": "scene.build.box",
+          "chance": 0.7
+        },
+        {
+          "text": "scene.shot.strike"
+        },
+        {
+          "text": "scene.post.hit"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.7
+        }
+      ]
+    },
+    {
+      "id": "shot.header.saved.catch",
+      "on": [
+        "shot.header.saved"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.cross"
+        },
+        {
+          "text": "scene.shot.header"
+        },
+        {
+          "text": "scene.save.catch"
+        }
+      ],
+      "weight": 2,
+      "when": {
+        "maxXg": 0.25
+      }
+    },
+    {
+      "id": "shot.header.saved.dive",
+      "on": [
+        "shot.header.saved"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.cross"
+        },
+        {
+          "text": "scene.shot.header"
+        },
+        {
+          "text": "scene.save.dive"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.4
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "shot.header.saved.reflex",
+      "on": [
+        "shot.header.saved"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.cross"
+        },
+        {
+          "text": "scene.shot.header"
+        },
+        {
+          "text": "scene.save.reflex"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.6
+        }
+      ],
+      "when": {
+        "keeperAttrs": [
+          {
+            "attr": "Reflexes",
+            "min": 14
+          }
+        ]
+      }
+    },
+    {
+      "id": "shot.header.wide.near",
+      "on": [
+        "shot.header.wide"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.cross"
+        },
+        {
+          "text": "scene.shot.header"
+        },
+        {
+          "text": "scene.wide.near"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.5
+        }
+      ],
+      "weight": 2,
+      "when": {
+        "minXg": 0.12
+      }
+    },
+    {
+      "id": "shot.header.wide.far",
+      "on": [
+        "shot.header.wide"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.cross"
+        },
+        {
+          "text": "scene.shot.header"
+        },
+        {
+          "text": "scene.wide.far"
+        }
+      ],
+      "when": {
+        "maxXg": 0.2
+      }
+    },
+    {
+      "id": "shot.header.blocked",
+      "on": [
+        "shot.header.blocked"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.cross"
+        },
+        {
+          "text": "scene.shot.header"
+        },
+        {
+          "text": "scene.blocked.body"
+        }
+      ]
+    },
+    {
+      "id": "shot.header.post",
+      "on": [
+        "shot.header.post"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.cross"
+        },
+        {
+          "text": "scene.shot.header"
+        },
+        {
+          "text": "scene.post.hit"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.7
+        }
+      ]
+    },
+    {
+      "id": "shot.longShot.saved.catch",
+      "on": [
+        "shot.longShot.saved"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.distance"
+        },
+        {
+          "text": "scene.shot.long"
+        },
+        {
+          "text": "scene.save.catch"
+        }
+      ],
+      "weight": 2,
+      "when": {
+        "maxXg": 0.25
+      }
+    },
+    {
+      "id": "shot.longShot.saved.dive",
+      "on": [
+        "shot.longShot.saved"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.distance"
+        },
+        {
+          "text": "scene.shot.long"
+        },
+        {
+          "text": "scene.save.dive"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.4
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "shot.longShot.saved.reflex",
+      "on": [
+        "shot.longShot.saved"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.distance"
+        },
+        {
+          "text": "scene.shot.long"
+        },
+        {
+          "text": "scene.save.reflex"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.6
+        }
+      ],
+      "when": {
+        "keeperAttrs": [
+          {
+            "attr": "Reflexes",
+            "min": 14
+          }
+        ]
+      }
+    },
+    {
+      "id": "shot.longShot.wide.near",
+      "on": [
+        "shot.longShot.wide"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.distance"
+        },
+        {
+          "text": "scene.shot.long"
+        },
+        {
+          "text": "scene.wide.near"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.5
+        }
+      ],
+      "weight": 2,
+      "when": {
+        "minXg": 0.12
+      }
+    },
+    {
+      "id": "shot.longShot.wide.far",
+      "on": [
+        "shot.longShot.wide"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.distance"
+        },
+        {
+          "text": "scene.shot.long"
+        },
+        {
+          "text": "scene.wide.far"
+        }
+      ],
+      "when": {
+        "maxXg": 0.2
+      }
+    },
+    {
+      "id": "shot.longShot.blocked",
+      "on": [
+        "shot.longShot.blocked"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.distance"
+        },
+        {
+          "text": "scene.shot.long"
+        },
+        {
+          "text": "scene.blocked.body"
+        }
+      ]
+    },
+    {
+      "id": "shot.longShot.post",
+      "on": [
+        "shot.longShot.post"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.distance"
+        },
+        {
+          "text": "scene.shot.long"
+        },
+        {
+          "text": "scene.post.hit"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.7
+        }
+      ]
+    },
+    {
+      "id": "shot.freeKick.saved.catch",
+      "on": [
+        "shot.freeKick.saved"
+      ],
+      "steps": [
+        {
+          "text": "scene.shot.freeKick"
+        },
+        {
+          "text": "scene.save.catch"
+        }
+      ],
+      "weight": 2,
+      "when": {
+        "maxXg": 0.25
+      }
+    },
+    {
+      "id": "shot.freeKick.saved.dive",
+      "on": [
+        "shot.freeKick.saved"
+      ],
+      "steps": [
+        {
+          "text": "scene.shot.freeKick"
+        },
+        {
+          "text": "scene.save.dive"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.4
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "shot.freeKick.saved.reflex",
+      "on": [
+        "shot.freeKick.saved"
+      ],
+      "steps": [
+        {
+          "text": "scene.shot.freeKick"
+        },
+        {
+          "text": "scene.save.reflex"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.6
+        }
+      ],
+      "when": {
+        "keeperAttrs": [
+          {
+            "attr": "Reflexes",
+            "min": 14
+          }
+        ]
+      }
+    },
+    {
+      "id": "shot.freeKick.wide.near",
+      "on": [
+        "shot.freeKick.wide"
+      ],
+      "steps": [
+        {
+          "text": "scene.shot.freeKick"
+        },
+        {
+          "text": "scene.wide.near"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.5
+        }
+      ],
+      "weight": 2,
+      "when": {
+        "minXg": 0.12
+      }
+    },
+    {
+      "id": "shot.freeKick.wide.far",
+      "on": [
+        "shot.freeKick.wide"
+      ],
+      "steps": [
+        {
+          "text": "scene.shot.freeKick"
+        },
+        {
+          "text": "scene.wide.far"
+        }
+      ],
+      "when": {
+        "maxXg": 0.2
+      }
+    },
+    {
+      "id": "shot.freeKick.blocked",
+      "on": [
+        "shot.freeKick.blocked"
+      ],
+      "steps": [
+        {
+          "text": "scene.shot.freeKick"
+        },
+        {
+          "text": "scene.blocked.body"
+        }
+      ]
+    },
+    {
+      "id": "shot.freeKick.post",
+      "on": [
+        "shot.freeKick.post"
+      ],
+      "steps": [
+        {
+          "text": "scene.shot.freeKick"
+        },
+        {
+          "text": "scene.post.hit"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.7
+        }
+      ]
+    },
+    {
+      "id": "shot.penalty.saved",
+      "on": [
+        "shot.penalty.saved"
+      ],
+      "steps": [
+        {
+          "text": "scene.shot.penalty"
+        },
+        {
+          "text": "scene.save.penalty"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.5
+        }
+      ]
+    },
+    {
+      "id": "shot.penalty.wide.near",
+      "on": [
+        "shot.penalty.wide"
+      ],
+      "steps": [
+        {
+          "text": "scene.shot.penalty"
+        },
+        {
+          "text": "scene.wide.near"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.5
+        }
+      ],
+      "weight": 2,
+      "when": {
+        "minXg": 0.12
+      }
+    },
+    {
+      "id": "shot.penalty.wide.far",
+      "on": [
+        "shot.penalty.wide"
+      ],
+      "steps": [
+        {
+          "text": "scene.shot.penalty"
+        },
+        {
+          "text": "scene.wide.far"
+        }
+      ],
+      "when": {
+        "maxXg": 0.2
+      }
+    },
+    {
+      "id": "shot.penalty.blocked",
+      "on": [
+        "shot.penalty.blocked"
+      ],
+      "steps": [
+        {
+          "text": "scene.shot.penalty"
+        },
+        {
+          "text": "scene.blocked.body"
+        }
+      ]
+    },
+    {
+      "id": "shot.penalty.post",
+      "on": [
+        "shot.penalty.post"
+      ],
+      "steps": [
+        {
+          "text": "scene.shot.penalty"
+        },
+        {
+          "text": "scene.post.hit"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.7
+        }
+      ]
+    },
+    {
+      "id": "shot.oneOnOne.saved.catch",
+      "on": [
+        "shot.oneOnOne.saved"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.through"
+        },
+        {
+          "text": "scene.shot.oneOnOne"
+        },
+        {
+          "text": "scene.save.catch"
+        }
+      ],
+      "weight": 2,
+      "when": {
+        "maxXg": 0.25
+      }
+    },
+    {
+      "id": "shot.oneOnOne.saved.dive",
+      "on": [
+        "shot.oneOnOne.saved"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.through"
+        },
+        {
+          "text": "scene.shot.oneOnOne"
+        },
+        {
+          "text": "scene.save.dive"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.4
+        }
+      ],
+      "weight": 2
+    },
+    {
+      "id": "shot.oneOnOne.saved.reflex",
+      "on": [
+        "shot.oneOnOne.saved"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.through"
+        },
+        {
+          "text": "scene.shot.oneOnOne"
+        },
+        {
+          "text": "scene.save.reflex"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.6
+        }
+      ],
+      "when": {
+        "keeperAttrs": [
+          {
+            "attr": "Reflexes",
+            "min": 14
+          }
+        ]
+      }
+    },
+    {
+      "id": "shot.oneOnOne.wide.near",
+      "on": [
+        "shot.oneOnOne.wide"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.through"
+        },
+        {
+          "text": "scene.shot.oneOnOne"
+        },
+        {
+          "text": "scene.wide.near"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.5
+        }
+      ],
+      "weight": 2,
+      "when": {
+        "minXg": 0.12
+      }
+    },
+    {
+      "id": "shot.oneOnOne.wide.far",
+      "on": [
+        "shot.oneOnOne.wide"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.through"
+        },
+        {
+          "text": "scene.shot.oneOnOne"
+        },
+        {
+          "text": "scene.wide.far"
+        }
+      ],
+      "when": {
+        "maxXg": 0.2
+      }
+    },
+    {
+      "id": "shot.oneOnOne.blocked",
+      "on": [
+        "shot.oneOnOne.blocked"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.through"
+        },
+        {
+          "text": "scene.shot.oneOnOne"
+        },
+        {
+          "text": "scene.blocked.body"
+        }
+      ]
+    },
+    {
+      "id": "shot.oneOnOne.post",
+      "on": [
+        "shot.oneOnOne.post"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.through"
+        },
+        {
+          "text": "scene.shot.oneOnOne"
+        },
+        {
+          "text": "scene.post.hit"
+        },
+        {
+          "text": "scene.chance.reaction",
+          "chance": 0.7
+        }
+      ]
+    },
+    {
+      "id": "goal",
+      "on": [
+        "goal"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.counter",
+          "when": {
+            "after": [
+              "counter"
+            ]
+          }
+        },
+        {
+          "text": "scene.build.box",
+          "chance": 0.7
+        },
+        {
+          "text": "scene.shot.strike"
+        },
+        {
+          "text": "scene.goal.finish"
+        },
+        {
+          "text": "scene.goal.call"
+        },
+        {
+          "text": "scene.goal.lead",
+          "when": {
+            "score": "Level"
+          }
+        },
+        {
+          "text": "scene.goal.extend",
+          "when": {
+            "score": "Leading"
+          }
+        },
+        {
+          "text": "scene.goal.comeback",
+          "when": {
+            "score": "Trailing"
+          }
+        },
+        {
+          "text": "scene.goal.late",
+          "when": {
+            "minMinute": 85
+          }
+        },
+        {
+          "text": "scene.goal.celebrate",
+          "chance": 0.6
+        }
+      ]
+    },
+    {
+      "id": "goal.header",
+      "on": [
+        "goal.header"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.cross"
+        },
+        {
+          "text": "scene.shot.header"
+        },
+        {
+          "text": "scene.goal.headerFinish"
+        },
+        {
+          "text": "scene.goal.call"
+        },
+        {
+          "text": "scene.goal.lead",
+          "when": {
+            "score": "Level"
+          }
+        },
+        {
+          "text": "scene.goal.extend",
+          "when": {
+            "score": "Leading"
+          }
+        },
+        {
+          "text": "scene.goal.comeback",
+          "when": {
+            "score": "Trailing"
+          }
+        },
+        {
+          "text": "scene.goal.late",
+          "when": {
+            "minMinute": 85
+          }
+        },
+        {
+          "text": "scene.goal.celebrate",
+          "chance": 0.6
+        }
+      ]
+    },
+    {
+      "id": "goal.longShot",
+      "on": [
+        "goal.longShot"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.distance"
+        },
+        {
+          "text": "scene.shot.long"
+        },
+        {
+          "text": "scene.goal.longFinish"
+        },
+        {
+          "text": "scene.goal.call"
+        },
+        {
+          "text": "scene.goal.lead",
+          "when": {
+            "score": "Level"
+          }
+        },
+        {
+          "text": "scene.goal.extend",
+          "when": {
+            "score": "Leading"
+          }
+        },
+        {
+          "text": "scene.goal.comeback",
+          "when": {
+            "score": "Trailing"
+          }
+        },
+        {
+          "text": "scene.goal.late",
+          "when": {
+            "minMinute": 85
+          }
+        },
+        {
+          "text": "scene.goal.celebrate",
+          "chance": 0.6
+        }
+      ]
+    },
+    {
+      "id": "goal.freeKick",
+      "on": [
+        "goal.freeKick"
+      ],
+      "steps": [
+        {
+          "text": "scene.shot.freeKick"
+        },
+        {
+          "text": "scene.goal.freeKickFinish"
+        },
+        {
+          "text": "scene.goal.call"
+        },
+        {
+          "text": "scene.goal.lead",
+          "when": {
+            "score": "Level"
+          }
+        },
+        {
+          "text": "scene.goal.extend",
+          "when": {
+            "score": "Leading"
+          }
+        },
+        {
+          "text": "scene.goal.comeback",
+          "when": {
+            "score": "Trailing"
+          }
+        },
+        {
+          "text": "scene.goal.late",
+          "when": {
+            "minMinute": 85
+          }
+        },
+        {
+          "text": "scene.goal.celebrate",
+          "chance": 0.6
+        }
+      ]
+    },
+    {
+      "id": "goal.penalty",
+      "on": [
+        "goal.penalty"
+      ],
+      "steps": [
+        {
+          "text": "scene.shot.penalty"
+        },
+        {
+          "text": "scene.goal.penaltyFinish"
+        },
+        {
+          "text": "scene.goal.call"
+        },
+        {
+          "text": "scene.goal.lead",
+          "when": {
+            "score": "Level"
+          }
+        },
+        {
+          "text": "scene.goal.extend",
+          "when": {
+            "score": "Leading"
+          }
+        },
+        {
+          "text": "scene.goal.comeback",
+          "when": {
+            "score": "Trailing"
+          }
+        },
+        {
+          "text": "scene.goal.late",
+          "when": {
+            "minMinute": 85
+          }
+        },
+        {
+          "text": "scene.goal.celebrate",
+          "chance": 0.6
+        }
+      ]
+    },
+    {
+      "id": "goal.oneOnOne",
+      "on": [
+        "goal.oneOnOne"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.through"
+        },
+        {
+          "text": "scene.shot.oneOnOne"
+        },
+        {
+          "text": "scene.goal.oneOnOneFinish"
+        },
+        {
+          "text": "scene.goal.call"
+        },
+        {
+          "text": "scene.goal.lead",
+          "when": {
+            "score": "Level"
+          }
+        },
+        {
+          "text": "scene.goal.extend",
+          "when": {
+            "score": "Leading"
+          }
+        },
+        {
+          "text": "scene.goal.comeback",
+          "when": {
+            "score": "Trailing"
+          }
+        },
+        {
+          "text": "scene.goal.late",
+          "when": {
+            "minMinute": 85
+          }
+        },
+        {
+          "text": "scene.goal.celebrate",
+          "chance": 0.6
+        }
+      ]
+    },
+    {
+      "id": "kickoff",
+      "on": [
+        "kickoff"
+      ],
+      "steps": [
+        {
+          "text": "scene.kickoff.open"
+        },
+        {
+          "text": "scene.kickoff.rain",
+          "when": {
+            "weather": [
+              "Rain"
+            ]
+          }
+        },
+        {
+          "text": "scene.kickoff.snow",
+          "when": {
+            "weather": [
+              "Snow"
+            ]
+          }
+        },
+        {
+          "text": "scene.kickoff.wind",
+          "when": {
+            "weather": [
+              "Wind"
+            ]
+          }
+        },
+        {
+          "text": "scene.kickoff.lights",
+          "when": {
+            "floodlit": true
+          }
+        }
+      ]
+    },
+    {
+      "id": "secondHalf",
+      "on": [
+        "secondHalf"
+      ],
+      "steps": [
+        {
+          "text": "scene.secondHalf.open"
+        }
+      ]
+    },
+    {
+      "id": "halfTime",
+      "on": [
+        "halfTime"
+      ],
+      "steps": [
+        {
+          "text": "scene.halfTime.open"
+        }
+      ]
+    },
+    {
+      "id": "halfTime.level",
+      "on": [
+        "halfTime"
+      ],
+      "steps": [
+        {
+          "text": "scene.halfTime.level"
+        }
+      ],
+      "weight": 2,
+      "when": {
+        "score": "Level"
+      }
+    },
+    {
+      "id": "fullTime",
+      "on": [
+        "fullTime"
+      ],
+      "steps": [
+        {
+          "text": "scene.fullTime.open"
+        },
+        {
+          "text": "scene.fullTime.reaction",
+          "chance": 0.8
+        }
+      ]
+    },
+    {
+      "id": "stoppage",
+      "on": [
+        "stoppage"
+      ],
+      "steps": [
+        {
+          "text": "scene.stoppage.board"
+        }
+      ]
+    },
+    {
+      "id": "endOfRegularTime",
+      "on": [
+        "endOfRegularTime"
+      ],
+      "steps": [
+        {
+          "text": "scene.endOfRegularTime.open"
+        }
+      ]
+    },
+    {
+      "id": "extraTime",
+      "on": [
+        "extraTime"
+      ],
+      "steps": [
+        {
+          "text": "scene.extraTime.open"
+        }
+      ]
+    },
+    {
+      "id": "extraTimeSecondHalf",
+      "on": [
+        "extraTimeSecondHalf"
+      ],
+      "steps": [
+        {
+          "text": "scene.extraTimeSecondHalf.open"
+        }
+      ]
+    },
+    {
+      "id": "shootoutStart",
+      "on": [
+        "shootoutStart"
+      ],
+      "steps": [
+        {
+          "text": "scene.shootoutStart.open"
+        }
+      ]
+    },
+    {
+      "id": "shootoutKick.goal",
+      "on": [
+        "shootoutKick.goal"
+      ],
+      "steps": [
+        {
+          "text": "scene.shootout.walk"
+        },
+        {
+          "text": "scene.shootout.goal"
+        }
+      ]
+    },
+    {
+      "id": "shootoutKick.saved",
+      "on": [
+        "shootoutKick.saved"
+      ],
+      "steps": [
+        {
+          "text": "scene.shootout.walk"
+        },
+        {
+          "text": "scene.shootout.saved"
+        }
+      ]
+    },
+    {
+      "id": "shootoutKick.miss",
+      "on": [
+        "shootoutKick.miss"
+      ],
+      "steps": [
+        {
+          "text": "scene.shootout.walk"
+        },
+        {
+          "text": "scene.shootout.miss"
+        }
+      ]
+    },
+    {
+      "id": "shootoutEnd",
+      "on": [
+        "shootoutEnd"
+      ],
+      "steps": [
+        {
+          "text": "scene.shootoutEnd.open"
+        }
+      ]
+    },
+    {
+      "id": "attack",
+      "on": [
+        "attack"
+      ],
+      "steps": [
+        {
+          "text": "scene.attack.wing"
+        },
+        {
+          "text": "scene.attack.stall",
+          "chance": 0.5
+        }
+      ]
+    },
+    {
+      "id": "attack.pressure",
+      "on": [
+        "attack"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.pressure"
+        },
+        {
+          "text": "scene.attack.wing"
+        }
+      ],
+      "weight": 0.4,
+      "when": {
+        "score": "Trailing",
+        "minMinute": 70
+      }
+    },
+    {
+      "id": "attack.centre",
+      "on": [
+        "attack"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.centre"
+        },
+        {
+          "text": "scene.attack.stall",
+          "chance": 0.5
+        }
+      ]
+    },
+    {
+      "id": "counter",
+      "on": [
+        "counter"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.counter"
+        }
+      ]
+    },
+    {
+      "id": "dribble",
+      "on": [
+        "dribble"
+      ],
+      "steps": [
+        {
+          "text": "scene.dribble.move"
+        },
+        {
+          "text": "scene.dribble.crowd",
+          "chance": 0.3
+        }
+      ]
+    },
+    {
+      "id": "dribble.flair",
+      "on": [
+        "dribble"
+      ],
+      "steps": [
+        {
+          "text": "scene.dribble.move"
+        },
+        {
+          "text": "scene.dribble.crowd"
+        }
+      ],
+      "when": {
+        "attrs": [
+          {
+            "attr": "Flair",
+            "min": 15
+          }
+        ]
+      }
+    },
+    {
+      "id": "cross",
+      "on": [
+        "cross"
+      ],
+      "steps": [
+        {
+          "text": "scene.build.wing",
+          "chance": 0.5
+        },
+        {
+          "text": "scene.cross.ball"
+        },
+        {
+          "text": "scene.cross.end",
+          "chance": 0.5
+        }
+      ]
+    },
+    {
+      "id": "aerialWon",
+      "on": [
+        "aerialWon"
+      ],
+      "steps": [
+        {
+          "text": "scene.aerial.win"
+        }
+      ]
+    },
+    {
+      "id": "foul",
+      "on": [
+        "foul"
+      ],
+      "steps": [
+        {
+          "text": "scene.foul.tackle"
+        },
+        {
+          "text": "scene.foul.whistle",
+          "chance": 0.6
+        }
+      ]
+    },
+    {
+      "id": "foul.dangerous",
+      "on": [
+        "foul.dangerous"
+      ],
+      "steps": [
+        {
+          "text": "scene.foul.tackle"
+        },
+        {
+          "text": "scene.foul.whistle"
+        },
+        {
+          "text": "scene.foul.danger"
+        }
+      ]
+    },
+    {
+      "id": "yellow",
+      "on": [
+        "yellow"
+      ],
+      "steps": [
+        {
+          "text": "scene.card.yellow"
+        },
+        {
+          "text": "scene.card.protest",
+          "chance": 0.4
+        }
+      ]
+    },
+    {
+      "id": "secondYellow",
+      "on": [
+        "secondYellow"
+      ],
+      "steps": [
+        {
+          "text": "scene.card.secondYellow"
+        },
+        {
+          "text": "scene.card.walk",
+          "chance": 0.7
+        }
+      ]
+    },
+    {
+      "id": "red",
+      "on": [
+        "red"
+      ],
+      "steps": [
+        {
+          "text": "scene.card.red"
+        },
+        {
+          "text": "scene.card.walk"
+        }
+      ]
+    },
+    {
+      "id": "freeKick",
+      "on": [
+        "freeKick"
+      ],
+      "steps": [
+        {
+          "text": "scene.freeKick.take"
+        }
+      ]
+    },
+    {
+      "id": "freeKick.direct",
+      "on": [
+        "freeKick.direct"
+      ],
+      "steps": [
+        {
+          "text": "scene.freeKick.wall"
+        }
+      ]
+    },
+    {
+      "id": "penalty",
+      "on": [
+        "penalty"
+      ],
+      "steps": [
+        {
+          "text": "scene.penalty.call"
+        },
+        {
+          "text": "scene.penalty.protest",
+          "chance": 0.6
+        }
+      ]
+    },
+    {
+      "id": "corner",
+      "on": [
+        "corner"
+      ],
+      "steps": [
+        {
+          "text": "scene.corner.take"
+        },
+        {
+          "text": "scene.corner.box",
+          "chance": 0.4
+        }
+      ]
+    },
+    {
+      "id": "offside",
+      "on": [
+        "offside"
+      ],
+      "steps": [
+        {
+          "text": "scene.offside.flag"
+        },
+        {
+          "text": "scene.offside.trap",
+          "chance": 0.4
+        }
+      ]
+    },
+    {
+      "id": "goalKick",
+      "on": [
+        "goalKick"
+      ],
+      "steps": [
+        {
+          "text": "scene.goalKick.take",
+          "chance": 0.3
+        }
+      ]
+    },
+    {
+      "id": "injury",
+      "on": [
+        "injury"
+      ],
+      "steps": [
+        {
+          "text": "scene.injury.down"
+        },
+        {
+          "text": "scene.injury.care",
+          "chance": 0.6
+        }
+      ]
+    },
+    {
+      "id": "substitution",
+      "on": [
+        "substitution"
+      ],
+      "steps": [
+        {
+          "text": "scene.sub.change"
+        },
+        {
+          "text": "scene.sub.applause",
+          "chance": 0.4
+        }
+      ]
+    }
+  ],
+  "rare": [
+    {
+      "id": "floodlight",
+      "chance": 0.08,
+      "when": {
+        "floodlit": true
+      },
+      "steps": [
+        {
+          "text": "scene.rare.floodlight"
+        }
+      ]
+    },
+    {
+      "id": "puddle",
+      "chance": 0.3,
+      "when": {
+        "weather": [
+          "Rain"
+        ]
+      },
+      "steps": [
+        {
+          "text": "scene.rare.puddle"
+        }
+      ]
+    },
+    {
+      "id": "snowball",
+      "chance": 0.3,
+      "when": {
+        "weather": [
+          "Snow"
+        ]
+      },
+      "steps": [
+        {
+          "text": "scene.rare.snowball"
+        }
+      ]
+    },
+    {
+      "id": "wind",
+      "chance": 0.3,
+      "when": {
+        "weather": [
+          "Wind"
+        ]
+      },
+      "steps": [
+        {
+          "text": "scene.rare.wind"
+        }
+      ]
+    },
+    {
+      "id": "sun",
+      "chance": 0.2,
+      "when": {
+        "weather": [
+          "Sunny"
+        ],
+        "floodlit": false
+      },
+      "steps": [
+        {
+          "text": "scene.rare.sun"
+        }
+      ]
+    },
+    {
+      "id": "wave",
+      "chance": 0.15,
+      "steps": [
+        {
+          "text": "scene.rare.wave"
+        }
+      ]
+    },
+    {
+      "id": "balloon",
+      "chance": 0.06,
+      "steps": [
+        {
+          "text": "scene.rare.balloon"
+        }
+      ]
+    },
+    {
+      "id": "dog",
+      "chance": 0.01,
+      "steps": [
+        {
+          "text": "scene.rare.dog"
+        }
+      ]
+    },
+    {
+      "id": "drums",
+      "chance": 0.15,
+      "steps": [
+        {
+          "text": "scene.rare.drums"
+        }
+      ]
+    },
+    {
+      "id": "linesman",
+      "chance": 0.02,
+      "steps": [
+        {
+          "text": "scene.rare.linesman"
+        }
+      ]
+    }
+  ]
+}
