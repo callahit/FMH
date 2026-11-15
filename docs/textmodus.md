@@ -2,7 +2,7 @@
 
 Im Darstellungsmodus **Textmodus** wird ein angeschautes Spiel als Folge kleiner Szenen erzählt: Spielaufbau, Abschluss,
 Reaktion von Torwart, Bank und Publikum, dazu seltene Szenen wie Flutlichtflackern, Pfützen oder ein Hund auf dem Platz.
-Das Ergebnis entscheidet immer die schnelle Engine. Der Erzähler (`SceneNarrator`) zieht aus einem eigenen Zufallsstrom und
+Das Ergebnis entscheidet immer die schnelle Engine. Der Erzähler (`SceneCommentary`) zieht aus einem eigenen Zufallsstrom und
 ändert weder Spielstand noch Statistik; Golden Master und Kalibrierung bleiben unberührt.
 
 ## Szenenkatalog (Daten)

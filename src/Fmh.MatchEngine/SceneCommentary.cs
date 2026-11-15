@@ -10,7 +10,7 @@ namespace Fmh.MatchEngine;
 /// <see cref="SceneRules"/>, Texte aus den Szenenbausteinen der gewählten Sprache. Das Ergebnis entscheidet die Engine;
 /// der Erzähler zieht aus einem eigenen Zufallsstrom und ändert weder Spielstand noch Statistik.
 /// </summary>
-public sealed class SceneNarrator
+public sealed class SceneCommentary
 {
     private const ulong Stream = 0x5CE7_E7E1_1E2DUL;
 
@@ -21,7 +21,7 @@ public sealed class SceneNarrator
     private readonly Dictionary<Side, (string Root, int Minute)> _last = new();
     private readonly List<(RareSceneDef Scene, int Minute)> _rare = new();
 
-    public SceneNarrator(GameData data, IMatchSimulation sim)
+    public SceneCommentary(GameData data, IMatchSimulation sim)
     {
         _data = data;
         _sim = sim;

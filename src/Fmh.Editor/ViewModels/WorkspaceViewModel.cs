@@ -40,7 +40,7 @@ public sealed partial class WorkspaceViewModel : ViewModelBase
         Sections = new SectionViewModel[]
         {
             new PackageSectionViewModel(ws), Countries, new ClubsSectionViewModel(ws), Players, People, files,
-            new LanguagesSectionViewModel(ws), Validation, new DiffSectionViewModel(ws), new TrialSectionViewModel(ws),
+            new LanguagesSectionViewModel(ws), new ScenesSectionViewModel(ws), Validation, new DiffSectionViewModel(ws), new TrialSectionViewModel(ws),
         };
         _selected = Sections[0];
         _validateTimer = new DispatcherTimer(TimeSpan.FromMilliseconds(600), DispatcherPriority.Background, (_, _) => RunValidation());
