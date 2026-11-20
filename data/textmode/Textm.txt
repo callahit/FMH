@@ -8615,7 +8615,7 @@
 8615 Das Spiel muss kurz unterbrochen werden, weil Nick Pothmann auf den Platz gelaufen kommt.
 8616 Das Spiel muss kurz unterbrochen werden, weil Rolf Langenberg auf den Platz gelaufen kommt.
 8617 Das Spiel muss kurz unterbrochen werden, weil Jörg Rohrer mit einer Gladbach-Fahne auf den Platz gelaufen kommt.
-8618 Das Flutlich wird schwächer und das Spiel muss für eine Viertelstunde unterbrochen werden.
+8618 Das Flutlicht wird schwächer und das Spiel muss für eine Viertelstunde unterbrochen werden.
 8619 Eine größere Anzahl Gänse zieht über das Stadion hinweg.
 8620 Das Spiel muss kurz unterbrochen werden, weil Nick Pothmann und Jörg Rohrer mit einer Gladbach-Fahne auf den Platz gelaufen kommen.
 8621 doch 2-GK hat aufgepasst und schnappt sich das Leder!
