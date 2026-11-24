@@ -126,7 +126,7 @@ public sealed partial class RelationsModule : GameModule, IRelationsService
         }
 
         // Offene / gebrochene Versprechen.
-        foreach (var promise in World.Promises.Where(x => x.PlayerId == p.Id && x.ClubId == club.Id))
+        foreach (var promise in PromisesOf(p.Id).Where(x => x.ClubId == club.Id))
         {
             if (promise.Outcome == PromiseOutcome.Broken)
                 reasons.Add(("sat.reason.promise.broken", -22));
@@ -160,6 +160,16 @@ public sealed partial class RelationsModule : GameModule, IRelationsService
         };
         if (Math.Abs((int)p.State.Morale - (int)targetMorale) >= 2)
             p.State.Morale = (Morale)Math.Clamp((int)p.State.Morale + Math.Sign((int)targetMorale - (int)p.State.Morale), 0, 6);
+    }
+
+    // Versprechen je Spieler; neu aufgebaut, wenn die Liste ersetzt oder ergänzt wurde (Einträge werden nie entfernt).
+    private (List<PlayerPromise> List, int Count, ILookup<int, PlayerPromise> ByPlayer)? _promiseIndex;
+
+    private IEnumerable<PlayerPromise> PromisesOf(int playerId)
+    {
+        if (_promiseIndex is not { } ix || !ReferenceEquals(ix.List, World.Promises) || ix.Count != World.Promises.Count)
+            _promiseIndex = ix = (World.Promises, World.Promises.Count, World.Promises.ToLookup(x => x.PlayerId));
+        return ix.ByPlayer[playerId];
     }
 
     public void RecalculateClub(Club club)
@@ -196,7 +206,7 @@ public sealed partial class RelationsModule : GameModule, IRelationsService
         rel.ExpectedStatus = status;
         if (p.ClubId is not { } cid) return;
         // Implizites Versprechen: Status bleibt die Saison über glaubwürdig (Spielzeit).
-        if (World.Promises.Any(x => x.PlayerId == p.Id && x.Implicit && x.Outcome == PromiseOutcome.Pending && x.Kind == PromiseKind.SquadRole))
+        if (PromisesOf(p.Id).Any(x => x.Implicit && x.Outcome == PromiseOutcome.Pending && x.Kind == PromiseKind.SquadRole))
             return;
         World.Promises.Add(new PlayerPromise
         {
