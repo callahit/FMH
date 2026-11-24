@@ -316,6 +316,13 @@ Die Karriere-Simulation (8 Saisons) zeigt eine stabile Welt:
       `data/base/competitions/europe.json`. Teilnehmer aus allen geladenen Ländern; Einstieg nach
       Länderkoeffizient. Termine Di–Do, ohne Kollision mit Ligaspielen. Start- und Rundenprämien,
       Fanstimmung und Vereinsruf steigen.
+    - Ligaphase: Alle Qualifikanten spielen mit. Ist das Feld größer als `leagueMatchdays` + 1, spielt jeder
+      Verein höchstens `leagueMatchdays` (8) Spieltage gegen verschiedene Gegner, sonst jeder gegen jeden.
+      Bei ungerader Teilnehmerzahl hat ein Teil der Vereine einen Spieltag frei.
+    - Koeffizienten im Fünfjahresfenster (`access.windowYears`): Grundwert je Land und Verein plus die
+      Zugewinne der letzten vier abgeschlossenen und der laufenden Saison; ältere Zugewinne verfallen zum
+      Saisonstart. Alte Spielstände starten das Fenster beim nächsten Saisonwechsel, alles Bisherige zählt
+      dann als Grundwert.
   - Ansicht unter Finanzen → Lizenz und Europa.
   - Saisonbilanz, Monatsverlauf als Diagramm.
 - **Stadion:** vier Tribünen mit Steh- und Sitzplätzen, Dach und Logen; Flutlicht, Rasenheizung,
@@ -794,6 +801,7 @@ danach je Abschnitt angehoben:
 - Abschnitt `internationals` Version 8 ergänzt in den Team-Daten Trainer, Ziel, Vertrag, Spielsystem, Vormerkliste und
   offenes Angebot. Ältere Spielstände haben keine Trainer; das Modul besetzt die Posten am nächsten Spieltag.
 - Abschnitt `grayZones` (Version 6, neu) bekommt die Tabelle `gray_zones` (Taten und aufgeflogene Fälle je Manager).
+- Abschnitt `license` (Version 7) bekommt `coefficient_base` und `coefficient_seasons` für das Fünfjahresfenster der Europapokal-Koeffizienten; die Migration legt leere Tabellen an.
   In älteren Spielständen beginnt die Akte leer.
 - Abschnitt `privateLife` (Version 6, neu) bekommt die Tabelle `private_lives` (Privatkonto, Stress und Besitz je
   Manager). In älteren Spielständen beginnt das Privatleben beim Laden neu.
@@ -1134,7 +1142,8 @@ Vergleich.
 - **Lizenz:** Open Source ist gesetzt, die konkrete Lizenz klärt der Projektinhaber später (Vorschlag
   GPL-3.0 für Code, CC BY-SA 4.0 für Daten). Bis dahin gibt es keine Lizenzdatei.
 - **Europapokal:** Echte Spiele zwischen geladenen Ländern sind umgesetzt (AP 5). Offene Punkte:
-  Hintergrundvereine für volle 36er-Ligaphasen, Koeffizienten-Bonusplätze und UEFA-Drop-Ins
+  Hintergrundvereine für volle 36er-Ligaphasen (die Ligaphase nimmt inzwischen alle Qualifikanten auf),
+  Koeffizienten-Bonusplätze und UEFA-Drop-Ins
   (UCL-Quali-Verlierer → UEL) feiner kalibrieren.
 - **Saisonphasen:** Umgesetzt ist eine zweite Phase je Saison; mehrere Folgephasen (z. B. Play-offs um den Titel nach
   der Meisterrunde) folgen, wenn ein Land sie braucht.

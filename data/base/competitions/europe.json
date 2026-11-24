@@ -40,7 +40,7 @@
       "id": "UCL",
       "entryPrize": 18600000,
       "fieldStrength": 13.6,
-      "targetLeagueSize": 8,
+      "leagueMatchdays": 8,
       "knockoutFrom": 4,
       "dropTo": "UEL",
       "stages": [
@@ -112,7 +112,7 @@
       "id": "UEL",
       "entryPrize": 4300000,
       "fieldStrength": 12.6,
-      "targetLeagueSize": 8,
+      "leagueMatchdays": 8,
       "knockoutFrom": 4,
       "dropTo": "UECL",
       "stages": [
@@ -184,7 +184,7 @@
       "id": "UECL",
       "entryPrize": 3200000,
       "fieldStrength": 11.8,
-      "targetLeagueSize": 8,
+      "leagueMatchdays": 8,
       "knockoutFrom": 4,
       "dropTo": "",
       "stages": [

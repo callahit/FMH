@@ -124,4 +124,100 @@ public class EuropeTests
         Assert.Contains(gate, t => t.Type == TransactionType.European);
         Assert.DoesNotContain(gate, t => t.Type == TransactionType.Tickets);
     }
+    /// <summary>
+    /// Review C-1: Alle Qualifikanten spielen die Ligaphase. Ein großes Feld spielt höchstens
+    /// <c>leagueMatchdays</c> Spieltage gegen verschiedene Gegner, niemand fällt stillschweigend heraus.
+    /// </summary>
+    [Theory]
+    [InlineData(15)]
+    [InlineData(16)]
+    [InlineData(6)]
+    public void LeaguePhaseTakesEveryQualifierWithAtMostEightMatchdays(int qualifiers)
+    {
+        var s = TestData.NewSession(77);
+        var world = s.World;
+        var format = TestData.Data.Europe!.Competition("UCL")!;
+        var cup = new Cup { Id = "UCL", Kind = CompetitionKind.Europe, SeasonYear = world.SeasonYear };
+        var round = new CupRound { Number = 5, StageId = "league", StageType = "league" };
+        cup.Rounds.Add(round);
+        var teams = world.Clubs.Keys.OrderBy(id => id).Take(qualifiers).ToList();
+        EuropeLogic.ScheduleLeague(world, TestData.Data, cup, round, teams, new Rng(5));
+
+        Assert.Equal(teams.OrderBy(i => i), round.Entrants.OrderBy(i => i));
+        var max = Math.Min(format.LeagueMatchdays, qualifiers % 2 == 0 ? qualifiers - 1 : qualifiers);
+        foreach (var id in teams)
+        {
+            var games = cup.Fixtures.Where(f => f.Involves(id)).ToList();
+            Assert.InRange(games.Count, max - 1, max);
+            var opponents = games.Select(f => f.HomeId == id ? f.AwayId : f.HomeId).ToList();
+            Assert.Equal(opponents.Count, opponents.Distinct().Count());
+            Assert.Contains(world.EuropeanEntries, e => e.ClubId == id && e.CompetitionId == "UCL" && !e.Eliminated);
+        }
+        Assert.True(cup.Fixtures.Select(f => f.Matchday).Distinct().Count() <= format.LeagueMatchdays);
+    }
+    /// <summary>Review I-1: Zugewinne verfallen nach dem Fünfjahresfenster; der Koeffizient bleibt begrenzt.</summary>
+    [Fact]
+    public void CoefficientGainsExpireAfterTheWindow()
+    {
+        var data = TestData.Data;
+        var world = WorldGenerator.Create(data, new NewGameOptions { Seed = 8, ClubKey = "nordheide", ManagerName = "Test" });
+        var format = data.Europe!;
+        EuropeLogic.EnsureCoefficients(world, format);
+        var club = world.Clubs.Keys.First();
+        var start = world.ClubCoefficients[club];
+        var startCountry = world.CountryCoefficients["DE"];
+        Assert.Equal(start, world.Coefficients.ClubBase[club]);
+
+        // Jede Saison 10 Punkte Zugewinn, dann Saisonwechsel.
+        var totals = new List<double>();
+        for (var season = 0; season < 8; season++)
+        {
+            world.ClubCoefficients[club] += 10;
+            world.CountryCoefficients["DE"] += 2;
+            world.SeasonYear++;
+            EuropeLogic.RollCoefficients(world, format);
+            EuropeLogic.RollCoefficients(world, format); // zweiter Aufruf in derselben Saison ändert nichts
+            totals.Add(world.ClubCoefficients[club]);
+        }
+        var kept = format.Access.WindowYears - 1;
+        Assert.Equal(kept, world.Coefficients.Seasons.Count);
+        Assert.Equal(start + 10 * kept, world.ClubCoefficients[club], 6);
+        Assert.Equal(startCountry + 2 * kept, world.CountryCoefficients["DE"], 6);
+        Assert.Equal(totals[^1], totals[^2], 6); // begrenzt statt endlos wachsend
+    }
+
+    /// <summary>Spielstände ohne Fenster: alles Bisherige wird Grundwert; Speichern und Laden behalten das Fenster.</summary>
+    [Fact]
+    public void CoefficientWindowSurvivesSavingAndStartsForOldSaves()
+    {
+        var data = TestData.Data;
+        var world = WorldGenerator.Create(data, new NewGameOptions { Seed = 9, ClubKey = "nordheide", ManagerName = "Test" });
+        var format = data.Europe!;
+        EuropeLogic.EnsureCoefficients(world, format);
+        world.Coefficients = new CoefficientWindow(); // wie ein Spielstand vor Version 7
+        var club = world.Clubs.Keys.First();
+        world.ClubCoefficients[club] = 99;
+        world.SeasonYear++;
+        EuropeLogic.RollCoefficients(world, format);
+        Assert.Equal(99, world.Coefficients.ClubBase[club]);
+        Assert.Equal(99, world.ClubCoefficients[club]);
+        world.ClubCoefficients[club] += 5;
+        world.SeasonYear++;
+        EuropeLogic.RollCoefficients(world, format);
+
+        var path = Path.Combine(Path.GetTempPath(), $"fmh-coeff-{Guid.NewGuid():N}.fmh");
+        try
+        {
+            Fmh.Core.Persistence.SqliteStore.Save(world, path);
+            var loaded = Fmh.Core.Persistence.SqliteStore.Load(path);
+            Assert.Equal(world.Coefficients.Seasons.Select(x => x.SeasonYear), loaded.Coefficients.Seasons.Select(x => x.SeasonYear));
+            Assert.Equal(5, loaded.Coefficients.Seasons[^1].Clubs[club], 6);
+            Assert.Equal(99, loaded.Coefficients.ClubBase[club]);
+            Assert.Equal("7", Fmh.Core.Persistence.SqliteStore.ReadMetaTable(path)["schema.license"]);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
 }

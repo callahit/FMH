@@ -40,8 +40,11 @@ public sealed class EuropeCompetitionFormat
     public string Id { get; set; } = "";
     public long EntryPrize { get; set; }
     public double FieldStrength { get; set; } = 13;
-    /// <summary>Zielgröße der Ligaphase; bei weniger Teilnehmern wird verkleinert (gerade Zahl).</summary>
-    public int TargetLeagueSize { get; set; } = 8;
+    /// <summary>
+    /// Höchstzahl Spieltage der Ligaphase. Alle Qualifikanten spielen mit; ist das Feld größer, spielt jeder Verein
+    /// so viele Runden gegen verschiedene Gegner (Ausschnitt eines Jeder-gegen-jeden-Plans), sonst jeder gegen jeden.
+    /// </summary>
+    public int LeagueMatchdays { get; set; } = 8;
     /// <summary>Wie viele Teams aus der Ligaphase in die K.-o.-Runde einziehen (Zweierpotenz).</summary>
     public int KnockoutFrom { get; set; } = 4;
     /// <summary>Wettbewerb, in den Qualifikationsverlierer fallen (leer = ausgeschieden).</summary>
