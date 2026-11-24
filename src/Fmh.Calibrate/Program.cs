@@ -15,6 +15,7 @@ namespace Fmh.Calibrate;
 /// Kommandozeilen-Simulator zur Kalibrierung der Matchengine (Kapitel 12).
 ///   fmh-calibrate [--matches 10000] [--seed 1] [--data pfad] [--strict]
 ///   fmh-calibrate --season [--seasons 1]       simuliert ganze Saisons und misst die Rechenzeit
+///   fmh-calibrate --season --profile           zusätzlich Rechenzeit je Modul
 ///   --strict                                   Exitcode 1, wenn eine Kennzahl die Toleranz verlässt
 ///   --max-ms 3                                 zusätzlich Rechenzeit je Spiel prüfen (nur auf vergleichbarer Hardware)
 ///   --max-drift 0.05                           zusätzlich Ligastärke-Drift je Saison prüfen
@@ -52,8 +53,11 @@ public static partial class Program
 
         var seed = ulong.Parse(opts.Get("seed") ?? "1", CultureInfo.InvariantCulture);
         if (opts.Has("season"))
+        {
+            _profile = opts.Has("profile");
             return RunSeasons(data, seed, int.Parse(opts.Get("seasons") ?? "1", CultureInfo.InvariantCulture), opts.Has("strict"),
                 opts.Get("max-drift") is { } d ? double.Parse(d, CultureInfo.InvariantCulture) : null);
+        }
 
         var matches = int.Parse(opts.Get("matches") ?? "10000", CultureInfo.InvariantCulture);
         // Toleranzen gelten für den Profibereich; untere Ebenen lassen sich mit --max-level einbeziehen.
@@ -88,6 +92,9 @@ public static partial class Program
             m.Add(sim);
         }
         sw.Stop();
+        if (session.Profile is { } profile)
+            foreach (var (key, ms) in profile.OrderByDescending(k => k.Value))
+                Console.WriteLine($"Rechenzeit {key,-16} {ms / 1000:F1} s ({ms / sw.Elapsed.TotalMilliseconds:P0})");
 
         Console.WriteLine($"FMH Matchengine-Kalibrierung: {Fmt.Int(count)} Spiele (Ebene 1–{maxLevel}), Seed {seed}, {sw.Elapsed.TotalSeconds:F1} s ({sw.Elapsed.TotalMilliseconds / count:F2} ms/Spiel)");
         Console.WriteLine();
@@ -138,10 +145,13 @@ public static partial class Program
         return inRange;
     }
 
+    private static bool _profile;
+
     private static int RunSeasons(GameData data, ulong seed, int seasons, bool strict, double? maxDrift)
     {
         var session = NewSession(data, seed);
         var world = session.World;
+        if (_profile) session.Profile = new Dictionary<string, double>();
         var sw = Stopwatch.StartNew();
         var matchdays = 0;
         var slowest = TimeSpan.Zero;

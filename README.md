@@ -838,6 +838,8 @@ Weitere Prüfungen:
   die CI ruft den Karrierelauf damit auf. Gemessen: +0,024 je Saison. Dafür holen junge Spieler im Mittel nur ihren
   Altersabschlag auf, Akademietalente erreichen etwa die Stärke ihres Vereins, und der Abbau ab 30 nimmt mit dem
   Alter zu.
+- `--profile` gibt beim Karrierelauf zusätzlich die Rechenzeit je Modul aus (Tagesschritt und Tagesbeginn),
+  um langsame Stellen zu finden. Ohne die Option wird nichts gemessen.
 
 Die Gewichte stehen in `data/base/rules/engine.json`.
 
