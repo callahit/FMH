@@ -70,7 +70,10 @@ public sealed partial class RelationsModule : GameModule, IRelationsService
             _ => 0.08,
         } + Math.Clamp((ambition - 10) * 0.008, -0.05, 0.08);
 
-    public void Recalculate(Player p)
+    public void Recalculate(Player p) => Recalculate(p, null);
+
+    /// <param name="table">Tabelle der Liga des Vereins, wenn der Aufrufer sie schon berechnet hat (ein Kader teilt sie).</param>
+    private void Recalculate(Player p, List<TableRow>? table)
     {
         if (p.ClubId is not { } cid || !World.Clubs.TryGetValue(cid, out var club) || p.IsYouth || p.Retired)
             return;
@@ -111,7 +114,7 @@ public sealed partial class RelationsModule : GameModule, IRelationsService
         // Vereinserfolg gegen Saisonziel.
         if (league is not null)
         {
-            var table = LeagueTable.Compute(league);
+            table ??= LeagueTable.Compute(league);
             var pos = table.FindIndex(r => r.ClubId == club.Id) + 1;
             if (pos > 0)
             {
@@ -175,7 +178,9 @@ public sealed partial class RelationsModule : GameModule, IRelationsService
     public void RecalculateClub(Club club)
     {
         var squad = World.SquadOf(club).Where(p => !p.IsYouth && !p.Retired).ToList();
-        foreach (var p in squad) Recalculate(p);
+        var league = World.FindLeague(club.LeagueId);
+        var table = league is null || squad.Count == 0 ? null : LeagueTable.Compute(league);
+        foreach (var p in squad) Recalculate(p, table);
         var cr = ClubOf(club);
         cr.SquadMood = squad.Count == 0 ? 55 : squad.Average(p => Of(p).Satisfaction);
     }
