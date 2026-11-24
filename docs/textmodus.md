@@ -1,11 +1,48 @@
-# Textmodus (FM2002-Szenenbaum)
+# Textmodus
 
-Angeschaute Spiele können im Darstellungsmodus **Textmodus** über den Szenenbaum aus dem FM2002-Textmodus-Update III (2. November 2001) laufen. Alle anderen Spiele, einschließlich Sofortergebnis und der Hintergrundpartien, bleiben auf der schnellen Engine. Deren Golden Master (10.000 Spiele) ändert sich dadurch nicht.
+Im Darstellungsmodus **Textmodus** wird ein angeschautes Spiel als Folge kleiner Szenen erzählt: Spielaufbau, Abschluss,
+Reaktion von Torwart, Bank und Publikum, dazu seltene Szenen wie Flutlichtflackern, Pfützen oder ein Hund auf dem Platz.
+Das Ergebnis entscheidet immer die schnelle Engine. Der Erzähler (`SceneCommentary`) zieht aus einem eigenen Zufallsstrom und
+ändert weder Spielstand noch Statistik; Golden Master und Kalibrierung bleiben unberührt.
 
-Die Originaldateien liegen unter `data/textmode/` (`Textm.sav`, `Textm.txt`, `liesmich.txt`). Sie sind nicht geschützt und dürfen im Repository stehen. `scene-tree.json` ist das daraus erzeugte, versionierte Asset (Format 1). Der Parameterkatalog steht in `data/textmode/parameter-katalog.json`. Die Decoder liegen unter `tools/textmode/`.
+## Szenenkatalog (Daten)
+
+- **Ablauf:** `data/<paket>/rules/scenes.json` (Schema `scenes`). Jede Szene nennt die Ereignisschlüssel (`on`, gleiche
+  Schlüssel wie der Kommentar, z. B. `goal.header`, `shot.oneOnOne.saved`, `foul.dangerous`), Bedingungen (`when`), ein
+  Gewicht und die Zeilenfolge (`steps`). Jede Zeile ist ein Textschlüssel mit optionaler Wahrscheinlichkeit (`chance`)
+  und eigener Bedingung.
+- **Bedingungen:** `after` (vorheriges Ereignis derselben Mannschaft, z. B. `counter`), `minMinute`/`maxMinute`,
+  `score` (`Level`, `Leading`, `Trailing` aus Sicht der handelnden Mannschaft vor dem Ereignis), `weather`, `floodlit`,
+  `knockout`, `minXg`/`maxXg`, `minRow`/`maxRow`, `attrs` (Attribute des Spielers) und `keeperAttrs` (gegnerischer Torwart).
+- **Seltene Szenen:** `rare` mit Wahrscheinlichkeit je Spiel; Zeitpunkt und Auftreten stehen ab Anpfiff fest.
+- **Texte:** je Sprache in `data/<paket>/lang/<code>.scenes.json` (Schema `scene-texts`), mehrere gleichwertige
+  Varianten je Schlüssel. Fehlende Sprachen fallen auf die Standardsprache zurück. Eine neue Sprache braucht nur eine
+  weitere Datei `lang/<code>.scenes.json`.
+- **Platzhalter:** `{p}` handelnder Spieler, `{o}` Gegen- oder Mitspieler des Ereignisses, `{g}` gegnerischer Torwart,
+  `{mate}` ein Mitspieler, `{def}` ein Verteidiger des Gegners (innerhalb einer Szene fest), `{ref}` Schiedsrichter,
+  `{t}`/`{other}` Mannschaften, `{home}`/`{away}`, `{score}`, `{side}`, `{pens}`, `{n}`/`{m}` Zahlenwert, `{min}` Minute.
+- **Rückfall:** Passt keine Szene, erscheint die normale Kommentarzeile.
+
+Ein Datenpaket kann `rules/scenes.json` ersetzen und eigene Texte in `lang/<code>.scenes.json` ergänzen. Der Katalog
+ist neu geschrieben; die Struktur (Ketten aus Aufbau, Aktion und Reaktion, Bedingungen an Spieler, Wetter und Licht)
+ist von Szenenbäumen klassischer Textmodi inspiriert.
+
+## Optionaler Szenenbaum aus eigenen Dateien
+
+Wer einen Szenenbaum im Format `Textm.sav`/`Textm.txt` besitzt, kann ihn weiter nutzen; dann läuft ein Spiel im
+Textmodus über die eigene Szenenbaum-Engine statt über den Katalog. Die Textmodus-Dateien gehören nicht zum Repository und werden nicht mitgeliefert. Der Textmodus ist nur verfügbar, wenn
+der Nutzer einen Szenenbaum selbst bereitstellt: entweder `Textm.sav` und `Textm.txt` oder das daraus erzeugte
+`scene-tree.json` (Format 1). FMH sucht in dieser Reihenfolge:
+
+1. im Ordner aus der Umgebungsvariablen `FMH_TEXTMODE_DIR`,
+2. im Benutzerordner `FMH/textmode` (Windows `%APPDATA%\FMH\textmode`, Linux `~/.config/FMH/textmode`),
+3. in einer lokalen Kopie unter `data/textmode/` (per `.gitignore` ausgeschlossen, nie committen).
+
+Ohne Dateien erzählt der Szenenkatalog. Die Tests, die den Baum brauchen (`[SceneFact]`), werden dann übersprungen;
+mit `FMH_TEXTMODE_DIR` laufen sie mit. Die Decoder liegen unter `tools/textmode/`:
 
 ```bash
-python3 tools/textmode/decode_textm.py data/textmode
+python3 tools/textmode/decode_textm.py "$FMH_TEXTMODE_DIR"
 ```
 
 ## Format
@@ -116,11 +153,11 @@ Alle Werte liegen innerhalb von etwa ±10 %. Der Test lässt ±13 % zu, bei Rot 
 
 ## Offen
 
-- Die exakte FM2002-Gewichtsformel ist nicht belegt. `SceneWeightOptions` ist der Stellhebel.
+- Die exakte Gewichtsformel des Baums ist nicht belegt. `SceneWeightOptions` ist der Stellhebel.
 - Die Ereignisschicht setzt die Häufigkeit von Fouls, Standards, Karten und kurzen Abschlüssen. Der Baum entscheidet den Text und, bei vollen Standards, das Tor.
 - Bytes b8/b9 (Stimmung), b20, b22, b28, b31 und b34 sind nur teilweise oder gar nicht angeschlossen. b34 hat keinen Effekt. b29 steuert nur noch die Geburtstagszeilen.
 - Attributindizes ohne Katalogname sind Annahmen.
 - `REASON`- und `INJURY`-Texte fehlen im Original.
-- Rollen wie Libero, Wingback und „ANC“ werden aus der FMH-Formation abgeleitet, nicht aus einem FM2002-Slot.
+- Rollen wie Libero, Wingback und „ANC“ werden aus der FMH-Formation abgeleitet, nicht aus einem Slot des Baums.
 - Elfmeterschießen benutzt Kategorie 1 und zählt nur Tor oder nicht. Verlängerung folgt der K.-o.-Regel der schnellen Engine.
 - Die 2D-Darstellung ist nicht Teil dieses MVP. Der Ereignisstrom (`MatchEvent` inklusive `Narrative`, Minute, Team, Spieler, Ergebnis) ist dafür vorgesehen. `Narrative` ist vom Golden Master ausgenommen.

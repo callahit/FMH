@@ -23,7 +23,7 @@ public sealed record SchemaEntry(string Name, Type Type, string Pattern)
                && relativePath.EndsWith(suffix, StringComparison.Ordinal)
                && !relativePath[prefix.Length..^suffix.Length].Contains('/')
                // Kommentarbausteine haben ein eigenes Schema
-               && !(Name == "lang" && relativePath.EndsWith(".commentary.json", StringComparison.Ordinal));
+               && !(Name == "lang" && (relativePath.EndsWith(".commentary.json", StringComparison.Ordinal) || relativePath.EndsWith(".scenes.json", StringComparison.Ordinal)));
     }
 }
 
@@ -69,9 +69,11 @@ public static class SchemaCatalog
         new("anstoss", typeof(AnstossRules), "rules/anstoss.json"),
         new("private-life", typeof(PrivateLifeRules), "rules/privateLife.json"),
         new("gray-zones", typeof(GrayZoneRules), "rules/grayZones.json"),
+        new("scenes", typeof(SceneRules), "rules/scenes.json"),
         new("europe", typeof(EuropeFormat), "competitions/europe.json"),
         new("lang", typeof(Dictionary<string, string>), "lang/*.json"),
         new("commentary", typeof(Dictionary<string, List<string>>), "lang/*.commentary.json"),
+        new("scene-texts", typeof(Dictionary<string, List<string>>), "lang/*.scenes.json"),
     };
 
     public static SchemaEntry? For(string relativePath) => Entries.FirstOrDefault(e => e.Matches(relativePath.Replace('\\', '/')));
@@ -138,7 +140,11 @@ public static class SchemaCatalog
         foreach (var e in Entries)
         {
             var match = new JsonArray($"data/*/{e.Pattern}");
-            if (e.Name == "lang") match.Add("!data/*/lang/*.commentary.json");
+            if (e.Name == "lang")
+            {
+                match.Add("!data/*/lang/*.commentary.json");
+                match.Add("!data/*/lang/*.scenes.json");
+            }
             list.Add(new JsonObject { ["fileMatch"] = match, ["url"] = $"./data/{Folder}/{e.FileName}" });
         }
         return new JsonObject { ["json.schemas"] = list };

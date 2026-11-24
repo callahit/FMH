@@ -45,6 +45,8 @@ public sealed class GameData
     public PrivateLifeRules? PrivateLife { get; init; }
     /// <summary>Grauzonen (AP 13c); null ohne Anstoß-Paket.</summary>
     public GrayZoneRules? GrayZones { get; init; }
+    /// <summary>Szenenkatalog des Textmodus (Ablauf); die Texte stehen in den Kommentarbausteinen der Sprache.</summary>
+    public SceneRules Scenes { get; init; } = new();
     /// <summary>Gemeinsames Format UCL/UEL/UECL (AP 5); null in älteren Paketen ohne competitions/europe.json.</summary>
     public EuropeFormat? Europe { get; set; }
 

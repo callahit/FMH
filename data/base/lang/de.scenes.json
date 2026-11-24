@@ -1,0 +1,423 @@
+{
+ "scene.kickoff.open": [
+  "{ref} gibt das Spiel frei. {home} gegen {away}, der Ball rollt.",
+  "Anpfiff durch {ref}! {home} und {away} legen los.",
+  "Die Mannschaften stehen, {ref} pfeift: Es geht los zwischen {home} und {away}."
+ ],
+ "scene.kickoff.rain": [
+  "Der Regen prasselt, der Rasen glänzt. Das wird rutschig heute.",
+  "Nasser Platz, schwere Beine: Beide Teams müssen mit dem Regen klarkommen."
+ ],
+ "scene.kickoff.snow": [
+  "Schneeflocken tanzen über den Platz, die Linien sind frisch freigefegt.",
+  "Winterwetter! Gespielt wird mit dem orangefarbenen Ball."
+ ],
+ "scene.kickoff.wind": [
+  "Kräftiger Wind heute, hohe Bälle werden zum Glücksspiel.",
+  "Die Fahnen stehen waagerecht. Wer gegen den Wind spielt, hat es schwer."
+ ],
+ "scene.kickoff.lights": [
+  "Unter Flutlicht leuchtet der Rasen in kräftigem Grün.",
+  "Flutlichtatmosphäre! Die Tribünen sind gut gefüllt."
+ ],
+ "scene.secondHalf.open": [
+  "Weiter geht's! {t} stößt zur zweiten Halbzeit an.",
+  "Die zweite Hälfte läuft, beim Stand von {score}.",
+  "{ref} pfeift wieder an. 45 Minuten bleiben."
+ ],
+ "scene.halfTime.level": [
+  "Pause beim Stand von {score}. Noch ist alles offen.",
+  "Halbzeit. {score}, und beide Trainer haben einiges zu besprechen."
+ ],
+ "scene.halfTime.open": [
+  "Halbzeit! Es steht {score}.",
+  "{ref} bittet zum Pausentee, {score} steht auf der Anzeigetafel.",
+  "Die Spieler gehen in die Kabinen, Stand {score}."
+ ],
+ "scene.fullTime.open": [
+  "Abpfiff! {ref} beendet die Partie, Endstand {score}.",
+  "Schluss, aus, vorbei! Das Spiel endet {score}.",
+  "Das war's. {home} gegen {away}, {score}."
+ ],
+ "scene.fullTime.reaction": [
+  "Die Spieler klatschen sich ab, auf den Rängen wird diskutiert.",
+  "Einige sinken zu Boden, andere laufen zu ihrer Kurve.",
+  "Ein Spiel, über das noch lange geredet wird."
+ ],
+ "scene.stoppage.board": [
+  "Der vierte Offizielle hebt die Tafel: {n} Minuten Nachspielzeit.",
+  "+{n}! So viel gibt es obendrauf.",
+  "Es gibt {n} Minuten Nachschlag."
+ ],
+ "scene.extraTime.open": [
+  "Verlängerung! Zweimal 15 Minuten, die Beine werden schwer.",
+  "Es geht in die Extraschicht. Wer hat noch Kraft?"
+ ],
+ "scene.endOfRegularTime.open": [
+  "Nach 90 Minuten steht es {score}. Es gibt keinen Sieger, also Verlängerung.",
+  "Unentschieden nach regulärer Spielzeit: {score}. Die Betreuer bringen Wasser."
+ ],
+ "scene.extraTimeSecondHalf.open": [
+  "Die letzte Viertelstunde der Verlängerung beginnt.",
+  "Seitenwechsel in der Verlängerung, noch 15 Minuten."
+ ],
+ "scene.shootoutStart.open": [
+  "Elfmeterschießen! Die Spieler stehen Arm in Arm am Mittelkreis.",
+  "Jetzt entscheiden die Nerven: Es gibt Elfmeterschießen."
+ ],
+ "scene.shootout.walk": [
+  "{p} legt sich den Ball zurecht ...",
+  "Der lange Weg zum Punkt für {p} ...",
+  "{p} atmet tief durch und läuft an ..."
+ ],
+ "scene.shootout.goal": [
+  "Drin! ({pens})",
+  "Sicher verwandelt! ({pens})",
+  "Eiskalt ins Eck! ({pens})"
+ ],
+ "scene.shootout.saved": [
+  "Gehalten! {g} ist der Held. ({pens})",
+  "{g} fliegt und hat ihn! ({pens})"
+ ],
+ "scene.shootout.miss": [
+  "Vorbei! Der Ball fliegt über die Latte. ({pens})",
+  "Daneben! {p} schlägt die Hände vors Gesicht. ({pens})"
+ ],
+ "scene.shootoutEnd.open": [
+  "Entschieden! {t} gewinnt das Elfmeterschießen mit {pens}.",
+  "Der Jubel kennt keine Grenzen: {t} setzt sich mit {pens} durch."
+ ],
+ "scene.build.wing": [
+  "{p} nimmt {side} Fahrt auf ...",
+  "{p} zieht {side} das Tempo an ...",
+  "Ball auf {p}, der {side} Platz vor sich hat ...",
+  "{mate} schickt {p} {side} auf die Reise ..."
+ ],
+ "scene.build.centre": [
+  "{t} lässt den Ball durchs Mittelfeld laufen, {p} fordert ihn ...",
+  "{mate} spielt quer auf {p} ...",
+  "Geduldiger Aufbau von {t}, {p} schaltet sich ein ...",
+  "{p} dreht sich im Mittelkreis und sucht die Lücke ..."
+ ],
+ "scene.build.pressure": [
+  "{t} drückt jetzt, {other} kommt kaum noch raus.",
+  "Die Abwehr von {other} wird immer weiter zurückgedrängt."
+ ],
+ "scene.build.counter": [
+  "Ballgewinn! {t} schaltet blitzschnell um ...",
+  "Konter! {p} rennt mit dem Ball am Fuß los ...",
+  "Plötzlich ist viel Platz: {p} und {mate} gegen nur noch zwei Verteidiger ..."
+ ],
+ "scene.build.through": [
+  "{mate} spielt den Ball genau in den Lauf von {p} ...",
+  "Steilpass! {p} ist durch ...",
+  "Die Abseitsfalle schnappt nicht zu, {p} läuft allein aufs Tor ..."
+ ],
+ "scene.build.cross": [
+  "Flanke von {mate} ...",
+  "Der Ball segelt von außen in den Strafraum ...",
+  "{mate} chippt den Ball an den langen Pfosten ..."
+ ],
+ "scene.build.distance": [
+  "{p} hat Platz vor dem Strafraum und fasst sich ein Herz ...",
+  "Aus der zweiten Reihe probiert es {p} ...",
+  "Keiner greift {p} an, also kommt der Schuss aus der Distanz ..."
+ ],
+ "scene.build.box": [
+  "Gewühl im Strafraum, der Ball springt zu {p} ...",
+  "{p} setzt sich gegen {def} durch ...",
+  "{p} nimmt den Ball an und dreht sich ..."
+ ],
+ "scene.dribble.move": [
+  "{p} täuscht links an, geht rechts vorbei, {o} ist geschlagen!",
+  "Übersteiger von {p}, {o} kauft ihm die Finte ab!",
+  "{p} spielt den Ball durch die Beine von {o}!",
+  "{p} lässt {o} mit einem schnellen Haken stehen."
+ ],
+ "scene.dribble.crowd": [
+  "Die Zuschauer raunen.",
+  "Applaus von den Rängen für diese Einlage."
+ ],
+ "scene.cross.ball": [
+  "{p} bringt den Ball {side} herein ...",
+  "Hohe Hereingabe von {p} ...",
+  "{p} flankt mit viel Schnitt in den Strafraum ..."
+ ],
+ "scene.cross.end": [
+  "Aber die Abwehr klärt.",
+  "{def} ist mit dem Kopf zuerst dran.",
+  "Zu weit, der Ball fliegt ins Seitenaus."
+ ],
+ "scene.aerial.win": [
+  "{p} steigt am höchsten und gewinnt das Kopfballduell gegen {o}.",
+  "Luftduell zwischen {p} und {o}, {p} setzt sich durch.",
+  "{p} springt mit Timing und köpft den Ball weiter."
+ ],
+ "scene.attack.wing": [
+  "{p} treibt den Ball {side} nach vorn.",
+  "{t} sucht {side} den Weg nach vorn, {p} am Ball.",
+  "{p} läuft {side} an {def} vorbei bis zur Mittellinie."
+ ],
+ "scene.attack.stall": [
+  "Doch {other} steht kompakt, der Angriff verpufft.",
+  "Am Ende fehlt der letzte Pass.",
+  "{def} läuft den Weg zu und erobert den Ball."
+ ],
+ "scene.shot.strike": [
+  "{p} zieht ab ...",
+  "Schuss von {p} ...",
+  "{p} probiert es mit dem Innenrist ...",
+  "{p} hält drauf ..."
+ ],
+ "scene.shot.header": [
+  "{p} köpft ...",
+  "{p} kommt zum Kopfball ...",
+  "Mit der Stirn: {p} ..."
+ ],
+ "scene.shot.long": [
+  "{p} hält aus über 20 Metern drauf ...",
+  "Ein Hammer von {p} aus der Distanz ..."
+ ],
+ "scene.shot.oneOnOne": [
+  "{p} allein vor {g} ...",
+  "Nur noch {g} steht im Weg ...",
+  "{p} hat alle Zeit der Welt, {g} kommt raus ..."
+ ],
+ "scene.shot.freeKick": [
+  "{p} läuft an, über die Mauer ...",
+  "Der Freistoß von {p} kommt mit viel Effet ..."
+ ],
+ "scene.shot.penalty": [
+  "{p} läuft an ...",
+  "{p} gegen {g}, Auge in Auge ...",
+  "{p} wartet auf den Pfiff von {ref} ... und läuft an ..."
+ ],
+ "scene.save.catch": [
+  "Aber {g} hat aufgepasst und fängt den Ball sicher.",
+  "{g} steht richtig und hält.",
+  "Kein Problem für {g}."
+ ],
+ "scene.save.dive": [
+  "Doch {g} fliegt ins Eck und lenkt den Ball um den Pfosten!",
+  "Glanzparade von {g}!",
+  "{g} ist mit den Fingerspitzen dran!"
+ ],
+ "scene.save.reflex": [
+  "Unglaublicher Reflex von {g}, der Ball war eigentlich schon drin!",
+  "{g} reißt die Hand hoch, was für eine Reaktion!"
+ ],
+ "scene.save.penalty": [
+  "{g} ahnt die Ecke und pariert!",
+  "Gehalten! {g} bleibt lange stehen und packt zu."
+ ],
+ "scene.wide.near": [
+  "Knapp vorbei!",
+  "Nur Zentimeter am Pfosten vorbei.",
+  "Der Ball streicht am Tor vorbei, {g} hätte keine Chance gehabt."
+ ],
+ "scene.wide.far": [
+  "Weit drüber, der Ball landet auf der Tribüne.",
+  "Das war nichts, deutlich vorbei.",
+  "Völlig verzogen."
+ ],
+ "scene.blocked.body": [
+  "{def} wirft sich dazwischen und blockt!",
+  "Geblockt! {def} ist im Weg.",
+  "Hängen geblieben am Bein von {def}."
+ ],
+ "scene.post.hit": [
+  "PFOSTEN! Das Aluminium rettet {other}!",
+  "Gegen die Latte! Der Ball springt zurück ins Feld.",
+  "Klong! Nur der Pfosten verhindert das Tor."
+ ],
+ "scene.chance.reaction": [
+  "{p} kann es nicht fassen.",
+  "Auf der Bank von {t} schlägt man die Hände über dem Kopf zusammen.",
+  "Das hätte das Tor sein müssen."
+ ],
+ "scene.goal.finish": [
+  "... und der Ball zappelt im Netz!",
+  "... flach ins linke Eck, unhaltbar!",
+  "... hoch unter die Latte!",
+  "... {g} streckt sich vergeblich, drin!"
+ ],
+ "scene.goal.headerFinish": [
+  "... wuchtig ins Tor!",
+  "... unhaltbar in den Winkel geköpft!",
+  "... und {g} ist ohne Chance!"
+ ],
+ "scene.goal.longFinish": [
+  "... und das Ding schlägt im Winkel ein!",
+  "... ein Traumtor aus der Distanz!"
+ ],
+ "scene.goal.freeKickFinish": [
+  "... über die Mauer und ins Netz! Ein Freistoß wie gemalt.",
+  "... um die Mauer herum, {g} kommt zu spät!"
+ ],
+ "scene.goal.penaltyFinish": [
+  "... und verwandelt sicher! {g} springt in die falsche Ecke.",
+  "... mitten rein, eiskalt!"
+ ],
+ "scene.goal.oneOnOneFinish": [
+  "... und schiebt eiskalt an {g} vorbei!",
+  "... lupft den Ball über {g} ins Tor!",
+  "... umkurvt {g} und schiebt ein!"
+ ],
+ "scene.goal.call": [
+  "TOR für {t}! {p} trifft, es steht {score}!",
+  "TOOOR! {p}! {score}!",
+  "Da ist das Tor! {p} macht es, {score} für {t}!"
+ ],
+ "scene.goal.lead": [
+  "{t} geht in Führung!",
+  "Die Führung! Die Kurve von {t} steht kopf."
+ ],
+ "scene.goal.extend": [
+  "{t} baut die Führung aus.",
+  "Das könnte die Vorentscheidung sein."
+ ],
+ "scene.goal.comeback": [
+  "{t} meldet sich zurück!",
+  "Neue Hoffnung für {t}!"
+ ],
+ "scene.goal.late": [
+  "So spät! {other} ist geschockt.",
+  "In der {min}. Minute, was für ein Zeitpunkt!"
+ ],
+ "scene.goal.celebrate": [
+  "{p} reißt sich das Trikot vom Leib und läuft zur Eckfahne.",
+  "{mate} springt {p} auf den Rücken.",
+  "Die ganze Mannschaft begräbt {p} unter sich."
+ ],
+ "scene.foul.tackle": [
+  "{p} kommt zu spät und trifft {o} am Knöchel.",
+  "{p} rempelt {o} von hinten um.",
+  "{p} hält {o} am Trikot fest.",
+  "Grätsche von {p}, {o} geht zu Boden."
+ ],
+ "scene.foul.whistle": [
+  "{ref} pfeift sofort.",
+  "Pfiff von {ref}, Freistoß.",
+  "{ref} hat es gesehen."
+ ],
+ "scene.foul.danger": [
+  "Freistoß in gefährlicher Position, {m} Meter vor dem Tor.",
+  "Das gibt einen Freistoß aus {m} Metern. Gefährlich!"
+ ],
+ "scene.card.yellow": [
+  "{ref} zückt Gelb für {p}.",
+  "Die Gelbe Karte für {p}, zu Recht.",
+  "Verwarnung für {p}."
+ ],
+ "scene.card.protest": [
+  "{p} beschwert sich, aber {ref} lässt nicht mit sich reden.",
+  "{p} schüttelt den Kopf."
+ ],
+ "scene.card.secondYellow": [
+  "Gelb-Rot! {p} muss vom Platz, {t} ist nur noch zu zehnt.",
+  "Die zweite Gelbe für {p}, und damit Rot."
+ ],
+ "scene.card.red": [
+  "ROT! {ref} schickt {p} vom Platz!",
+  "Glatt Rot für {p}! Das wird eine lange Sperre."
+ ],
+ "scene.card.walk": [
+  "Mit gesenktem Kopf trottet {p} in die Kabine.",
+  "{p} verlässt unter Pfiffen den Platz."
+ ],
+ "scene.freeKick.take": [
+  "Freistoß für {t}, {p} führt schnell aus.",
+  "{p} legt sich den Ball hin und spielt kurz."
+ ],
+ "scene.freeKick.wall": [
+  "Die Mauer von {other} steht, {g} dirigiert.",
+  "{ref} schreitet die Meter ab und sprüht die Linie.",
+  "{p} und {mate} stehen am Ball. Wer schießt?"
+ ],
+ "scene.penalty.call": [
+  "ELFMETER! {o} bringt {p} im Strafraum zu Fall, {ref} zeigt auf den Punkt!",
+  "Strafstoß für {t}! {o} war zu ungestüm gegen {p}."
+ ],
+ "scene.penalty.protest": [
+  "Die Spieler von {other} umringen {ref}, doch der bleibt dabei.",
+  "Proteste bei {other}, aber die Entscheidung steht."
+ ],
+ "scene.corner.take": [
+  "Ecke für {t}. {p} tritt an.",
+  "{p} schnappt sich den Ball zur Ecke.",
+  "Eckstoß von {p}, die Großen gehen mit nach vorn."
+ ],
+ "scene.corner.box": [
+  "Im Strafraum wird geschoben und gezogen.",
+  "{ref} ermahnt die Spieler im Fünfmeterraum."
+ ],
+ "scene.offside.flag": [
+  "Die Fahne geht hoch: Abseits, {p} stand zu weit vorn.",
+  "Abseits! {p} war einen Schritt zu früh gestartet.",
+  "Der Linienrichter winkt, Abseits gegen {p}."
+ ],
+ "scene.offside.trap": [
+  "Die Abwehr von {other} ist im richtigen Moment herausgerückt.",
+  "Die Abseitsfalle von {other} schnappt zu."
+ ],
+ "scene.goalKick.take": [
+  "Abstoß für {t}.",
+  "{g} wartet mit dem Abstoß, die Uhr läuft."
+ ],
+ "scene.injury.down": [
+  "{p} bleibt liegen und hält sich das Bein.",
+  "{p} hat sich wehgetan, die Betreuer laufen aufs Feld.",
+  "Das sieht nicht gut aus für {p}."
+ ],
+ "scene.injury.care": [
+  "Die Physios behandeln {p} an der Seitenlinie.",
+  "{ref} unterbricht das Spiel."
+ ],
+ "scene.sub.change": [
+  "Wechsel bei {t}: {p} kommt für {o}.",
+  "{o} geht runter, {p} ist neu im Spiel.",
+  "Frische Kräfte bei {t}: {p} ersetzt {o}."
+ ],
+ "scene.sub.applause": [
+  "{o} bekommt Applaus beim Verlassen des Platzes.",
+  "Handschlag an der Seitenlinie."
+ ],
+ "scene.rare.floodlight": [
+  "Das Flutlicht flackert kurz, für einen Moment liegt der Platz im Halbdunkel.",
+  "Ein Mast des Flutlichts fällt kurz aus. {ref} unterbricht, dann geht es weiter."
+ ],
+ "scene.rare.puddle": [
+  "Der Ball bleibt in einer Pfütze liegen, alle rutschen hinterher.",
+  "Ein Pass bleibt im nassen Rasen stecken."
+ ],
+ "scene.rare.snowball": [
+  "Ein Schneeball fliegt von der Tribüne, {ref} schaut streng hinüber.",
+  "Die Platzwarte fegen in der Spielunterbrechung die Linien frei."
+ ],
+ "scene.rare.wind": [
+  "Eine Windböe trägt einen langen Ball ins Seitenaus.",
+  "Der Wind wirbelt Papierschnipsel über den Rasen."
+ ],
+ "scene.rare.sun": [
+  "Die tief stehende Sonne blendet {g}, der die Mütze tiefer zieht.",
+  "Strahlender Sonnenschein, auf den Rängen werden die Sonnenbrillen gezückt."
+ ],
+ "scene.rare.wave": [
+  "Eine La-Ola-Welle rollt durchs Stadion.",
+  "Die Fans von {home} stimmen ein Lied an, das ganze Stadion singt mit."
+ ],
+ "scene.rare.balloon": [
+  "Ein Luftballon schwebt auf den Platz, {g} kickt ihn ins Aus.",
+  "Ein Wasserball landet im Strafraum. Ein Balljunge sprintet hinterher."
+ ],
+ "scene.rare.dog": [
+  "Ein kleiner Hund läuft aufs Spielfeld! Die Ordner jagen ihn unter Gelächter vom Platz."
+ ],
+ "scene.rare.drums": [
+  "Aus der Kurve dröhnen die Trommeln, es wird laut.",
+  "Pfiffe, als der Stadionsprecher eine Durchsage macht."
+ ],
+ "scene.rare.linesman": [
+  "Der Linienrichter rutscht aus und steht schnell wieder auf. Kurzer Applaus."
+ ]
+}

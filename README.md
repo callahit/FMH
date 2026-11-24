@@ -82,6 +82,15 @@ Spielstand, und liegt in `settings.json` neben dem Spielstandordner.
   aus, „Tutorial aus“ schaltet alle ab; „Hinweise erneut zeigen“ in den Einstellungen setzt sie zurück. Die Hinweise
   stehen als Daten in `rules/ui.json` (Seite) und in den Sprachdateien (`tutorial.<id>.title`, `tutorial.<id>.text`).
 
+## Textmodus
+
+Der Darstellungsmodus „Textmodus“ erzählt ein angeschautes Spiel als Folge kleiner Szenen (Aufbau, Abschluss,
+Reaktion, seltene Szenen nach Wetter und Flutlicht). Ablauf und Bedingungen stehen in `data/base/rules/scenes.json`,
+die Texte je Sprache in `data/base/lang/<code>.scenes.json` (Deutsch und Englisch, 93 Bausteine mit 235 Varianten).
+Das Ergebnis entscheidet die schnelle Engine; der Erzähler ändert keine Statistik. Wer einen eigenen Szenenbaum im
+Format `Textm.sav`/`Textm.txt` hat, kann ihn über `FMH_TEXTMODE_DIR` oder den Benutzerordner `FMH/textmode` einbinden.
+Details in [docs/textmodus.md](docs/textmodus.md).
+
 ## Spielmodi (AP 12a)
 
 Im Startdialog wird der Spielmodus gewählt:
@@ -923,6 +932,11 @@ noch offen.
     kommen aus dem Schema; Positionen werden auf die Schreibweise des Schemas gebracht, ungültige Werte abgewiesen.
     Attribute, Positionseignungen und Charakterwerte bearbeitet man im Baum.
   - Personal: Personal, KI-Manager und Schiedsrichter (`staff/`, `managers/`, `referees/`) als Tabellen.
+  - Szenen (Textmodus): Liste aller Szenen und seltenen Szenen mit Suche über Kennung, Schlüssel und Texte.
+    Rechts stehen Ereignisse, Gewicht und Bedingungen als Formular (Minute, Spielstand, Wetter, Flutlicht, xG,
+    Attribute wie `Finishing>=15`). Darunter die Zeilen mit Textschlüssel, Chance und den Varianten je Sprache, eine
+    Variante je Zeile. Fehlende Übersetzungen und abweichende Platzhalter sind markiert. Szenen lassen sich kopieren
+    und löschen, Zeilen hinzufügen und entfernen.
   - Regeln und Inhalte: jede Datendatei als Baum. Werte behalten ihren Typ, ungültige Zahlen werden abgewiesen.
     Listen bekommen neue Einträge als Kopie des letzten, Objekte neue Felder (Zahl, Wahrheitswert, `[]`, `{}` oder
     Text), und jeder Eintrag lässt sich entfernen. Mit Schema zeigt der Feldname die Beschreibung, „+ Feld“ schlägt

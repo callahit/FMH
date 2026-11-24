@@ -22,7 +22,7 @@ public class SceneRareTests
         Assert.True(SceneRare.Allows(RareKind.Crowd, Weather.Sunny, floodlit: false, easterEggs: false));
     }
 
-    [Fact]
+    [SceneFact]
     public void OneSceneMatchStaysShort()
     {
         var session = TestData.NewSession(19);
@@ -32,7 +32,7 @@ public class SceneRareTests
         Assert.InRange(scene.Events.Count, 20, 2500);
     }
 
-    [Fact]
+    [SceneFact]
     public void EveryOrdinaryRareTextAppearsAndEasterEggsStayOff()
     {
         const int matches = 1000;

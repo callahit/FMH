@@ -63,7 +63,7 @@ public sealed class MatchSetup
     public int Substitutions { get; init; } = 5;
     public bool NeutralGround { get; init; }
     public KnockoutContext? Knockout { get; init; }
-    /// <summary>Angeschautes Spiel über den FM2002-Szenenbaum. Hintergrundspiele lassen das aus.</summary>
+    /// <summary>Angeschautes Spiel über den Szenenbaum des Textmodus. Hintergrundspiele lassen das aus.</summary>
     public bool UseSceneText { get; init; }
     /// <summary>Platzhalter REF. Die schnelle Engine liest das Feld nicht.</summary>
     public string? RefereeName { get; init; }

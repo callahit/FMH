@@ -1,0 +1,95 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:s="using:Fmh.Editor.Services"
+             xmlns:vm="using:Fmh.Editor.ViewModels"
+             x:Class="Fmh.Editor.Views.ScenesSectionView"
+             x:DataType="vm:ScenesSectionViewModel">
+  <DockPanel>
+    <StackPanel DockPanel.Dock="Top" Spacing="8" Margin="0,0,0,10">
+      <TextBlock Classes="h1" Text="{Binding Title}" />
+      <TextBlock Classes="hint" Text="{s:L editor.scenes.hint}" TextWrapping="Wrap" />
+      <StackPanel Orientation="Horizontal" Spacing="12">
+        <TextBox Text="{Binding Filter}" Watermark="{s:L editor.scenes.search}" Width="320" />
+        <CheckBox IsChecked="{Binding OnlyProblems}" Content="{s:L editor.scenes.onlyProblems}" />
+        <TextBlock VerticalAlignment="Center" Text="{Binding Summary}" />
+        <Button Content="{s:L editor.scenes.add}" Command="{Binding AddCommand}" />
+        <Button Content="{s:L editor.scenes.remove}" Command="{Binding RemoveCommand}" />
+      </StackPanel>
+    </StackPanel>
+    <ListBox DockPanel.Dock="Left" Width="340" ItemsSource="{Binding Items}" SelectedItem="{Binding Selected}">
+      <ListBox.ItemTemplate>
+        <DataTemplate x:DataType="vm:SceneItem">
+          <StackPanel Orientation="Horizontal" Spacing="6">
+            <TextBlock Text="⚠" IsVisible="{Binding Problem}" Foreground="#E8A33D" />
+            <TextBlock Text="{Binding Label}" TextTrimming="CharacterEllipsis" />
+          </StackPanel>
+        </DataTemplate>
+      </ListBox.ItemTemplate>
+    </ListBox>
+    <ScrollViewer Margin="12,0,0,0" DataContext="{Binding Selected}" x:DataType="vm:SceneItem">
+      <StackPanel Spacing="8" IsVisible="{Binding $parent[UserControl].((vm:ScenesSectionViewModel)DataContext).Selected, Converter={x:Static ObjectConverters.IsNotNull}}">
+        <Grid ColumnDefinitions="240,*,*" RowDefinitions="Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto,Auto" RowSpacing="6" ColumnSpacing="8">
+          <TextBlock Grid.Row="0" VerticalAlignment="Center" Text="{s:L editor.scenes.id}" />
+          <TextBox Grid.Row="0" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Id}" />
+          <TextBlock Grid.Row="1" VerticalAlignment="Center" Text="{s:L editor.scenes.on}" />
+          <TextBox Grid.Row="1" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding On}" IsEnabled="{Binding !Rare}" />
+          <TextBlock Grid.Row="2" VerticalAlignment="Center" Text="{s:L editor.scenes.weight}" />
+          <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Weight}" />
+          <TextBlock Grid.Row="3" VerticalAlignment="Center" Text="{s:L editor.scenes.after}" />
+          <TextBox Grid.Row="3" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding After}" />
+          <TextBlock Grid.Row="4" VerticalAlignment="Center" Text="{s:L editor.scenes.weather}" />
+          <TextBox Grid.Row="4" Grid.Column="1" Grid.ColumnSpan="2" Text="{Binding Weather}" Watermark="Sunny, Cloudy, Rain, Snow, Wind" />
+          <TextBlock Grid.Row="5" VerticalAlignment="Center" Text="{s:L editor.scenes.minute}" />
+          <TextBox Grid.Row="5" Grid.Column="1" Text="{Binding MinMinute}" />
+          <TextBox Grid.Row="5" Grid.Column="2" Text="{Binding MaxMinute}" />
+          <TextBlock Grid.Row="6" VerticalAlignment="Center" Text="{s:L editor.scenes.xg}" />
+          <TextBox Grid.Row="6" Grid.Column="1" Text="{Binding MinXg}" />
+          <TextBox Grid.Row="6" Grid.Column="2" Text="{Binding MaxXg}" />
+          <TextBlock Grid.Row="7" VerticalAlignment="Center" Text="{s:L editor.scenes.score}" />
+          <TextBox Grid.Row="7" Grid.Column="1" Text="{Binding Score}" Watermark="Level, Leading, Trailing" />
+          <TextBlock Grid.Row="8" VerticalAlignment="Center" Text="{s:L editor.scenes.floodlit}" />
+          <TextBox Grid.Row="8" Grid.Column="1" Text="{Binding Floodlit}" />
+          <TextBlock Grid.Row="9" VerticalAlignment="Center" Text="{s:L editor.scenes.knockout}" />
+          <TextBox Grid.Row="9" Grid.Column="1" Text="{Binding Knockout}" />
+          <TextBlock Grid.Row="10" VerticalAlignment="Center" Text="{s:L editor.scenes.attrs}" />
+          <StackPanel Grid.Row="10" Grid.Column="1" Grid.ColumnSpan="2" Spacing="6">
+            <TextBox Text="{Binding Attrs}" />
+            <TextBox Text="{Binding KeeperAttrs}" Watermark="{s:L editor.scenes.keeperAttrs}" />
+          </StackPanel>
+        </Grid>
+        <StackPanel Orientation="Horizontal" Spacing="12" Margin="0,8,0,0">
+          <TextBlock Classes="h2" Text="{s:L editor.scenes.steps}" VerticalAlignment="Center" />
+          <Button Content="{s:L editor.scenes.addStep}" Command="{Binding AddStepCommand}" />
+        </StackPanel>
+        <ItemsControl ItemsSource="{Binding Steps}">
+          <ItemsControl.ItemTemplate>
+            <DataTemplate x:DataType="vm:SceneStepRow">
+              <Border BorderBrush="#2A3A52" BorderThickness="1" CornerRadius="4" Padding="8" Margin="0,0,0,8">
+                <StackPanel Spacing="6">
+                  <StackPanel Orientation="Horizontal" Spacing="8">
+                    <TextBox Text="{Binding Key}" Width="320" Watermark="{s:L editor.scenes.key}" />
+                    <TextBlock Text="{s:L editor.scenes.chance}" VerticalAlignment="Center" />
+                    <TextBox Text="{Binding Chance}" Width="70" />
+                    <TextBlock Text="{Binding ProblemText}" Foreground="#E8A33D" VerticalAlignment="Center" />
+                    <Button Content="{s:L editor.scenes.removeStep}"
+                            Command="{Binding $parent[ItemsControl].((vm:SceneItem)DataContext).RemoveStepCommand}" CommandParameter="{Binding}" />
+                  </StackPanel>
+                  <ItemsControl ItemsSource="{Binding Texts}">
+                    <ItemsControl.ItemTemplate>
+                      <DataTemplate x:DataType="vm:SceneStepText">
+                        <DockPanel Margin="0,0,0,4">
+                          <TextBlock DockPanel.Dock="Left" Width="40" Text="{Binding Language}" VerticalAlignment="Top" Margin="0,6,0,0" />
+                          <TextBox Text="{Binding Text}" AcceptsReturn="True" TextWrapping="Wrap" MinHeight="48" />
+                        </DockPanel>
+                      </DataTemplate>
+                    </ItemsControl.ItemTemplate>
+                  </ItemsControl>
+                </StackPanel>
+              </Border>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </StackPanel>
+    </ScrollViewer>
+  </DockPanel>
+</UserControl>

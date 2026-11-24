@@ -98,6 +98,13 @@ public sealed partial class MatchViewModel
                     new SolidColorBrush(goal ? P.Gold : e.Key ? P.Text : P.Muted),
                     new SolidColorBrush(marker), goal ? FontWeight.Bold : FontWeight.Normal));
             }
+            else if (_narrator is not null)
+            {
+                foreach (var line in _narrator.Narrate(e))
+                    Ticker.Insert(0, new TickerLine(line.Minute, line.Text,
+                        new SolidColorBrush(line.Highlight ? P.Gold : e.Key ? P.Text : P.Muted),
+                        new SolidColorBrush(marker), line.Highlight ? FontWeight.Bold : FontWeight.Normal));
+            }
             else if (_commentary!.Describe(e, ticker) is { } line)
             {
                 Ticker.Insert(0, new TickerLine(line.Minute, line.Text,
