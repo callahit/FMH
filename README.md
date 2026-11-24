@@ -801,8 +801,8 @@ danach je Abschnitt angehoben:
 - Abschnitt `internationals` Version 8 ergänzt in den Team-Daten Trainer, Ziel, Vertrag, Spielsystem, Vormerkliste und
   offenes Angebot. Ältere Spielstände haben keine Trainer; das Modul besetzt die Posten am nächsten Spieltag.
 - Abschnitt `grayZones` (Version 6, neu) bekommt die Tabelle `gray_zones` (Taten und aufgeflogene Fälle je Manager).
-- Abschnitt `license` (Version 7) bekommt `coefficient_base` und `coefficient_seasons` für das Fünfjahresfenster der Europapokal-Koeffizienten; die Migration legt leere Tabellen an.
   In älteren Spielständen beginnt die Akte leer.
+- Abschnitt `license` (Version 7) bekommt `coefficient_base` und `coefficient_seasons` für das Fünfjahresfenster der Europapokal-Koeffizienten; die Migration legt leere Tabellen an.
 - Abschnitt `privateLife` (Version 6, neu) bekommt die Tabelle `private_lives` (Privatkonto, Stress und Besitz je
   Manager). In älteren Spielständen beginnt das Privatleben beim Laden neu.
 - Abschnitt `anstoss` (Version 6, neu) bekommt die Tabelle `anstoss_settings` (Anstoß-Schalter je Manager, nur
