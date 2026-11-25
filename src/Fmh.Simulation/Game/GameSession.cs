@@ -152,11 +152,22 @@ public sealed partial class GameSession
         return new AdvanceResult { Reason = StopReason.Limit };
     }
 
+    /// <summary>Optionale Zeitmessung je Modul in Millisekunden (null = aus), z. B. für <c>fmh-calibrate --profile</c>.</summary>
+    public Dictionary<string, double>? Profile { get; set; }
+
+    private void Measure(string key, Action step)
+    {
+        if (Profile is null) { step(); return; }
+        var start = System.Diagnostics.Stopwatch.GetTimestamp();
+        step();
+        Profile[key] = Profile.GetValueOrDefault(key) + System.Diagnostics.Stopwatch.GetElapsedTime(start).TotalMilliseconds;
+    }
+
     /// <summary>Ein Kalendertag: jedes Modul rechnet seinen Tagesschritt (Training, Spiele, Transfers, Scouting, Wettbewerbe …).</summary>
     private StopReason? ProcessDay()
     {
         var day = new DayContext(World.Date, World.AllMatches.Where(f => f.Date == World.Date).ToList());
-        foreach (var m in Modules) m.OnDay(day);
+        foreach (var m in Modules) Measure(m.Id, () => m.OnDay(day));
         return day.Stop;
     }
 
@@ -164,7 +175,7 @@ public sealed partial class GameSession
     private StopReason? StartOfDay()
     {
         var day = new DayContext(World.Date, Array.Empty<Fixture>());
-        _kernel.Bus.Publish(new DayStarted(day));
+        Measure("day-start", () => _kernel.Bus.Publish(new DayStarted(day)));
         return day.Stop;
     }
 }
