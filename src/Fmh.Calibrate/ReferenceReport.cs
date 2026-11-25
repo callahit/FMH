@@ -48,22 +48,32 @@ public static class ReferenceReport
                     History[id] = (sum + value, n + 1, target, tol);
                     seasons = n + 1;
                     var mean = (sum + value) / (n + 1);
-                    means.Add($"{key} {M(mean)}{(Math.Abs(mean / target - 1) <= tol ? "" : " ABWEICHUNG")}");
+                    // Zwischenstand: gewertet wird erst der Durchschnitt aller Saisons (PrintSummary).
+                    means.Add($"{key} {M(mean)}{(Math.Abs(mean / target - 1) <= tol ? "" : " außerhalb")}");
                 }
             }
             Check("income", r.Income);
             Check("expenses", r.Expenses);
             Console.WriteLine($"Ligazahlen {div.First().Format.Name} ({r.Source}{(r.Official ? "" : ", nicht amtlich")}), Spiel/Bericht in Mio.: {string.Join(", ", parts)}");
-            Console.WriteLine($"  Ø {seasons} Saison(s): {string.Join(", ", means)}");
+            Console.WriteLine($"  Ø {seasons} Saison(s), Zwischenstand: {string.Join(", ", means)}");
         }
     }
 
     /// <summary>
-    /// Ergebnis des Laufs: Der Durchschnitt aller ausgewerteten Saisons jeder Kennzahl liegt in der Toleranz. Auch die
-    /// Ligazahlen sind Durchschnitte; einzelne Saisons (etwa mit einem reichen Absteiger) weichen stärker ab.
+    /// Gewertetes Ergebnis der Ligazahlen: Der Durchschnitt aller ausgewerteten Saisons jeder Kennzahl liegt in der
+    /// Toleranz. Auch die Ligazahlen sind Durchschnitte; einzelne Saisons (etwa mit einem reichen Absteiger) weichen
+    /// stärker ab und gelten nur als Zwischenstand.
     /// </summary>
-    public static bool MeansOk() =>
-        History.Values.All(h => Math.Abs(h.Sum / h.Seasons / h.Target - 1) <= h.Tolerance);
+    public static bool PrintSummary()
+    {
+        var off = History.Where(h => Math.Abs(h.Value.Sum / h.Value.Seasons / h.Value.Target - 1) > h.Value.Tolerance)
+            .OrderBy(h => h.Key, StringComparer.Ordinal)
+            .Select(h => $"{h.Key} {h.Value.Sum / h.Value.Seasons / 1_000_000:F1}/{h.Value.Target / 1_000_000.0:F1} ABWEICHUNG")
+            .ToList();
+        Console.WriteLine($"Ligazahlen Ø über alle Saisons ({History.Count} Kennzahlen, Toleranzen je Kennzahl): " +
+                          (off.Count == 0 ? "alle im Rahmen" : string.Join(", ", off)));
+        return off.Count == 0;
+    }
 
     /// <summary>Durchschnitt je Verein nach Kategorie, Erträge und Aufwand jeweils positiv.</summary>
     public static Dictionary<string, double> Actuals(IReadOnlyCollection<Club> clubs)

@@ -861,12 +861,20 @@ Weitere Prüfungen:
   Lizenz-Punktabzüge unter den Grenzen bleiben (siehe Finanzen). Dazu kommen die Entlassungen je Saison in den
   1. Ligen, mit dem Zielbereich aus `rules/managers.json`, und der Anteil unzufriedener Spieler je Kader mit dem
   Zielbereich aus `rules/relations.json`.
-- `--max-drift 0.05` prüft zusätzlich die Ligastärke-Drift (Durchschnitt der besten elf je Verein der 1. Liga);
+- Gewertet wird jede ausgewertete Saison (Gehälter, Mindestkader, Spielwelt), bei den Ligazahlen der Durchschnitt
+  aller Saisons. Die Zeilen „Zwischenstand“ nach jeder Saison zeigen nur den bisherigen Durchschnitt; am Ende steht
+  „Ligazahlen Ø über alle Saisons“ mit den gewerteten Abweichungen. Jede Zeile mit „ABWEICHUNG“ lässt `--strict`
+  scheitern.
+- `--max-drift 0.05` prüft zusätzlich die Ligastärke-Drift in beide Richtungen (Durchschnitt der besten elf je Verein der 1. Liga);
   die CI ruft den Karrierelauf damit auf. Gemessen: +0,024 je Saison. Dafür holen junge Spieler im Mittel nur ihren
   Altersabschlag auf, Akademietalente erreichen etwa die Stärke ihres Vereins, und der Abbau ab 30 nimmt mit dem
   Alter zu.
 - `--profile` gibt beim Karrierelauf zusätzlich die Rechenzeit je Modul aus (Tagesschritt und Tagesbeginn),
   um langsame Stellen zu finden. Ohne die Option wird nichts gemessen.
+
+Szenenbaum (optional, siehe `docs/textmodus.md`): Sind die bereitgestellten Dateien beschädigt, startet das Spiel ohne
+Szenenbaum und nennt den Grund auf der Konsole. Die Tests mit den Originaldateien laufen nur, wenn sie bereitgestellt
+sind (`FMH_TEXTMODE_DIR`), also nicht in der CI; das Laden beschädigter Dateien prüft ein Test auch dort.
 
 Die Gewichte stehen in `data/base/rules/engine.json`.
 

@@ -62,7 +62,7 @@ public static partial class Program
         Console.WriteLine();
     }
 
-    /// <summary>Gehälter der letzten ausgewerteten Saison im Zielkorridor (±30 % um <c>targetAnnualWage</c> je Division)?</summary>
+    /// <summary>Gehälter jeder ausgewerteten Saison im Zielkorridor (±30 % um <c>targetAnnualWage</c> je Division)?</summary>
     private static bool _wagesOk = true;
     private static bool _squadOk = true;
     private static bool _worldOk = true;
@@ -78,7 +78,6 @@ public static partial class Program
     /// <summary>Durchschnittliches Jahresgehalt der Kaderspieler je Division gegen das Kalibrierungsziel aus den Daten.</summary>
     private static void PrintWageStats(World w)
     {
-        _wagesOk = true;
         if (_startYear == 0) _startYear = w.SeasonYear;
         var growth = Math.Pow(WageGrowth, w.SeasonYear - _startYear);
         foreach (var div in w.Leagues.GroupBy(l => (l.CountryCode, l.Format.Id)))
