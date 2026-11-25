@@ -243,7 +243,7 @@ public sealed partial class ShellViewModel : ViewModelBase
         {
             State.Autosave();
         }
-        catch (IOException ex)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or Microsoft.Data.Sqlite.SqliteException)
         {
             StatusMessage = T.Format("ui.saveFailed", ex.Message);
         }
@@ -266,7 +266,7 @@ public sealed partial class ShellViewModel : ViewModelBase
             var path = State.SaveCurrent();
             StatusMessage = T.Format("ui.saved", Path.GetFileName(path));
         }
-        catch (Exception ex) when (ex is IOException or Microsoft.Data.Sqlite.SqliteException)
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or Microsoft.Data.Sqlite.SqliteException)
         {
             StatusMessage = T.Format("ui.saveFailed", ex.Message);
         }

@@ -9,6 +9,9 @@ namespace Fmh.Desktop;
 
 public sealed class App : Application
 {
+    /// <summary>Gesetzt, wenn die Datenpakete fehlerhaft sind: statt des Spiels erscheint nur die Fehlerliste.</summary>
+    public static IReadOnlyList<string>? StartupProblems { get; set; }
+
     public override void Initialize()
     {
         AvaloniaXamlLoader.Load(this);
@@ -20,8 +23,9 @@ public sealed class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var vm = new MainWindowViewModel();
-            desktop.MainWindow = new MainWindow { DataContext = vm };
+            desktop.MainWindow = StartupProblems is { } problems
+                ? StartupErrorWindow.Create(problems)
+                : new MainWindow { DataContext = new MainWindowViewModel() };
         }
         base.OnFrameworkInitializationCompleted();
     }

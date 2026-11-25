@@ -61,7 +61,7 @@ public static class PackageLoader
 
         var countries = PathsUnder("countries").Select(p => Json.Load<CountryConfig>(p).Normalize()).ToList();
         var clubs = PathsUnder("clubs").SelectMany(Json.Load<List<ClubDefinition>>).ToList();
-        var names = PathsUnder("names").Select(Json.Load<NameList>).ToDictionary(n => n.Country);
+        var names = UniqueBy(PathsUnder("names").Select(p => (p, Json.Load<NameList>(p))), n => n.Country, "Namensliste für Land");
 
         var languages = LoadLanguages(ordered);
         var defaultLanguage = ordered.Select(m => m.DefaultLanguage).LastOrDefault(l => !string.IsNullOrEmpty(l)) ?? "de";
@@ -84,7 +84,7 @@ public static class PackageLoader
             // Ereignisse dürfen auf mehrere Dateien verteilt sein (Community-Pakete ergänzen eigene).
             Events = PathsUnder("events").SelectMany(Json.Load<List<EventDef>>).ToList(),
             PressQuestions = Path1("rules/press.json") is { } pr ? Json.Load<List<PressQuestionDef>>(pr) : new(),
-            Sponsors = PathsUnder("sponsors").Select(Json.Load<SponsorList>).ToDictionary(s => s.Country),
+            Sponsors = UniqueBy(PathsUnder("sponsors").Select(p => (p, Json.Load<SponsorList>(p))), s => s.Country, "Sponsorenliste für Land"),
             Engine = Path1("rules/engine.json") is { } e ? Json.Load<EngineConfig>(e) : new(),
             Currencies = Path1("rules/currencies.json") is { } cu ? Json.Load<CurrencyConfig>(cu) : new(),
             TransferRules = Path1("rules/transfers.json") is { } tr ? Json.Load<TransferRules>(tr) : new(),
@@ -174,9 +174,27 @@ public static class PackageLoader
         return files;
     }
 
+    /// <summary>Je Schlüssel genau eine Datei; sonst ein Datenfehler mit beiden Dateien statt einer nichtssagenden Ausnahme.</summary>
+    private static Dictionary<string, T> UniqueBy<T>(IEnumerable<(string Path, T Item)> items, Func<T, string> key, string what)
+    {
+        var result = new Dictionary<string, T>();
+        var source = new Dictionary<string, string>();
+        foreach (var (path, item) in items)
+        {
+            var k = key(item);
+            if (source.TryGetValue(k, out var first))
+                throw new InvalidDataException($"{what} „{k}“ ist doppelt: {first} und {path}.");
+            source[k] = path;
+            result[k] = item;
+        }
+        return result;
+    }
+
     internal static List<PackageManifest> SortByDependencies(List<PackageManifest> manifests)
     {
-        var byId = manifests.ToDictionary(m => m.Id);
+        var byId = new Dictionary<string, PackageManifest>();
+        foreach (var m in manifests)
+            if (!byId.TryAdd(m.Id, m)) throw new InvalidDataException($"Paket-Id „{m.Id}“ ist doppelt vergeben.");
         var result = new List<PackageManifest>();
         var state = new Dictionary<string, int>(); // 1 = in Arbeit, 2 = fertig
 
