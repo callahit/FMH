@@ -10,18 +10,38 @@ Das Ergebnis entscheidet immer die schnelle Engine. Der Erzähler (`SceneComment
 - **Ablauf:** `data/<paket>/rules/scenes.json` (Schema `scenes`). Jede Szene nennt die Ereignisschlüssel (`on`, gleiche
   Schlüssel wie der Kommentar, z. B. `goal.header`, `shot.oneOnOne.saved`, `foul.dangerous`), Bedingungen (`when`), ein
   Gewicht und die Zeilenfolge (`steps`). Jede Zeile ist ein Textschlüssel mit optionaler Wahrscheinlichkeit (`chance`)
-  und eigener Bedingung.
-- **Bedingungen:** `after` (vorheriges Ereignis derselben Mannschaft, z. B. `counter`), `minMinute`/`maxMinute`,
-  `score` (`Level`, `Leading`, `Trailing` aus Sicht der handelnden Mannschaft vor dem Ereignis), `weather`, `floodlit`,
-  `knockout`, `minXg`/`maxXg`, `minRow`/`maxRow`, `attrs` (Attribute des Spielers) und `keeperAttrs` (gegnerischer Torwart).
+  und eigener Bedingung. Eine Zeile mit `"previous": true` wird aus Sicht der vorigen Aktion des Gegners gefüllt
+  (Spieler, Mannschaft, Seite) und erzählt deren Ausgang, der erst jetzt feststeht (siehe `afterOpponent`).
+- **Bedingungen:** `after` (vorheriges Ereignis derselben Mannschaft, z. B. `counter`), `afterOpponent` (vorige Aktion
+  des Gegners in derselben oder der Minute davor, seitdem nichts Eigenes), `minMinute`/`maxMinute`,
+  `score` (`Level`, `Leading`, `Trailing` aus Sicht der handelnden Mannschaft vor dem Ereignis), `minMargin`/`maxMargin`
+  (Tordifferenz aus dieser Sicht, z. B. `-2` = zwei Tore zurück), `standing` (`Home`, `Away`, `Level`: wer führt,
+  unabhängig von der Seite, für Anpfiff, Halbzeit und Abpfiff), `weather`, `floodlit`, `knockout`, `minXg`/`maxXg`,
+  `minRow`/`maxRow`, `attrs` (Attribute des Spielers) und `keeperAttrs` (gegnerischer Torwart).
+- **Ausgang erst, wenn er feststeht:** Angriff, Konter, Flanke, Ecke und Dribbling werden gemeldet, bevor die Engine
+  weiß, wie sie enden. Ihre Szenen erzählen deshalb nur den Aufbau; „verpufft“, „zu lang“ oder „geklärt“ kommen erst
+  mit der nächsten Aktion des Gegners (`afterOpponent` und `previous`). Auf ein Foul folgt immer ein Freistoß, daher
+  gibt es keine Vorteilszeilen.
+- **Keine Wiederholung:** Innerhalb eines Spiels nimmt der Erzähler von einem Baustein erst wieder eine Variante, die
+  schon kam, wenn alle anderen verbraucht sind.
 - **Seltene Szenen:** `rare` mit Wahrscheinlichkeit je Spiel; Zeitpunkt und Auftreten stehen ab Anpfiff fest.
 - **Texte:** je Sprache in `data/<paket>/lang/<code>.scenes.json` (Schema `scene-texts`), mehrere gleichwertige
   Varianten je Schlüssel. Fehlende Sprachen fallen auf die Standardsprache zurück. Eine neue Sprache braucht nur eine
   weitere Datei `lang/<code>.scenes.json`.
 - **Platzhalter:** `{p}` handelnder Spieler, `{o}` Gegen- oder Mitspieler des Ereignisses, `{g}` gegnerischer Torwart,
+  `{k}` Torwart der handelnden Mannschaft (z. B. beim Abstoß),
   `{mate}` ein Mitspieler, `{def}` ein Verteidiger des Gegners (innerhalb einer Szene fest), `{ref}` Schiedsrichter,
   `{t}`/`{other}` Mannschaften, `{home}`/`{away}`, `{score}`, `{side}`, `{pens}`, `{n}`/`{m}` Zahlenwert, `{min}` Minute.
 - **Rückfall:** Passt keine Szene, erscheint die normale Kommentarzeile.
+
+**Umfang:** 451 Szenen und 29 seltene Szenen über 261 Bausteine mit 2.600 Varianten je Sprache (2.596 verschiedene
+Sätze, Deutsch und Englisch mit gleichen Platzhaltern je Variante). Dazu gehören Aufbau nach Spielsituation
+(Spieleröffnung, Kombination, Konter, Pressing, Standard, Schlussoffensive, Regen, Wind, Schnee), Abschlussarten
+(Volley, Schlenzer, Heber, Kopfball-Varianten, abgefälscht), Ausgänge (Paraden, Fehlschüsse, Blocks, Pfosten und
+Latte), Tore nach Spielstand und Minute (Führung, Ausgleich, Anschluss, Ehrentreffer, Siegtreffer, Nachspielzeit),
+Reaktionen von Spielern, Bank, Torwart und Publikum, Fouls, Karten, Standards, Spielfluss und Elfmeterschießen. Ein Test
+sichert mindestens 2.500 verschiedene Sätze je Sprache, gleiche Platzhalter je Variantenpaar und dass jeder Baustein
+in einer Szene vorkommt.
 
 Ein Datenpaket kann `rules/scenes.json` ersetzen und eigene Texte in `lang/<code>.scenes.json` ergänzen. Der Katalog
 ist neu geschrieben; die Struktur (Ketten aus Aufbau, Aktion und Reaktion, Bedingungen an Spieler, Wetter und Licht)

@@ -18,8 +18,9 @@ public sealed class SceneCommentary
     private readonly IMatchSimulation _sim;
     private readonly CommentaryGenerator _fallback;
     private readonly Dictionary<int, Player> _players = new();
-    private readonly Dictionary<Side, (string Root, int Minute)> _last = new();
+    private readonly Dictionary<Side, (string Root, int Minute, MatchEvent Event)> _last = new();
     private readonly List<(RareSceneDef Scene, int Minute)> _rare = new();
+    private readonly Dictionary<string, HashSet<int>> _used = new(StringComparer.Ordinal);
 
     public SceneCommentary(GameData data, IMatchSimulation sim)
     {
@@ -53,7 +54,7 @@ public sealed class SceneCommentary
             if (candidates.Count > 0) AddSteps(lines, Weighted(candidates, rng).Steps, e, rng, Highlight(e));
             else if (_fallback.Plain(e) is { } plain) lines.Add(plain with { Highlight = Highlight(e) });
         }
-        if (key is not null) _last[e.Side] = (key.Split('.')[0], e.Minute);
+        if (key is not null) _last[e.Side] = (key.Split('.')[0], e.Minute, e);
         return lines;
     }
 
@@ -76,13 +77,30 @@ public sealed class SceneCommentary
         var start = lines.Count;
         // Platzhalter für Mitspieler und Gegenspieler bleiben innerhalb einer Szene gleich.
         var cast = Cast(e, rng);
+        var previous = _last.TryGetValue(e.Side.Other(), out var opp) ? opp.Event : null;
+        var previousCast = previous is null ? null : Cast(previous, rng);
         foreach (var step in steps)
         {
             if (!Holds(step.When, e) || !rng.Chance(step.Chance)) continue;
+            if (step.Previous && previous is null) continue;
             if (!_data.Commentary.TryGetValue(step.Text, out var variants) || variants.Count == 0) continue;
-            lines.Add(new CommentaryLine(e, e.MinuteLabel, Capitalize(Fill(rng.Pick(variants), e, cast)), false));
+            var text = step.Previous ? Fill(Pick(step.Text, variants, rng), previous!, previousCast!) : Fill(Pick(step.Text, variants, rng), e, cast);
+            lines.Add(new CommentaryLine(e, e.MinuteLabel, Capitalize(text), false));
         }
         if (highlightLast && lines.Count > start) lines[^1] = lines[^1] with { Highlight = true };
+    }
+
+    /// <summary>
+    /// Variante eines Bausteins: bevorzugt eine, die in diesem Spiel noch nicht kam; sind alle verbraucht, beginnt die
+    /// Runde von vorn. So wiederholt sich ein Satz erst, wenn der Baustein ausgeschöpft ist.
+    /// </summary>
+    private string Pick(string key, List<string> variants, Rng rng)
+    {
+        if (!_used.TryGetValue(key, out var used) || used.Count >= variants.Count) _used[key] = used = new HashSet<int>();
+        var free = Enumerable.Range(0, variants.Count).Where(i => !used.Contains(i)).ToList();
+        var index = rng.Pick(free);
+        used.Add(index);
+        return variants[index];
     }
 
     /// <summary>Gilt die Bedingung für dieses Ereignis?</summary>
@@ -101,22 +119,49 @@ public sealed class SceneCommentary
         if (c.MaxRow is { } maxRow && e.Row > maxRow) return false;
         if (c.After is { Count: > 0 } after &&
             !(_last.TryGetValue(e.Side, out var prev) && e.Minute - prev.Minute <= 1 && after.Contains(prev.Root))) return false;
+        if (c.AfterOpponent is { Count: > 0 } afterOpp && PreviousOpponent(e, afterOpp) is null) return false;
         if (c.Score is { } score && ScoreFor(e) != score) return false;
+        if (c.MinMargin is { } minMargin && MarginFor(e) < minMargin) return false;
+        if (c.MaxMargin is { } maxMargin && MarginFor(e) > maxMargin) return false;
+        if (c.Standing is { } standing && StandingOf(e) != standing) return false;
         if (c.Attrs is { Count: > 0 } attrs && !Fits(attrs, e.PlayerId is { } id ? _players.GetValueOrDefault(id) : null)) return false;
         if (c.KeeperAttrs is { Count: > 0 } ka && !Fits(ka, Keeper(e.Side.Other())?.Player)) return false;
         return true;
+    }
+
+    /// <summary>
+    /// Vorige Aktion des Gegners in derselben oder der Minute davor, wenn ihr Schlüssel passt und seitdem die eigene
+    /// Mannschaft noch nichts erzählt hat (sonst wäre ihr Ausgang schon berichtet).
+    /// </summary>
+    private MatchEvent? PreviousOpponent(MatchEvent e, List<string> roots)
+    {
+        if (!_last.TryGetValue(e.Side.Other(), out var prev) || e.Minute - prev.Minute > 1 || !roots.Contains(prev.Root)) return null;
+        if (_last.TryGetValue(e.Side, out var own) && own.Event.Index > prev.Event.Index) return null;
+        return prev.Event;
     }
 
     private static bool Fits(List<SceneAttr> attrs, Player? p) =>
         p is not null && attrs.All(a => (a.Min is not { } min || p.Attributes[a.Attr] >= min) && (a.Max is not { } max || p.Attributes[a.Attr] <= max));
 
     /// <summary>Spielstand aus Sicht der handelnden Mannschaft vor dem Ereignis (ein Tor zählt noch nicht).</summary>
-    private static SceneScore ScoreFor(MatchEvent e)
+    private static SceneScore ScoreFor(MatchEvent e) => MarginFor(e) switch
+    {
+        0 => SceneScore.Level,
+        > 0 => SceneScore.Leading,
+        _ => SceneScore.Trailing,
+    };
+
+    /// <summary>Tordifferenz aus Sicht der handelnden Mannschaft vor dem Ereignis (ein Tor zählt noch nicht).</summary>
+    private static int MarginFor(MatchEvent e)
     {
         var (own, opp) = e.Side == Side.Home ? (e.HomeScore, e.AwayScore) : (e.AwayScore, e.HomeScore);
         if (e.Type == MatchEventType.Goal) own--;
-        return own == opp ? SceneScore.Level : own > opp ? SceneScore.Leading : SceneScore.Trailing;
+        return own - opp;
     }
+
+    /// <summary>Wer nach dem Ereignis führt (Heim, Gast, keiner).</summary>
+    private static SceneStanding StandingOf(MatchEvent e) =>
+        e.HomeScore == e.AwayScore ? SceneStanding.Level : e.HomeScore > e.AwayScore ? SceneStanding.Home : SceneStanding.Away;
 
     private MatchPlayer? Keeper(Side side) => _sim.Team(side).OnPitch.FirstOrDefault(p => p.Position == Position.GK);
 
@@ -142,6 +187,7 @@ public sealed class SceneCommentary
             .Replace("{p}", Name(e.PlayerId))
             .Replace("{o}", Name(e.OtherPlayerId))
             .Replace("{g}", Keeper(e.Side.Other())?.Player.ShortName ?? _data.Texts["comm.keeper"])
+            .Replace("{k}", Keeper(e.Side)?.Player.ShortName ?? _data.Texts["comm.keeper"])
             .Replace("{mate}", cast.Mate)
             .Replace("{def}", cast.Defender)
             .Replace("{ref}", _sim.Setup.RefereeName ?? _data.Texts["scene.referee"])

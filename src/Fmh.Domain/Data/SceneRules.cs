@@ -36,6 +36,11 @@ public sealed class SceneStep
     /// <summary>Wahrscheinlichkeit, dass die Zeile erscheint (1 = immer).</summary>
     public double Chance { get; set; } = 1;
     public SceneCondition? When { get; set; }
+    /// <summary>
+    /// Zeile aus Sicht der vorigen Aktion des Gegners (Spieler, Mannschaft, Seite): erzählt deren Ausgang, der erst jetzt
+    /// feststeht, etwa „Die Flanke von {p} ist zu lang“ zu Beginn des Gegenangriffs. Braucht <c>afterOpponent</c>.
+    /// </summary>
+    public bool Previous { get; set; }
 }
 
 /// <summary>Bedingungen; nicht gesetzte Felder gelten immer.</summary>
@@ -43,10 +48,17 @@ public sealed class SceneCondition
 {
     /// <summary>Vorheriges Ereignis derselben Mannschaft in derselben Minute, z. B. <c>cross</c> oder <c>counter</c>.</summary>
     public List<string>? After { get; set; }
+    /// <summary>Vorige Aktion des Gegners in derselben oder der Minute davor, z. B. <c>cross</c>, <c>corner</c> oder <c>attack</c>.</summary>
+    public List<string>? AfterOpponent { get; set; }
     public int? MinMinute { get; set; }
     public int? MaxMinute { get; set; }
     /// <summary>Spielstand aus Sicht der handelnden Mannschaft vor dem Ereignis.</summary>
     public SceneScore? Score { get; set; }
+    /// <summary>Tordifferenz aus Sicht der handelnden Mannschaft vor dem Ereignis (z. B. −2 = zwei Tore zurück).</summary>
+    public int? MinMargin { get; set; }
+    public int? MaxMargin { get; set; }
+    /// <summary>Wer gerade führt, unabhängig von der Seite des Ereignisses (Anpfiff, Halbzeit, Abpfiff).</summary>
+    public SceneStanding? Standing { get; set; }
     public List<Weather>? Weather { get; set; }
     public bool? Floodlit { get; set; }
     public bool? Knockout { get; set; }
@@ -62,6 +74,8 @@ public sealed class SceneCondition
 }
 
 public enum SceneScore { Level, Leading, Trailing }
+
+public enum SceneStanding { Level, Home, Away }
 
 public sealed class SceneAttr
 {
