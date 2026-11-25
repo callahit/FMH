@@ -100,13 +100,32 @@ public sealed class SceneTreeAsset
         lock (Gate)
         {
             if (_searched) return _cached;
-            if (Locate() is { } dir)
-            {
-                var json = Path.Combine(dir, "scene-tree.json");
-                _cached = File.Exists(json) ? SceneAssetStore.Read(json) : TextmImporter.Load(dir);
-            }
+            if (Locate() is { } dir) _cached = TryLoad(dir, out _);
             _searched = true;
             return _cached;
+        }
+    }
+
+    /// <summary>
+    /// Lädt den Szenenbaum aus einem Ordner. Sind die Dateien beschädigt oder unvollständig, gibt es keinen Szenenbaum
+    /// (null, Grund in <paramref name="error"/>, auch auf der Konsole): Das Spiel startet dann mit der schnellen Engine,
+    /// statt am Start abzubrechen.
+    /// </summary>
+    public static SceneTreeAsset? TryLoad(string dir, out string? error)
+    {
+        error = null;
+        try
+        {
+            var json = Path.Combine(dir, "scene-tree.json");
+            return File.Exists(json) ? SceneAssetStore.Read(json) : TextmImporter.Load(dir);
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or InvalidDataException
+                                       or System.Text.Json.JsonException or ArgumentException or IndexOutOfRangeException
+                                       or InvalidOperationException or OverflowException or FormatException)
+        {
+            error = $"Szenenbaum in {dir} nicht lesbar, Textmodus ohne Szenenbaum: {ex.Message}";
+            Console.Error.WriteLine(error);
+            return null;
         }
     }
 
