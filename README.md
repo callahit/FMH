@@ -776,7 +776,9 @@ Verschachtelte Konfigurationen (Ligaformat, Taktik, Pokalrunden, Verhandlungen) 
 daneben. Die Tabellen gehören Speicherabschnitten je Modul; jeder führt seine eigene Version in der
 Tabelle `meta` (`schema.world`, `schema.finance` …). Die frühere globale Schemaversion 5 ist die
 Ausgangsversion aller Abschnitte. Ältere Spielstände werden beim Laden zuerst global bis Version 5 und
-danach je Abschnitt angehoben:
+danach je Abschnitt angehoben. Vorher legt das Spiel eine Kopie des Originals daneben
+(`name.fmh.<Datum-Uhrzeit>.bak`); sie erscheint nicht in der Liste der Spielstände. Aktuelle Spielstände
+bekommen keine Kopie.
 
 - Version 1 (Phase 1) bekommt die Karrieredaten: Budgets, Scouts, Pokal und Amateurvereine.
 - Version 2 bekommt die Spalten für sprachneutrale Texte.
