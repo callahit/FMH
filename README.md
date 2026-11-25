@@ -781,7 +781,16 @@ Verschachtelte Konfigurationen (Ligaformat, Taktik, Pokalrunden, Verhandlungen) 
 daneben. Die Tabellen gehören Speicherabschnitten je Modul; jeder führt seine eigene Version in der
 Tabelle `meta` (`schema.world`, `schema.finance` …). Die frühere globale Schemaversion 5 ist die
 Ausgangsversion aller Abschnitte. Ältere Spielstände werden beim Laden zuerst global bis Version 5 und
-danach je Abschnitt angehoben:
+danach je Abschnitt angehoben. Vorher legt das Spiel eine Kopie des Originals daneben
+(`name.fmh.<Datum-Uhrzeit>.bak`); sie erscheint nicht in der Liste der Spielstände. Aktuelle Spielstände
+bekommen keine Kopie.
+
+Unerwartete Fehler: Das Spiel schreibt einen Bericht nach `FMH/crash/crash-<Datum-Uhrzeit>.txt` und sichert das
+laufende Spiel als eigene Datei `notfall-<Datum-Uhrzeit>.fmh` im Spielstandverzeichnis. Vorhandene Spielstände
+bleiben unberührt; im Ironman-Modus gibt es keine Notfallkopie, dort gilt der letzte automatische Spielstand.
+Fehler in der Oberfläche werden in einem Dialog gemeldet, das Spiel läuft weiter. Fehler in den Datenpaketen
+(auch doppelte Länderlisten oder Paket-Ids) zeigt das Spiel beim Start in einem eigenen Fenster;
+`FMH_NO_GUI=1` schreibt sie nur auf die Konsole.
 
 - Version 1 (Phase 1) bekommt die Karrieredaten: Budgets, Scouts, Pokal und Amateurvereine.
 - Version 2 bekommt die Spalten für sprachneutrale Texte.

@@ -24,6 +24,7 @@ public class SaveCompatibilityTests
     {
         SqliteConnection.ClearAllPools();
         if (File.Exists(path)) File.Delete(path);
+        foreach (var backup in Directory.GetFiles(Path.GetDirectoryName(path)!, Path.GetFileName(path) + ".*.bak")) File.Delete(backup);
     }
 
     private static void Exec(string path, string sql)

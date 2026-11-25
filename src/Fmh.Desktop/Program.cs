@@ -19,26 +19,35 @@ public static class Program
             if (args[i] == "--lang") language = args[i + 1];
         }
 
+        CrashHandler.Install();
         GameData data;
         try
         {
             data = PackageLoader.Load(PackageLoader.FindDataRoot(dataPath));
         }
-        catch (Exception ex) when (ex is IOException or InvalidDataException or DirectoryNotFoundException)
+        catch (Exception ex) when (ex is IOException or InvalidDataException or DirectoryNotFoundException or System.Text.Json.JsonException)
         {
-            Console.Error.WriteLine($"Daten konnten nicht geladen werden: {ex.Message}");
-            return 2;
+            return StartupError(args, new[] { ex.Message });
         }
         var problems = DataValidator.Validate(data);
-        if (problems.Count > 0)
-        {
-            Console.Error.WriteLine("Fehler in den Datenpaketen:");
-            foreach (var p in problems) Console.Error.WriteLine("  - " + p);
-            return 2;
-        }
+        if (problems.Count > 0) return StartupError(args, problems);
 
         AppState.Initialise(data, savePath ?? SaveGame.DefaultDirectory(), language);
         return BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+    }
+
+    /// <summary>
+    /// Datenfehler beim Start: auf der Konsole und in einem Fenster (ohne Konsole sähe sie sonst niemand).
+    /// Die Sprachdateien sind dann womöglich selbst betroffen, deshalb steht der Hinweis zweisprachig im Code.
+    /// </summary>
+    private static int StartupError(string[] args, IReadOnlyList<string> problems)
+    {
+        Console.Error.WriteLine("Fehler in den Datenpaketen / Errors in the data packages:");
+        foreach (var p in problems) Console.Error.WriteLine("  - " + p);
+        if (Environment.GetEnvironmentVariable("FMH_NO_GUI") is { Length: > 0 }) return 2;
+        App.StartupProblems = problems;
+        BuildAvaloniaApp().StartWithClassicDesktopLifetime(args);
+        return 2;
     }
 
     public static AppBuilder BuildAvaloniaApp() =>
