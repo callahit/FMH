@@ -220,4 +220,108 @@ public partial class UiTests
         Pump();
         Assert.IsType<LeaguePageViewModel>(shell.Page);
     }
+    /// <summary>Enter auf einer fokussierten Schaltfläche löst sie aus, nicht das Kürzel des Bildschirms.</summary>
+    [AvaloniaFact]
+    public void EnterActivatesTheFocusedButtonInsteadOfTheScreenShortcut()
+    {
+        var (w, vm) = Open();
+        var shell = StartGame(vm);
+        shell.SaveCommand.Execute(null);
+        vm.Navigate(new StartViewModel(vm));
+        Pump();
+        var start = Assert.IsType<StartViewModel>(vm.Screen);
+        Assert.NotEmpty(start.Saves); // ohne Fokus lädt Enter den neuesten Spielstand
+        var newGame = w.GetVisualDescendants().OfType<Button>().First(b => b.Command == start.NewGameCommand);
+        newGame.Focus();
+        Pump();
+        w.KeyPress(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, null);
+        Pump();
+        Assert.IsType<NewGameViewModel>(vm.Screen);
+    }
+
+    /// <summary>Der Ticker-Knopf schaltet genau einmal um (vorher hoben Bindung und Kommando sich auf).</summary>
+    [AvaloniaFact]
+    public void TickerButtonTogglesOnceAndShowsTheState()
+    {
+        var (w, vm) = Open();
+        var shell = StartGame(vm);
+        var s = AppState.Current.Session!;
+        s.HumanManager.Profile.MatchDisplay = MatchDisplayMode.Commentary;
+        var fixture = s.World.AllMatches.Where(f => f.Result is null && f.Involves(s.HumanClub.Id)).OrderBy(f => f.Date).First();
+        var match = new MatchViewModel(vm, shell, fixture);
+        vm.Navigate(match);
+        match.KickoffCommand.Execute(null);
+        Pump();
+        Assert.False(match.TickerMode);
+        var toggle = w.GetVisualDescendants().OfType<Avalonia.Controls.Primitives.ToggleButton>().First(b => b.Command == match.ToggleTickerCommand);
+        Assert.True(toggle.IsEnabled);
+        toggle.Focus();
+        Pump();
+        w.KeyPress(Key.Space, RawInputModifiers.None, PhysicalKey.Space, null);
+        w.KeyRelease(Key.Space, RawInputModifiers.None, PhysicalKey.Space, null);
+        Pump();
+        Assert.True(match.TickerMode);
+        Assert.True(toggle.IsChecked);
+        Assert.Equal(MatchDisplayMode.Ticker, s.HumanManager.Profile.MatchDisplay);
+        // Taste M schaltet zurück, der Knopf zeigt es an.
+        match.ToggleTickerCommand.Execute(null);
+        Pump();
+        Assert.False(match.TickerMode);
+        Assert.False(toggle.IsChecked);
+    }
+    /// <summary>Offener Dialog: Fokus im Dialog, der Bildschirm dahinter ist gesperrt; danach kehrt der Fokus zurück.</summary>
+    [AvaloniaFact]
+    public void DialogTrapsFocusAndRestoresItAfterwards()
+    {
+        var (w, vm) = Open();
+        var start = Assert.IsType<StartViewModel>(vm.Screen);
+        var newGame = w.GetVisualDescendants().OfType<Button>().First(b => b.Command == start.NewGameCommand);
+        newGame.Focus();
+        Pump();
+        vm.ShowDialog(new MessageDialogViewModel("Hinweis", new[] { "Zeile" }));
+        Pump();
+        Assert.False(newGame.IsEffectivelyEnabled);
+        var focused = w.FocusManager!.GetFocusedElement() as Avalonia.Visual;
+        Assert.NotNull(focused);
+        Assert.Contains(focused!.GetVisualAncestors(), a => a is ContentControl { Name: "DialogHost" });
+        vm.CloseDialog();
+        Pump();
+        Assert.True(newGame.IsEffectivelyEnabled);
+        Assert.Same(newGame, w.FocusManager.GetFocusedElement());
+    }
+
+    /// <summary>Schließen mit ungespeichertem Fortschritt fragt nach; „Weiterspielen“ lässt das Fenster offen.</summary>
+    [AvaloniaFact]
+    public void ClosingWithUnsavedProgressAsksFirst()
+    {
+        var (w, vm) = Open();
+        var shell = StartGame(vm);
+        Assert.False(AppState.Current.HasUnsavedProgress); // neues Spiel: noch nichts verloren
+        var session = AppState.Current.Session!;
+        var day = session.World.Date;
+        for (var i = 0; i < 50 && session.World.Date == day; i++)
+        {
+            var r = session.Advance(1);
+            if (r.Reason == StopReason.Decision) session.DelegateDecisions();
+            if (r.Reason == StopReason.HumanMatch && r.Fixture is { } f) session.PlayInstant(f);
+        }
+        Assert.True(AppState.Current.HasUnsavedProgress);
+
+        w.Close();
+        Pump();
+        Assert.True(w.IsVisible);
+        var ask = Assert.IsType<ChoiceDialogViewModel>(vm.Dialog);
+        Assert.Equal(3, ask.Options.Count);
+        ask.ChooseCommand.Execute(ask.Options[2]); // weiterspielen
+        Pump();
+        Assert.True(w.IsVisible);
+        Assert.Null(vm.Dialog);
+
+        // Nach dem Speichern schließt das Fenster ohne Rückfrage.
+        shell.SaveCommand.Execute(null);
+        Assert.False(AppState.Current.HasUnsavedProgress);
+        w.Close();
+        Pump();
+        Assert.False(w.IsVisible);
+    }
 }

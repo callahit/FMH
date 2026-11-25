@@ -32,14 +32,14 @@ public sealed partial class MatchViewModel
         if (int.TryParse(value, out var s)) Speed = s;
     }
 
+    /// <summary>Im Szenenmodus läuft der Szenentext im Tickerbereich; Umschalten gibt es dort nicht.</summary>
+    public bool CanToggleTicker => Profile.MatchDisplay != MatchDisplayMode.Scene;
+
+    /// <summary>Einziger Weg, den Tickermodus zu wechseln (Knopf und Taste M); der Knopf zeigt den Zustand nur an.</summary>
     [RelayCommand]
     private void ToggleTicker()
     {
-        if (Profile.MatchDisplay == MatchDisplayMode.Scene)
-        {
-            TickerMode = true;
-            return;
-        }
+        if (!CanToggleTicker) return;
         TickerMode = !TickerMode;
         if (!_conference) Profile.MatchDisplay = TickerMode ? MatchDisplayMode.Ticker : MatchDisplayMode.Commentary;
     }
