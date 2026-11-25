@@ -142,6 +142,21 @@ public sealed class GrayZonesTests
         Assert.DoesNotContain(s.World.Messages, m => m.SubjectRef?.Key == "gray.detected.subject");
     }
 
+    /// <summary>Ältere Taten ohne Verein (Spielstände vor dem Feld) gelten, wenn das Spiel den jetzigen Verein betrifft.</summary>
+    [Fact]
+    public void DeedWithoutClubFromAnOlderSaveStillCountsForTheOwnMatch()
+    {
+        var s = Session(Always.Value, 1322);
+        s.Advance(1);
+        var target = s.GrayZoneFixture!;
+        Assert.Null(s.UseGrayZone("doping"));
+        var deed = s.GrayZoneFile!.Deeds.Single();
+        deed.ClubId = 0;
+        s.PlayInstant(UntilMatch(s, target.Id));
+        Assert.True(deed.Detected);
+        Assert.Equal(1, s.GrayZoneFile.Detected);
+    }
+
     [Fact]
     public void ContractTrickLowersTheDemandOrBackfires()
     {
