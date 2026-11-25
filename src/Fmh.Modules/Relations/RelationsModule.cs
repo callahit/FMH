@@ -114,7 +114,7 @@ public sealed partial class RelationsModule : GameModule, IRelationsService
         // Vereinserfolg gegen Saisonziel.
         if (league is not null)
         {
-            table ??= TableOf(league);
+            table ??= LeagueTable.Compute(league);
             var pos = table.FindIndex(r => r.ClubId == club.Id) + 1;
             if (pos > 0)
             {
@@ -175,25 +175,11 @@ public sealed partial class RelationsModule : GameModule, IRelationsService
         return ix.ByPlayer[playerId];
     }
 
-    // Tabelle je Liga, bis sich Datum, gespielte Spiele, Abzüge, Phasen oder Teilnehmer ändern (nach jedem Spiel
-    // rechnen beide Vereine neu, montags die ganze Liga).
-    private readonly Dictionary<string, ((DateOnly, int, int, int, int, int) Key, List<TableRow> Rows)> _tables = new();
-
-    private List<TableRow> TableOf(League league)
-    {
-        var key = (World.Date, league.Fixtures.Count(f => f.Result is not null), league.Deductions.Count,
-            league.Deductions.Values.Sum(), league.PhasesScheduled, league.ClubIds.Count);
-        if (_tables.TryGetValue(league.Id, out var cached) && cached.Key == key) return cached.Rows;
-        var rows = LeagueTable.Compute(league);
-        _tables[league.Id] = (key, rows);
-        return rows;
-    }
-
     public void RecalculateClub(Club club)
     {
         var squad = World.SquadOf(club).Where(p => !p.IsYouth && !p.Retired).ToList();
         var league = World.FindLeague(club.LeagueId);
-        var table = league is null || squad.Count == 0 ? null : TableOf(league);
+        var table = league is null || squad.Count == 0 ? null : LeagueTable.Compute(league);
         foreach (var p in squad) Recalculate(p, table);
         var cr = ClubOf(club);
         cr.SquadMood = squad.Count == 0 ? 55 : squad.Average(p => Of(p).Satisfaction);
