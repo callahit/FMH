@@ -92,9 +92,6 @@ public static partial class Program
             m.Add(sim);
         }
         sw.Stop();
-        if (session.Profile is { } profile)
-            foreach (var (key, ms) in profile.OrderByDescending(k => k.Value))
-                Console.WriteLine($"Rechenzeit {key,-16} {ms / 1000:F1} s ({ms / sw.Elapsed.TotalMilliseconds:P0})");
 
         Console.WriteLine($"FMH Matchengine-Kalibrierung: {Fmt.Int(count)} Spiele (Ebene 1–{maxLevel}), Seed {seed}, {sw.Elapsed.TotalSeconds:F1} s ({sw.Elapsed.TotalMilliseconds / count:F2} ms/Spiel)");
         Console.WriteLine();
@@ -220,6 +217,9 @@ public static partial class Program
             }
         }
         sw.Stop();
+        if (session.Profile is { } profile)
+            foreach (var (key, ms) in profile.OrderByDescending(k => k.Value))
+                Console.WriteLine($"Rechenzeit {key,-16} {ms / 1000:F1} s ({ms / sw.Elapsed.TotalMilliseconds:P0})");
         Console.WriteLine($"{seasons} Saison(s) in {sw.Elapsed.TotalSeconds:F1} s, {matchdays} Spieltage des eigenen Vereins, langsamster Spieltag {slowest.TotalMilliseconds:F0} ms (Ziel < 5000 ms).");
         // Drift von Saisonende zu Saisonende (gleicher Zeitpunkt im Jahreslauf, Review F-07): Die erzeugte Startwelt hat volle
         // Kader, am ersten Tag nach einer Saison fehlen je nach Transferfenster noch die Neuzugänge. Mit nur einer Saison
