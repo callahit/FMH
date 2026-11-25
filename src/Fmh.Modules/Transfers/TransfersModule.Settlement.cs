@@ -106,7 +106,9 @@ public sealed partial class TransfersModule
         }
         if (contract.SigningFee > 0) Finance.Book(buyer, TransactionType.SigningFee, -contract.SigningFee, TR("tx.signingFee", p.Name));
 
-        if (offer.SwapPlayerId is { } swapId && seller is not null && World.Players.TryGetValue(swapId, out var swap))
+        // Zwischen Angebot und Abschluss kann der Tauschspieler gewechselt sein: nur ein eigener Spieler wechselt mit.
+        if (offer.SwapPlayerId is { } swapId && seller is not null && World.Players.TryGetValue(swapId, out var swap)
+            && swap.ClubId == buyer.Id && swap.Loan is null && !swap.Retired)
         {
             Season.RemoveFromClub(swap);
             swap.ClubId = seller.Id;
@@ -209,6 +211,8 @@ public sealed partial class TransfersModule
     public void ExpireContractsAndLoans()
     {
         var today = World.Date;
+        // Karriereende während einer Leihe (ältere Spielstände): die Leihe endet, der Spieler kehrt nicht zurück.
+        foreach (var p in World.Players.Values.Where(p => p.Retired && p.Loan is not null).ToList()) EndLoanOnRetirement(p);
         foreach (var p in World.Players.Values.Where(p => p.Loan is not null && p.Loan.Until < today).ToList())
         {
             var loan = p.Loan!;
@@ -259,6 +263,14 @@ public sealed partial class TransfersModule
     }
 
     /// <summary>Vereinslose ohne Perspektive beenden ihre Laufbahn (auch freigegebene Jugendspieler unterhalb des Amateurniveaus).</summary>
+    /// <summary>Karriereende eines Leihspielers: die Leihe endet ohne Rückkehr zum Stammverein.</summary>
+    public void EndLoanOnRetirement(Player p)
+    {
+        if (p.Loan is null) return;
+        p.Loan = null;
+        _activeLoans = null;
+    }
+
     public void RetireFreeAgents()
     {
         var floor = PlayerGenerator.ClubLevel(1) - 2;

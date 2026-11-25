@@ -16,6 +16,8 @@ public sealed class GrayDeed
     public DateOnly Date { get; set; }
     /// <summary>Betroffenes Spiel (bei Spiel-Taten).</summary>
     public int? FixtureId { get; set; }
+    /// <summary>Verein des Managers bei der Tat (0 = unbekannt, ältere Spielstände). Nach einem Vereinswechsel verfällt die Tat.</summary>
+    public int ClubId { get; set; }
     /// <summary>Betroffener Spieler (Vertragstrick).</summary>
     public int? PlayerId { get; set; }
     /// <summary>Gedopte Spieler (Startelf und Bank des Spiels).</summary>

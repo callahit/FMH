@@ -52,12 +52,12 @@ public sealed class GrayZonesModule : GameModule
             if (NextFixture() is not { } f) return "gray.error.noFixture";
             if (file?.Deeds.Any(d => d.FixtureId == f.Id) == true) return "gray.error.planned";
             Pay(club, cost);
-            File().Deeds.Add(new GrayDeed { Action = action.Id, Date = World.Date, FixtureId = f.Id });
+            File().Deeds.Add(new GrayDeed { Action = action.Id, Date = World.Date, FixtureId = f.Id, ClubId = club.Id });
             return null;
         }
         if (negotiation is not { WageDemand: { } demand } n || n.BuyerId != club.Id) return "gray.error.noNegotiation";
         Pay(club, cost);
-        var deed = new GrayDeed { Action = action.Id, Date = World.Date, PlayerId = n.PlayerId };
+        var deed = new GrayDeed { Action = action.Id, Date = World.Date, PlayerId = n.PlayerId, ClubId = club.Id };
         File().Deeds.Add(deed);
         n.WageDemand = (int)Math.Round(demand * (1 - action.WageCut));
         if (Detect(action, deed, World.Date.DayNumber))
@@ -83,9 +83,16 @@ public sealed class GrayZonesModule : GameModule
     private GrayDeed? DeedFor(Fixture f) =>
         World.GrayZones.TryGetValue(HumanManager.Id, out var file) ? file.Deeds.FirstOrDefault(d => d.FixtureId == f.Id && !d.Resolved) : null;
 
+    /// <summary>
+    /// Gehört die Tat zum jetzigen Verein des Managers? Nach Entlassung oder Wechsel verfällt sie ohne Wirkung,
+    /// statt den neuen Verein zu bestrafen. Ältere Taten ohne Verein: das Spiel muss den jetzigen Verein betreffen.
+    /// </summary>
+    private bool BelongsToCurrentClub(GrayDeed deed, Fixture f) =>
+        !Board.AwaitingNewJob && (deed.ClubId != 0 ? deed.ClubId == HumanClub.Id : f.Involves(HumanClub.Id));
+
     private void Boost(Fixture f, IMatchSimulation sim)
     {
-        if (DeedFor(f) is not { } deed || !On || GrayZones.Find(Data.GrayZones!, deed.Action) is not { } action) return;
+        if (DeedFor(f) is not { } deed || !BelongsToCurrentClub(deed, f) || !On || GrayZones.Find(Data.GrayZones!, deed.Action) is not { } action) return;
         var team = sim.Home.Club.Id == HumanClub.Id ? sim.Home : sim.Away.Club.Id == HumanClub.Id ? sim.Away : null;
         if (team is null) return;
         foreach (var mp in team.OnPitch.Concat(team.Bench)) mp.DayForm += action.DayForm;
@@ -96,7 +103,7 @@ public sealed class GrayZonesModule : GameModule
     {
         if (f.Result is null || DeedFor(f) is not { } deed) return;
         deed.Resolved = true;
-        if (!On || GrayZones.Find(Data.GrayZones!, deed.Action) is not { } action) return;
+        if (!BelongsToCurrentClub(deed, f) || !On || GrayZones.Find(Data.GrayZones!, deed.Action) is not { } action) return;
         if (Detect(action, deed, f.Id)) Penalize(action, deed, f);
     }
 

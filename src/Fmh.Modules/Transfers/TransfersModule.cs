@@ -101,7 +101,10 @@ public sealed partial class TransfersModule : GameModule, ITransfersService
         if ((n.Type is DealType.Transfer or DealType.Loan) && !Season.IsTransferWindowOpen(buyer))
             return new(ResponseKind.Reject, "neg.error.window");
         var seller = World.Clubs[sellerId];
-        if (offer.SwapPlayerId is { } swap && World.Players[swap].ClubId != buyer.Id) return new(ResponseKind.Reject, "neg.error.swap");
+        // Tauschspieler: eigener Spieler (kein Leihspieler eines anderen Vereins) und nicht der umworbene Spieler selbst.
+        if (offer.SwapPlayerId is { } swap && (!World.Players.TryGetValue(swap, out var sp) || sp.ClubId != buyer.Id
+                                               || sp.Loan is not null || sp.Retired || swap == p.Id))
+            return new(ResponseKind.Reject, "neg.error.swap");
         offer.InstallmentYears = Math.Clamp(offer.InstallmentYears, 0, 3);
         offer.InstallmentCount = Math.Clamp(offer.InstallmentCount, 0, TransferTerms.MaxInstallments);
         offer.DownPayment = Math.Max(0, offer.DownPayment);
