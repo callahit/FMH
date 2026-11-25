@@ -153,7 +153,7 @@ internal static class WorldFingerprint
             ["messages"] = J(w.Messages),
             ["transfers"] = J(new { w.Transfers, w.Transactions, w.Installments, w.TransferConditions, w.ContractHistory, w.Clauses, w.PreemptionOffers, w.Negotiations, w.NegotiationLocks }),
             ["scouting"] = J(new { w.Scouts, w.ScoutAssignments, w.ScoutReports, w.Knowledge }),
-            ["environment"] = J(new { w.Staff, w.Events, w.EventHistory, w.PendingPress, w.EuropeanEntries, w.CountryCoefficients, w.ClubCoefficients }),
+            ["environment"] = J(new { w.Staff, w.Events, w.EventHistory, w.PendingPress, w.EuropeanEntries, w.CountryCoefficients, w.ClubCoefficients, w.Coefficients }),
             ["relations"] = J(new { w.PlayerRelations, w.Promises, w.ClubRelations, w.Agents, w.PlayerAgents }),
             ["internationals"] = J(new { w.NationalTeams, w.InternationalFixtures, w.InternationalWindows, Caps = w.Caps.OrderBy(kv => kv.Key), w.Tournaments }),
             ["friendlies"] = J(new { w.Friendlies, w.SummerTournaments }),

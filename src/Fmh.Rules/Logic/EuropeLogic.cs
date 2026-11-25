@@ -30,14 +30,24 @@ public static partial class EuropeLogic
 
     public static void EnsureCoefficients(World world, EuropeFormat format)
     {
+        // Neue Länder und Vereine: Startwert ist zugleich ihr Grundwert im Fünfjahresfenster.
+        var window = world.Coefficients;
+        var fresh = window.CountryBase.Count == 0 && window.ClubBase.Count == 0 && world.CountryCoefficients.Count == 0;
         foreach (var c in world.Countries)
             if (!world.CountryCoefficients.ContainsKey(c.Code))
-                world.CountryCoefficients[c.Code] = format.Access.DefaultCountryScore
+            {
+                var start = format.Access.DefaultCountryScore
                     + world.Clubs.Values.Where(cl => cl.CountryCode == c.Code && world.FindLeague(cl.LeagueId)?.Level == 1)
                         .Select(cl => cl.Reputation).DefaultIfEmpty(10).Average() * 0.4;
+                world.CountryCoefficients[c.Code] = start;
+                if (fresh || window.CountryBase.Count > 0) window.CountryBase[c.Code] = start;
+            }
         foreach (var club in world.Clubs.Values)
             if (!world.ClubCoefficients.ContainsKey(club.Id))
+            {
                 world.ClubCoefficients[club.Id] = club.Reputation * 2.5;
+                if (fresh || window.ClubBase.Count > 0) window.ClubBase[club.Id] = club.Reputation * 2.5;
+            }
     }
 
     /// <summary>Einstiegs-Stufen-Id für einen Qualifikanten.</summary>
@@ -59,6 +69,7 @@ public static partial class EuropeLogic
     {
         if (data.Europe is not { } format) return new();
         EnsureCoefficients(world, format);
+        RollCoefficients(world, format);
         var ranks = CountryRanks(world, format);
         var created = new List<Cup>();
         foreach (var comp in format.Competitions)

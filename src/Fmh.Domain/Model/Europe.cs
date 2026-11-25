@@ -77,3 +77,23 @@ public sealed class StadiumDesign
     public bool Roof { get; set; } = true;
     public string Name { get; set; } = "";
 }
+
+/// <summary>
+/// Koeffizienten-Fenster (Review I-1): Grundwert je Land und Verein plus die Zugewinne der letzten Spielzeiten.
+/// Der laufende Koeffizient ist Grundwert + Zugewinne der Fensterjahre (inklusive laufender Saison).
+/// </summary>
+public sealed class CoefficientWindow
+{
+    public Dictionary<string, double> CountryBase { get; set; } = new();
+    public Dictionary<int, double> ClubBase { get; set; } = new();
+    /// <summary>Abgeschlossene Spielzeiten, älteste zuerst (höchstens Fensterjahre minus eins).</summary>
+    public List<CoefficientSeason> Seasons { get; set; } = new();
+}
+
+/// <summary>Zugewinne einer abgeschlossenen Europapokal-Saison.</summary>
+public sealed class CoefficientSeason
+{
+    public int SeasonYear { get; set; }
+    public Dictionary<string, double> Countries { get; set; } = new();
+    public Dictionary<int, double> Clubs { get; set; } = new();
+}

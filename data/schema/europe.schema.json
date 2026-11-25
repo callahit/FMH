@@ -89,6 +89,10 @@
             "description": "Wie viele Teams aus der Ligaphase in die K.-o.-Runde einziehen (Zweierpotenz).",
             "type": "integer"
           },
+          "leagueMatchdays": {
+            "description": "Höchstzahl Spieltage der Ligaphase. Alle Qualifikanten spielen mit; ist das Feld größer, spielt jeder Verein so viele Runden gegen verschiedene Gegner (Ausschnitt eines Jeder-gegen-jeden-Plans), sonst jeder gegen jeden.",
+            "type": "integer"
+          },
           "stages": {
             "items": {
               "additionalProperties": false,
@@ -122,10 +126,6 @@
               "type": "object"
             },
             "type": "array"
-          },
-          "targetLeagueSize": {
-            "description": "Zielgröße der Ligaphase; bei weniger Teilnehmern wird verkleinert (gerade Zahl).",
-            "type": "integer"
           }
         },
         "type": "object"
