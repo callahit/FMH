@@ -177,7 +177,7 @@ public sealed partial class RelationsModule : GameModule, IRelationsService
 
     // Tabelle je Liga, bis sich Datum, gespielte Spiele, Abzüge, Phasen oder Teilnehmer ändern (nach jedem Spiel
     // rechnen beide Vereine neu, montags die ganze Liga).
-    private readonly Dictionary<int, ((DateOnly, int, int, int, int, int) Key, List<TableRow> Rows)> _tables = new();
+    private readonly Dictionary<string, ((DateOnly, int, int, int, int, int) Key, List<TableRow> Rows)> _tables = new();
 
     private List<TableRow> TableOf(League league)
     {
