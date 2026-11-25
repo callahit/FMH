@@ -230,6 +230,7 @@ public sealed partial class MatchViewModel : ViewModelBase
         _commentary = new CommentaryGenerator(Data, _sim);
         _narrator = scene && !instant ? new SceneCommentary(Data, _sim) : null;
         TickerMode = scene || Profile.MatchDisplay is MatchDisplayMode.Ticker or MatchDisplayMode.Conference;
+        OnPropertyChanged(nameof(CanToggleTicker));
         _conference = Profile.MatchDisplay == MatchDisplayMode.Conference;
         // Konferenz: die übrigen Spiele werden vorab berechnet und minutengenau aufgedeckt.
         if (_conference) Session.PlayOtherFixturesToday();

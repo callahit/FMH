@@ -220,4 +220,53 @@ public partial class UiTests
         Pump();
         Assert.IsType<LeaguePageViewModel>(shell.Page);
     }
+    /// <summary>Enter auf einer fokussierten Schaltfläche löst sie aus, nicht das Kürzel des Bildschirms.</summary>
+    [AvaloniaFact]
+    public void EnterActivatesTheFocusedButtonInsteadOfTheScreenShortcut()
+    {
+        var (w, vm) = Open();
+        var shell = StartGame(vm);
+        shell.SaveCommand.Execute(null);
+        vm.Navigate(new StartViewModel(vm));
+        Pump();
+        var start = Assert.IsType<StartViewModel>(vm.Screen);
+        Assert.NotEmpty(start.Saves); // ohne Fokus lädt Enter den neuesten Spielstand
+        var newGame = w.GetVisualDescendants().OfType<Button>().First(b => b.Command == start.NewGameCommand);
+        newGame.Focus();
+        Pump();
+        w.KeyPress(Key.Enter, RawInputModifiers.None, PhysicalKey.Enter, null);
+        Pump();
+        Assert.IsType<NewGameViewModel>(vm.Screen);
+    }
+
+    /// <summary>Der Ticker-Knopf schaltet genau einmal um (vorher hoben Bindung und Kommando sich auf).</summary>
+    [AvaloniaFact]
+    public void TickerButtonTogglesOnceAndShowsTheState()
+    {
+        var (w, vm) = Open();
+        var shell = StartGame(vm);
+        var s = AppState.Current.Session!;
+        s.HumanManager.Profile.MatchDisplay = MatchDisplayMode.Commentary;
+        var fixture = s.World.AllMatches.Where(f => f.Result is null && f.Involves(s.HumanClub.Id)).OrderBy(f => f.Date).First();
+        var match = new MatchViewModel(vm, shell, fixture);
+        vm.Navigate(match);
+        match.KickoffCommand.Execute(null);
+        Pump();
+        Assert.False(match.TickerMode);
+        var toggle = w.GetVisualDescendants().OfType<Avalonia.Controls.Primitives.ToggleButton>().First(b => b.Command == match.ToggleTickerCommand);
+        Assert.True(toggle.IsEnabled);
+        toggle.Focus();
+        Pump();
+        w.KeyPress(Key.Space, RawInputModifiers.None, PhysicalKey.Space, null);
+        w.KeyRelease(Key.Space, RawInputModifiers.None, PhysicalKey.Space, null);
+        Pump();
+        Assert.True(match.TickerMode);
+        Assert.True(toggle.IsChecked);
+        Assert.Equal(MatchDisplayMode.Ticker, s.HumanManager.Profile.MatchDisplay);
+        // Taste M schaltet zurück, der Knopf zeigt es an.
+        match.ToggleTickerCommand.Execute(null);
+        Pump();
+        Assert.False(match.TickerMode);
+        Assert.False(toggle.IsChecked);
+    }
 }
