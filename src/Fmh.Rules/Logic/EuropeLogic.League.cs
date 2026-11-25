@@ -7,28 +7,16 @@ public static partial class EuropeLogic
 {
     public static void ScheduleLeague(World world, GameData data, Cup cup, CupRound round, List<int> teams, Rng rng)
     {
-        var target = data.Europe?.Competition(cup.Id)?.TargetLeagueSize ?? 8;
-        if (target % 2 == 1) target--;
+        // Review C-1: Kein Qualifikant fällt heraus; große Felder spielen höchstens leagueMatchdays Spieltage.
+        var matchdays = Math.Max(1, data.Europe?.Competition(cup.Id)?.LeagueMatchdays ?? 8);
         var pool = teams.Distinct().ToList();
-        if (pool.Count > target)
-            pool = pool
-                .OrderByDescending(id => world.ClubCoefficients.GetValueOrDefault(id, world.Clubs[id].Reputation))
-                .ThenBy(id => id)
-                .Take(target)
-                .ToList();
-        if (pool.Count % 2 == 1)
-            pool = pool
-                .OrderByDescending(id => world.ClubCoefficients.GetValueOrDefault(id, world.Clubs[id].Reputation))
-                .ThenBy(id => id)
-                .Take(pool.Count - 1)
-                .ToList();
         if (pool.Count < 2) return;
 
         round.Entrants = pool;
         round.Teams = pool.Count;
         foreach (var id in pool) TouchEntry(world, cup.Id, id, round.Number - 1, eliminated: false);
 
-        var days = ScheduleGenerator.RoundRobin(pool, rounds: 1, rng);
+        var days = ScheduleGenerator.RoundRobin(pool, rounds: 1, rng).Take(matchdays).ToList();
         var dates = LeagueDates(round, days.Count, world.SeasonYear);
         for (var d = 0; d < days.Count; d++)
         {
