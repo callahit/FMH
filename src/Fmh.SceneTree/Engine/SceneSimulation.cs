@@ -33,7 +33,9 @@ public sealed partial class SceneSimulation : IMatchSimulation
     private bool _kickScored;
     private CardPending _pendingCard;
     private MatchPlayer? _cardPlayer, _victim, _injuryPlayer, _lastAttacker;
-    private double _extraStoppage;
+    private string? _heldCheer;
+    private MatchPlayer? _ejectAfterIncident;
+    private MatchPlayer? _injureAfterIncident;
     private readonly List<PlannedIncident> _plan = new();
     private readonly List<string> _rareTags = new();
     private byte _reason;
@@ -155,9 +157,12 @@ public sealed partial class SceneSimulation : IMatchSimulation
         _clock += minutes * 60;
         Team(_attack).Stats.PossessionSeconds += minutes * 60;
         if (_stoppage >= 0 || _clock < PeriodSeconds) return;
+        var rare = PlannedRareStoppage();
         var max = _period switch { 1 => 4, 2 => 6, 3 => 2, _ => 3 };
         var min = _period >= 3 ? 0 : 1;
-        _stoppage = (int)Math.Clamp(Math.Round(0.6 + _extraStoppage + _rng.Range(0, 1.4)), min, Math.Max(max, Math.Min(12, max + _extraStoppage)));
+        // Unterbrechungen dieser Halbzeit zählen mit, auch wenn der Text erst nach der Ansage kommt.
+        var cap = Math.Max(max, Math.Min(12, max + rare));
+        _stoppage = (int)Math.Clamp(Math.Round(0.6 + rare + _rng.Range(0, 1.4)), min, cap);
         if (_stoppage > 0) Emit(MatchEventType.Stoppage, _attack, value: _stoppage, key: true);
     }
 

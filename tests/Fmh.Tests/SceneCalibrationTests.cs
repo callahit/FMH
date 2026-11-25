@@ -8,7 +8,7 @@ namespace Fmh.Tests;
 
 /// <summary>
 /// 1.000 Textmodus-Spiele gegen die schnelle Engine. Die Gewichte stehen in <see cref="SceneWeightOptions.Default"/>.
-/// Toleranzen sind bewusst grob: der Baum entscheidet den Ablauf, die Formel ist eine Kalibrierung.
+/// Toleranz je Kennzahl ±10 % gegen die schnelle Engine. Die Formel bleibt eine Kalibrierung.
 /// </summary>
 public class SceneCalibrationTests
 {
@@ -98,17 +98,17 @@ public class SceneCalibrationTests
         _out.WriteLine($"Ecken {sc:0.00} (schnell {fc:0.00}), Fouls {sf:0.00} (schnell {ff:0.00}), Abseits {soff:0.00} (schnell {foff:0.00})");
         _out.WriteLine($"Gelb {sy:0.00} (schnell {fy:0.00}), Rot {sr:0.00} (schnell {fr:0.00}), Verletzungen {inj:0.00} (schnell {finj:0.00})");
 
-        // Etwa ±13 % der schnellen Engine. Seltene Ereignisse (Rot, Verletzung) etwas weiter, weil die Stichprobe klein ist.
-        Near(sg, fg, 0.13);
-        Near(ss, fs, 0.13);
-        Near(so, fo, 0.13);
-        Near(sx, fx, 0.13);
-        Near(sc, fc, 0.13);
-        Near(sf, ff, 0.13);
-        Near(soff, foff, 0.13);
-        Near(sy, fy, 0.13);
-        Near(sr, fr, 0.20);
-        Near(inj, finj, 0.20);
+        // Abnahmeziel etwa ±10 % je Kennzahl, feste Seeds, deshalb ohne Extra-Band für seltene Ereignisse.
+        Near(sg, fg, 0.10);
+        Near(ss, fs, 0.10);
+        Near(so, fo, 0.10);
+        Near(sx, fx, 0.10);
+        Near(sc, fc, 0.10);
+        Near(sf, ff, 0.10);
+        Near(soff, foff, 0.10);
+        Near(sy, fy, 0.10);
+        Near(sr, fr, 0.10);
+        Near(inj, finj, 0.10);
     }
 
     private static void Near(double actual, double expected, double tolerance)

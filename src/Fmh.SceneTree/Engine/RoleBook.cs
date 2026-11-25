@@ -70,8 +70,8 @@ public sealed class RoleBook
 
     public MatchPlayer? Find(int code, int index)
     {
-        if (!_roles.TryGetValue(code, out var list) || list.Count == 0) return null;
-        return index >= 0 && index < list.Count ? list[index] : list[^1];
+        if (!_roles.TryGetValue(code, out var list) || list.Count == 0 || index < 0 || index >= list.Count) return null;
+        return list[index];
     }
 
     public MatchPlayer? Find(RoleRef role, int index) => role.IsEmpty ? null : Find(role.Code, index);
