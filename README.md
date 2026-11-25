@@ -177,6 +177,8 @@ Kosten und Geldstrafen gelten für einen Erstligisten und schrumpfen mit kleiner
   Aufdeckung entscheidet sich nach dem Abpfiff. Der Zufall läuft über einen eigenen Strom, sodass ein Spiel ohne Taten
   unverändert bleibt.
 - **Entlassung:** Nach drei aufgeflogenen Taten entlässt der Vorstand den Manager.
+- **Vereinswechsel:** Eine Tat gehört zum Verein, bei dem der Manager sie begangen hat. Nach Entlassung oder Wechsel
+  verfällt eine noch offene Tat ohne Wirkung; der neue Verein wird nicht bestraft.
 - **Bedienung:** Der Dialog „Grauzonen …“ auf der Vereinsseite unter „Karriere“ führt die Spiel-Taten. Der Vertragstrick
   ist ein eigener Knopf in der Spielerphase einer Verhandlung.
 - **Ereignisse:** Fünf weitere Ereignisse rund um Bestechung und Beraterangebote.
@@ -201,10 +203,13 @@ Kosten und Geldstrafen gelten für einen Erstligisten und schrumpfen mit kleiner
     durch den Verkäufer. Am letzten Fenstertag (Deadline Day) gibt es einen Ticker und dringende KI-Käufe.
     Verhandlungen lassen sich an den Sportdirektor mit Höchstablöse und Höchstgehalt delegieren
     (Bericht im Posteingang).
-    - mit dem Verein: Ablöse, Raten, Weiterverkaufsbeteiligung, Tauschspieler;
+    - mit dem Verein: Ablöse, Raten, Weiterverkaufsbeteiligung, Tauschspieler (nur eigene Spieler, keine Leihspieler
+      und nicht der umworbene Spieler selbst);
     - mit dem Spieler: Laufzeit, Gehalt, Handgeld, Prämien, Ausstiegsklausel, Auf- und Abstiegsklausel
       (Gehalt −% bei Abstieg, +% bei Aufstieg), jährliche Erhöhung, Kaderstatus.
-  - Leihen mit Gehaltsanteil, Kaufoption oder -pflicht und Rückholklausel.
+  - Leihen mit Gehaltsanteil, Kaufoption oder -pflicht und Rückholklausel. Beendet ein Leihspieler seine Karriere,
+    endet die Leihe; er kehrt nicht zum Stammverein zurück.
+  - Ein Spieler bewertet einen Käufer höher, wenn der angebotene Kaderstatus mindestens dem erwarteten entspricht.
   - Vorverträge, ablösefreie Spieler, Vertragsverlängerungen und Beraterhonorar.
   - Verweigerungsgründe: Reputation, Liga, Konkurrenz, Vereinstreue.
   - Die KI kauft, verleiht, sichert sich Vorverträge und bietet für eigene Spieler; solche Angebote

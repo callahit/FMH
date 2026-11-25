@@ -256,7 +256,8 @@ public static class Negotiations
             _ => 0.7,
         };
         return buyer.Reputation * 10 + role * 20 + n.Contract.WeeklyWage / 1000.0
-               + (ExpectedStatus(p, buyer, world, data) <= status ? 5 : 0);
+               // Bonus, wenn der angebotene Status mindestens dem erwarteten entspricht (Star = 0 ist der höchste).
+               + (status <= ExpectedStatus(p, buyer, world, data) ? 5 : 0);
     }
 
     public static bool CanSubmitClub(Negotiation n) =>

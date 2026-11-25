@@ -13,6 +13,8 @@ public interface ITransfersService
     Contract MakeContract(ContractOffer o, DateOnly start, Club club);
     /// <summary>Vertrag setzen und die bisherige Fassung in der Historie behalten.</summary>
     void SetContract(Player p, Contract? next, int? previousClubId = null, int dealId = 0);
+    /// <summary>Karriereende eines Leihspielers: die Leihe endet ohne Rückkehr zum Stammverein.</summary>
+    void EndLoanOnRetirement(Player p);
     /// <summary>Zum Saisonwechsel: Verträge enden, Vorverträge greifen, Leihen laufen aus.</summary>
     void ExpireContractsAndLoans();
     void EnforceSquadLimits();

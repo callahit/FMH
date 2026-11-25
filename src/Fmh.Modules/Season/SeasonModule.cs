@@ -228,6 +228,7 @@ public sealed partial class SeasonModule : GameModule, ISeasonService
         {
             Transfers.SetContract(p, null);
             RemoveFromClub(p);
+            Transfers.EndLoanOnRetirement(p);
             p.Retired = true;
             if (club.Id == HumanClub.Id)
                 Notify(MessageType.Info, "msg.sender.assistant",
