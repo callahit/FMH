@@ -104,6 +104,24 @@ public sealed class EditorScenesUiTests : IDisposable
         Assert.Equal(count + 1, scenes.SceneCount);
         Assert.Equal(header.Id + ".copy", scenes.Selected!.Id);
         Assert.Equal(header.Steps.Count, scenes.Selected.Steps.Count);
+        // Die Kopie hat eigene Textschlüssel mit denselben Texten; Ändern der Kopie lässt das Original stehen.
+        var copied = scenes.Selected;
+        Assert.All(copied.Steps.Zip(header.Steps), p =>
+        {
+            Assert.NotEqual(p.Second.Key, p.First.Key);
+            Assert.Equal(p.Second["de"], p.First["de"]);
+        });
+        var originalText = header.Steps[0]["de"];
+        copied.Steps[0].Texts.Single(t => t.Language == "de").Text = "Nur in der Kopie";
+        Assert.Equal(originalText, header.Steps[0]["de"]);
+        // Kopieren ist ein Schritt für Rückgängig: Szene und Texte verschwinden zusammen.
+        var copyKey = copied.Steps[0].Key;
+        ws.UndoCommand.Execute(null);
+        ws.UndoCommand.Execute(null);
+        Assert.Equal(count, scenes.SceneCount);
+        Assert.Null((ws.Workspace.Document("lang/de.scenes.json") as JsonObject)?[copyKey]);
+        ws.RedoCommand.Execute(null);
+        Assert.Equal(count + 1, scenes.SceneCount);
         scenes.Selected = scenes.Items.First(i => i.Id == header.Id);
         Pump();
         var frame = window.CaptureRenderedFrame();

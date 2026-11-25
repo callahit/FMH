@@ -940,6 +940,8 @@ noch offen.
   - Ein neues Paket baut auf den angehakten Paketen auf (`dependsOn`). Im Manifest steht `"createdWith": "fmh-editor"`.
   - Ins Paket kommen nur geänderte Dateien. Sprachdateien enthalten nur die geänderten Texte, weil das Spiel sie
     schlüsselweise zusammenführt.
+  - Gespeichert wird in den Ordner, aus dem das Paket kommt. Die Paket-Id darf nur Buchstaben, Ziffern, `-` und `_`
+    enthalten; ein Paket mit anderer Id öffnet der Editor nicht, und keine Datei landet außerhalb des Paketordners.
 - **Bereiche:**
   - Paket: Name, Version, geänderte Dateien.
   - Länder und Wettbewerbe:
@@ -960,7 +962,11 @@ noch offen.
     Rechts stehen Ereignisse, Gewicht und Bedingungen als Formular (Minute, Spielstand, Wetter, Flutlicht, xG,
     Attribute wie `Finishing>=15`). Darunter die Zeilen mit Textschlüssel, Chance und den Varianten je Sprache, eine
     Variante je Zeile. Fehlende Übersetzungen und abweichende Platzhalter sind markiert. Szenen lassen sich kopieren
-    und löschen, Zeilen hinzufügen und entfernen.
+    und löschen, Zeilen hinzufügen und entfernen. Eine Kopie bekommt eigene Textschlüssel mit den Texten des
+    Originals, sodass das Bearbeiten der Kopie das Original nicht ändert.
+    - Die Datenprüfung (Spielstart und Editor) prüft den Szenenkatalog: eindeutige Kennungen, Ereignisse, Gewichte,
+      Wahrscheinlichkeiten, Minuten- und Attributgrenzen und zu jeder Zeile Text in der Standardsprache. Fehlt eine
+      Übersetzung in einer anderen Sprache, erzählt das Spiel dort die einfache Kommentarzeile.
   - Regeln und Inhalte: jede Datendatei als Baum. Werte behalten ihren Typ, ungültige Zahlen werden abgewiesen.
     Listen bekommen neue Einträge als Kopie des letzten, Objekte neue Felder (Zahl, Wahrheitswert, `[]`, `{}` oder
     Text), und jeder Eintrag lässt sich entfernen. Mit Schema zeigt der Feldname die Beschreibung, „+ Feld“ schlägt

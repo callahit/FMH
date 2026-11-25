@@ -20,7 +20,12 @@ public sealed class PackageWorkspace
 
     public string DataRoot { get; }
     public PackageManifest Manifest { get; }
-    public string PackageDirectory => Path.Combine(DataRoot, Manifest.Id);
+    /// <summary>Ordner des Pakets: beim Öffnen der tatsächliche Ordner, bei einem neuen Paket DataRoot/Id.</summary>
+    public string PackageDirectory => string.IsNullOrEmpty(Manifest.Directory) ? Path.Combine(DataRoot, Manifest.Id) : Manifest.Directory;
+
+    /// <summary>Erlaubte Paket-Id: Buchstaben, Ziffern, '-' und '_' (kein Pfad, kein „..“).</summary>
+    public static bool IsValidId(string? id) =>
+        !string.IsNullOrWhiteSpace(id) && id.All(c => char.IsAsciiLetterOrDigit(c) || c is '-' or '_');
 
     /// <summary>Wird nach jeder Änderung, jedem Rückgängig und Wiederholen ausgelöst.</summary>
     public event Action? Changed;
@@ -50,7 +55,7 @@ public sealed class PackageWorkspace
     /// <summary>Legt ein neues, leeres Paket an (noch nicht gespeichert).</summary>
     public static PackageWorkspace Create(string dataRoot, string id, string name, IEnumerable<string> dependsOn)
     {
-        if (string.IsNullOrWhiteSpace(id) || id.Any(c => !(char.IsAsciiLetterOrDigit(c) || c is '-' or '_')))
+        if (!IsValidId(id))
             throw new ArgumentException("Paket-Id darf nur Buchstaben, Ziffern, '-' und '_' enthalten.", nameof(id));
         var all = Packages(dataRoot);
         if (all.Any(p => p.Id == id)) throw new InvalidOperationException($"Paket '{id}' gibt es schon.");
@@ -63,6 +68,9 @@ public sealed class PackageWorkspace
     {
         var all = Packages(dataRoot);
         var manifest = all.FirstOrDefault(p => p.Id == id) ?? throw new InvalidOperationException($"Paket '{id}' fehlt.");
+        // Die Id steht in der Datei des Pakets und landet in Pfaden (Probelauf, Validierung): nur erlaubte Zeichen.
+        if (!IsValidId(manifest.Id))
+            throw new InvalidOperationException($"Paket-Id '{manifest.Id}' ist ungültig (nur Buchstaben, Ziffern, '-' und '_').");
         if (manifest.CreatedWith != Tool)
             throw new InvalidOperationException($"Paket '{id}' wurde nicht mit dem Editor angelegt und bleibt unverändert. Lege ein eigenes Paket darüber an.");
         return new PackageWorkspace(dataRoot, manifest, Lower(all, manifest));
@@ -209,9 +217,13 @@ public sealed class PackageWorkspace
     {
         Directory.CreateDirectory(dir);
         CanonicalJson.Save(Path.Combine(dir, PackageLoader.ManifestFile), System.Text.Json.JsonSerializer.SerializeToNode(Manifest, Json.Options));
+        var root = Path.GetFullPath(dir).TrimEnd(Path.DirectorySeparatorChar) + Path.DirectorySeparatorChar;
         foreach (var rel in Files)
         {
-            var path = Path.Combine(dir, rel);
+            var path = Path.GetFullPath(Path.Combine(dir, rel));
+            // Jede Datei bleibt im Paketordner, auch bei einem präparierten relativen Pfad.
+            if (!path.StartsWith(root, StringComparison.Ordinal))
+                throw new InvalidOperationException($"Datei '{rel}' läge außerhalb des Pakets.");
             if (Packaged(rel) is { } content) CanonicalJson.Save(path, content);
             else if (File.Exists(path)) File.Delete(path);
         }

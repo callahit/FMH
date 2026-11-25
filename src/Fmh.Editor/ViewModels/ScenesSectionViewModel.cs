@@ -84,7 +84,11 @@ public sealed partial class ScenesSectionViewModel : SectionViewModel
 
     internal void Apply(JsonEdit edit) => Workspace.Apply(edit);
 
-    /// <summary>Neue Szene als Kopie der gewählten (oder leer), direkt dahinter.</summary>
+    /// <summary>
+    /// Neue Szene als Kopie der gewählten (oder leer), direkt dahinter. Die Zeilen der Kopie bekommen eigene
+    /// Textschlüssel mit kopierten Texten je Sprache; sonst änderte das Bearbeiten der Kopie auch das Original.
+    /// Alles ist ein Schritt für Rückgängig.
+    /// </summary>
     [RelayCommand]
     private void Add()
     {
@@ -93,11 +97,38 @@ public sealed partial class ScenesSectionViewModel : SectionViewModel
         var arr = Root[list] as JsonArray;
         var index = Selected is { } s ? s.Index + 1 : arr?.Count ?? 0;
         var copy = Selected?.Node.DeepClone() as JsonObject ?? new JsonObject { ["on"] = new JsonArray("kickoff"), ["steps"] = new JsonArray() };
-        copy["id"] = (copy["id"]?.ToString() ?? "scene") + ".copy";
-        if (arr is null) Apply(new SetValue(File, JsonPath.Root.Then(list), new JsonArray(copy)));
-        else Apply(new InsertItem(File, JsonPath.Root.Then(list), index, copy));
+        var oldId = copy["id"]?.ToString() ?? "scene";
+        var newId = oldId + ".copy";
+        copy["id"] = newId;
+        var edits = new List<JsonEdit>
+        {
+            arr is null ? new SetValue(File, JsonPath.Root.Then(list), new JsonArray(copy)) : new InsertItem(File, JsonPath.Root.Then(list), index, copy),
+        };
+        var taken = new HashSet<string>(StringComparer.Ordinal);
+        foreach (var language in Languages)
+            if (Workspace.Document($"lang/{language}.scenes.json") is JsonObject texts)
+                foreach (var (key, _) in texts) taken.Add(key);
+        if (copy["steps"] is JsonArray steps)
+            foreach (var step in steps.OfType<JsonObject>())
+            {
+                if (step["text"]?.ToString() is not { Length: > 0 } key) continue;
+                var fresh = FreshKey(key.Contains(oldId, StringComparison.Ordinal) ? key.Replace(oldId, newId, StringComparison.Ordinal) : key + ".copy", taken);
+                step["text"] = fresh;
+                foreach (var language in Languages)
+                    if (Texts(language, key) is { Count: > 0 } lines)
+                        edits.Add(new SetValue($"lang/{language}.scenes.json", JsonPath.Root.Then(fresh), lines.DeepClone()));
+            }
+        Apply(new EditBatch($"Szene {oldId} kopiert", edits));
         Rebuild();
         Selected = Items.FirstOrDefault(i => i.Rare == rare && i.Index == index);
+    }
+
+    /// <summary>Freier Textschlüssel: der gewünschte oder mit angehängter Nummer.</summary>
+    private static string FreshKey(string wanted, HashSet<string> taken)
+    {
+        var key = wanted;
+        for (var n = 2; !taken.Add(key); n++) key = wanted + n;
+        return key;
     }
 
     [RelayCommand]
