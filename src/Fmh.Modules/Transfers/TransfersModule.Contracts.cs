@@ -63,10 +63,16 @@ public sealed partial class TransfersModule
     /// Setzt den Vertrag des Spielers und schreibt die Historie. <paramref name="previousClubId"/> ist der Verein des
     /// bisherigen Vertrags, wenn der Spieler schon zum neuen Verein umgezogen wurde.
     /// </summary>
+    // Vertragshistorie und Klauseln wachsen mit jeder Saison; je Spieler indiziert statt bei jedem Vertrag ganz durchsucht.
+    private readonly AppendOnlyIndex<ContractRecord> _contractsByPlayer = new(c => c.PlayerId);
+    private readonly AppendOnlyIndex<Clause> _clausesByPlayer = new(c => c.PlayerId);
+
+    private IReadOnlyList<Clause> ClausesOf(int playerId) => _clausesByPlayer.Of(World.Clauses, playerId);
+
     public void SetContract(Player p, Contract? next, int? previousClubId = null, int dealId = 0)
     {
         if (ReferenceEquals(p.Contract, next)) return;
-        var previous = World.ContractHistory.LastOrDefault(c => c.PlayerId == p.Id && c.Current);
+        var previous = _contractsByPlayer.Of(World.ContractHistory, p.Id).LastOrDefault(c => c.Current);
         if (previous is null && p.Contract is { } old)
         {
             previous = new ContractRecord
@@ -99,7 +105,7 @@ public sealed partial class TransfersModule
 
     private void DeactivateContractClauses(int playerId)
     {
-        foreach (var c in World.Clauses.Where(c => c.PlayerId == playerId && c.Kind is ClauseKind.Release or ClauseKind.RelegationWage
+        foreach (var c in ClausesOf(playerId).Where(c => c.Kind is ClauseKind.Release or ClauseKind.RelegationWage
                      or ClauseKind.PromotionWage or ClauseKind.YearlyRaise or ClauseKind.ExtensionOption))
             c.Active = false;
     }
@@ -156,11 +162,11 @@ public sealed partial class TransfersModule
 
     /// <summary>Aktives Rückkaufrecht des angegebenen Vereins.</summary>
     public Clause? ActiveBuyBack(Player p, int clubId) =>
-        World.Clauses.FirstOrDefault(c => c.Active && c.Kind == ClauseKind.BuyBack && c.PlayerId == p.Id
+        ClausesOf(p.Id).FirstOrDefault(c => c.Active && c.Kind == ClauseKind.BuyBack
             && c.BeneficiaryClubId == clubId && (c.Until is null || c.Until >= World.Date));
 
     /// <summary>Aktives Vorkaufsrecht eines früheren Vereins.</summary>
     public Clause? ActivePreemption(Player p) =>
-        World.Clauses.FirstOrDefault(c => c.Active && c.Kind == ClauseKind.Preemption && c.PlayerId == p.Id
+        ClausesOf(p.Id).FirstOrDefault(c => c.Active && c.Kind == ClauseKind.Preemption
             && (c.Until is null || c.Until >= World.Date));
 }

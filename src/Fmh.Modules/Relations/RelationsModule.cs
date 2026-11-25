@@ -165,15 +165,10 @@ public sealed partial class RelationsModule : GameModule, IRelationsService
             p.State.Morale = (Morale)Math.Clamp((int)p.State.Morale + Math.Sign((int)targetMorale - (int)p.State.Morale), 0, 6);
     }
 
-    // Versprechen je Spieler; neu aufgebaut, wenn die Liste ersetzt oder ergänzt wurde (Einträge werden nie entfernt).
-    private (List<PlayerPromise> List, int Count, ILookup<int, PlayerPromise> ByPlayer)? _promiseIndex;
+    // Versprechen je Spieler (die Liste wächst mit jedem Vertrag); neue Einträge werden nachgetragen.
+    private readonly AppendOnlyIndex<PlayerPromise> _promisesByPlayer = new(x => x.PlayerId);
 
-    private IEnumerable<PlayerPromise> PromisesOf(int playerId)
-    {
-        if (_promiseIndex is not { } ix || !ReferenceEquals(ix.List, World.Promises) || ix.Count != World.Promises.Count)
-            _promiseIndex = ix = (World.Promises, World.Promises.Count, World.Promises.ToLookup(x => x.PlayerId));
-        return ix.ByPlayer[playerId];
-    }
+    private IReadOnlyList<PlayerPromise> PromisesOf(int playerId) => _promisesByPlayer.Of(World.Promises, playerId);
 
     public void RecalculateClub(Club club)
     {
