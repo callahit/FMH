@@ -51,6 +51,7 @@ public static class SceneValidator
         if (c.MinMinute > c.MaxMinute) errors.Add($"Szene '{id}': „minMinute“ liegt nach „maxMinute“.");
         if (c.MinXg > c.MaxXg) errors.Add($"Szene '{id}': „minXg“ liegt über „maxXg“.");
         if (c.MinRow > c.MaxRow) errors.Add($"Szene '{id}': „minRow“ liegt über „maxRow“.");
+        if (c.MinMargin > c.MaxMargin) errors.Add($"Szene '{id}': „minMargin“ liegt über „maxMargin“.");
         foreach (var a in (c.Attrs ?? new()).Concat(c.KeeperAttrs ?? new()).Where(a => a.Min > a.Max))
             errors.Add($"Szene '{id}': Attribut {a.Attr} hat Mindestwert über Höchstwert.");
     }

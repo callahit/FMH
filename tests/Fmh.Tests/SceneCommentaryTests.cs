@@ -10,7 +10,7 @@ namespace Fmh.Tests;
 public sealed partial class SceneCommentaryTests
 {
     private static readonly string[] Placeholders =
-        { "p", "o", "g", "mate", "def", "ref", "t", "other", "home", "away", "score", "side", "pens", "n", "m", "min" };
+        { "p", "o", "g", "k", "mate", "def", "ref", "t", "other", "home", "away", "score", "side", "pens", "n", "m", "min" };
 
     [GeneratedRegex(@"\{(\w+)\}")]
     private static partial Regex Placeholder();

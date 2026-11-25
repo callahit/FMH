@@ -91,7 +91,11 @@ Spielstand, und liegt in `settings.json` neben dem Spielstandordner.
 
 Der Darstellungsmodus „Textmodus“ erzählt ein angeschautes Spiel als Folge kleiner Szenen (Aufbau, Abschluss,
 Reaktion, seltene Szenen nach Wetter und Flutlicht). Ablauf und Bedingungen stehen in `data/base/rules/scenes.json`,
-die Texte je Sprache in `data/base/lang/<code>.scenes.json` (Deutsch und Englisch, 93 Bausteine mit 235 Varianten).
+die Texte je Sprache in `data/base/lang/<code>.scenes.json` (Deutsch und Englisch, 261 Bausteine mit 2.600 Varianten,
+also rund 2.600 verschiedene Sätze je Sprache in 451 Szenen und 29 seltenen Szenen). Szenen richten sich nach
+Spielsituation, Spielstand und Tordifferenz, Minute, Wetter, Flutlicht, Pokal und den Attributen von Schütze und Torwart.
+Den Ausgang von Angriffen, Flanken und Ecken erzählt der Textmodus erst, wenn er feststeht, und innerhalb eines Spiels
+wiederholt sich ein Satz erst, wenn sein Baustein ausgeschöpft ist.
 Das Ergebnis entscheidet die schnelle Engine; der Erzähler ändert keine Statistik. Wer einen eigenen Szenenbaum im
 Format `Textm.sav`/`Textm.txt` hat, kann ihn über `FMH_TEXTMODE_DIR` oder den Benutzerordner `FMH/textmode` einbinden.
 Details in [docs/textmodus.md](docs/textmodus.md).

@@ -35,6 +35,10 @@
                 "$ref": "#/properties/scenes/items/properties/when/properties/after",
                 "description": "Vorheriges Ereignis derselben Mannschaft in derselben Minute, z. B. cross oder counter."
               },
+              "afterOpponent": {
+                "$ref": "#/properties/scenes/items/properties/when/properties/afterOpponent",
+                "description": "Vorige Aktion des Gegners in derselben oder der Minute davor, z. B. cross, corner oder attack."
+              },
               "attrs": {
                 "$ref": "#/properties/scenes/items/properties/when/properties/attrs",
                 "description": "Attributgrenzen des handelnden Spielers."
@@ -55,6 +59,12 @@
                   "null"
                 ]
               },
+              "maxMargin": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
               "maxMinute": {
                 "type": [
                   "integer",
@@ -70,6 +80,13 @@
               "maxXg": {
                 "type": [
                   "number",
+                  "null"
+                ]
+              },
+              "minMargin": {
+                "description": "Tordifferenz aus Sicht der handelnden Mannschaft vor dem Ereignis (z. B. −2 = zwei Tore zurück).",
+                "type": [
+                  "integer",
                   "null"
                 ]
               },
@@ -98,6 +115,15 @@
                   "Level",
                   "Leading",
                   "Trailing",
+                  null
+                ]
+              },
+              "standing": {
+                "description": "Wer gerade führt, unabhängig von der Seite des Ereignisses (Anpfiff, Halbzeit, Abpfiff).",
+                "enum": [
+                  "Level",
+                  "Home",
+                  "Away",
                   null
                 ]
               },
@@ -139,6 +165,10 @@
                   "description": "Wahrscheinlichkeit, dass die Zeile erscheint (1 = immer).",
                   "type": "number"
                 },
+                "previous": {
+                  "description": "Zeile aus Sicht der vorigen Aktion des Gegners (Spieler, Mannschaft, Seite): erzählt deren Ausgang, der erst jetzt feststeht, etwa „Die Flanke von {p} ist zu lang“ zu Beginn des Gegenangriffs. Braucht afterOpponent.",
+                  "type": "boolean"
+                },
                 "text": {
                   "type": "string"
                 },
@@ -148,6 +178,10 @@
                     "after": {
                       "$ref": "#/properties/scenes/items/properties/when/properties/after",
                       "description": "Vorheriges Ereignis derselben Mannschaft in derselben Minute, z. B. cross oder counter."
+                    },
+                    "afterOpponent": {
+                      "$ref": "#/properties/scenes/items/properties/when/properties/afterOpponent",
+                      "description": "Vorige Aktion des Gegners in derselben oder der Minute davor, z. B. cross, corner oder attack."
                     },
                     "attrs": {
                       "$ref": "#/properties/scenes/items/properties/when/properties/attrs",
@@ -169,6 +203,12 @@
                         "null"
                       ]
                     },
+                    "maxMargin": {
+                      "type": [
+                        "integer",
+                        "null"
+                      ]
+                    },
                     "maxMinute": {
                       "type": [
                         "integer",
@@ -184,6 +224,13 @@
                     "maxXg": {
                       "type": [
                         "number",
+                        "null"
+                      ]
+                    },
+                    "minMargin": {
+                      "description": "Tordifferenz aus Sicht der handelnden Mannschaft vor dem Ereignis (z. B. −2 = zwei Tore zurück).",
+                      "type": [
+                        "integer",
                         "null"
                       ]
                     },
@@ -215,6 +262,15 @@
                         null
                       ]
                     },
+                    "standing": {
+                      "description": "Wer gerade führt, unabhängig von der Seite des Ereignisses (Anpfiff, Halbzeit, Abpfiff).",
+                      "enum": [
+                        "Level",
+                        "Home",
+                        "Away",
+                        null
+                      ]
+                    },
                     "weather": {
                       "$ref": "#/properties/scenes/items/properties/when/properties/weather"
                     }
@@ -238,6 +294,16 @@
             "properties": {
               "after": {
                 "description": "Vorheriges Ereignis derselben Mannschaft in derselben Minute, z. B. cross oder counter.",
+                "items": {
+                  "type": "string"
+                },
+                "type": [
+                  "array",
+                  "null"
+                ]
+              },
+              "afterOpponent": {
+                "description": "Vorige Aktion des Gegners in derselben oder der Minute davor, z. B. cross, corner oder attack.",
                 "items": {
                   "type": "string"
                 },
@@ -341,6 +407,12 @@
                   "null"
                 ]
               },
+              "maxMargin": {
+                "type": [
+                  "integer",
+                  "null"
+                ]
+              },
               "maxMinute": {
                 "type": [
                   "integer",
@@ -356,6 +428,13 @@
               "maxXg": {
                 "type": [
                   "number",
+                  "null"
+                ]
+              },
+              "minMargin": {
+                "description": "Tordifferenz aus Sicht der handelnden Mannschaft vor dem Ereignis (z. B. −2 = zwei Tore zurück).",
+                "type": [
+                  "integer",
                   "null"
                 ]
               },
@@ -384,6 +463,15 @@
                   "Level",
                   "Leading",
                   "Trailing",
+                  null
+                ]
+              },
+              "standing": {
+                "description": "Wer gerade führt, unabhängig von der Seite des Ereignisses (Anpfiff, Halbzeit, Abpfiff).",
+                "enum": [
+                  "Level",
+                  "Home",
+                  "Away",
                   null
                 ]
               },
