@@ -58,7 +58,12 @@ Die globalen Tasten sind die Standardbelegung aus `data/base/rules/ui.json` und 
 | Kader / Transfers | Enter oder Doppelklick: Spielerprofil, ←→ im Profil: voriger/nächster Spieler |
 | Taktik | A automatisch aufstellen, Esc Auswahl aufheben, Umschalt+Pfeile gewählten Platz verschieben |
 | Liga | T Tabelle ↔ Torjäger |
-| Spiel | Leertaste/P Pause, W Wechsel, T Taktik, Z Zuruf, M Kommentar/Ticker |
+| Spiel | Leertaste/P Pause, W Wechsel, T Taktik, Z Zuruf, M Kommentar/Ticker (im Szenenmodus ohne Wirkung) |
+
+Hat eine Schaltfläche, ein Umschalter, eine Aufklappliste, ein Menü oder ein Regler den Fokus, lösen Enter und
+Leertaste dieses Element aus statt des Kürzels der Seite. Ein offener Dialog hält den Fokus; die Seite dahinter ist
+gesperrt, und nach dem Schließen kehrt der Fokus zurück. Wer das Fenster mit ungespeichertem Fortschritt schließt,
+wird gefragt: speichern und beenden, ohne Speichern beenden oder weiterspielen.
 
 Die Farbcodierung der Attribute steht zusätzlich als Symbol daneben (▼ 1–5, · 6–10, ▲ 11–15, ★ 16–20).
 Farbthemen: Klassik, Hell, Terminal, Hoher Kontrast.

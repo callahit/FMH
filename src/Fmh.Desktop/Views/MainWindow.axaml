@@ -10,9 +10,10 @@
   <!-- Skalierung der ganzen Oberfläche (Einstellung Schriftgröße) -->
   <LayoutTransformControl LayoutTransform="{Binding UiTransform}">
     <Grid>
-      <ContentControl Content="{Binding Screen}" />
+      <!-- Bei offenem Dialog ist der Bildschirm dahinter gesperrt: Tab bleibt im Dialog. -->
+      <ContentControl Content="{Binding Screen}" IsEnabled="{Binding !HasDialog}" />
       <Border IsVisible="{Binding HasDialog}" Background="#99000000">
-        <ContentControl Content="{Binding Dialog}" HorizontalAlignment="Center" VerticalAlignment="Center" />
+        <ContentControl x:Name="DialogHost" Content="{Binding Dialog}" HorizontalAlignment="Center" VerticalAlignment="Center" />
       </Border>
     </Grid>
   </LayoutTransformControl>

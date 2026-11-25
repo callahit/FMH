@@ -76,9 +76,22 @@ public sealed class AppState
         set
         {
             _session = value;
+            MarkSaved();
             ApplyCurrency();
         }
     }
+
+    private (DateOnly, int, int, int)? _savedState;
+
+    /// <summary>Stand der Welt, an dem sich Fortschritt ablesen lässt (Tag, Nachrichten, Abschlüsse, Transfers).</summary>
+    private (DateOnly, int, int, int)? Progress() =>
+        _session?.World is { } w ? (w.Date, w.Messages.Count, w.NextDealId, w.Transfers.Count) : null;
+
+    /// <summary>Nach Laden, neuem Spiel oder Speichern gilt der Stand als gesichert.</summary>
+    public void MarkSaved() => _savedState = Progress();
+
+    /// <summary>Ein Spiel läuft und ist seit dem letzten Speichern weitergelaufen (Rückfrage beim Schließen).</summary>
+    public bool HasUnsavedProgress => _session is not null && Progress() != _savedState;
 
     /// <summary>Kurs einer Währung für die Anzeige: eigener Kurs des Profils, sonst der Standardkurs aus den Daten.</summary>
     public double RateOf(string code) =>
@@ -95,10 +108,16 @@ public sealed class AppState
     {
         var s = Session ?? throw new InvalidOperationException("Kein Spiel geladen.");
         s.SyncRng();
-        if (s.World.Rules.Ironman) return SaveGame.IronmanSave(s.World, SaveDirectory);
+        if (s.World.Rules.Ironman)
+        {
+            var ironman = SaveGame.IronmanSave(s.World, SaveDirectory);
+            MarkSaved();
+            return ironman;
+        }
         var name = s.HumanClub.Key + "-" + new string(s.HumanManager.Name.ToLowerInvariant().Select(c => char.IsLetterOrDigit(c) ? c : '_').ToArray());
         var path = Path.Combine(SaveDirectory, name + SaveGame.Extension);
         SaveGame.Save(s.World, path);
+        MarkSaved();
         return path;
     }
 
@@ -106,6 +125,8 @@ public sealed class AppState
     {
         var s = Session ?? throw new InvalidOperationException("Kein Spiel geladen.");
         s.SyncRng();
-        return SaveGame.Autosave(s.World, SaveDirectory);
+        var path = SaveGame.Autosave(s.World, SaveDirectory);
+        MarkSaved();
+        return path;
     }
 }

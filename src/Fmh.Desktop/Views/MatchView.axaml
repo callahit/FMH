@@ -303,7 +303,7 @@
             <Button Classes="primary" Content="{s:L match.secondHalf}" Command="{Binding SecondHalfCommand}" IsVisible="{Binding IsHalfTime}" />
             <TextBlock Text="{s:L match.tempo}" Classes="muted" VerticalAlignment="Center" Margin="10,0,0,0" />
             <Slider Width="150" Minimum="1" Maximum="5" TickFrequency="1" IsSnapToTickEnabled="True" Value="{Binding Speed}" VerticalAlignment="Center" />
-            <ToggleButton IsChecked="{Binding TickerMode}" Content="{s:L match.tickerOnly}" Command="{Binding ToggleTickerCommand}" />
+            <ToggleButton IsChecked="{Binding TickerMode, Mode=OneWay}" IsEnabled="{Binding CanToggleTicker}" Content="{s:L match.tickerOnly}" Command="{Binding ToggleTickerCommand}" />
           </StackPanel>
           <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8" Margin="18,0">
             <Button Command="{Binding SubstituteCommand}">
