@@ -269,4 +269,59 @@ public partial class UiTests
         Assert.False(match.TickerMode);
         Assert.False(toggle.IsChecked);
     }
+    /// <summary>Offener Dialog: Fokus im Dialog, der Bildschirm dahinter ist gesperrt; danach kehrt der Fokus zurück.</summary>
+    [AvaloniaFact]
+    public void DialogTrapsFocusAndRestoresItAfterwards()
+    {
+        var (w, vm) = Open();
+        var start = Assert.IsType<StartViewModel>(vm.Screen);
+        var newGame = w.GetVisualDescendants().OfType<Button>().First(b => b.Command == start.NewGameCommand);
+        newGame.Focus();
+        Pump();
+        vm.ShowDialog(new MessageDialogViewModel("Hinweis", new[] { "Zeile" }));
+        Pump();
+        Assert.False(newGame.IsEffectivelyEnabled);
+        var focused = w.FocusManager!.GetFocusedElement() as Avalonia.Visual;
+        Assert.NotNull(focused);
+        Assert.Contains(focused!.GetVisualAncestors(), a => a is ContentControl { Name: "DialogHost" });
+        vm.CloseDialog();
+        Pump();
+        Assert.True(newGame.IsEffectivelyEnabled);
+        Assert.Same(newGame, w.FocusManager.GetFocusedElement());
+    }
+
+    /// <summary>Schließen mit ungespeichertem Fortschritt fragt nach; „Weiterspielen“ lässt das Fenster offen.</summary>
+    [AvaloniaFact]
+    public void ClosingWithUnsavedProgressAsksFirst()
+    {
+        var (w, vm) = Open();
+        var shell = StartGame(vm);
+        Assert.False(AppState.Current.HasUnsavedProgress); // neues Spiel: noch nichts verloren
+        var session = AppState.Current.Session!;
+        var day = session.World.Date;
+        for (var i = 0; i < 50 && session.World.Date == day; i++)
+        {
+            var r = session.Advance(1);
+            if (r.Reason == StopReason.Decision) session.DelegateDecisions();
+            if (r.Reason == StopReason.HumanMatch && r.Fixture is { } f) session.PlayInstant(f);
+        }
+        Assert.True(AppState.Current.HasUnsavedProgress);
+
+        w.Close();
+        Pump();
+        Assert.True(w.IsVisible);
+        var ask = Assert.IsType<ChoiceDialogViewModel>(vm.Dialog);
+        Assert.Equal(3, ask.Options.Count);
+        ask.ChooseCommand.Execute(ask.Options[2]); // weiterspielen
+        Pump();
+        Assert.True(w.IsVisible);
+        Assert.Null(vm.Dialog);
+
+        // Nach dem Speichern schließt das Fenster ohne Rückfrage.
+        shell.SaveCommand.Execute(null);
+        Assert.False(AppState.Current.HasUnsavedProgress);
+        w.Close();
+        Pump();
+        Assert.False(w.IsVisible);
+    }
 }
