@@ -120,6 +120,10 @@ public static class SqliteStore
     public static World Load(string path)
     {
         if (!File.Exists(path)) throw new FileNotFoundException("Spielstand nicht gefunden.", path);
+        bool migrate;
+        using (var check = Open(path, readOnly: true)) migrate = NeedsMigration(check);
+        // Vor dem Anheben eine Kopie des alten Stands: Geht beim Migrieren etwas schief, bleibt das Original erhalten.
+        if (migrate) BackupBeforeMigration(path);
         using (var con = Open(path))
         {
             Migrate(con);
@@ -158,6 +162,23 @@ public static class SqliteStore
                 Exec(con, tx, $"INSERT OR REPLACE INTO meta (key, value) VALUES ('{key}', '{s.Version.ToString(Inv)}')");
         }
         tx.Commit();
+    }
+
+    /// <summary>Ob <see cref="Migrate"/> etwas ändern würde (ältere globale Version oder ein Abschnitt ohne/mit älterer Version).</summary>
+    public static bool NeedsMigration(SqliteConnection con)
+    {
+        if (ReadSchemaVersion(con) != SchemaVersion) return true;
+        var meta = ReadMetaTable(con);
+        return Sections.Any(s => !meta.TryGetValue(SectionKey + s.ModuleId, out var v) || v != s.Version.ToString(Inv));
+    }
+
+    /// <summary>Kopie neben dem Spielstand (<c>name.fmh.&lt;Zeitpunkt&gt;.bak</c>, erscheint nicht in der Liste der Spielstände).</summary>
+    public static string BackupBeforeMigration(string path)
+    {
+        SqliteConnection.ClearAllPools();
+        var backup = $"{path}.{DateTime.Now.ToString("yyyyMMdd-HHmmss", Inv)}.bak";
+        File.Copy(path, backup, overwrite: true);
+        return backup;
     }
 
     private static int ReadSchemaVersion(SqliteConnection con)

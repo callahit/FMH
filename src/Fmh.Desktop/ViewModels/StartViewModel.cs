@@ -71,7 +71,8 @@ public sealed partial class StartViewModel : ViewModelBase
             State.Session = new GameSession(world, Data, State.Engine);
             _main.Navigate(new ShellViewModel(_main));
         }
-        catch (Exception ex) when (ex is InvalidDataException or IOException or Microsoft.Data.Sqlite.SqliteException or FormatException)
+        catch (Exception ex) when (ex is InvalidDataException or IOException or UnauthorizedAccessException or Microsoft.Data.Sqlite.SqliteException
+                                       or FormatException or System.Text.Json.JsonException)
         {
             _main.ShowDialog(new MessageDialogViewModel(T["load.error"], new[] { ex.Message }));
         }
